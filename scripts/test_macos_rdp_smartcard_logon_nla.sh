@@ -9,4 +9,4 @@ mkdir -p log
 ./client/Mac/cli/MacFreeRDP.app/Contents/MacOS/MacFreeRDP /v:${RDP_SERVER} /u:${RDP_USER} /d:${RDP_DOMAIN} /smartcard /smartcard-logon
 
 # check logs
-grep -e 'PCSC_SCardStatus_Internal\|smartcard_trace_status_return' log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME} |head -15
+grep -e 'PCSC_SCardStatus_Internal\|smartcard_trace_status_return' log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME} | tail -15

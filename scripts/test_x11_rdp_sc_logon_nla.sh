@@ -14,4 +14,4 @@ mkdir -p log
 # ./client/X11/xfreerdp /v:${RDP_SERVER} /d:${RDP_DOMAIN} /smartcard /smartcard-logon /pkcs11-module:/usr/local/lib/libiaspkcs11.so /pkinit-anchors:/etc/chain1.pem,/etc/chain2.pem /csp:'Middleware IAS ECC Cryptographic Provider'
 
 # check logs
-grep -e 'PCSC_SCardStatus_Internal\|smartcard_trace_status_return' log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME} |head -15
+grep -e 'PCSC_SCardStatus_Internal\|smartcard_trace_status_return' log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME} | tail -15
