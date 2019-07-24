@@ -1,0 +1,57 @@
+# macOS FreeRDP smartcard logon support build notes
+
+# General
+# cssp smartcard_creds PR:
+# https://github.com/FreeRDP/FreeRDP/pull/5195
+
+# clone and patch informatimago:cssp-smartcard branch
+git clone https://github.com/informatimago/FreeRDP
+cd FreeRDP
+git checkout cssp-smartcard
+patch -p1 < ../bmiklautz_pkcs11h_gssapi.diff
+
+# install freerdp macos dependencies
+brew install opensc pkcs11-helper ffmpeg krb5
+
+# add brew krb5 to path and compiler flags
+# FIXME: build against official macOS kerberos/use pkgconfig
+export PATH="/usr/local/opt/krb5/bin:$PATH"
+export PATH="/usr/local/opt/krb5/sbin:$PATH"
+export LDFLAGS="-L/usr/local/opt/krb5/lib"
+export CPPFLAGS="-I/usr/local/opt/krb5/include"
+
+# set pkgconfig path to brew openssl
+export PKG_CONFIG_PATH=/usr/local/opt/openssl/lib/pkgconfig
+
+# clean up cmake cached files
+find . -name CMakeCache.txt | xargs rm
+find . -name CMakeFiles | xargs rm -r
+
+# generate makefiles
+cmake -DWITH_PCSC=ON -DWITH-FFMPEG=ON -DWITH_PKCS11H=ON -DWITH_GSSAPI=ON .
+
+# for initial testing vs windows rdp
+# cmake -DWITH_PCSC=ON -DWITH-FFMPEG=ON -DWITH_PKCS11H=OFF -DWITH_GSSAPI=OFF .
+
+# build project
+cmake --build .
+
+# get buildconfig output
+./client/Mac/cli/MacFreeRDP.app/Contents/MacOS/MacFreeRDP /buildconfig
+
+
+# macOS kerberos configuration
+https://github.com/Microsoft/vscode-mssql/wiki/How-to-enable-Integrated-Authentication-on-macOS-and-Linux-using-Kerberos
+
+DC: winsrv2016-1.test.local
+Domain: TEST.LOCAL
+
+sudo vi /etc/krb5.conf
+
+[libdefaults]
+  default_realm = TEST.LOCAL
+
+[realms]
+TEST.LOCAL = {
+   kdc = winsrv2016-1.test.local
+}
