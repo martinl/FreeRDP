@@ -1,0 +1,65 @@
+Install DC
+
+Download Windows Server 2016 Eval ISO
+Install VM, 2xCPU, 4GB RAM, 100GB HDD
+Install VM tools
+Install Windows Updates
+Set static ip, gw, dns
+Set computer name: winsrv2016-1.test.local
+Restart
+Enable RDP, NLA on
+
+Install AD Domain Services Role
+Restart
+Promote Server to Domain Controller, new Forest test.local
+Set DSRM Password
+
+Install AD CS role to issue DC certificate
+Set up Enterprise CA
+Create copy of Smartcard Logon template, allow any subject and require manager approval
+
+Create Smartcard Logon GPO
+https://support.microsoft.com/en-us/help/281245/guidelines-for-enabling-smart-card-logon-with-third-party-certificatio
+https://support.yubico.com/support/solutions/articles/15000006456-yubikey-smart-card-deployment-guide
+https://www.id.ee/public/1901_-_ID_kaardi_login_Windows_domeenis.pdf
+
+Import smartcard root ca to AD NTAuth certstore
+certutil -f root-ca.cer NTAuthCA
+
+https://support.microsoft.com/en-us/help/295663/how-to-import-third-party-certification-authority-ca-certificates-into
+
+Test FreeRDP 
+./client/X11/xfreerdp /v:ip /u:Administrator
+
+Insert Yubikey
+
+Install Yubikey manager
+
+tar xvzf yubikey-manager-qt-1.1.2.tar.gz
+
+sudo apt install \
+      libqt5svg5-dev \
+      python3-pip \
+      python3-yubikey-manager \
+      qml-module-io-thp-pyotherside \
+      qml-module-qt-labs-calendar \
+      qml-module-qt-labs-folderlistmodel \
+      qml-module-qt-labs-platform \
+      qml-module-qt-labs-settings \
+      qml-module-qtgraphicaleffects \
+      qml-module-qtquick-controls2 \
+      qml-module-qtquick-dialogs \
+      qml-module-qtquick-layouts \
+      qml-module-qtquick-window2 \
+      qml-module-qtquick2 \
+      qt5-default \
+      qtbase5-dev \
+      qtdeclarative5-dev \
+      qtquickcontrols2-5-dev
+
+cd yubikey-manager
+qmake && make
+./ykman-gui/ykman-gui &
+
+https://developers.yubico.com/PIV/Introduction/YubiKey_and_PIV.html
+
