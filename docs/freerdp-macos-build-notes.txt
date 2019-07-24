@@ -28,13 +28,16 @@ find . -name CMakeCache.txt | xargs rm
 find . -name CMakeFiles | xargs rm -r
 
 # generate makefiles
-cmake -DWITH_PCSC=ON -DWITH-FFMPEG=ON -DWITH_PKCS11H=ON -DWITH_GSSAPI=ON .
+# cmake -DWITH_PCSC=ON -DWITH-FFMPEG=ON -DWITH_PKCS11H=ON -DWITH_GSSAPI=ON .
 
 # for initial testing vs windows rdp
 # cmake -DWITH_PCSC=ON -DWITH-FFMPEG=ON -DWITH_PKCS11H=OFF -DWITH_GSSAPI=OFF .
 
 # build project
 cmake --build .
+
+# debug build with unit tests
+cmake -DWITH_SSE2=ON -DWITH_GSSAPI=ON -DWITH_PKCS11H=ON -DWITH_KERBEROS=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DWITH_CUNIT=ON -DWITH_DEBUG_NTLM=ON -DWITH_DEBUG_NEGO=ON -DWITH_DEBUG_NLA=ON -DWITH_DEBUG_SCARD=ON . && make && make CTEST_OUTPUT_ON_FAILURE=1 test
 
 # get buildconfig output
 ./client/Mac/cli/MacFreeRDP.app/Contents/MacOS/MacFreeRDP /buildconfig
