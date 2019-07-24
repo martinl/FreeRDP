@@ -5,6 +5,8 @@ export WLOG_FILEAPPENDER_OUTPUT_FILE_PATH=log
 export WLOG_FILEAPPENDER_OUTPUT_FILE_NAME=freerdp-x11-smartcard-logon-nla.log
 export WLOG_LEVEL=DEBUG
 
+mkdir -p log
+
 # smartcard logon with NLA
 ./client/X11/xfreerdp /v:${RDP_SERVER} /d:${RDP_DOMAIN} /smart-sizing /smartcard /smartcard-logon /pkcs11-module:/usr/lib/x86_64-linux-gnu/opensc-pkcs11.so -sec-tls -sec-rdp
 

@@ -5,6 +5,8 @@ export WLOG_FILEAPPENDER_OUTPUT_FILE_PATH=log
 export WLOG_FILEAPPENDER_OUTPUT_FILE_NAME=freerdp-x11-smartcard-logon-no-nla.log
 export WLOG_LEVEL=DEBUG
 
+mkdir -p log
+
 # smartcardlogon without NLA
 ./client/X11/xfreerdp /v:${RDP_SERVER} /u:${RDP_USER} /smart-sizing /smartcard /smartcard-logon -sec-nla
 

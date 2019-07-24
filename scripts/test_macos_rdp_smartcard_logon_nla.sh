@@ -3,6 +3,9 @@ export WLOG_APPENDER=FILE
 export WLOG_FILEAPPENDER_OUTPUT_FILE_PATH=log
 export WLOG_FILEAPPENDER_OUTPUT_FILE_NAME=freerdp-macos-smartcard-logon-nla.log
 export WLOG_LEVEL=DEBUG
+
+mkdir -p log
+
 ./client/Mac/cli/MacFreeRDP.app/Contents/MacOS/MacFreeRDP /v:${RDP_SERVER} /u:${RDP_USER} /d:${RDP_DOMAIN} /smartcard /smartcard-logon
 
 # check logs
