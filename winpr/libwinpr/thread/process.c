@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/handle.h>
@@ -53,38 +53,39 @@
 
 #ifndef _WIN32
 
-#include <winpr/crt.h>
-#include <winpr/path.h>
-#include <winpr/environment.h>
+#	include <winpr/crt.h>
+#	include <winpr/path.h>
+#	include <winpr/environment.h>
 
-#include <grp.h>
+#	include <grp.h>
 
-#include <signal.h>
+#	include <signal.h>
 
-#include "thread.h"
+#	include "thread.h"
 
-#include "../security/security.h"
+#	include "../security/security.h"
 
-#ifndef NSIG
-#ifdef SIGMAX
-#define NSIG SIGMAX
-#else
-#define NSIG 64
-#endif
-#endif
+#	ifndef NSIG
+#		ifdef SIGMAX
+#			define NSIG SIGMAX
+#		else
+#			define NSIG 64
+#		endif
+#	endif
 
 /**
- * If the file name does not contain a directory path, the system searches for the executable file in the following sequence:
+ * If the file name does not contain a directory path, the system searches for the executable file
+ * in the following sequence:
  *
  * 1) The directory from which the application loaded.
  * 2) The current directory for the parent process.
- * 3) The 32-bit Windows system directory. Use the GetSystemDirectory function to get the path of this directory.
- * 4) The 16-bit Windows system directory. There is no function that obtains the path of this directory,
- *    but it is searched. The name of this directory is System.
- * 5) The Windows directory. Use the GetWindowsDirectory function to get the path of this directory.
- * 6) The directories that are listed in the PATH environment variable. Note that this function
- *    does not search the per-application path specified by the App Paths registry key. To include
- *    this per-application path in the search sequence, use the ShellExecute function.
+ * 3) The 32-bit Windows system directory. Use the GetSystemDirectory function to get the path of
+ * this directory. 4) The 16-bit Windows system directory. There is no function that obtains the
+ * path of this directory, but it is searched. The name of this directory is System. 5) The Windows
+ * directory. Use the GetWindowsDirectory function to get the path of this directory. 6) The
+ * directories that are listed in the PATH environment variable. Note that this function does not
+ * search the per-application path specified by the App Paths registry key. To include this
+ * per-application path in the search sequence, use the ShellExecute function.
  */
 
 static char* FindApplicationPath(char* application)
@@ -107,7 +108,7 @@ static char* FindApplicationPath(char* application)
 	if (!nSize)
 		return _strdup(application);
 
-	lpSystemPath = (LPSTR) malloc(nSize);
+	lpSystemPath = (LPSTR)malloc(nSize);
 
 	if (!lpSystemPath)
 		return NULL;
@@ -142,11 +143,11 @@ static char* FindApplicationPath(char* application)
 static HANDLE CreateProcessHandle(pid_t pid);
 static BOOL ProcessHandleCloseHandle(HANDLE handle);
 
-BOOL _CreateProcessExA(HANDLE hToken, DWORD dwLogonFlags,
-                       LPCSTR lpApplicationName, LPSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes,
-                       LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags,
-                       LPVOID lpEnvironment,
-                       LPCSTR lpCurrentDirectory, LPSTARTUPINFOA lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
+BOOL _CreateProcessExA(HANDLE hToken, DWORD dwLogonFlags, LPCSTR lpApplicationName,
+                       LPSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes,
+                       LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
+                       DWORD dwCreationFlags, LPVOID lpEnvironment, LPCSTR lpCurrentDirectory,
+                       LPSTARTUPINFOA lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
 {
 	pid_t pid;
 	int numArgs;
@@ -168,7 +169,7 @@ BOOL _CreateProcessExA(HANDLE hToken, DWORD dwLogonFlags,
 	if (!pArgs)
 		return FALSE;
 
-	token = (WINPR_ACCESS_TOKEN*) hToken;
+	token = (WINPR_ACCESS_TOKEN*)hToken;
 
 	if (lpEnvironment)
 	{
@@ -207,9 +208,9 @@ BOOL _CreateProcessExA(HANDLE hToken, DWORD dwLogonFlags,
 	if (pid == 0)
 	{
 		/* child process */
-#ifndef __sun
+#	ifndef __sun
 		int maxfd;
-#endif
+#	endif
 		int fd;
 		int sig;
 		sigset_t set;
@@ -246,37 +247,37 @@ BOOL _CreateProcessExA(HANDLE hToken, DWORD dwLogonFlags,
 				dup2(handle_fd, STDIN_FILENO);
 		}
 
-#ifdef __sun
+#	ifdef __sun
 		closefrom(3);
-#else
-#ifdef F_MAXFD // on some BSD derivates
+#	else
+#		ifdef F_MAXFD // on some BSD derivates
 		maxfd = fcntl(0, F_MAXFD);
-#else
+#		else
 		maxfd = sysconf(_SC_OPEN_MAX);
-#endif
+#		endif
 
 		for (fd = 3; fd < maxfd; fd++)
 			close(fd);
 
-#endif // __sun
+#	endif // __sun
 
 		if (token)
 		{
 			if (token->GroupId)
 			{
-				int rc = setgid((gid_t) token->GroupId);
+				int rc = setgid((gid_t)token->GroupId);
 
 				if (rc < 0)
 				{
 				}
 				else
 				{
-					initgroups(token->Username, (gid_t) token->GroupId);
+					initgroups(token->Username, (gid_t)token->GroupId);
 				}
 			}
 
 			if (token->UserId)
-				setuid((uid_t) token->UserId);
+				setuid((uid_t)token->UserId);
 		}
 
 		/* TODO: add better cwd handling and error checking */
@@ -311,8 +312,8 @@ BOOL _CreateProcessExA(HANDLE hToken, DWORD dwLogonFlags,
 
 	lpProcessInformation->hProcess = process;
 	lpProcessInformation->hThread = thread;
-	lpProcessInformation->dwProcessId = (DWORD) pid;
-	lpProcessInformation->dwThreadId = (DWORD) pid;
+	lpProcessInformation->dwProcessId = (DWORD)pid;
+	lpProcessInformation->dwThreadId = (DWORD)pid;
 	ret = TRUE;
 finish:
 
@@ -348,77 +349,74 @@ finish:
 
 BOOL CreateProcessA(LPCSTR lpApplicationName, LPSTR lpCommandLine,
                     LPSECURITY_ATTRIBUTES lpProcessAttributes,
-                    LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags,
-                    LPVOID lpEnvironment,
-                    LPCSTR lpCurrentDirectory, LPSTARTUPINFOA lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
+                    LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
+                    DWORD dwCreationFlags, LPVOID lpEnvironment, LPCSTR lpCurrentDirectory,
+                    LPSTARTUPINFOA lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
 {
-	return _CreateProcessExA(NULL, 0,
-	                         lpApplicationName, lpCommandLine, lpProcessAttributes,
+	return _CreateProcessExA(NULL, 0, lpApplicationName, lpCommandLine, lpProcessAttributes,
 	                         lpThreadAttributes, bInheritHandles, dwCreationFlags, lpEnvironment,
 	                         lpCurrentDirectory, lpStartupInfo, lpProcessInformation);
 }
 
 BOOL CreateProcessW(LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
                     LPSECURITY_ATTRIBUTES lpProcessAttributes,
-                    LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags,
-                    LPVOID lpEnvironment,
-                    LPCWSTR lpCurrentDirectory, LPSTARTUPINFOW lpStartupInfo,
-                    LPPROCESS_INFORMATION lpProcessInformation)
+                    LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
+                    DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
+                    LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
 {
 	return TRUE;
 }
 
 BOOL CreateProcessAsUserA(HANDLE hToken, LPCSTR lpApplicationName, LPSTR lpCommandLine,
                           LPSECURITY_ATTRIBUTES lpProcessAttributes,
-                          LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags,
-                          LPVOID lpEnvironment,
-                          LPCSTR lpCurrentDirectory, LPSTARTUPINFOA lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
+                          LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
+                          DWORD dwCreationFlags, LPVOID lpEnvironment, LPCSTR lpCurrentDirectory,
+                          LPSTARTUPINFOA lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
 {
-	return _CreateProcessExA(hToken, 0,
-	                         lpApplicationName, lpCommandLine, lpProcessAttributes,
+	return _CreateProcessExA(hToken, 0, lpApplicationName, lpCommandLine, lpProcessAttributes,
 	                         lpThreadAttributes, bInheritHandles, dwCreationFlags, lpEnvironment,
 	                         lpCurrentDirectory, lpStartupInfo, lpProcessInformation);
 }
 
 BOOL CreateProcessAsUserW(HANDLE hToken, LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
                           LPSECURITY_ATTRIBUTES lpProcessAttributes,
-                          LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags,
-                          LPVOID lpEnvironment,
-                          LPCWSTR lpCurrentDirectory, LPSTARTUPINFOW lpStartupInfo,
-                          LPPROCESS_INFORMATION lpProcessInformation)
+                          LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles,
+                          DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
+                          LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
 {
 	return TRUE;
 }
 
 BOOL CreateProcessWithLogonA(LPCSTR lpUsername, LPCSTR lpDomain, LPCSTR lpPassword,
-                             DWORD dwLogonFlags,
-                             LPCSTR lpApplicationName, LPSTR lpCommandLine, DWORD dwCreationFlags, LPVOID lpEnvironment,
-                             LPCSTR lpCurrentDirectory, LPSTARTUPINFOA lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
+                             DWORD dwLogonFlags, LPCSTR lpApplicationName, LPSTR lpCommandLine,
+                             DWORD dwCreationFlags, LPVOID lpEnvironment, LPCSTR lpCurrentDirectory,
+                             LPSTARTUPINFOA lpStartupInfo,
+                             LPPROCESS_INFORMATION lpProcessInformation)
 {
 	return TRUE;
 }
 
 BOOL CreateProcessWithLogonW(LPCWSTR lpUsername, LPCWSTR lpDomain, LPCWSTR lpPassword,
-                             DWORD dwLogonFlags,
-                             LPCWSTR lpApplicationName, LPWSTR lpCommandLine, DWORD dwCreationFlags, LPVOID lpEnvironment,
+                             DWORD dwLogonFlags, LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
+                             DWORD dwCreationFlags, LPVOID lpEnvironment,
                              LPCWSTR lpCurrentDirectory, LPSTARTUPINFOW lpStartupInfo,
                              LPPROCESS_INFORMATION lpProcessInformation)
 {
 	return TRUE;
 }
 
-BOOL CreateProcessWithTokenA(HANDLE hToken, DWORD dwLogonFlags,
-                             LPCSTR lpApplicationName, LPSTR lpCommandLine, DWORD dwCreationFlags, LPVOID lpEnvironment,
-                             LPCSTR lpCurrentDirectory, LPSTARTUPINFOA lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
+BOOL CreateProcessWithTokenA(HANDLE hToken, DWORD dwLogonFlags, LPCSTR lpApplicationName,
+                             LPSTR lpCommandLine, DWORD dwCreationFlags, LPVOID lpEnvironment,
+                             LPCSTR lpCurrentDirectory, LPSTARTUPINFOA lpStartupInfo,
+                             LPPROCESS_INFORMATION lpProcessInformation)
 {
-	return _CreateProcessExA(NULL, 0,
-	                         lpApplicationName, lpCommandLine, NULL,
-	                         NULL, FALSE, dwCreationFlags, lpEnvironment,
-	                         lpCurrentDirectory, lpStartupInfo, lpProcessInformation);
+	return _CreateProcessExA(NULL, 0, lpApplicationName, lpCommandLine, NULL, NULL, FALSE,
+	                         dwCreationFlags, lpEnvironment, lpCurrentDirectory, lpStartupInfo,
+	                         lpProcessInformation);
 }
 
-BOOL CreateProcessWithTokenW(HANDLE hToken, DWORD dwLogonFlags,
-                             LPCWSTR lpApplicationName, LPWSTR lpCommandLine, DWORD dwCreationFlags, LPVOID lpEnvironment,
+BOOL CreateProcessWithTokenW(HANDLE hToken, DWORD dwLogonFlags, LPCWSTR lpApplicationName,
+                             LPWSTR lpCommandLine, DWORD dwCreationFlags, LPVOID lpEnvironment,
                              LPCWSTR lpCurrentDirectory, LPSTARTUPINFOW lpStartupInfo,
                              LPPROCESS_INFORMATION lpProcessInformation)
 {
@@ -427,7 +425,7 @@ BOOL CreateProcessWithTokenW(HANDLE hToken, DWORD dwLogonFlags,
 
 VOID ExitProcess(UINT uExitCode)
 {
-	exit((int) uExitCode);
+	exit((int)uExitCode);
 }
 
 BOOL GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode)
@@ -440,7 +438,7 @@ BOOL GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode)
 	if (!lpExitCode)
 		return FALSE;
 
-	process = (WINPR_PROCESS*) hProcess;
+	process = (WINPR_PROCESS*)hProcess;
 	*lpExitCode = process->dwExitCode;
 	return TRUE;
 }
@@ -452,24 +450,24 @@ HANDLE _GetCurrentProcess(VOID)
 
 DWORD GetCurrentProcessId(VOID)
 {
-	return ((DWORD) getpid());
+	return ((DWORD)getpid());
 }
 
 DWORD GetProcessId(HANDLE Process)
 {
 	WINPR_PROCESS* process;
-	process = (WINPR_PROCESS*) Process;
+	process = (WINPR_PROCESS*)Process;
 
 	if (!process)
 		return 0;
 
-	return (DWORD) process->pid;
+	return (DWORD)process->pid;
 }
 
 BOOL TerminateProcess(HANDLE hProcess, UINT uExitCode)
 {
 	WINPR_PROCESS* process;
-	process = (WINPR_PROCESS*) hProcess;
+	process = (WINPR_PROCESS*)hProcess;
 
 	if (!process || (process->pid <= 0))
 		return FALSE;
@@ -480,17 +478,16 @@ BOOL TerminateProcess(HANDLE hProcess, UINT uExitCode)
 	return TRUE;
 }
 
-
 static BOOL ProcessHandleCloseHandle(HANDLE handle)
 {
-	WINPR_PROCESS* process = (WINPR_PROCESS*) handle;
+	WINPR_PROCESS* process = (WINPR_PROCESS*)handle;
 	free(process);
 	return TRUE;
 }
 
 static BOOL ProcessHandleIsHandle(HANDLE handle)
 {
-	WINPR_PROCESS* process = (WINPR_PROCESS*) handle;
+	WINPR_PROCESS* process = (WINPR_PROCESS*)handle;
 
 	if (!process || process->Type != HANDLE_TYPE_PROCESS)
 	{
@@ -513,34 +510,31 @@ static int ProcessGetFd(HANDLE handle)
 	return -1;
 }
 
-static HANDLE_OPS ops =
-{
-	ProcessHandleIsHandle,
-	ProcessHandleCloseHandle,
-	ProcessGetFd,
-	NULL, /* CleanupHandle */
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+static HANDLE_OPS ops = { ProcessHandleIsHandle,
+	                      ProcessHandleCloseHandle,
+	                      ProcessGetFd,
+	                      NULL, /* CleanupHandle */
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL };
 
 HANDLE CreateProcessHandle(pid_t pid)
 {
 	WINPR_PROCESS* process;
-	process = (WINPR_PROCESS*) calloc(1, sizeof(WINPR_PROCESS));
+	process = (WINPR_PROCESS*)calloc(1, sizeof(WINPR_PROCESS));
 
 	if (!process)
 		return NULL;
@@ -552,4 +546,3 @@ HANDLE CreateProcessHandle(pid_t pid)
 }
 
 #endif
-

@@ -25,34 +25,41 @@
 #include <uwac/uwac-tools.h>
 
 /** @brief */
-struct uwac_touch_automata {
+struct uwac_touch_automata
+{
 	struct wl_array tp;
 };
 
-void UwacTouchAutomataInit(UwacTouchAutomata *automata) {
+void UwacTouchAutomataInit(UwacTouchAutomata* automata)
+{
 	wl_array_init(&automata->tp);
 }
 
-void UwacTouchAutomataReset(UwacTouchAutomata *automata) {
+void UwacTouchAutomataReset(UwacTouchAutomata* automata)
+{
 	automata->tp.size = 0;
 }
 
-bool UwacTouchAutomataInjectEvent(UwacTouchAutomata *automata, UwacEvent *event) {
+bool UwacTouchAutomataInjectEvent(UwacTouchAutomata* automata, UwacEvent* event)
+{
+	UwacTouchPoint* tp;
 
-	UwacTouchPoint *tp;
-
-	switch (event->type) {
+	switch (event->type)
+	{
 	case UWAC_EVENT_TOUCH_FRAME_BEGIN:
 		break;
 
-	case UWAC_EVENT_TOUCH_UP: {
-		UwacTouchUp *touchUp = &event->touchUp;
+	case UWAC_EVENT_TOUCH_UP:
+	{
+		UwacTouchUp* touchUp = &event->touchUp;
 		size_t toMove = automata->tp.size - sizeof(UwacTouchPoint);
-
-		wl_array_for_each(tp, &automata->tp) {
-			if ((int64_t)tp->id == touchUp->id) {
+		wl_array_for_each(tp, &automata->tp)
+		{
+			if ((int64_t)tp->id == touchUp->id)
+			{
 				if (toMove)
-					memmove(tp, tp+1, toMove);
+					memmove(tp, tp + 1, toMove);
+
 				return true;
 			}
 
@@ -61,18 +68,20 @@ bool UwacTouchAutomataInjectEvent(UwacTouchAutomata *automata, UwacEvent *event)
 		break;
 	}
 
-	case UWAC_EVENT_TOUCH_DOWN: {
-		UwacTouchDown *touchDown = &event->touchDown;
-
-		wl_array_for_each(tp, &automata->tp) {
-			if ((int64_t)tp->id == touchDown->id) {
+	case UWAC_EVENT_TOUCH_DOWN:
+	{
+		UwacTouchDown* touchDown = &event->touchDown;
+		wl_array_for_each(tp, &automata->tp)
+		{
+			if ((int64_t)tp->id == touchDown->id)
+			{
 				tp->x = touchDown->x;
 				tp->y = touchDown->y;
 				return true;
 			}
 		}
-
 		tp = wl_array_add(&automata->tp, sizeof(UwacTouchPoint));
+
 		if (!tp)
 			return false;
 

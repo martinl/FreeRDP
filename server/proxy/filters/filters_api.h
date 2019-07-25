@@ -24,10 +24,11 @@
 
 #include <winpr/winpr.h>
 
-enum pf_filter_result {
-    FILTER_PASS = 0,
-    FILTER_DROP,
-    FILTER_IGNORE
+enum pf_filter_result
+{
+	FILTER_PASS = 0,
+	FILTER_DROP,
+	FILTER_IGNORE
 };
 
 typedef enum pf_filter_result PF_FILTER_RESULT;
@@ -35,29 +36,33 @@ typedef struct connection_info connectionInfo;
 typedef struct proxy_events proxyEvents;
 typedef struct proxy_keyboard_event_info proxyKeyboardEventInfo;
 typedef struct proxy_mouse_event_info proxyMouseEventInfo;
-typedef PF_FILTER_RESULT(*proxyEvent)(connectionInfo* info, void* param);
+typedef PF_FILTER_RESULT (*proxyEvent)(connectionInfo* info, void* param);
 
-struct connection_info {
-    char* TargetHostname;
-    char* ClientHostname;
-    char* Username;
+struct connection_info
+{
+	char* TargetHostname;
+	char* ClientHostname;
+	char* Username;
 };
 
-struct proxy_events {
-    proxyEvent KeyboardEvent;
-    proxyEvent MouseEvent;
+struct proxy_events
+{
+	proxyEvent KeyboardEvent;
+	proxyEvent MouseEvent;
 };
 
 #pragma pack(push, 1)
-struct proxy_keyboard_event_info {
-    UINT16 flags;
-    UINT16 rdp_scan_code;
+struct proxy_keyboard_event_info
+{
+	UINT16 flags;
+	UINT16 rdp_scan_code;
 };
 
-struct proxy_mouse_event_info {
-    UINT16 flags;
-    UINT16 x;
-    UINT16 y;
+struct proxy_mouse_event_info
+{
+	UINT16 flags;
+	UINT16 x;
+	UINT16 y;
 };
 #pragma pack(pop)
 

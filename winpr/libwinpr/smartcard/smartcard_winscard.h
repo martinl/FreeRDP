@@ -22,10 +22,11 @@
 
 #ifdef _WIN32
 
-#include <winpr/smartcard.h>
+#	include <winpr/smartcard.h>
 
-#define WINSCARD_LOAD_PROC(_name, ...) \
-	WinSCard_SCardApiFunctionTable.pfn ## _name = (fn ## _name) GetProcAddress(g_WinSCardModule, #_name);
+#	define WINSCARD_LOAD_PROC(_name, ...)          \
+		WinSCard_SCardApiFunctionTable.pfn##_name = \
+		    (fn##_name)GetProcAddress(g_WinSCardModule, #_name);
 
 int WinSCard_InitializeSCardApi(void);
 PSCardApiFunctionTable WinSCard_GetSCardApiFunctionTable(void);

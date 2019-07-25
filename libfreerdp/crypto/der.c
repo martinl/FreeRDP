@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -104,4 +104,3 @@ int der_write_sequence_tag(wStream* s, int length)
 	Stream_Write_UINT8(s, (ER_CLASS_UNIV | ER_CONSTRUCT) | (ER_TAG_MASK & ER_TAG_SEQUENCE));
 	return der_write_length(s, length) + 1;
 }
-

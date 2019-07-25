@@ -26,10 +26,9 @@
 FREERDP_LOCAL void rfx_init_neon(RFX_CONTEXT* context);
 
 #ifndef RFX_INIT_SIMD
-#if defined(WITH_NEON)
-#define RFX_INIT_SIMD(_rfx_context) rfx_init_neon(_rfx_context)
-#endif
+#	if defined(WITH_NEON)
+#		define RFX_INIT_SIMD(_rfx_context) rfx_init_neon(_rfx_context)
+#	endif
 #endif
 
 #endif /* FREERDP_LIB_CODEC_RFX_NEON_H */
-

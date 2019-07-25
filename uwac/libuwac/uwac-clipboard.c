@@ -39,12 +39,12 @@ static void data_offer_offer(void* data, struct wl_data_offer* data_offer,
                              const char* offered_mime_type)
 {
 	UwacSeat* seat = (UwacSeat*)data;
-
 	assert(seat);
+
 	if (!seat->ignore_announcement)
 	{
-		UwacClipboardEvent* event = (UwacClipboardEvent*)UwacDisplayNewEvent(seat->display,
-		                            UWAC_EVENT_CLIPBOARD_OFFER);
+		UwacClipboardEvent* event =
+		    (UwacClipboardEvent*)UwacDisplayNewEvent(seat->display, UWAC_EVENT_CLIPBOARD_OFFER);
 
 		if (!event)
 		{
@@ -59,21 +59,18 @@ static void data_offer_offer(void* data, struct wl_data_offer* data_offer,
 	}
 }
 
-static const struct wl_data_offer_listener data_offer_listener =
-{
-	.offer = data_offer_offer
-};
+static const struct wl_data_offer_listener data_offer_listener = { .offer = data_offer_offer };
 
 static void data_device_data_offer(void* data, struct wl_data_device* data_device,
                                    struct wl_data_offer* data_offer)
 {
 	UwacSeat* seat = (UwacSeat*)data;
-
 	assert(seat);
+
 	if (!seat->ignore_announcement)
 	{
-		UwacClipboardEvent* event = (UwacClipboardEvent*)UwacDisplayNewEvent(seat->display,
-		                            UWAC_EVENT_CLIPBOARD_SELECT);
+		UwacClipboardEvent* event =
+		    (UwacClipboardEvent*)UwacDisplayNewEvent(seat->display, UWAC_EVENT_CLIPBOARD_SELECT);
 
 		if (!event)
 		{
@@ -95,10 +92,8 @@ static void data_device_selection(void* data, struct wl_data_device* data_device
 {
 }
 
-static const struct wl_data_device_listener data_device_listener =
-{
-	.data_offer = data_device_data_offer,
-	.selection = data_device_selection
+static const struct wl_data_device_listener data_device_listener = {
+	.data_offer = data_device_data_offer, .selection = data_device_selection
 };
 
 /* copy */
@@ -120,8 +115,7 @@ static void data_source_cancelled_handler(void* data, struct wl_data_source* dat
 	seat->cancel_data(seat, seat->data_context);
 }
 
-static const struct wl_data_source_listener data_source_listener =
-{
+static const struct wl_data_source_listener data_source_listener = {
 	.target = data_source_target_handler,
 	.send = data_source_send_handler,
 	.cancelled = data_source_cancelled_handler
@@ -154,7 +148,6 @@ UwacReturnCode UwacSeatRegisterClipboard(UwacSeat* s)
 		return UWAC_NOT_ENOUGH_RESOURCES;
 
 	UwacRegisterDeviceListener(s);
-
 	rc = UwacCreateDataSource(s);
 
 	if (rc != UWAC_SUCCESS)
@@ -198,10 +191,7 @@ static void callback_done(void* data, struct wl_callback* callback, uint32_t ser
 	*(uint32_t*)data = serial;
 }
 
-static const struct wl_callback_listener callback_listener =
-{
-	.done = callback_done
-};
+static const struct wl_callback_listener callback_listener = { .done = callback_done };
 
 uint32_t get_serial(UwacSeat* s)
 {
@@ -218,10 +208,9 @@ uint32_t get_serial(UwacSeat* s)
 	return serial;
 }
 
-UwacReturnCode UwacClipboardOfferAnnounce(UwacSeat* seat,
-        void* context,
-        UwacDataTransferHandler transfer,
-        UwacCancelDataTransferHandler cancel)
+UwacReturnCode UwacClipboardOfferAnnounce(UwacSeat* seat, void* context,
+                                          UwacDataTransferHandler transfer,
+                                          UwacCancelDataTransferHandler cancel)
 {
 	if (!seat)
 		return UWAC_ERROR_INTERNAL;
@@ -260,6 +249,7 @@ void* UwacClipboardDataGet(UwacSeat* seat, const char* mime, size_t* size)
 		void* tmp;
 		alloc += 1024;
 		tmp = xrealloc(data, alloc);
+
 		if (!tmp)
 		{
 			free(data);
@@ -269,19 +259,20 @@ void* UwacClipboardDataGet(UwacSeat* seat, const char* mime, size_t* size)
 
 		data = tmp;
 		r = read(pipefd[0], &data[pos], alloc - pos);
+
 		if (r > 0)
 			pos += r;
+
 		if (r < 0)
 		{
 			free(data);
 			close(pipefd[0]);
 			return NULL;
 		}
-	} while(r > 0);
+	} while (r > 0);
 
 	close(pipefd[0]);
 	close(pipefd[1]);
-
 	*size = pos + 1;
 	return data;
 }

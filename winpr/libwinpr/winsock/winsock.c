@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -27,22 +27,22 @@
 #include <winpr/winsock.h>
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#	include <unistd.h>
 #endif
 #ifdef HAVE_SYS_FILIO_H
-#include <sys/filio.h>
+#	include <sys/filio.h>
 #endif
 #ifdef HAVE_SYS_SOCKIO_H
-#include <sys/sockio.h>
+#	include <sys/sockio.h>
 #endif
 
 #ifndef _WIN32
-#include <fcntl.h>
+#	include <fcntl.h>
 #endif
 
 #ifdef __APPLE__
-#define WSAIOCTL_IFADDRS
-#include <ifaddrs.h>
+#	define WSAIOCTL_IFADDRS
+#	include <ifaddrs.h>
 #endif
 
 /**
@@ -232,7 +232,7 @@
 
 #ifdef _WIN32
 
-#if (_WIN32_WINNT < 0x0600)
+#	if (_WIN32_WINNT < 0x0600)
 
 PCSTR winpr_inet_ntop(INT Family, PVOID pAddr, PSTR pStringBuf, size_t StringBufSize)
 {
@@ -242,8 +242,8 @@ PCSTR winpr_inet_ntop(INT Family, PVOID pAddr, PSTR pStringBuf, size_t StringBuf
 		memset(&in, 0, sizeof(in));
 		in.sin_family = AF_INET;
 		memcpy(&in.sin_addr, pAddr, sizeof(struct in_addr));
-		getnameinfo((struct sockaddr*) &in, sizeof(struct sockaddr_in), pStringBuf, StringBufSize, NULL, 0,
-		            NI_NUMERICHOST);
+		getnameinfo((struct sockaddr*)&in, sizeof(struct sockaddr_in), pStringBuf, StringBufSize,
+		            NULL, 0, NI_NUMERICHOST);
 		return pStringBuf;
 	}
 	else if (Family == AF_INET6)
@@ -252,8 +252,8 @@ PCSTR winpr_inet_ntop(INT Family, PVOID pAddr, PSTR pStringBuf, size_t StringBuf
 		memset(&in, 0, sizeof(in));
 		in.sin6_family = AF_INET6;
 		memcpy(&in.sin6_addr, pAddr, sizeof(struct in_addr6));
-		getnameinfo((struct sockaddr*) &in, sizeof(struct sockaddr_in6), pStringBuf, StringBufSize, NULL, 0,
-		            NI_NUMERICHOST);
+		getnameinfo((struct sockaddr*)&in, sizeof(struct sockaddr_in6), pStringBuf, StringBufSize,
+		            NULL, 0, NI_NUMERICHOST);
 		return pStringBuf;
 	}
 
@@ -268,38 +268,38 @@ INT winpr_inet_pton(INT Family, PCSTR pszAddrString, PVOID pAddrBuf)
 	if ((Family != AF_INET) && (Family != AF_INET6))
 		return -1;
 
-	if (WSAStringToAddressA((char*) pszAddrString, Family, NULL, (struct sockaddr*) &addr,
+	if (WSAStringToAddressA((char*)pszAddrString, Family, NULL, (struct sockaddr*)&addr,
 	                        &addr_len) != 0)
 		return 0;
 
 	if (Family == AF_INET)
 	{
-		memcpy(pAddrBuf, &((struct sockaddr_in*) &addr)->sin_addr, sizeof(struct in_addr));
+		memcpy(pAddrBuf, &((struct sockaddr_in*)&addr)->sin_addr, sizeof(struct in_addr));
 	}
 	else if (Family == AF_INET6)
 	{
-		memcpy(pAddrBuf, &((struct sockaddr_in6*) &addr)->sin6_addr, sizeof(struct in6_addr));
+		memcpy(pAddrBuf, &((struct sockaddr_in6*)&addr)->sin6_addr, sizeof(struct in6_addr));
 	}
 
 	return 1;
 }
 
-#endif /* (_WIN32_WINNT < 0x0600) */
+#	endif /* (_WIN32_WINNT < 0x0600) */
 
 #else /* _WIN32 */
 
-#include <netdb.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <net/if.h>
+#	include <netdb.h>
+#	include <errno.h>
+#	include <unistd.h>
+#	include <sys/ioctl.h>
+#	include <sys/socket.h>
+#	include <netinet/in.h>
+#	include <netinet/tcp.h>
+#	include <net/if.h>
 
-#ifndef MSG_NOSIGNAL
-#define MSG_NOSIGNAL 0
-#endif
+#	ifndef MSG_NOSIGNAL
+#		define MSG_NOSIGNAL 0
+#	endif
 
 int WSAStartup(WORD wVersionRequired, LPWSADATA lpWSAData)
 {
@@ -318,182 +318,182 @@ void WSASetLastError(int iError)
 {
 	switch (iError)
 	{
-		/* Base error codes */
-		case WSAEINTR:
-			errno = EINTR;
-			break;
+	/* Base error codes */
+	case WSAEINTR:
+		errno = EINTR;
+		break;
 
-		case WSAEBADF:
-			errno = EBADF;
-			break;
+	case WSAEBADF:
+		errno = EBADF;
+		break;
 
-		case WSAEACCES:
-			errno = EACCES;
-			break;
+	case WSAEACCES:
+		errno = EACCES;
+		break;
 
-		case WSAEFAULT:
-			errno = EFAULT;
-			break;
+	case WSAEFAULT:
+		errno = EFAULT;
+		break;
 
-		case WSAEINVAL:
-			errno = EINVAL;
-			break;
+	case WSAEINVAL:
+		errno = EINVAL;
+		break;
 
-		case WSAEMFILE:
-			errno = EMFILE;
-			break;
+	case WSAEMFILE:
+		errno = EMFILE;
+		break;
 
 		/* BSD sockets error codes */
 
-		case WSAEWOULDBLOCK:
-			errno = EWOULDBLOCK;
-			break;
+	case WSAEWOULDBLOCK:
+		errno = EWOULDBLOCK;
+		break;
 
-		case WSAEINPROGRESS:
-			errno = EINPROGRESS;
-			break;
+	case WSAEINPROGRESS:
+		errno = EINPROGRESS;
+		break;
 
-		case WSAEALREADY:
-			errno = EALREADY;
-			break;
+	case WSAEALREADY:
+		errno = EALREADY;
+		break;
 
-		case WSAENOTSOCK:
-			errno = ENOTSOCK;
-			break;
+	case WSAENOTSOCK:
+		errno = ENOTSOCK;
+		break;
 
-		case WSAEDESTADDRREQ:
-			errno = EDESTADDRREQ;
-			break;
+	case WSAEDESTADDRREQ:
+		errno = EDESTADDRREQ;
+		break;
 
-		case WSAEMSGSIZE:
-			errno = EMSGSIZE;
-			break;
+	case WSAEMSGSIZE:
+		errno = EMSGSIZE;
+		break;
 
-		case WSAEPROTOTYPE:
-			errno = EPROTOTYPE;
-			break;
+	case WSAEPROTOTYPE:
+		errno = EPROTOTYPE;
+		break;
 
-		case WSAENOPROTOOPT:
-			errno = ENOPROTOOPT;
-			break;
+	case WSAENOPROTOOPT:
+		errno = ENOPROTOOPT;
+		break;
 
-		case WSAEPROTONOSUPPORT:
-			errno = EPROTONOSUPPORT;
-			break;
+	case WSAEPROTONOSUPPORT:
+		errno = EPROTONOSUPPORT;
+		break;
 
-		case WSAESOCKTNOSUPPORT:
-			errno = ESOCKTNOSUPPORT;
-			break;
+	case WSAESOCKTNOSUPPORT:
+		errno = ESOCKTNOSUPPORT;
+		break;
 
-		case WSAEOPNOTSUPP:
-			errno = EOPNOTSUPP;
-			break;
+	case WSAEOPNOTSUPP:
+		errno = EOPNOTSUPP;
+		break;
 
-		case WSAEPFNOSUPPORT:
-			errno = EPFNOSUPPORT;
-			break;
+	case WSAEPFNOSUPPORT:
+		errno = EPFNOSUPPORT;
+		break;
 
-		case WSAEAFNOSUPPORT:
-			errno = EAFNOSUPPORT;
-			break;
+	case WSAEAFNOSUPPORT:
+		errno = EAFNOSUPPORT;
+		break;
 
-		case WSAEADDRINUSE:
-			errno = EADDRINUSE;
-			break;
+	case WSAEADDRINUSE:
+		errno = EADDRINUSE;
+		break;
 
-		case WSAEADDRNOTAVAIL:
-			errno = EADDRNOTAVAIL;
-			break;
+	case WSAEADDRNOTAVAIL:
+		errno = EADDRNOTAVAIL;
+		break;
 
-		case WSAENETDOWN:
-			errno = ENETDOWN;
-			break;
+	case WSAENETDOWN:
+		errno = ENETDOWN;
+		break;
 
-		case WSAENETUNREACH:
-			errno = ENETUNREACH;
-			break;
+	case WSAENETUNREACH:
+		errno = ENETUNREACH;
+		break;
 
-		case WSAENETRESET:
-			errno = ENETRESET;
-			break;
+	case WSAENETRESET:
+		errno = ENETRESET;
+		break;
 
-		case WSAECONNABORTED:
-			errno = ECONNABORTED;
-			break;
+	case WSAECONNABORTED:
+		errno = ECONNABORTED;
+		break;
 
-		case WSAECONNRESET:
-			errno = ECONNRESET;
-			break;
+	case WSAECONNRESET:
+		errno = ECONNRESET;
+		break;
 
-		case WSAENOBUFS:
-			errno = ENOBUFS;
-			break;
+	case WSAENOBUFS:
+		errno = ENOBUFS;
+		break;
 
-		case WSAEISCONN:
-			errno = EISCONN;
-			break;
+	case WSAEISCONN:
+		errno = EISCONN;
+		break;
 
-		case WSAENOTCONN:
-			errno = ENOTCONN;
-			break;
+	case WSAENOTCONN:
+		errno = ENOTCONN;
+		break;
 
-		case WSAESHUTDOWN:
-			errno = ESHUTDOWN;
-			break;
+	case WSAESHUTDOWN:
+		errno = ESHUTDOWN;
+		break;
 
-		case WSAETOOMANYREFS:
-			errno = ETOOMANYREFS;
-			break;
+	case WSAETOOMANYREFS:
+		errno = ETOOMANYREFS;
+		break;
 
-		case WSAETIMEDOUT:
-			errno = ETIMEDOUT;
-			break;
+	case WSAETIMEDOUT:
+		errno = ETIMEDOUT;
+		break;
 
-		case WSAECONNREFUSED:
-			errno = ECONNREFUSED;
-			break;
+	case WSAECONNREFUSED:
+		errno = ECONNREFUSED;
+		break;
 
-		case WSAELOOP:
-			errno = ELOOP;
-			break;
+	case WSAELOOP:
+		errno = ELOOP;
+		break;
 
-		case WSAENAMETOOLONG:
-			errno = ENAMETOOLONG;
-			break;
+	case WSAENAMETOOLONG:
+		errno = ENAMETOOLONG;
+		break;
 
-		case WSAEHOSTDOWN:
-			errno = EHOSTDOWN;
-			break;
+	case WSAEHOSTDOWN:
+		errno = EHOSTDOWN;
+		break;
 
-		case WSAEHOSTUNREACH:
-			errno = EHOSTUNREACH;
-			break;
+	case WSAEHOSTUNREACH:
+		errno = EHOSTUNREACH;
+		break;
 
-		case WSAENOTEMPTY:
-			errno = ENOTEMPTY;
-			break;
-#ifdef EPROCLIM
+	case WSAENOTEMPTY:
+		errno = ENOTEMPTY;
+		break;
+#	ifdef EPROCLIM
 
-		case WSAEPROCLIM:
-			errno = EPROCLIM;
-			break;
-#endif
+	case WSAEPROCLIM:
+		errno = EPROCLIM;
+		break;
+#	endif
 
-		case WSAEUSERS:
-			errno = EUSERS;
-			break;
+	case WSAEUSERS:
+		errno = EUSERS;
+		break;
 
-		case WSAEDQUOT:
-			errno = EDQUOT;
-			break;
+	case WSAEDQUOT:
+		errno = EDQUOT;
+		break;
 
-		case WSAESTALE:
-			errno = ESTALE;
-			break;
+	case WSAESTALE:
+		errno = ESTALE;
+		break;
 
-		case WSAEREMOTE:
-			errno = EREMOTE;
-			break;
+	case WSAEREMOTE:
+		errno = EREMOTE;
+		break;
 	}
 }
 
@@ -503,195 +503,195 @@ int WSAGetLastError(void)
 
 	switch (errno)
 	{
-		/* Base error codes */
-		case EINTR:
-			iError = WSAEINTR;
-			break;
+	/* Base error codes */
+	case EINTR:
+		iError = WSAEINTR;
+		break;
 
-		case EBADF:
-			iError = WSAEBADF;
-			break;
+	case EBADF:
+		iError = WSAEBADF;
+		break;
 
-		case EACCES:
-			iError = WSAEACCES;
-			break;
+	case EACCES:
+		iError = WSAEACCES;
+		break;
 
-		case EFAULT:
-			iError = WSAEFAULT;
-			break;
+	case EFAULT:
+		iError = WSAEFAULT;
+		break;
 
-		case EINVAL:
-			iError = WSAEINVAL;
-			break;
+	case EINVAL:
+		iError = WSAEINVAL;
+		break;
 
-		case EMFILE:
-			iError = WSAEMFILE;
-			break;
+	case EMFILE:
+		iError = WSAEMFILE;
+		break;
 
 		/* BSD sockets error codes */
 
-		case EWOULDBLOCK:
-			iError = WSAEWOULDBLOCK;
-			break;
+	case EWOULDBLOCK:
+		iError = WSAEWOULDBLOCK;
+		break;
 
-		case EINPROGRESS:
-			iError = WSAEINPROGRESS;
-			break;
+	case EINPROGRESS:
+		iError = WSAEINPROGRESS;
+		break;
 
-		case EALREADY:
-			iError = WSAEALREADY;
-			break;
+	case EALREADY:
+		iError = WSAEALREADY;
+		break;
 
-		case ENOTSOCK:
-			iError = WSAENOTSOCK;
-			break;
+	case ENOTSOCK:
+		iError = WSAENOTSOCK;
+		break;
 
-		case EDESTADDRREQ:
-			iError = WSAEDESTADDRREQ;
-			break;
+	case EDESTADDRREQ:
+		iError = WSAEDESTADDRREQ;
+		break;
 
-		case EMSGSIZE:
-			iError = WSAEMSGSIZE;
-			break;
+	case EMSGSIZE:
+		iError = WSAEMSGSIZE;
+		break;
 
-		case EPROTOTYPE:
-			iError = WSAEPROTOTYPE;
-			break;
+	case EPROTOTYPE:
+		iError = WSAEPROTOTYPE;
+		break;
 
-		case ENOPROTOOPT:
-			iError = WSAENOPROTOOPT;
-			break;
+	case ENOPROTOOPT:
+		iError = WSAENOPROTOOPT;
+		break;
 
-		case EPROTONOSUPPORT:
-			iError = WSAEPROTONOSUPPORT;
-			break;
+	case EPROTONOSUPPORT:
+		iError = WSAEPROTONOSUPPORT;
+		break;
 
-		case ESOCKTNOSUPPORT:
-			iError = WSAESOCKTNOSUPPORT;
-			break;
+	case ESOCKTNOSUPPORT:
+		iError = WSAESOCKTNOSUPPORT;
+		break;
 
-		case EOPNOTSUPP:
-			iError = WSAEOPNOTSUPP;
-			break;
+	case EOPNOTSUPP:
+		iError = WSAEOPNOTSUPP;
+		break;
 
-		case EPFNOSUPPORT:
-			iError = WSAEPFNOSUPPORT;
-			break;
+	case EPFNOSUPPORT:
+		iError = WSAEPFNOSUPPORT;
+		break;
 
-		case EAFNOSUPPORT:
-			iError = WSAEAFNOSUPPORT;
-			break;
+	case EAFNOSUPPORT:
+		iError = WSAEAFNOSUPPORT;
+		break;
 
-		case EADDRINUSE:
-			iError = WSAEADDRINUSE;
-			break;
+	case EADDRINUSE:
+		iError = WSAEADDRINUSE;
+		break;
 
-		case EADDRNOTAVAIL:
-			iError = WSAEADDRNOTAVAIL;
-			break;
+	case EADDRNOTAVAIL:
+		iError = WSAEADDRNOTAVAIL;
+		break;
 
-		case ENETDOWN:
-			iError = WSAENETDOWN;
-			break;
+	case ENETDOWN:
+		iError = WSAENETDOWN;
+		break;
 
-		case ENETUNREACH:
-			iError = WSAENETUNREACH;
-			break;
+	case ENETUNREACH:
+		iError = WSAENETUNREACH;
+		break;
 
-		case ENETRESET:
-			iError = WSAENETRESET;
-			break;
+	case ENETRESET:
+		iError = WSAENETRESET;
+		break;
 
-		case ECONNABORTED:
-			iError = WSAECONNABORTED;
-			break;
+	case ECONNABORTED:
+		iError = WSAECONNABORTED;
+		break;
 
-		case ECONNRESET:
-			iError = WSAECONNRESET;
-			break;
+	case ECONNRESET:
+		iError = WSAECONNRESET;
+		break;
 
-		case ENOBUFS:
-			iError = WSAENOBUFS;
-			break;
+	case ENOBUFS:
+		iError = WSAENOBUFS;
+		break;
 
-		case EISCONN:
-			iError = WSAEISCONN;
-			break;
+	case EISCONN:
+		iError = WSAEISCONN;
+		break;
 
-		case ENOTCONN:
-			iError = WSAENOTCONN;
-			break;
+	case ENOTCONN:
+		iError = WSAENOTCONN;
+		break;
 
-		case ESHUTDOWN:
-			iError = WSAESHUTDOWN;
-			break;
+	case ESHUTDOWN:
+		iError = WSAESHUTDOWN;
+		break;
 
-		case ETOOMANYREFS:
-			iError = WSAETOOMANYREFS;
-			break;
+	case ETOOMANYREFS:
+		iError = WSAETOOMANYREFS;
+		break;
 
-		case ETIMEDOUT:
-			iError = WSAETIMEDOUT;
-			break;
+	case ETIMEDOUT:
+		iError = WSAETIMEDOUT;
+		break;
 
-		case ECONNREFUSED:
-			iError = WSAECONNREFUSED;
-			break;
+	case ECONNREFUSED:
+		iError = WSAECONNREFUSED;
+		break;
 
-		case ELOOP:
-			iError = WSAELOOP;
-			break;
+	case ELOOP:
+		iError = WSAELOOP;
+		break;
 
-		case ENAMETOOLONG:
-			iError = WSAENAMETOOLONG;
-			break;
+	case ENAMETOOLONG:
+		iError = WSAENAMETOOLONG;
+		break;
 
-		case EHOSTDOWN:
-			iError = WSAEHOSTDOWN;
-			break;
+	case EHOSTDOWN:
+		iError = WSAEHOSTDOWN;
+		break;
 
-		case EHOSTUNREACH:
-			iError = WSAEHOSTUNREACH;
-			break;
+	case EHOSTUNREACH:
+		iError = WSAEHOSTUNREACH;
+		break;
 
-		case ENOTEMPTY:
-			iError = WSAENOTEMPTY;
-			break;
-#ifdef EPROCLIM
+	case ENOTEMPTY:
+		iError = WSAENOTEMPTY;
+		break;
+#	ifdef EPROCLIM
 
-		case EPROCLIM:
-			iError = WSAEPROCLIM;
-			break;
-#endif
+	case EPROCLIM:
+		iError = WSAEPROCLIM;
+		break;
+#	endif
 
-		case EUSERS:
-			iError = WSAEUSERS;
-			break;
+	case EUSERS:
+		iError = WSAEUSERS;
+		break;
 
-		case EDQUOT:
-			iError = WSAEDQUOT;
-			break;
+	case EDQUOT:
+		iError = WSAEDQUOT;
+		break;
 
-		case ESTALE:
-			iError = WSAESTALE;
-			break;
+	case ESTALE:
+		iError = WSAESTALE;
+		break;
 
-		case EREMOTE:
-			iError = WSAEREMOTE;
-			break;
-			/* Special cases */
-#if (EAGAIN != EWOULDBLOCK)
+	case EREMOTE:
+		iError = WSAEREMOTE;
+		break;
+		/* Special cases */
+#	if (EAGAIN != EWOULDBLOCK)
 
-		case EAGAIN:
-			iError = WSAEWOULDBLOCK;
-			break;
-#endif
-#if defined(EPROTO)
+	case EAGAIN:
+		iError = WSAEWOULDBLOCK;
+		break;
+#	endif
+#	if defined(EPROTO)
 
-		case EPROTO:
-			iError = WSAECONNRESET;
-			break;
-#endif
+	case EPROTO:
+		iError = WSAECONNRESET;
+		break;
+#	endif
 	}
 
 	/**
@@ -784,13 +784,12 @@ SOCKET WSASocketA(int af, int type, int protocol, LPWSAPROTOCOL_INFOA lpProtocol
 SOCKET WSASocketW(int af, int type, int protocol, LPWSAPROTOCOL_INFOW lpProtocolInfo, GROUP g,
                   DWORD dwFlags)
 {
-	return WSASocketA(af, type, protocol, (LPWSAPROTOCOL_INFOA) lpProtocolInfo, g, dwFlags);
+	return WSASocketA(af, type, protocol, (LPWSAPROTOCOL_INFOA)lpProtocolInfo, g, dwFlags);
 }
 
-int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer,
-             DWORD cbInBuffer, LPVOID lpvOutBuffer, DWORD cbOutBuffer,
-             LPDWORD lpcbBytesReturned, LPWSAOVERLAPPED lpOverlapped,
-             LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
+int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer, DWORD cbInBuffer,
+             LPVOID lpvOutBuffer, DWORD cbOutBuffer, LPDWORD lpcbBytesReturned,
+             LPWSAOVERLAPPED lpOverlapped, LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
 {
 	int fd;
 	int index;
@@ -818,10 +817,10 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer,
 		return SOCKET_ERROR;
 	}
 
-	fd = (int) s;
-	pInterfaces = (INTERFACE_INFO*) lpvOutBuffer;
+	fd = (int)s;
+	pInterfaces = (INTERFACE_INFO*)lpvOutBuffer;
 	maxNumInterfaces = cbOutBuffer / sizeof(INTERFACE_INFO);
-#ifdef WSAIOCTL_IFADDRS
+#	ifdef WSAIOCTL_IFADDRS
 	{
 		struct ifaddrs* ifa = NULL;
 		struct ifaddrs* ifap = NULL;
@@ -838,9 +837,9 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer,
 		for (ifa = ifap; ifa; ifa = ifa->ifa_next)
 		{
 			pInterface = &pInterfaces[index];
-			pAddress = (struct sockaddr_in*) &pInterface->iiAddress;
-			pBroadcast = (struct sockaddr_in*) &pInterface->iiBroadcastAddress;
-			pNetmask = (struct sockaddr_in*) &pInterface->iiNetmask;
+			pAddress = (struct sockaddr_in*)&pInterface->iiAddress;
+			pBroadcast = (struct sockaddr_in*)&pInterface->iiBroadcastAddress;
+			pNetmask = (struct sockaddr_in*)&pInterface->iiNetmask;
 			nFlags = 0;
 
 			if (ifa->ifa_flags & IFF_UP)
@@ -865,9 +864,9 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer,
 				if ((ifa->ifa_addr->sa_family != AF_INET) && (ifa->ifa_addr->sa_family != AF_INET6))
 					continue;
 
-				getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr),
-				            address, sizeof(address), 0, 0, NI_NUMERICHOST);
-				inet_pton(ifa->ifa_addr->sa_family, address, (void*) &pAddress->sin_addr);
+				getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr), address, sizeof(address), 0, 0,
+				            NI_NUMERICHOST);
+				inet_pton(ifa->ifa_addr->sa_family, address, (void*)&pAddress->sin_addr);
 			}
 			else
 			{
@@ -876,12 +875,13 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer,
 
 			if (ifa->ifa_dstaddr)
 			{
-				if ((ifa->ifa_dstaddr->sa_family != AF_INET) && (ifa->ifa_dstaddr->sa_family != AF_INET6))
+				if ((ifa->ifa_dstaddr->sa_family != AF_INET) &&
+				    (ifa->ifa_dstaddr->sa_family != AF_INET6))
 					continue;
 
-				getnameinfo(ifa->ifa_dstaddr, sizeof(struct sockaddr),
-				            broadcast, sizeof(broadcast), 0, 0, NI_NUMERICHOST);
-				inet_pton(ifa->ifa_dstaddr->sa_family, broadcast, (void*) &pBroadcast->sin_addr);
+				getnameinfo(ifa->ifa_dstaddr, sizeof(struct sockaddr), broadcast, sizeof(broadcast),
+				            0, 0, NI_NUMERICHOST);
+				inet_pton(ifa->ifa_dstaddr->sa_family, broadcast, (void*)&pBroadcast->sin_addr);
 			}
 			else
 			{
@@ -890,12 +890,13 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer,
 
 			if (ifa->ifa_netmask)
 			{
-				if ((ifa->ifa_netmask->sa_family != AF_INET) && (ifa->ifa_netmask->sa_family != AF_INET6))
+				if ((ifa->ifa_netmask->sa_family != AF_INET) &&
+				    (ifa->ifa_netmask->sa_family != AF_INET6))
 					continue;
 
-				getnameinfo(ifa->ifa_netmask, sizeof(struct sockaddr),
-				            netmask, sizeof(netmask), 0, 0, NI_NUMERICHOST);
-				inet_pton(ifa->ifa_netmask->sa_family, netmask, (void*) &pNetmask->sin_addr);
+				getnameinfo(ifa->ifa_netmask, sizeof(struct sockaddr), netmask, sizeof(netmask), 0,
+				            0, NI_NUMERICHOST);
+				inet_pton(ifa->ifa_netmask->sa_family, netmask, (void*)&pNetmask->sin_addr);
 			}
 			else
 			{
@@ -910,7 +911,7 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer,
 		freeifaddrs(ifap);
 		return 0;
 	}
-#endif
+#	endif
 	ifconf.ifc_len = sizeof(buffer);
 	ifconf.ifc_buf = buffer;
 
@@ -925,12 +926,13 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer,
 	numInterfaces = 0;
 	ifreq = ifconf.ifc_req;
 
-	while ((ifconf.ifc_len >= 0) && (offset < (size_t)ifconf.ifc_len) && (numInterfaces < maxNumInterfaces))
+	while ((ifconf.ifc_len >= 0) && (offset < (size_t)ifconf.ifc_len) &&
+	       (numInterfaces < maxNumInterfaces))
 	{
 		pInterface = &pInterfaces[index];
-		pAddress = (struct sockaddr_in*) &pInterface->iiAddress;
-		pBroadcast = (struct sockaddr_in*) &pInterface->iiBroadcastAddress;
-		pNetmask = (struct sockaddr_in*) &pInterface->iiNetmask;
+		pAddress = (struct sockaddr_in*)&pInterface->iiAddress;
+		pBroadcast = (struct sockaddr_in*)&pInterface->iiBroadcastAddress;
+		pNetmask = (struct sockaddr_in*)&pInterface->iiNetmask;
 
 		if (ioctl(fd, SIOCGIFFLAGS, ifreq) != 0)
 			goto next_ifreq;
@@ -960,9 +962,9 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer,
 		if ((ifreq->ifr_addr.sa_family != AF_INET) && (ifreq->ifr_addr.sa_family != AF_INET6))
 			goto next_ifreq;
 
-		getnameinfo(&ifreq->ifr_addr, sizeof(ifreq->ifr_addr),
-		            address, sizeof(address), 0, 0, NI_NUMERICHOST);
-		inet_pton(ifreq->ifr_addr.sa_family, address, (void*) &pAddress->sin_addr);
+		getnameinfo(&ifreq->ifr_addr, sizeof(ifreq->ifr_addr), address, sizeof(address), 0, 0,
+		            NI_NUMERICHOST);
+		inet_pton(ifreq->ifr_addr.sa_family, address, (void*)&pAddress->sin_addr);
 
 		if (ioctl(fd, SIOCGIFBRDADDR, ifreq) != 0)
 			goto next_ifreq;
@@ -970,9 +972,9 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer,
 		if ((ifreq->ifr_addr.sa_family != AF_INET) && (ifreq->ifr_addr.sa_family != AF_INET6))
 			goto next_ifreq;
 
-		getnameinfo(&ifreq->ifr_addr, sizeof(ifreq->ifr_addr),
-		            broadcast, sizeof(broadcast), 0, 0, NI_NUMERICHOST);
-		inet_pton(ifreq->ifr_addr.sa_family, broadcast, (void*) &pBroadcast->sin_addr);
+		getnameinfo(&ifreq->ifr_addr, sizeof(ifreq->ifr_addr), broadcast, sizeof(broadcast), 0, 0,
+		            NI_NUMERICHOST);
+		inet_pton(ifreq->ifr_addr.sa_family, broadcast, (void*)&pBroadcast->sin_addr);
 
 		if (ioctl(fd, SIOCGIFNETMASK, ifreq) != 0)
 			goto next_ifreq;
@@ -980,17 +982,17 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer,
 		if ((ifreq->ifr_addr.sa_family != AF_INET) && (ifreq->ifr_addr.sa_family != AF_INET6))
 			goto next_ifreq;
 
-		getnameinfo(&ifreq->ifr_addr, sizeof(ifreq->ifr_addr),
-		            netmask, sizeof(netmask), 0, 0, NI_NUMERICHOST);
-		inet_pton(ifreq->ifr_addr.sa_family, netmask, (void*) &pNetmask->sin_addr);
+		getnameinfo(&ifreq->ifr_addr, sizeof(ifreq->ifr_addr), netmask, sizeof(netmask), 0, 0,
+		            NI_NUMERICHOST);
+		inet_pton(ifreq->ifr_addr.sa_family, netmask, (void*)&pNetmask->sin_addr);
 		numInterfaces++;
 	next_ifreq:
-#if !defined(__linux__) && !defined(__sun__) && !defined(__CYGWIN__)
+#	if !defined(__linux__) && !defined(__sun__) && !defined(__CYGWIN__)
 		ifreq_len = IFNAMSIZ + ifreq->ifr_addr.sa_len;
-#else
+#	else
 		ifreq_len = sizeof(*ifreq);
-#endif
-		ifreq = (struct ifreq*) & ((BYTE*) ifreq)[ifreq_len];
+#	endif
+		ifreq = (struct ifreq*)&((BYTE*)ifreq)[ifreq_len];
 		offset += ifreq_len;
 		index++;
 	}
@@ -1002,18 +1004,18 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer,
 SOCKET _accept(SOCKET s, struct sockaddr* addr, int* addrlen)
 {
 	int status;
-	int fd = (int) s;
-	socklen_t s_addrlen = (socklen_t) * addrlen;
+	int fd = (int)s;
+	socklen_t s_addrlen = (socklen_t)*addrlen;
 	status = accept(fd, addr, &s_addrlen);
-	*addrlen = (socklen_t) s_addrlen;
+	*addrlen = (socklen_t)s_addrlen;
 	return status;
 }
 
 int _bind(SOCKET s, const struct sockaddr* addr, int namelen)
 {
 	int status;
-	int fd = (int) s;
-	status = bind(fd, addr, (socklen_t) namelen);
+	int fd = (int)s;
+	status = bind(fd, addr, (socklen_t)namelen);
 
 	if (status < 0)
 		return SOCKET_ERROR;
@@ -1024,7 +1026,7 @@ int _bind(SOCKET s, const struct sockaddr* addr, int namelen)
 int closesocket(SOCKET s)
 {
 	int status;
-	int fd = (int) s;
+	int fd = (int)s;
 	status = close(fd);
 	return status;
 }
@@ -1032,8 +1034,8 @@ int closesocket(SOCKET s)
 int _connect(SOCKET s, const struct sockaddr* name, int namelen)
 {
 	int status;
-	int fd = (int) s;
-	status = connect(fd, name, (socklen_t) namelen);
+	int fd = (int)s;
+	status = connect(fd, name, (socklen_t)namelen);
 
 	if (status < 0)
 		return SOCKET_ERROR;
@@ -1043,7 +1045,7 @@ int _connect(SOCKET s, const struct sockaddr* name, int namelen)
 
 int _ioctlsocket(SOCKET s, long cmd, u_long* argp)
 {
-	int fd = (int) s;
+	int fd = (int)s;
 
 	if (cmd == FIONBIO)
 	{
@@ -1069,30 +1071,30 @@ int _ioctlsocket(SOCKET s, long cmd, u_long* argp)
 int _getpeername(SOCKET s, struct sockaddr* name, int* namelen)
 {
 	int status;
-	int fd = (int) s;
-	socklen_t s_namelen = (socklen_t) * namelen;
+	int fd = (int)s;
+	socklen_t s_namelen = (socklen_t)*namelen;
 	status = getpeername(fd, name, &s_namelen);
-	*namelen = (int) s_namelen;
+	*namelen = (int)s_namelen;
 	return status;
 }
 
 int _getsockname(SOCKET s, struct sockaddr* name, int* namelen)
 {
 	int status;
-	int fd = (int) s;
-	socklen_t s_namelen = (socklen_t) * namelen;
+	int fd = (int)s;
+	socklen_t s_namelen = (socklen_t)*namelen;
 	status = getsockname(fd, name, &s_namelen);
-	*namelen = (int) s_namelen;
+	*namelen = (int)s_namelen;
 	return status;
 }
 
 int _getsockopt(SOCKET s, int level, int optname, char* optval, int* optlen)
 {
 	int status;
-	int fd = (int) s;
-	socklen_t s_optlen = (socklen_t) * optlen;
-	status = getsockopt(fd, level, optname, (void*) optval, &s_optlen);
-	*optlen = (socklen_t) s_optlen;
+	int fd = (int)s;
+	socklen_t s_optlen = (socklen_t)*optlen;
+	status = getsockopt(fd, level, optname, (void*)optval, &s_optlen);
+	*optlen = (socklen_t)s_optlen;
 	return status;
 }
 
@@ -1108,7 +1110,7 @@ u_short _htons(u_short hostshort)
 
 unsigned long _inet_addr(const char* cp)
 {
-	return (long) inet_addr(cp);
+	return (long)inet_addr(cp);
 }
 
 char* _inet_ntoa(struct in_addr in)
@@ -1119,7 +1121,7 @@ char* _inet_ntoa(struct in_addr in)
 int _listen(SOCKET s, int backlog)
 {
 	int status;
-	int fd = (int) s;
+	int fd = (int)s;
 	status = listen(fd, backlog);
 	return status;
 }
@@ -1137,18 +1139,18 @@ u_short _ntohs(u_short netshort)
 int _recv(SOCKET s, char* buf, int len, int flags)
 {
 	int status;
-	int fd = (int) s;
-	status = (int) recv(fd, (void*) buf, (size_t) len, flags);
+	int fd = (int)s;
+	status = (int)recv(fd, (void*)buf, (size_t)len, flags);
 	return status;
 }
 
 int _recvfrom(SOCKET s, char* buf, int len, int flags, struct sockaddr* from, int* fromlen)
 {
 	int status;
-	int fd = (int) s;
-	socklen_t s_fromlen = (socklen_t) * fromlen;
-	status = (int) recvfrom(fd, (void*) buf, (size_t) len, flags, from, &s_fromlen);
-	*fromlen = (int) s_fromlen;
+	int fd = (int)s;
+	socklen_t s_fromlen = (socklen_t)*fromlen;
+	status = (int)recvfrom(fd, (void*)buf, (size_t)len, flags, from, &s_fromlen);
+	*fromlen = (int)s_fromlen;
 	return status;
 }
 
@@ -1159,9 +1161,8 @@ int _select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds,
 
 	do
 	{
-		status = select(nfds, readfds, writefds, exceptfds, (struct timeval*) timeout);
-	}
-	while ((status < 0) && (errno == EINTR));
+		status = select(nfds, readfds, writefds, exceptfds, (struct timeval*)timeout);
+	} while ((status < 0) && (errno == EINTR));
 
 	return status;
 }
@@ -1169,47 +1170,47 @@ int _select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds,
 int _send(SOCKET s, const char* buf, int len, int flags)
 {
 	int status;
-	int fd = (int) s;
+	int fd = (int)s;
 	flags |= MSG_NOSIGNAL;
-	status = (int) send(fd, (void*) buf, (size_t) len, flags);
+	status = (int)send(fd, (void*)buf, (size_t)len, flags);
 	return status;
 }
 
 int _sendto(SOCKET s, const char* buf, int len, int flags, const struct sockaddr* to, int tolen)
 {
 	int status;
-	int fd = (int) s;
-	status = (int) sendto(fd, (void*) buf, (size_t) len, flags, to, (socklen_t) tolen);
+	int fd = (int)s;
+	status = (int)sendto(fd, (void*)buf, (size_t)len, flags, to, (socklen_t)tolen);
 	return status;
 }
 
 int _setsockopt(SOCKET s, int level, int optname, const char* optval, int optlen)
 {
 	int status;
-	int fd = (int) s;
-	status = setsockopt(fd, level, optname, (void*) optval, (socklen_t) optlen);
+	int fd = (int)s;
+	status = setsockopt(fd, level, optname, (void*)optval, (socklen_t)optlen);
 	return status;
 }
 
 int _shutdown(SOCKET s, int how)
 {
 	int status;
-	int fd = (int) s;
+	int fd = (int)s;
 	int s_how = -1;
 
 	switch (how)
 	{
-		case SD_RECEIVE:
-			s_how = SHUT_RD;
-			break;
+	case SD_RECEIVE:
+		s_how = SHUT_RD;
+		break;
 
-		case SD_SEND:
-			s_how = SHUT_WR;
-			break;
+	case SD_SEND:
+		s_how = SHUT_WR;
+		break;
 
-		case SD_BOTH:
-			s_how = SHUT_RDWR;
-			break;
+	case SD_BOTH:
+		s_how = SHUT_RDWR;
+		break;
 	}
 
 	if (s_how < 0)
@@ -1228,14 +1229,14 @@ SOCKET _socket(int af, int type, int protocol)
 	if (fd < 0)
 		return INVALID_SOCKET;
 
-	s = (SOCKET) fd;
+	s = (SOCKET)fd;
 	return s;
 }
 
 struct hostent* _gethostbyaddr(const char* addr, int len, int type)
 {
 	struct hostent* host;
-	host = gethostbyaddr((void*) addr, (socklen_t) len, type);
+	host = gethostbyaddr((void*)addr, (socklen_t)len, type);
 	return host;
 }
 
@@ -1249,7 +1250,7 @@ struct hostent* _gethostbyname(const char* name)
 int _gethostname(char* name, int namelen)
 {
 	int status;
-	status = gethostname(name, (size_t) namelen);
+	status = gethostname(name, (size_t)namelen);
 	return status;
 }
 
@@ -1281,4 +1282,4 @@ struct protoent* _getprotobyname(const char* name)
 	return proto;
 }
 
-#endif  /* _WIN32 */
+#endif /* _WIN32 */

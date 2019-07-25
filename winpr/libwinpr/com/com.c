@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -118,7 +118,6 @@ HRESULT CoInitializeEx(LPVOID pvReserved, DWORD dwCoInit)
 
 void CoUninitialize(void)
 {
-
 }
 
 #endif

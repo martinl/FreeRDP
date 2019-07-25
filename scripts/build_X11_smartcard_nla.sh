@@ -183,8 +183,11 @@ function compile_and_test(){
 function cmake_cleanup(){
 
   # clean up cached cmakefiles
+  find . -name CTestTestfile.cmake | xargs rm
+  find . -name cmake_install.cmake | xargs rm
   find . -name CMakeCache.txt | xargs rm
   find . -name CMakeFiles | xargs rm -r
+  find . -name Makefile | xargs rm
 
 }
 

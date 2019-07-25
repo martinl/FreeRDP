@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <stdio.h>
@@ -39,7 +39,10 @@
 #include "nsc_sse2.h"
 
 #ifndef NSC_INIT_SIMD
-#define NSC_INIT_SIMD(_nsc_context) do { } while (0)
+#	define NSC_INIT_SIMD(_nsc_context) \
+		do                              \
+		{                               \
+		} while (0)
 #endif
 
 static BOOL nsc_decode(NSC_CONTEXT* context)
@@ -70,22 +73,20 @@ static BOOL nsc_decode(NSC_CONTEXT* context)
 
 		if (context->ChromaSubsamplingLevel)
 		{
-			yplane = context->priv->PlaneBuffers[0] + y * rw; /* Y */
-			coplane = context->priv->PlaneBuffers[1] + (y >> 1) * (rw >>
-			          1); /* Co, supersampled */
-			cgplane = context->priv->PlaneBuffers[2] + (y >> 1) * (rw >>
-			          1); /* Cg, supersampled */
+			yplane = context->priv->PlaneBuffers[0] + y * rw;                /* Y */
+			coplane = context->priv->PlaneBuffers[1] + (y >> 1) * (rw >> 1); /* Co, supersampled */
+			cgplane = context->priv->PlaneBuffers[2] + (y >> 1) * (rw >> 1); /* Cg, supersampled */
 		}
 		else
 		{
-			yplane = context->priv->PlaneBuffers[0] + y * context->width; /* Y */
+			yplane = context->priv->PlaneBuffers[0] + y * context->width;  /* Y */
 			coplane = context->priv->PlaneBuffers[1] + y * context->width; /* Co */
 			cgplane = context->priv->PlaneBuffers[2] + y * context->width; /* Cg */
 		}
 
 		for (x = 0; x < context->width; x++)
 		{
-			INT16 y_val = (INT16) * yplane;
+			INT16 y_val = (INT16)*yplane;
 			INT16 co_val = (INT16)(INT8)(*coplane << shift);
 			INT16 cg_val = (INT16)(INT8)(*cgplane << shift);
 			INT16 r_val = y_val + co_val - cg_val;
@@ -136,13 +137,13 @@ static BOOL nsc_rle_decode(BYTE* in, BYTE* out, UINT32 outSize, UINT32 originalS
 
 			if (*in < 0xFF)
 			{
-				len = (UINT32) * in++;
+				len = (UINT32)*in++;
 				len += 2;
 			}
 			else
 			{
 				in++;
-				len = *((UINT32*) in);
+				len = *((UINT32*)in);
 				in += 4;
 			}
 
@@ -198,8 +199,8 @@ static BOOL nsc_rle_decompress_data(NSC_CONTEXT* context)
 		}
 		else if (planeSize < originalSize)
 		{
-			if (!nsc_rle_decode(rle, context->priv->PlaneBuffers[i], context->priv->PlaneBuffersLength,
-			                    originalSize))
+			if (!nsc_rle_decode(rle, context->priv->PlaneBuffers[i],
+			                    context->priv->PlaneBuffersLength, originalSize))
 				return FALSE;
 		}
 		else
@@ -226,10 +227,9 @@ static BOOL nsc_stream_initialize(NSC_CONTEXT* context, wStream* s)
 	for (i = 0; i < 4; i++)
 		Stream_Read_UINT32(s, context->PlaneByteCount[i]);
 
-	Stream_Read_UINT8(s, context->ColorLossLevel); /* ColorLossLevel (1 byte) */
-	Stream_Read_UINT8(s,
-	                  context->ChromaSubsamplingLevel); /* ChromaSubsamplingLevel (1 byte) */
-	Stream_Seek(s, 2); /* Reserved (2 bytes) */
+	Stream_Read_UINT8(s, context->ColorLossLevel);         /* ColorLossLevel (1 byte) */
+	Stream_Read_UINT8(s, context->ChromaSubsamplingLevel); /* ChromaSubsamplingLevel (1 byte) */
+	Stream_Seek(s, 2);                                     /* Reserved (2 bytes) */
 	context->Planes = Stream_Pointer(s);
 	return TRUE;
 }
@@ -276,7 +276,7 @@ static BOOL nsc_context_initialize(NSC_CONTEXT* context, wStream* s)
 	{
 		for (i = 0; i < 4; i++)
 		{
-			void* tmp = (BYTE*) realloc(context->priv->PlaneBuffers[i], length);
+			void* tmp = (BYTE*)realloc(context->priv->PlaneBuffers[i], length);
 
 			if (!tmp)
 				return FALSE;
@@ -302,14 +302,10 @@ static BOOL nsc_context_initialize(NSC_CONTEXT* context, wStream* s)
 	return TRUE;
 }
 
-static void nsc_profiler_print(NSC_CONTEXT_PRIV* priv)
-{
-	PROFILER_PRINT_HEADER
-	PROFILER_PRINT(priv->prof_nsc_rle_decompress_data)
-	PROFILER_PRINT(priv->prof_nsc_decode)
-	PROFILER_PRINT(priv->prof_nsc_rle_compress_data)
-	PROFILER_PRINT(priv->prof_nsc_encode)
-	PROFILER_PRINT_FOOTER
+static void nsc_profiler_print(NSC_CONTEXT_PRIV* priv){
+	PROFILER_PRINT_HEADER PROFILER_PRINT(priv->prof_nsc_rle_decompress_data)
+	    PROFILER_PRINT(priv->prof_nsc_decode) PROFILER_PRINT(priv->prof_nsc_rle_compress_data)
+	        PROFILER_PRINT(priv->prof_nsc_encode) PROFILER_PRINT_FOOTER
 }
 
 BOOL nsc_context_reset(NSC_CONTEXT* context, UINT32 width, UINT32 height)
@@ -325,12 +321,12 @@ BOOL nsc_context_reset(NSC_CONTEXT* context, UINT32 width, UINT32 height)
 NSC_CONTEXT* nsc_context_new(void)
 {
 	NSC_CONTEXT* context;
-	context = (NSC_CONTEXT*) calloc(1, sizeof(NSC_CONTEXT));
+	context = (NSC_CONTEXT*)calloc(1, sizeof(NSC_CONTEXT));
 
 	if (!context)
 		return NULL;
 
-	context->priv = (NSC_CONTEXT_PRIV*) calloc(1, sizeof(NSC_CONTEXT_PRIV));
+	context->priv = (NSC_CONTEXT_PRIV*)calloc(1, sizeof(NSC_CONTEXT_PRIV));
 
 	if (!context->priv)
 		goto error;
@@ -345,11 +341,9 @@ NSC_CONTEXT* nsc_context_new(void)
 	if (!context->priv->PlanePool)
 		goto error;
 
-	PROFILER_CREATE(context->priv->prof_nsc_rle_decompress_data,
-	                "nsc_rle_decompress_data")
+	PROFILER_CREATE(context->priv->prof_nsc_rle_decompress_data, "nsc_rle_decompress_data")
 	PROFILER_CREATE(context->priv->prof_nsc_decode, "nsc_decode")
-	PROFILER_CREATE(context->priv->prof_nsc_rle_compress_data,
-	                "nsc_rle_compress_data")
+	PROFILER_CREATE(context->priv->prof_nsc_rle_compress_data, "nsc_rle_compress_data")
 	PROFILER_CREATE(context->priv->prof_nsc_encode, "nsc_encode")
 	/* Default encoding parameters */
 	context->ColorLossLevel = 3;
@@ -396,12 +390,9 @@ BOOL nsc_context_set_pixel_format(NSC_CONTEXT* context, UINT32 pixel_format)
 	return TRUE;
 }
 
-BOOL nsc_process_message(NSC_CONTEXT* context, UINT16 bpp,
-                         UINT32 width, UINT32 height,
-                         const BYTE* data, UINT32 length,
-                         BYTE* pDstData, UINT32 DstFormat,
-                         UINT32 nDstStride,
-                         UINT32 nXDst, UINT32 nYDst, UINT32 nWidth,
+BOOL nsc_process_message(NSC_CONTEXT* context, UINT16 bpp, UINT32 width, UINT32 height,
+                         const BYTE* data, UINT32 length, BYTE* pDstData, UINT32 DstFormat,
+                         UINT32 nDstStride, UINT32 nXDst, UINT32 nYDst, UINT32 nWidth,
                          UINT32 nHeight, UINT32 flip)
 {
 	wStream* s;
@@ -416,29 +407,29 @@ BOOL nsc_process_message(NSC_CONTEXT* context, UINT16 bpp,
 
 	switch (bpp)
 	{
-		case 32:
-			context->format = PIXEL_FORMAT_BGRA32;
-			break;
+	case 32:
+		context->format = PIXEL_FORMAT_BGRA32;
+		break;
 
-		case 24:
-			context->format = PIXEL_FORMAT_BGR24;
-			break;
+	case 24:
+		context->format = PIXEL_FORMAT_BGR24;
+		break;
 
-		case 16:
-			context->format = PIXEL_FORMAT_BGR16;
-			break;
+	case 16:
+		context->format = PIXEL_FORMAT_BGR16;
+		break;
 
-		case 8:
-			context->format = PIXEL_FORMAT_RGB8;
-			break;
+	case 8:
+		context->format = PIXEL_FORMAT_RGB8;
+		break;
 
-		case 4:
-			context->format = PIXEL_FORMAT_A4;
-			break;
+	case 4:
+		context->format = PIXEL_FORMAT_A4;
+		break;
 
-		default:
-			Stream_Free(s, TRUE);
-			return FALSE;
+	default:
+		Stream_Free(s, TRUE);
+		return FALSE;
 	}
 
 	context->width = width;
@@ -470,9 +461,8 @@ BOOL nsc_process_message(NSC_CONTEXT* context, UINT16 bpp,
 			return FALSE;
 	}
 
-	if (!freerdp_image_copy(pDstData, DstFormat, nDstStride, nXDst, nYDst,
-	                        width, height, context->BitmapData,
-	                        PIXEL_FORMAT_BGRA32, 0, 0, 0, NULL, flip))
+	if (!freerdp_image_copy(pDstData, DstFormat, nDstStride, nXDst, nYDst, width, height,
+	                        context->BitmapData, PIXEL_FORMAT_BGRA32, 0, 0, 0, NULL, flip))
 		return FALSE;
 
 	return TRUE;

@@ -32,23 +32,23 @@ typedef struct x11_shadow_subsystem x11ShadowSubsystem;
 #include <X11/Xlib.h>
 
 #ifdef WITH_XSHM
-#include <X11/extensions/XShm.h>
+#	include <X11/extensions/XShm.h>
 #endif
 
 #ifdef WITH_XFIXES
-#include <X11/extensions/Xfixes.h>
+#	include <X11/extensions/Xfixes.h>
 #endif
 
 #ifdef WITH_XTEST
-#include <X11/extensions/XTest.h>
+#	include <X11/extensions/XTest.h>
 #endif
 
 #ifdef WITH_XDAMAGE
-#include <X11/extensions/Xdamage.h>
+#	include <X11/extensions/Xdamage.h>
 #endif
 
 #ifdef WITH_XINERAMA
-#include <X11/extensions/Xinerama.h>
+#	include <X11/extensions/Xinerama.h>
 #endif
 
 struct x11_shadow_subsystem
@@ -103,10 +103,9 @@ struct x11_shadow_subsystem
 };
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-
-
 
 #ifdef __cplusplus
 }

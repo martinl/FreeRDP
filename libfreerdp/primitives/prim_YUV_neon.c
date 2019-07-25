@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/sysinfo.h>
@@ -32,15 +32,14 @@
 #include "prim_internal.h"
 
 #if !defined(WITH_NEON)
-#error "This file must only be included if WITH_NEON is active!"
+#	error "This file must only be included if WITH_NEON is active!"
 #endif
 
 #include <arm_neon.h>
 
 static primitives_t* generic = NULL;
 
-static INLINE uint8x8_t neon_YUV2R(int32x4_t Ch, int32x4_t Cl,
-                                   int16x4_t Dh, int16x4_t Dl,
+static INLINE uint8x8_t neon_YUV2R(int32x4_t Ch, int32x4_t Cl, int16x4_t Dh, int16x4_t Dl,
                                    int16x4_t Eh, int16x4_t El)
 {
 	/* R = (256 * Y + 403 * (V - 128)) >> 8 */
@@ -53,8 +52,7 @@ static INLINE uint8x8_t neon_YUV2R(int32x4_t Ch, int32x4_t Cl,
 	return vqmovun_s16(R);
 }
 
-static INLINE uint8x8_t neon_YUV2G(int32x4_t Ch, int32x4_t Cl,
-                                   int16x4_t Dh, int16x4_t Dl,
+static INLINE uint8x8_t neon_YUV2G(int32x4_t Ch, int32x4_t Cl, int16x4_t Dh, int16x4_t Dl,
                                    int16x4_t Eh, int16x4_t El)
 {
 	/* G = (256L * Y -  48 * (U - 128) - 120 * (V - 128)) >> 8 */
@@ -70,8 +68,7 @@ static INLINE uint8x8_t neon_YUV2G(int32x4_t Ch, int32x4_t Cl,
 	return vqmovun_s16(G);
 }
 
-static INLINE uint8x8_t neon_YUV2B(int32x4_t Ch, int32x4_t Cl,
-                                   int16x4_t Dh, int16x4_t Dl,
+static INLINE uint8x8_t neon_YUV2B(int32x4_t Ch, int32x4_t Cl, int16x4_t Dh, int16x4_t Dl,
                                    int16x4_t Eh, int16x4_t El)
 {
 	/* B = (256L * Y + 475 * (U - 128)) >> 8*/
@@ -85,10 +82,11 @@ static INLINE uint8x8_t neon_YUV2B(int32x4_t Ch, int32x4_t Cl,
 }
 
 static INLINE BYTE* neon_YuvToRgbPixel(BYTE* pRGB, int16x8_t Y, int16x8_t D, int16x8_t E,
-                                       const uint8_t rPos,  const uint8_t gPos, const uint8_t bPos, const uint8_t aPos)
+                                       const uint8_t rPos, const uint8_t gPos, const uint8_t bPos,
+                                       const uint8_t aPos)
 {
 	uint8x8x4_t bgrx;
-	const int32x4_t Ch = vmulq_n_s32(vmovl_s16(vget_high_s16(Y)), 256);  /* Y * 256 */
+	const int32x4_t Ch = vmulq_n_s32(vmovl_s16(vget_high_s16(Y)), 256); /* Y * 256 */
 	const int32x4_t Cl = vmulq_n_s32(vmovl_s16(vget_low_s16(Y)), 256);  /* Y * 256 */
 	const int16x4_t Dh = vget_high_s16(D);
 	const int16x4_t Dl = vget_low_s16(D);
@@ -136,11 +134,9 @@ static INLINE BYTE* neon_YuvToRgbPixel(BYTE* pRGB, int16x8_t Y, int16x8_t D, int
 	return pRGB;
 }
 
-static INLINE pstatus_t neon_YUV420ToX(
-    const BYTE* pSrc[3], const UINT32 srcStep[3],
-    BYTE* pDst, UINT32 dstStep,
-    const prim_size_t* roi, const uint8_t rPos,  const uint8_t gPos,
-    const uint8_t bPos, const uint8_t aPos)
+static INLINE pstatus_t neon_YUV420ToX(const BYTE* pSrc[3], const UINT32 srcStep[3], BYTE* pDst,
+                                       UINT32 dstStep, const prim_size_t* roi, const uint8_t rPos,
+                                       const uint8_t gPos, const uint8_t bPos, const uint8_t aPos)
 {
 	UINT32 y;
 	const UINT32 nWidth = roi->width;
@@ -259,39 +255,36 @@ static INLINE pstatus_t neon_YUV420ToX(
 	return PRIMITIVES_SUCCESS;
 }
 
-static pstatus_t neon_YUV420ToRGB_8u_P3AC4R(
-    const BYTE* pSrc[3], const UINT32 srcStep[3],
-    BYTE* pDst, UINT32 dstStep, UINT32 DstFormat,
-    const prim_size_t* roi)
+static pstatus_t neon_YUV420ToRGB_8u_P3AC4R(const BYTE* pSrc[3], const UINT32 srcStep[3],
+                                            BYTE* pDst, UINT32 dstStep, UINT32 DstFormat,
+                                            const prim_size_t* roi)
 {
 	switch (DstFormat)
 	{
-		case PIXEL_FORMAT_BGRA32:
-		case PIXEL_FORMAT_BGRX32:
-			return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 2, 1, 0, 3);
+	case PIXEL_FORMAT_BGRA32:
+	case PIXEL_FORMAT_BGRX32:
+		return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 2, 1, 0, 3);
 
-		case PIXEL_FORMAT_RGBA32:
-		case PIXEL_FORMAT_RGBX32:
-			return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 0, 1, 2, 3);
+	case PIXEL_FORMAT_RGBA32:
+	case PIXEL_FORMAT_RGBX32:
+		return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 0, 1, 2, 3);
 
-		case PIXEL_FORMAT_ARGB32:
-		case PIXEL_FORMAT_XRGB32:
-			return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 1, 2, 3, 0);
+	case PIXEL_FORMAT_ARGB32:
+	case PIXEL_FORMAT_XRGB32:
+		return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 1, 2, 3, 0);
 
-		case PIXEL_FORMAT_ABGR32:
-		case PIXEL_FORMAT_XBGR32:
-			return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 3, 2, 1, 0);
+	case PIXEL_FORMAT_ABGR32:
+	case PIXEL_FORMAT_XBGR32:
+		return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 3, 2, 1, 0);
 
-		default:
-			return generic->YUV420ToRGB_8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+	default:
+		return generic->YUV420ToRGB_8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
 	}
 }
 
-static INLINE pstatus_t neon_YUV444ToX(
-    const BYTE* pSrc[3], const UINT32 srcStep[3],
-    BYTE* pDst, UINT32 dstStep,
-    const prim_size_t* roi, const uint8_t rPos,  const uint8_t gPos,
-    const uint8_t bPos, const uint8_t aPos)
+static INLINE pstatus_t neon_YUV444ToX(const BYTE* pSrc[3], const UINT32 srcStep[3], BYTE* pDst,
+                                       UINT32 dstStep, const prim_size_t* roi, const uint8_t rPos,
+                                       const uint8_t gPos, const uint8_t bPos, const uint8_t aPos)
 {
 	UINT32 y;
 	const UINT32 nWidth = roi->width;
@@ -353,31 +346,30 @@ static INLINE pstatus_t neon_YUV444ToX(
 	return PRIMITIVES_SUCCESS;
 }
 
-static pstatus_t neon_YUV444ToRGB_8u_P3AC4R(
-    const BYTE* pSrc[3], const UINT32 srcStep[3],
-    BYTE* pDst, UINT32 dstStep, UINT32 DstFormat,
-    const prim_size_t* roi)
+static pstatus_t neon_YUV444ToRGB_8u_P3AC4R(const BYTE* pSrc[3], const UINT32 srcStep[3],
+                                            BYTE* pDst, UINT32 dstStep, UINT32 DstFormat,
+                                            const prim_size_t* roi)
 {
 	switch (DstFormat)
 	{
-		case PIXEL_FORMAT_BGRA32:
-		case PIXEL_FORMAT_BGRX32:
-			return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 2, 1, 0, 3);
+	case PIXEL_FORMAT_BGRA32:
+	case PIXEL_FORMAT_BGRX32:
+		return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 2, 1, 0, 3);
 
-		case PIXEL_FORMAT_RGBA32:
-		case PIXEL_FORMAT_RGBX32:
-			return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 0, 1, 2, 3);
+	case PIXEL_FORMAT_RGBA32:
+	case PIXEL_FORMAT_RGBX32:
+		return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 0, 1, 2, 3);
 
-		case PIXEL_FORMAT_ARGB32:
-		case PIXEL_FORMAT_XRGB32:
-			return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 1, 2, 3, 0);
+	case PIXEL_FORMAT_ARGB32:
+	case PIXEL_FORMAT_XRGB32:
+		return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 1, 2, 3, 0);
 
-		case PIXEL_FORMAT_ABGR32:
-		case PIXEL_FORMAT_XBGR32:
-			return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 3, 2, 1, 0);
+	case PIXEL_FORMAT_ABGR32:
+	case PIXEL_FORMAT_XBGR32:
+		return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 3, 2, 1, 0);
 
-		default:
-			return generic->YUV444ToRGB_8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+	default:
+		return generic->YUV444ToRGB_8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
 	}
 }
 
@@ -391,18 +383,12 @@ static pstatus_t neon_LumaToYUV444(const BYTE* pSrcRaw[3], const UINT32 srcStep[
 	const UINT32 halfWidth = (nWidth + 1) / 2;
 	const UINT32 halfHeight = (nHeight + 1) / 2;
 	const UINT32 evenY = 0;
-	const BYTE* pSrc[3] =
-	{
-		pSrcRaw[0] + roi->top* srcStep[0] + roi->left,
-		pSrcRaw[1] + roi->top / 2 * srcStep[1] + roi->left / 2,
-		pSrcRaw[2] + roi->top / 2 * srcStep[2] + roi->left / 2
-	};
-	BYTE* pDst[3] =
-	{
-		pDstRaw[0] + roi->top* dstStep[0] + roi->left,
-		pDstRaw[1] + roi->top* dstStep[1] + roi->left,
-		pDstRaw[2] + roi->top* dstStep[2] + roi->left
-	};
+	const BYTE* pSrc[3] = { pSrcRaw[0] + roi->top * srcStep[0] + roi->left,
+		                    pSrcRaw[1] + roi->top / 2 * srcStep[1] + roi->left / 2,
+		                    pSrcRaw[2] + roi->top / 2 * srcStep[2] + roi->left / 2 };
+	BYTE* pDst[3] = { pDstRaw[0] + roi->top * dstStep[0] + roi->left,
+		              pDstRaw[1] + roi->top * dstStep[1] + roi->left,
+		              pDstRaw[2] + roi->top * dstStep[2] + roi->left };
 
 	/* Y data is already here... */
 	/* B1 */
@@ -469,8 +455,7 @@ static pstatus_t neon_LumaToYUV444(const BYTE* pSrcRaw[3], const UINT32 srcStep[
 	return PRIMITIVES_SUCCESS;
 }
 
-static pstatus_t neon_ChromaFilter(BYTE* pDst[3], const UINT32 dstStep[3],
-                                   const RECTANGLE_16* roi)
+static pstatus_t neon_ChromaFilter(BYTE* pDst[3], const UINT32 dstStep[3], const RECTANGLE_16* roi)
 {
 	const UINT32 oddY = 1;
 	const UINT32 evenY = 0;
@@ -499,11 +484,12 @@ static pstatus_t neon_ChromaFilter(BYTE* pDst[3], const UINT32 dstStep[3],
 			{
 				/* U = (U2x,2y << 2) - U2x1,2y - U2x,2y1 - U2x1,2y1 */
 				uint8x8x2_t u = vld2_u8(&pU[2 * x]);
-				const int16x8_t up = vreinterpretq_s16_u16(vshll_n_u8(u.val[0], 2)); /* Ux2,2y << 2 */
+				const int16x8_t up =
+				    vreinterpretq_s16_u16(vshll_n_u8(u.val[0], 2)); /* Ux2,2y << 2 */
 				const uint8x8x2_t u1 = vld2_u8(&pU1[2 * x]);
 				const uint16x8_t usub = vaddl_u8(u1.val[1], u1.val[0]); /* U2x,2y1 + U2x1,2y1 */
-				const int16x8_t us = vreinterpretq_s16_u16(vaddw_u8(usub,
-				                     u.val[1])); /* U2x1,2y + U2x,2y1 + U2x1,2y1 */
+				const int16x8_t us = vreinterpretq_s16_u16(
+				    vaddw_u8(usub, u.val[1])); /* U2x1,2y + U2x,2y1 + U2x1,2y1 */
 				const int16x8_t un = vsubq_s16(up, us);
 				const uint8x8_t u8 = vqmovun_s16(un); /* CLIP(un) */
 				u.val[0] = u8;
@@ -512,11 +498,12 @@ static pstatus_t neon_ChromaFilter(BYTE* pDst[3], const UINT32 dstStep[3],
 			{
 				/* V = (V2x,2y << 2) - V2x1,2y - V2x,2y1 - V2x1,2y1 */
 				uint8x8x2_t v = vld2_u8(&pV[2 * x]);
-				const int16x8_t vp = vreinterpretq_s16_u16(vshll_n_u8(v.val[0], 2)); /* Vx2,2y << 2 */
+				const int16x8_t vp =
+				    vreinterpretq_s16_u16(vshll_n_u8(v.val[0], 2)); /* Vx2,2y << 2 */
 				const uint8x8x2_t v1 = vld2_u8(&pV1[2 * x]);
 				const uint16x8_t vsub = vaddl_u8(v1.val[1], v1.val[0]); /* V2x,2y1 + V2x1,2y1 */
-				const int16x8_t vs = vreinterpretq_s16_u16(vaddw_u8(vsub,
-				                     v.val[1])); /* V2x1,2y + V2x,2y1 + V2x1,2y1 */
+				const int16x8_t vs = vreinterpretq_s16_u16(
+				    vaddw_u8(vsub, v.val[1])); /* V2x1,2y + V2x,2y1 + V2x1,2y1 */
 				const int16x8_t vn = vsubq_s16(vp, vs);
 				const uint8x8_t v8 = vqmovun_s16(vn); /* CLIP(vn) */
 				v.val[0] = v8;
@@ -565,18 +552,12 @@ static pstatus_t neon_ChromaV1ToYUV444(const BYTE* pSrcRaw[3], const UINT32 srcS
 	 * We need the padded height for B4 and B5 conversion. */
 	const UINT32 padHeigth = nHeight + 16 - nHeight % 16;
 	const UINT32 halfPad = halfWidth % 16;
-	const BYTE* pSrc[3] =
-	{
-		pSrcRaw[0] + roi->top* srcStep[0] + roi->left,
-		pSrcRaw[1] + roi->top / 2 * srcStep[1] + roi->left / 2,
-		pSrcRaw[2] + roi->top / 2 * srcStep[2] + roi->left / 2
-	};
-	BYTE* pDst[3] =
-	{
-		pDstRaw[0] + roi->top* dstStep[0] + roi->left,
-		pDstRaw[1] + roi->top* dstStep[1] + roi->left,
-		pDstRaw[2] + roi->top* dstStep[2] + roi->left
-	};
+	const BYTE* pSrc[3] = { pSrcRaw[0] + roi->top * srcStep[0] + roi->left,
+		                    pSrcRaw[1] + roi->top / 2 * srcStep[1] + roi->left / 2,
+		                    pSrcRaw[2] + roi->top / 2 * srcStep[2] + roi->left / 2 };
+	BYTE* pDst[3] = { pDstRaw[0] + roi->top * dstStep[0] + roi->left,
+		              pDstRaw[1] + roi->top * dstStep[1] + roi->left,
+		              pDstRaw[2] + roi->top * dstStep[2] + roi->left };
 
 	/* The second half of U and V is a bit more tricky... */
 	/* B4 and B5 */
@@ -643,9 +624,8 @@ static pstatus_t neon_ChromaV1ToYUV444(const BYTE* pSrcRaw[3], const UINT32 srcS
 }
 
 static pstatus_t neon_ChromaV2ToYUV444(const BYTE* pSrc[3], const UINT32 srcStep[3],
-                                       UINT32 nTotalWidth, UINT32 nTotalHeight,
-                                       BYTE* pDst[3], const UINT32 dstStep[3],
-                                       const RECTANGLE_16* roi)
+                                       UINT32 nTotalWidth, UINT32 nTotalHeight, BYTE* pDst[3],
+                                       const UINT32 dstStep[3], const RECTANGLE_16* roi)
 {
 	UINT32 x, y;
 	const UINT32 nWidth = roi->right - roi->left;
@@ -725,12 +705,10 @@ static pstatus_t neon_ChromaV2ToYUV444(const BYTE* pSrc[3], const UINT32 srcStep
 	return neon_ChromaFilter(pDst, dstStep, roi);
 }
 
-static pstatus_t neon_YUV420CombineToYUV444(
-    avc444_frame_type type,
-    const BYTE* pSrc[3], const UINT32 srcStep[3],
-    UINT32 nWidth, UINT32 nHeight,
-    BYTE* pDst[3], const UINT32 dstStep[3],
-    const RECTANGLE_16* roi)
+static pstatus_t neon_YUV420CombineToYUV444(avc444_frame_type type, const BYTE* pSrc[3],
+                                            const UINT32 srcStep[3], UINT32 nWidth, UINT32 nHeight,
+                                            BYTE* pDst[3], const UINT32 dstStep[3],
+                                            const RECTANGLE_16* roi)
 {
 	if (!pSrc || !pSrc[0] || !pSrc[1] || !pSrc[2])
 		return -1;
@@ -743,17 +721,17 @@ static pstatus_t neon_YUV420CombineToYUV444(
 
 	switch (type)
 	{
-		case AVC444_LUMA:
-			return neon_LumaToYUV444(pSrc, srcStep, pDst, dstStep, roi);
+	case AVC444_LUMA:
+		return neon_LumaToYUV444(pSrc, srcStep, pDst, dstStep, roi);
 
-		case AVC444_CHROMAv1:
-			return neon_ChromaV1ToYUV444(pSrc, srcStep, pDst, dstStep, roi);
+	case AVC444_CHROMAv1:
+		return neon_ChromaV1ToYUV444(pSrc, srcStep, pDst, dstStep, roi);
 
-		case AVC444_CHROMAv2:
-			return neon_ChromaV2ToYUV444(pSrc, srcStep, nWidth, nHeight, pDst, dstStep, roi);
+	case AVC444_CHROMAv2:
+		return neon_ChromaV2ToYUV444(pSrc, srcStep, nWidth, nHeight, pDst, dstStep, roi);
 
-		default:
-			return -1;
+	default:
+		return -1;
 	}
 }
 

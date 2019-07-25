@@ -111,9 +111,9 @@ static BOOL wlf_disp_sendResize(wlfDispContext* wlfDisp)
 	/* TODO: Multimonitor support for wayland
 	if (wlc->fullscreen && (settings->MonitorCount > 0))
 	{
-		if (wlf_disp_sendLayout(wlfDisp->disp, settings->MonitorDefArray,
-		                       settings->MonitorCount) != CHANNEL_RC_OK)
-			return FALSE;
+	    if (wlf_disp_sendLayout(wlfDisp->disp, settings->MonitorDefArray,
+	                           settings->MonitorCount) != CHANNEL_RC_OK)
+	        return FALSE;
 	}
 	else
 	*/
@@ -192,8 +192,8 @@ static void wlf_disp_OnGraphicsReset(void* context, GraphicsResetEventArgs* e)
 	wlfContext* wlc;
 	wlfDispContext* wlfDisp;
 	rdpSettings* settings;
-
 	WINPR_UNUSED(e);
+
 	if (!wlf_disp_check_context(context, &wlc, &wlfDisp, &settings))
 		return;
 
@@ -211,8 +211,8 @@ static void wlf_disp_OnTimer(void* context, TimerEventArgs* e)
 	wlfContext* wlc;
 	wlfDispContext* wlfDisp;
 	rdpSettings* settings;
-
 	WINPR_UNUSED(e);
+
 	if (!wlf_disp_check_context(context, &wlc, &wlfDisp, &settings))
 		return;
 
@@ -283,29 +283,29 @@ UINT wlf_disp_sendLayout(DispClientContext* disp, rdpMonitor* monitors, size_t n
 
 		switch (monitors[i].attributes.orientation)
 		{
-			case 90:
-				layouts[i].Orientation = ORIENTATION_PORTRAIT;
-				break;
+		case 90:
+			layouts[i].Orientation = ORIENTATION_PORTRAIT;
+			break;
 
-			case 180:
-				layouts[i].Orientation = ORIENTATION_LANDSCAPE_FLIPPED;
-				break;
+		case 180:
+			layouts[i].Orientation = ORIENTATION_LANDSCAPE_FLIPPED;
+			break;
 
-			case 270:
-				layouts[i].Orientation = ORIENTATION_PORTRAIT_FLIPPED;
-				break;
+		case 270:
+			layouts[i].Orientation = ORIENTATION_PORTRAIT_FLIPPED;
+			break;
 
-			case 0:
-			default:
-				/* MS-RDPEDISP - 2.2.2.2.1:
-				 * Orientation (4 bytes): A 32-bit unsigned integer that specifies the
-				 * orientation of the monitor in degrees. Valid values are 0, 90, 180
-				 * or 270
-				 *
-				 * So we default to ORIENTATION_LANDSCAPE
-				 */
-				layouts[i].Orientation = ORIENTATION_LANDSCAPE;
-				break;
+		case 0:
+		default:
+			/* MS-RDPEDISP - 2.2.2.2.1:
+			 * Orientation (4 bytes): A 32-bit unsigned integer that specifies the
+			 * orientation of the monitor in degrees. Valid values are 0, 90, 180
+			 * or 270
+			 *
+			 * So we default to ORIENTATION_LANDSCAPE
+			 */
+			layouts[i].Orientation = ORIENTATION_LANDSCAPE;
+			break;
 		}
 
 		layouts[i].DesktopScaleFactor = settings->DesktopScaleFactor;
@@ -334,7 +334,8 @@ static UINT wlf_DisplayControlCaps(DispClientContext* disp, UINT32 maxNumMonitor
 	wlfDispContext* wlfDisp = (wlfDispContext*)disp->custom;
 	rdpSettings* settings = wlfDisp->wlc->context.settings;
 	WLog_DBG(TAG,
-	         "DisplayControlCapsPdu: MaxNumMonitors: %"PRIu32" MaxMonitorAreaFactorA: %"PRIu32" MaxMonitorAreaFactorB: %"PRIu32"",
+	         "DisplayControlCapsPdu: MaxNumMonitors: %" PRIu32 " MaxMonitorAreaFactorA: %" PRIu32
+	         " MaxMonitorAreaFactorB: %" PRIu32 "",
 	         maxNumMonitors, maxMonitorAreaFactorA, maxMonitorAreaFactorB);
 	wlfDisp->activated = TRUE;
 
@@ -358,7 +359,7 @@ BOOL wlf_disp_init(wlfDispContext* wlfDisp, DispClientContext* disp)
 		return FALSE;
 
 	wlfDisp->disp = disp;
-	disp->custom = (void*) wlfDisp;
+	disp->custom = (void*)wlfDisp;
 
 	if (settings->DynamicResolutionUpdate)
 	{

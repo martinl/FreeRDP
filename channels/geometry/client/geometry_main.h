@@ -21,7 +21,7 @@
 #define FREERDP_CHANNEL_GEOMETRY_CLIENT_MAIN_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <freerdp/dvc.h>
@@ -29,6 +29,4 @@
 #include <freerdp/addin.h>
 #include <freerdp/client/geometry.h>
 
-
 #endif /* FREERDP_CHANNEL_GEOMETRY_CLIENT_MAIN_H */
-

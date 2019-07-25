@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -31,7 +31,6 @@
 errno_t _itoa_s(int value, char* buffer, size_t sizeInCharacters, int radix)
 {
 	int length;
-
 	length = sprintf_s(NULL, 0, "%d", value);
 
 	if (length < 0)
@@ -41,9 +40,7 @@ errno_t _itoa_s(int value, char* buffer, size_t sizeInCharacters, int radix)
 		return -1;
 
 	sprintf_s(buffer, length + 1, "%d", value);
-
 	return 0;
 }
 
 #endif
-

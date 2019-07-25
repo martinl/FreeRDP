@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -33,14 +33,13 @@
 wKeyValuePair* KeyValuePair_New(void* key, void* value)
 {
 	wKeyValuePair* keyValuePair;
+	keyValuePair = (wKeyValuePair*)malloc(sizeof(wKeyValuePair));
 
-	keyValuePair = (wKeyValuePair*) malloc(sizeof(wKeyValuePair));
 	if (!keyValuePair)
 		return NULL;
 
 	keyValuePair->key = key;
 	keyValuePair->value = value;
-
 	return keyValuePair;
 }
 

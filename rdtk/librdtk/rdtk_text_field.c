@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include "rdtk_font.h"
@@ -25,7 +25,7 @@
 #include "rdtk_text_field.h"
 
 int rdtk_text_field_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int nHeight,
-		rdtkTextField* textField, const char* text)
+                         rdtkTextField* textField, const char* text)
 {
 	int offsetX;
 	int offsetY;
@@ -36,21 +36,17 @@ int rdtk_text_field_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth,
 	rdtkFont* font;
 	rdtkEngine* engine;
 	rdtkNinePatch* ninePatch;
-
 	engine = surface->engine;
 	font = engine->font;
 	textField = surface->engine->textField;
 	ninePatch = textField->ninePatch;
-
 	rdtk_font_text_draw_size(font, &textWidth, &textHeight, text);
-
 	rdtk_nine_patch_draw(surface, nXDst, nYDst, nWidth, nHeight, ninePatch);
 
 	if ((textWidth > 0) && (textHeight > 0))
 	{
 		fillWidth = nWidth - (ninePatch->width - ninePatch->fillWidth);
 		fillHeight = nHeight - (ninePatch->height - ninePatch->fillHeight);
-
 		offsetX = ninePatch->fillLeft;
 		offsetY = ninePatch->fillTop;
 
@@ -73,15 +69,13 @@ int rdtk_text_field_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth,
 rdtkTextField* rdtk_text_field_new(rdtkEngine* engine, rdtkNinePatch* ninePatch)
 {
 	rdtkTextField* textField;
-
-	textField = (rdtkTextField*) calloc(1, sizeof(rdtkTextField));
+	textField = (rdtkTextField*)calloc(1, sizeof(rdtkTextField));
 
 	if (!textField)
 		return NULL;
 
 	textField->engine = engine;
 	textField->ninePatch = ninePatch;
-
 	return textField;
 }
 

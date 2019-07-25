@@ -31,15 +31,13 @@
 #define TAG PROXY_TAG("filters")
 #define FILTER_INIT_METHOD "filter_init"
 
-static const char* FILTER_RESULT_STRINGS[] =
-{
+static const char* FILTER_RESULT_STRINGS[] = {
 	"FILTER_PASS",
 	"FILTER_DROP",
 	"FILTER_IGNORE",
 };
 
-static const char* EVENT_TYPE_STRINGS[] =
-{
+static const char* EVENT_TYPE_STRINGS[] = {
 	"KEYBOARD_EVENT",
 	"MOUSE_EVENT",
 };
@@ -80,37 +78,38 @@ BOOL pf_filters_init(filters_list** list)
 }
 
 PF_FILTER_RESULT pf_filters_run_by_type(filters_list* list, PF_FILTER_TYPE type,
-                                        connectionInfo* info,
-                                        void* param)
+                                        connectionInfo* info, void* param)
 {
 	proxyFilter* filter;
 	proxyEvents* events;
 	PF_FILTER_RESULT result = FILTER_PASS;
-	const size_t count = (size_t) ArrayList_Count(list);
+	const size_t count = (size_t)ArrayList_Count(list);
 	size_t index;
 
 	for (index = 0; index < count; index++)
 	{
-		filter = (proxyFilter*) ArrayList_GetItem(list, index);
+		filter = (proxyFilter*)ArrayList_GetItem(list, index);
 		events = filter->events;
 		WLog_DBG(TAG, "pf_filters_run_by_type(): Running filter: %s", filter->name);
 
 		switch (type)
 		{
-			case FILTER_TYPE_KEYBOARD:
-				IFCALLRET(events->KeyboardEvent, result, info, param);
-				break;
+		case FILTER_TYPE_KEYBOARD:
+			IFCALLRET(events->KeyboardEvent, result, info, param);
+			break;
 
-			case FILTER_TYPE_MOUSE:
-				IFCALLRET(events->MouseEvent, result, info, param);
-				break;
+		case FILTER_TYPE_MOUSE:
+			IFCALLRET(events->MouseEvent, result, info, param);
+			break;
 		}
 
 		if (result != FILTER_PASS)
 		{
-			/* Filter returned FILTER_DROP or FILTER_IGNORE. There's no need to call next filters. */
+			/* Filter returned FILTER_DROP or FILTER_IGNORE. There's no need to call next filters.
+			 */
 			WLog_INFO(TAG, "Filter %s [%s] returned %s", filter->name,
-			          pf_filters_get_event_type_string(type), pf_filters_get_filter_result_string(result));
+			          pf_filters_get_event_type_string(type),
+			          pf_filters_get_filter_result_string(result));
 			return result;
 		}
 	}
@@ -139,12 +138,12 @@ void pf_filters_unregister_all(filters_list* list)
 
 	if (list == NULL)
 		return;
-	
-	count = (size_t) ArrayList_Count(list);
+
+	count = (size_t)ArrayList_Count(list);
 
 	for (index = 0; index < count; index++)
 	{
-		proxyFilter* filter = (proxyFilter*) ArrayList_GetItem(list, index);
+		proxyFilter* filter = (proxyFilter*)ArrayList_GetItem(list, index);
 		WLog_DBG(TAG, "pf_filters_unregister_all(): freeing filter: %s", filter->name);
 		pf_filters_filter_free(filter);
 	}
@@ -158,7 +157,6 @@ BOOL pf_filters_register_new(filters_list* list, const char* module_path, const 
 	proxyFilter* filter = NULL;
 	HMODULE handle = NULL;
 	filterInitFn fn;
-
 	assert(list != NULL);
 	handle = LoadLibraryA(module_path);
 
@@ -168,13 +166,14 @@ BOOL pf_filters_register_new(filters_list* list, const char* module_path, const 
 		return FALSE;
 	}
 
-	if (!(fn = (filterInitFn) GetProcAddress(handle, FILTER_INIT_METHOD)))
+	if (!(fn = (filterInitFn)GetProcAddress(handle, FILTER_INIT_METHOD)))
 	{
-		WLog_ERR(TAG, "pf_filters_register_new(): GetProcAddress failed while loading %s", module_path);
+		WLog_ERR(TAG, "pf_filters_register_new(): GetProcAddress failed while loading %s",
+		         module_path);
 		goto error;
 	}
 
-	filter = (proxyFilter*) malloc(sizeof(proxyFilter));
+	filter = (proxyFilter*)malloc(sizeof(proxyFilter));
 
 	if (filter == NULL)
 	{
@@ -192,7 +191,8 @@ BOOL pf_filters_register_new(filters_list* list, const char* module_path, const 
 
 	if (!fn(events))
 	{
-		WLog_ERR(TAG, "pf_filters_register_new(): failed calling external filter_init: %s", module_path);
+		WLog_ERR(TAG, "pf_filters_register_new(): failed calling external filter_init: %s",
+		         module_path);
 		goto error;
 	}
 

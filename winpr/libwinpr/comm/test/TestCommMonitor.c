@@ -13,10 +13,8 @@ int TestCommMonitor(int argc, char* argv[])
 	DWORD dwEvtMask;
 	OVERLAPPED overlapped;
 	LPCSTR lpFileName = "\\\\.\\COM1";
-
-	hComm = CreateFileA(lpFileName,
-			GENERIC_READ | GENERIC_WRITE,
-			0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+	hComm = CreateFileA(lpFileName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+	                    FILE_FLAG_OVERLAPPED, NULL);
 
 	if (!hComm || (hComm == INVALID_HANDLE_VALUE))
 	{
@@ -28,14 +26,15 @@ int TestCommMonitor(int argc, char* argv[])
 
 	if (!fSuccess)
 	{
-		printf("SetCommMask failure: GetLastError() = %"PRIu32"\n", GetLastError());
+		printf("SetCommMask failure: GetLastError() = %" PRIu32 "\n", GetLastError());
 		return -1;
 	}
 
 	ZeroMemory(&overlapped, sizeof(OVERLAPPED));
+
 	if (!(overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL)))
 	{
-		printf("CreateEvent failed: GetLastError() = %"PRIu32"\n", GetLastError());
+		printf("CreateEvent failed: GetLastError() = %" PRIu32 "\n", GetLastError());
 		return -1;
 	}
 
@@ -61,13 +60,11 @@ int TestCommMonitor(int argc, char* argv[])
 		}
 		else
 		{
-			printf("WaitCommEvent failure: GetLastError() = %"PRIu32"\n", dwError);
+			printf("WaitCommEvent failure: GetLastError() = %" PRIu32 "\n", dwError);
 			return -1;
 		}
 	}
 
 	CloseHandle(hComm);
-
 	return 0;
 }
-

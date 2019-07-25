@@ -18,16 +18,16 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/error.h>
 
 #ifndef _WIN32
 
-#include <stdio.h>
+#	include <stdio.h>
 
-#include <winpr/nt.h>
+#	include <winpr/nt.h>
 
 UINT GetErrorMode(void)
 {
@@ -42,16 +42,19 @@ UINT SetErrorMode(UINT uMode)
 DWORD GetLastError(VOID)
 {
 	PTEB pt = NtCurrentTeb();
+
 	if (pt)
 	{
 		return NtCurrentTeb()->LastErrorValue;
 	}
+
 	return ERROR_OUTOFMEMORY;
 }
 
 VOID SetLastError(DWORD dwErrCode)
 {
 	PTEB pt = NtCurrentTeb();
+
 	if (pt)
 	{
 		pt->LastErrorValue = dwErrCode;
@@ -60,12 +63,11 @@ VOID SetLastError(DWORD dwErrCode)
 
 VOID RestoreLastError(DWORD dwErrCode)
 {
-
 }
 
-VOID RaiseException(DWORD dwExceptionCode, DWORD dwExceptionFlags, DWORD nNumberOfArguments, CONST ULONG_PTR* lpArguments)
+VOID RaiseException(DWORD dwExceptionCode, DWORD dwExceptionFlags, DWORD nNumberOfArguments,
+                    CONST ULONG_PTR* lpArguments)
 {
-
 }
 
 LONG UnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
@@ -73,7 +75,8 @@ LONG UnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 	return 0;
 }
 
-LPTOP_LEVEL_EXCEPTION_FILTER SetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter)
+LPTOP_LEVEL_EXCEPTION_FILTER
+SetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter)
 {
 	return NULL;
 }

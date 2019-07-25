@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <stdio.h>
@@ -51,7 +51,6 @@ static void mf_server_main_loop(freerdp_listener* instance)
 	int rcount;
 	void* rfds[32];
 	fd_set rfds_set;
-
 	memset(rfds, 0, sizeof(rfds));
 
 	while (1)
@@ -82,10 +81,8 @@ static void mf_server_main_loop(freerdp_listener* instance)
 		if (select(max_fds + 1, &rfds_set, NULL, NULL, NULL) == -1)
 		{
 			/* these are not really errors */
-			if (!((errno == EAGAIN) ||
-				(errno == EWOULDBLOCK) ||
-				(errno == EINPROGRESS) ||
-				(errno == EINTR))) /* signal occurred */
+			if (!((errno == EAGAIN) || (errno == EWOULDBLOCK) || (errno == EINPROGRESS) ||
+			      (errno == EINTR))) /* signal occurred */
 			{
 				break;
 			}
@@ -103,11 +100,9 @@ static void mf_server_main_loop(freerdp_listener* instance)
 int main(int argc, char* argv[])
 {
 	freerdp_listener* instance;
-
 	signal(SIGPIPE, SIG_IGN);
-
 	WTSRegisterWtsApiFunctionTable(FreeRDP_InitWtsApi());
-	
+
 	if (!(instance = freerdp_listener_new()))
 		return 1;
 
@@ -119,6 +114,5 @@ int main(int argc, char* argv[])
 	}
 
 	freerdp_listener_free(instance);
-
 	return 0;
 }

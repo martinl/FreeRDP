@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include "shadow_surface.h"
@@ -32,8 +32,7 @@ rdpShadowScreen* shadow_screen_new(rdpShadowServer* server)
 	rdpShadowScreen* screen;
 	rdpShadowSubsystem* subsystem;
 	MONITOR_DEF* primary;
-
-	screen = (rdpShadowScreen*) calloc(1, sizeof(rdpShadowScreen));
+	screen = (rdpShadowScreen*)calloc(1, sizeof(rdpShadowScreen));
 
 	if (!screen)
 		goto out_error;
@@ -45,35 +44,27 @@ rdpShadowScreen* shadow_screen_new(rdpShadowServer* server)
 		goto out_free;
 
 	region16_init(&(screen->invalidRegion));
-
 	primary = &(subsystem->monitors[subsystem->selectedMonitor]);
-
 	x = primary->left;
 	y = primary->top;
 	width = primary->right - primary->left;
 	height = primary->bottom - primary->top;
-
 	screen->width = width;
 	screen->height = height;
-
 	screen->primary = shadow_surface_new(server, x, y, width, height);
 
 	if (!screen->primary)
 		goto out_free_region;
 
 	server->surface = screen->primary;
-
 	screen->lobby = shadow_surface_new(server, x, y, width, height);
 
 	if (!screen->lobby)
 		goto out_free_primary;
 
 	server->lobby = screen->lobby;
-
 	shadow_client_init_lobby(server);
-
 	return screen;
-
 out_free_primary:
 	shadow_surface_free(screen->primary);
 	server->surface = screen->primary = NULL;
@@ -92,7 +83,6 @@ void shadow_screen_free(rdpShadowScreen* screen)
 		return;
 
 	DeleteCriticalSection(&(screen->lock));
-
 	region16_uninit(&(screen->invalidRegion));
 
 	if (screen->primary)
@@ -122,14 +112,13 @@ BOOL shadow_screen_resize(rdpShadowScreen* screen)
 
 	subsystem = screen->server->subsystem;
 	primary = &(subsystem->monitors[subsystem->selectedMonitor]);
-
 	x = primary->left;
 	y = primary->top;
 	width = primary->right - primary->left;
 	height = primary->bottom - primary->top;
 
-	if (shadow_surface_resize(screen->primary, x, y, width, height)
-			&& shadow_surface_resize(screen->lobby, x, y, width, height))
+	if (shadow_surface_resize(screen->primary, x, y, width, height) &&
+	    shadow_surface_resize(screen->lobby, x, y, width, height))
 	{
 		if ((width != screen->width) || (height != screen->height))
 		{
@@ -138,8 +127,9 @@ BOOL shadow_screen_resize(rdpShadowScreen* screen)
 			screen->height = height;
 			shadow_client_init_lobby(screen->server);
 		}
+
 		return TRUE;
-	} 
+	}
 
 	return FALSE;
 }

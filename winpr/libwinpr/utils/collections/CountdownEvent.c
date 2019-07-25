@@ -18,11 +18,11 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#	include <unistd.h>
 #endif
 
 #include <winpr/crt.h>
@@ -90,7 +90,6 @@ HANDLE CountdownEvent_WaitHandle(wCountdownEvent* countdown)
 void CountdownEvent_AddCount(wCountdownEvent* countdown, DWORD signalCount)
 {
 	EnterCriticalSection(&countdown->lock);
-
 	countdown->count += signalCount;
 
 	if (countdown->count > 0)
@@ -100,7 +99,8 @@ void CountdownEvent_AddCount(wCountdownEvent* countdown, DWORD signalCount)
 }
 
 /**
- * Registers multiple signals with the CountdownEvent, decrementing the value of CurrentCount by the specified amount.
+ * Registers multiple signals with the CountdownEvent, decrementing the value of CurrentCount by the
+ * specified amount.
  */
 
 BOOL CountdownEvent_Signal(wCountdownEvent* countdown, DWORD signalCount)
@@ -108,9 +108,7 @@ BOOL CountdownEvent_Signal(wCountdownEvent* countdown, DWORD signalCount)
 	BOOL status;
 	BOOL newStatus;
 	BOOL oldStatus;
-
 	status = newStatus = oldStatus = FALSE;
-
 	EnterCriticalSection(&countdown->lock);
 
 	if (WaitForSingleObject(countdown->event, 0) == WAIT_OBJECT_0)
@@ -131,7 +129,6 @@ BOOL CountdownEvent_Signal(wCountdownEvent* countdown, DWORD signalCount)
 	}
 
 	LeaveCriticalSection(&countdown->lock);
-
 	return status;
 }
 
@@ -152,7 +149,7 @@ wCountdownEvent* CountdownEvent_New(DWORD initialCount)
 {
 	wCountdownEvent* countdown = NULL;
 
-	if (!(countdown = (wCountdownEvent*) calloc(1, sizeof(wCountdownEvent))))
+	if (!(countdown = (wCountdownEvent*)calloc(1, sizeof(wCountdownEvent))))
 		return NULL;
 
 	countdown->count = initialCount;
@@ -169,14 +166,12 @@ wCountdownEvent* CountdownEvent_New(DWORD initialCount)
 			goto fail_set_event;
 
 	return countdown;
-
 fail_set_event:
 	CloseHandle(countdown->event);
 fail_create_event:
 	DeleteCriticalSection(&countdown->lock);
 fail_critical_section:
 	free(countdown);
-
 	return NULL;
 }
 
@@ -187,6 +182,5 @@ void CountdownEvent_Free(wCountdownEvent* countdown)
 
 	DeleteCriticalSection(&countdown->lock);
 	CloseHandle(countdown->event);
-
 	free(countdown);
 }

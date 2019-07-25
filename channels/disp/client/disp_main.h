@@ -23,7 +23,7 @@
 #define FREERDP_CHANNEL_DISP_CLIENT_MAIN_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <freerdp/dvc.h>
@@ -33,8 +33,6 @@
 
 #include <freerdp/client/disp.h>
 
-
 #define TAG CHANNELS_TAG("disp.client")
 
 #endif /* FREERDP_CHANNEL_DISP_CLIENT_MAIN_H */
-

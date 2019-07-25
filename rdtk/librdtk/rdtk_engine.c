@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include "rdtk_font.h"
@@ -30,8 +30,7 @@
 rdtkEngine* rdtk_engine_new()
 {
 	rdtkEngine* engine;
-
-	engine = (rdtkEngine*) calloc(1, sizeof(rdtkEngine));
+	engine = (rdtkEngine*)calloc(1, sizeof(rdtkEngine));
 
 	if (!engine)
 		return NULL;
@@ -40,7 +39,6 @@ rdtkEngine* rdtk_engine_new()
 	rdtk_nine_patch_engine_init(engine);
 	rdtk_button_engine_init(engine);
 	rdtk_text_field_engine_init(engine);
-
 	return engine;
 }
 
@@ -53,6 +51,5 @@ void rdtk_engine_free(rdtkEngine* engine)
 	rdtk_nine_patch_engine_uninit(engine);
 	rdtk_button_engine_uninit(engine);
 	rdtk_text_field_engine_uninit(engine);
-
 	free(engine);
 }

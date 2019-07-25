@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include "JournaldAppender.h"
@@ -31,32 +31,34 @@
 #include <winpr/crt.h>
 #include <winpr/environment.h>
 
-
 struct _wLogJournaldAppender
 {
 	WLOG_APPENDER_COMMON();
-	char *identifier;
-	FILE *stream;
+	char* identifier;
+	FILE* stream;
 };
 typedef struct _wLogJournaldAppender wLogJournaldAppender;
 
 static BOOL WLog_JournaldAppender_Open(wLog* log, wLogAppender* appender)
 {
 	int fd;
-	wLogJournaldAppender *journaldAppender;
+	wLogJournaldAppender* journaldAppender;
 
 	if (!log || !appender)
 		return FALSE;
 
 	journaldAppender = (wLogJournaldAppender*)appender;
+
 	if (journaldAppender->stream)
 		return TRUE;
 
 	fd = sd_journal_stream_fd(journaldAppender->identifier, LOG_INFO, 1);
+
 	if (fd < 0)
 		return FALSE;
 
 	journaldAppender->stream = fdopen(fd, "w");
+
 	if (!journaldAppender->stream)
 	{
 		close(fd);
@@ -75,16 +77,17 @@ static BOOL WLog_JournaldAppender_Close(wLog* log, wLogAppender* appender)
 	return TRUE;
 }
 
-static BOOL WLog_JournaldAppender_WriteMessage(wLog* log, wLogAppender* appender, wLogMessage* message)
+static BOOL WLog_JournaldAppender_WriteMessage(wLog* log, wLogAppender* appender,
+                                               wLogMessage* message)
 {
-	char *formatStr;
+	char* formatStr;
 	wLogJournaldAppender* journaldAppender;
 	char prefix[WLOG_MAX_PREFIX_SIZE];
 
 	if (!log || !appender || !message)
 		return FALSE;
 
-	journaldAppender = (wLogJournaldAppender *)appender;
+	journaldAppender = (wLogJournaldAppender*)appender;
 
 	switch (message->Level)
 	{
@@ -92,22 +95,28 @@ static BOOL WLog_JournaldAppender_WriteMessage(wLog* log, wLogAppender* appender
 	case WLOG_DEBUG:
 		formatStr = "<7>%s%s\n";
 		break;
+
 	case WLOG_INFO:
 		formatStr = "<6>%s%s\n";
 		break;
+
 	case WLOG_WARN:
 		formatStr = "<4>%s%s\n";
 		break;
+
 	case WLOG_ERROR:
 		formatStr = "<3>%s%s\n";
 		break;
+
 	case WLOG_FATAL:
 		formatStr = "<2>%s%s\n";
 		break;
+
 	case WLOG_OFF:
 		return TRUE;
+
 	default:
-		fprintf(stderr, "%s: unknown level %"PRIu32"\n", __FUNCTION__, message->Level);
+		fprintf(stderr, "%s: unknown level %" PRIu32 "\n", __FUNCTION__, message->Level);
 		return FALSE;
 	}
 
@@ -116,10 +125,12 @@ static BOOL WLog_JournaldAppender_WriteMessage(wLog* log, wLogAppender* appender
 
 	if (message->Level != WLOG_OFF)
 		fprintf(journaldAppender->stream, formatStr, message->PrefixString, message->TextString);
+
 	return TRUE;
 }
 
-static BOOL WLog_JournaldAppender_WriteDataMessage(wLog* log, wLogAppender* appender, wLogMessage* message)
+static BOOL WLog_JournaldAppender_WriteDataMessage(wLog* log, wLogAppender* appender,
+                                                   wLogMessage* message)
 {
 	if (!log || !appender || !message)
 		return FALSE;
@@ -127,18 +138,18 @@ static BOOL WLog_JournaldAppender_WriteDataMessage(wLog* log, wLogAppender* appe
 	return TRUE;
 }
 
-static BOOL WLog_JournaldAppender_WriteImageMessage(wLog* log, wLogAppender* appender, wLogMessage* message)
+static BOOL WLog_JournaldAppender_WriteImageMessage(wLog* log, wLogAppender* appender,
+                                                    wLogMessage* message)
 {
 	if (!log || !appender || !message)
 		return FALSE;
 
-
 	return TRUE;
 }
 
-static BOOL WLog_JournaldAppender_Set(wLogAppender* appender, const char *setting, void *value)
+static BOOL WLog_JournaldAppender_Set(wLogAppender* appender, const char* setting, void* value)
 {
-	wLogJournaldAppender* journaldAppender = (wLogJournaldAppender *)appender;
+	wLogJournaldAppender* journaldAppender = (wLogJournaldAppender*)appender;
 
 	if (!value || !strlen(value))
 		return FALSE;
@@ -153,17 +164,20 @@ static BOOL WLog_JournaldAppender_Set(wLogAppender* appender, const char *settin
 	if (journaldAppender->identifier)
 		free(journaldAppender->identifier);
 
-	return ((journaldAppender->identifier = _strdup((const char *)value)) != NULL);
+	return ((journaldAppender->identifier = _strdup((const char*)value)) != NULL);
 }
 
 static void WLog_JournaldAppender_Free(wLogAppender* appender)
 {
-	wLogJournaldAppender *journaldAppender;
+	wLogJournaldAppender* journaldAppender;
+
 	if (appender)
 	{
 		journaldAppender = (wLogJournaldAppender*)appender;
+
 		if (journaldAppender->stream)
 			fclose(journaldAppender->stream);
+
 		free(journaldAppender->identifier);
 		free(journaldAppender);
 	}
@@ -174,8 +188,8 @@ wLogAppender* WLog_JournaldAppender_New(wLog* log)
 	wLogJournaldAppender* appender;
 	DWORD nSize;
 	LPCSTR name = "WLOG_JOURNALD_ID";
+	appender = (wLogJournaldAppender*)calloc(1, sizeof(wLogJournaldAppender));
 
-	appender = (wLogJournaldAppender*) calloc(1, sizeof(wLogJournaldAppender));
 	if (!appender)
 		return NULL;
 
@@ -187,23 +201,23 @@ wLogAppender* WLog_JournaldAppender_New(wLog* log)
 	appender->WriteImageMessage = WLog_JournaldAppender_WriteImageMessage;
 	appender->Set = WLog_JournaldAppender_Set;
 	appender->Free = WLog_JournaldAppender_Free;
-
 	nSize = GetEnvironmentVariableA(name, NULL, 0);
+
 	if (nSize)
 	{
-		appender->identifier = (LPSTR) malloc(nSize);
+		appender->identifier = (LPSTR)malloc(nSize);
+
 		if (!appender->identifier)
 			goto error_open;
 
-		if (GetEnvironmentVariableA(name, appender->identifier, nSize) != nSize -1)
+		if (GetEnvironmentVariableA(name, appender->identifier, nSize) != nSize - 1)
 			goto error_open;
 
-		if (!WLog_JournaldAppender_Open(log, (wLogAppender *)appender))
+		if (!WLog_JournaldAppender_Open(log, (wLogAppender*)appender))
 			goto error_open;
 	}
 
-	return (wLogAppender *)appender;
-
+	return (wLogAppender*)appender;
 error_open:
 	free(appender->identifier);
 	free(appender);

@@ -19,26 +19,27 @@
 #ifndef FREERDP_SERVER_SHADOW_WIN_WDS_H
 #define FREERDP_SERVER_SHADOW_WIN_WDS_H
 
-#define WITH_WDS_API	1
+#define WITH_WDS_API 1
 
 #ifndef CINTERFACE
-#define CINTERFACE
+#	define CINTERFACE
 #endif
 
 #include <rdpencomapi.h>
 
 #ifndef DISPID_RDPAPI_EVENT_ON_BOUNDING_RECT_CHANGED
-#define	DISPID_RDPAPI_EVENT_ON_BOUNDING_RECT_CHANGED	340
+#	define DISPID_RDPAPI_EVENT_ON_BOUNDING_RECT_CHANGED 340
 #endif
 
 #include "win_shadow.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-int win_shadow_wds_init(winShadowSubsystem* subsystem);
-int win_shadow_wds_uninit(winShadowSubsystem* subsystem);
+	int win_shadow_wds_init(winShadowSubsystem* subsystem);
+	int win_shadow_wds_uninit(winShadowSubsystem* subsystem);
 
 #ifdef __cplusplus
 }

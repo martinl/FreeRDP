@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <freerdp/server/shadow.h>
@@ -41,8 +41,7 @@ extern int Mac_ShadowSubsystemEntry(RDP_SHADOW_ENTRY_POINTS* pEntryPoints);
 extern int Win_ShadowSubsystemEntry(RDP_SHADOW_ENTRY_POINTS* pEntryPoints);
 #endif
 
-static RDP_SHADOW_SUBSYSTEM g_Subsystems[] =
-{
+static RDP_SHADOW_SUBSYSTEM g_Subsystems[] = {
 
 #ifdef WITH_SHADOW_X11
 	{ "X11", X11_ShadowSubsystemEntry },
@@ -88,7 +87,6 @@ static pfnShadowSubsystemEntry shadow_subsystem_load_static_entry(const char* na
 void shadow_subsystem_set_entry_builtin(const char* name)
 {
 	pfnShadowSubsystemEntry entry;
-
 	entry = shadow_subsystem_load_static_entry(name);
 
 	if (entry)

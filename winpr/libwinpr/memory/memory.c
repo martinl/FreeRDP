@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -26,7 +26,7 @@
 #include <winpr/memory.h>
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#	include <unistd.h>
 #endif
 
 /**
@@ -76,10 +76,10 @@
 
 #ifndef _WIN32
 
-#include "memory.h"
+#	include "memory.h"
 
 HANDLE CreateFileMappingA(HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes, DWORD flProtect,
-		DWORD dwMaximumSizeHigh, DWORD dwMaximumSizeLow, LPCSTR lpName)
+                          DWORD dwMaximumSizeHigh, DWORD dwMaximumSizeLow, LPCSTR lpName)
 {
 	if (hFile != INVALID_HANDLE_VALUE)
 	{
@@ -90,7 +90,7 @@ HANDLE CreateFileMappingA(HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes, DWOR
 }
 
 HANDLE CreateFileMappingW(HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes, DWORD flProtect,
-		DWORD dwMaximumSizeHigh, DWORD dwMaximumSizeLow, LPCWSTR lpName)
+                          DWORD dwMaximumSizeHigh, DWORD dwMaximumSizeLow, LPCWSTR lpName)
 {
 	return NULL;
 }
@@ -106,13 +106,13 @@ HANDLE OpenFileMappingW(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpNa
 }
 
 LPVOID MapViewOfFile(HANDLE hFileMappingObject, DWORD dwDesiredAccess, DWORD dwFileOffsetHigh,
-		DWORD dwFileOffsetLow, SIZE_T dwNumberOfBytesToMap)
+                     DWORD dwFileOffsetLow, SIZE_T dwNumberOfBytesToMap)
 {
 	return NULL;
 }
 
 LPVOID MapViewOfFileEx(HANDLE hFileMappingObject, DWORD dwDesiredAccess, DWORD dwFileOffsetHigh,
-		DWORD dwFileOffsetLow, SIZE_T dwNumberOfBytesToMap, LPVOID lpBaseAddress)
+                       DWORD dwFileOffsetLow, SIZE_T dwNumberOfBytesToMap, LPVOID lpBaseAddress)
 {
 	return NULL;
 }
@@ -128,4 +128,3 @@ BOOL UnmapViewOfFile(LPCVOID lpBaseAddress)
 }
 
 #endif
-

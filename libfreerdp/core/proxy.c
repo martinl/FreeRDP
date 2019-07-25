@@ -24,7 +24,7 @@
 #include "freerdp/settings.h"
 #include "tcp.h"
 
-#include "winpr/environment.h"	/* For GetEnvironmentVariableA */
+#include "winpr/environment.h" /* For GetEnvironmentVariableA */
 
 #define CRLF "\r\n"
 #define TAG FREERDP_TAG("core.proxy")
@@ -52,20 +52,15 @@ enum
 };
 
 /* CONN REQ replies in enum. order */
-static const char* rplstat[] =
-{
-	"succeeded",
-	"general SOCKS server failure",
-	"connection not allowed by ruleset",
-	"Network unreachable",
-	"Host unreachable",
-	"Connection refused",
-	"TTL expired",
-	"Command not supported",
-	"Address type not supported"
-};
-
-
+static const char* rplstat[] = { "succeeded",
+	                             "general SOCKS server failure",
+	                             "connection not allowed by ruleset",
+	                             "Network unreachable",
+	                             "Host unreachable",
+	                             "Connection refused",
+	                             "TTL expired",
+	                             "Command not supported",
+	                             "Address type not supported" };
 
 static BOOL http_proxy_connect(BIO* bufferedBio, const char* hostname, UINT16 port);
 static BOOL socks_proxy_connect(BIO* bufferedBio, const char* proxyUsername,
@@ -176,7 +171,7 @@ static BOOL check_no_proxy(rdpSettings* settings, const char* no_proxy)
 
 		if (currentlen > 0)
 		{
-			WLog_DBG(TAG, "%s => %s (%"PRIdz")", settings->ServerHostname, current, currentlen);
+			WLog_DBG(TAG, "%s => %s (%" PRIdz ")", settings->ServerHostname, current, currentlen);
 
 			/* detect left and right "*" wildcard */
 			if (current[0] == '*')
@@ -195,7 +190,8 @@ static BOOL check_no_proxy(rdpSettings* settings, const char* no_proxy)
 				if (strncmp(current, settings->ServerHostname, currentlen - 1) == 0)
 					result = TRUE;
 			}
-			else if (current[0] == '.') /* Only compare if the no_proxy variable contains a whole domain. */
+			else if (current[0] ==
+			         '.') /* Only compare if the no_proxy variable contains a whole domain. */
 			{
 				if (host_len > currentlen)
 				{
@@ -276,7 +272,8 @@ void proxy_read_environment(rdpSettings* settings, char* envname)
 		{
 			if (check_no_proxy(settings, env))
 			{
-				WLog_INFO(TAG, "deactivating proxy: %s [%s=%s]", settings->ServerHostname, envname, env);
+				WLog_INFO(TAG, "deactivating proxy: %s [%s=%s]", settings->ServerHostname, envname,
+				          env);
 				settings->ProxyType = PROXY_TYPE_NONE;
 			}
 		}
@@ -291,7 +288,7 @@ void proxy_read_environment(rdpSettings* settings, char* envname)
 
 BOOL proxy_parse_uri(rdpSettings* settings, const char* uri)
 {
-	const char* hostname, *pport;
+	const char *hostname, *pport;
 	const char* protocol;
 	const char* p;
 	UINT16 port;
@@ -365,24 +362,23 @@ BOOL proxy_parse_uri(rdpSettings* settings, const char* uri)
 }
 
 BOOL proxy_connect(rdpSettings* settings, BIO* bufferedBio, const char* proxyUsername,
-                   const char* proxyPassword,
-                   const char* hostname, UINT16 port)
+                   const char* proxyPassword, const char* hostname, UINT16 port)
 {
 	switch (settings->ProxyType)
 	{
-		case PROXY_TYPE_NONE:
-		case PROXY_TYPE_IGNORE:
-			return TRUE;
+	case PROXY_TYPE_NONE:
+	case PROXY_TYPE_IGNORE:
+		return TRUE;
 
-		case PROXY_TYPE_HTTP:
-			return http_proxy_connect(bufferedBio, hostname, port);
+	case PROXY_TYPE_HTTP:
+		return http_proxy_connect(bufferedBio, hostname, port);
 
-		case PROXY_TYPE_SOCKS:
-			return socks_proxy_connect(bufferedBio, proxyUsername, proxyPassword, hostname, port);
+	case PROXY_TYPE_SOCKS:
+		return socks_proxy_connect(bufferedBio, proxyUsername, proxyPassword, hostname, port);
 
-		default:
-			WLog_ERR(TAG, "Invalid internal proxy configuration");
-			return FALSE;
+	default:
+		WLog_ERR(TAG, "Invalid internal proxy configuration");
+		return FALSE;
 	}
 }
 
@@ -427,7 +423,8 @@ static BOOL http_proxy_connect(BIO* bufferedBio, const char* hostname, UINT16 po
 			return FALSE;
 		}
 
-		status = BIO_read(bufferedBio, (BYTE*)recv_buf + resultsize, sizeof(recv_buf) - resultsize - 1);
+		status =
+		    BIO_read(bufferedBio, (BYTE*)recv_buf + resultsize, sizeof(recv_buf) - resultsize - 1);
 
 		if (status < 0)
 		{
@@ -503,7 +500,8 @@ static int recv_socks_reply(BIO* bufferedBio, BYTE* buf, int len, char* reason, 
 		if (status == 0)
 		{
 			/* Error? */
-			WLog_ERR(TAG, "Failed reading %s reply from SOCKS proxy (BIO_read returned zero)", reason);
+			WLog_ERR(TAG, "Failed reading %s reply from SOCKS proxy (BIO_read returned zero)",
+			         reason);
 			return -1;
 		}
 	}
@@ -524,8 +522,7 @@ static int recv_socks_reply(BIO* bufferedBio, BYTE* buf, int len, char* reason, 
 }
 
 static BOOL socks_proxy_connect(BIO* bufferedBio, const char* proxyUsername,
-                                const char* proxyPassword,
-                                const char* hostname, UINT16 port)
+                                const char* proxyPassword, const char* hostname, UINT16 port)
 {
 	int status;
 	int nauthMethods = 1, writeLen = 3;
@@ -539,7 +536,7 @@ static BOOL socks_proxy_connect(BIO* bufferedBio, const char* proxyUsername,
 	}
 
 	/* select auth. method */
-	buf[0] = 5; /* SOCKS version */
+	buf[0] = 5;            /* SOCKS version */
 	buf[1] = nauthMethods; /* #of methods offered */
 	buf[2] = AUTH_M_NO_AUTH;
 
@@ -561,67 +558,67 @@ static BOOL socks_proxy_connect(BIO* bufferedBio, const char* proxyUsername,
 
 	switch (buf[1])
 	{
-		case AUTH_M_NO_AUTH:
-			WLog_DBG(TAG, "SOCKS Proxy: (NO AUTH) method was selected");
-			break;
+	case AUTH_M_NO_AUTH:
+		WLog_DBG(TAG, "SOCKS Proxy: (NO AUTH) method was selected");
+		break;
 
-		case AUTH_M_USR_PASS:
-			if (!proxyUsername || !proxyPassword)
-				return FALSE;
-			else
+	case AUTH_M_USR_PASS:
+		if (!proxyUsername || !proxyPassword)
+			return FALSE;
+		else
+		{
+			int usernameLen = strnlen(proxyUsername, 255);
+			int userpassLen = strnlen(proxyPassword, 255);
+			BYTE* ptr;
+
+			if (nauthMethods < 2)
 			{
-				int usernameLen = strnlen(proxyUsername, 255);
-				int userpassLen = strnlen(proxyPassword, 255);
-				BYTE* ptr;
-
-				if (nauthMethods < 2)
-				{
-					WLog_ERR(TAG, "SOCKS Proxy: USER/PASS method was not proposed to server");
-					return FALSE;
-				}
-
-				/* user/password v1 method */
-				ptr = buf + 2;
-				buf[0] = 1;
-				buf[1] = usernameLen;
-				memcpy(ptr, proxyUsername, usernameLen);
-				ptr += usernameLen;
-				*ptr = userpassLen;
-				ptr++;
-				memcpy(ptr, proxyPassword, userpassLen);
-				status = BIO_write(bufferedBio, buf, 3 + usernameLen + userpassLen);
-
-				if (status != 3 + usernameLen + userpassLen)
-				{
-					WLog_ERR(TAG, "SOCKS Proxy: error writing user/password request");
-					return FALSE;
-				}
-
-				status = recv_socks_reply(bufferedBio, buf, 2, "AUTH REQ", 1);
-
-				if (status < 2)
-					return FALSE;
-
-				if (buf[1] != 0x00)
-				{
-					WLog_ERR(TAG, "SOCKS Proxy: invalid user/password");
-					return FALSE;
-				}
+				WLog_ERR(TAG, "SOCKS Proxy: USER/PASS method was not proposed to server");
+				return FALSE;
 			}
 
-			break;
+			/* user/password v1 method */
+			ptr = buf + 2;
+			buf[0] = 1;
+			buf[1] = usernameLen;
+			memcpy(ptr, proxyUsername, usernameLen);
+			ptr += usernameLen;
+			*ptr = userpassLen;
+			ptr++;
+			memcpy(ptr, proxyPassword, userpassLen);
+			status = BIO_write(bufferedBio, buf, 3 + usernameLen + userpassLen);
 
-		default:
-			WLog_ERR(TAG, "SOCKS Proxy: unknown method 0x%x was selected by proxy", buf[1]);
-			return FALSE;
+			if (status != 3 + usernameLen + userpassLen)
+			{
+				WLog_ERR(TAG, "SOCKS Proxy: error writing user/password request");
+				return FALSE;
+			}
+
+			status = recv_socks_reply(bufferedBio, buf, 2, "AUTH REQ", 1);
+
+			if (status < 2)
+				return FALSE;
+
+			if (buf[1] != 0x00)
+			{
+				WLog_ERR(TAG, "SOCKS Proxy: invalid user/password");
+				return FALSE;
+			}
+		}
+
+		break;
+
+	default:
+		WLog_ERR(TAG, "SOCKS Proxy: unknown method 0x%x was selected by proxy", buf[1]);
+		return FALSE;
 	}
 
 	/* CONN request */
-	buf[0] = 5; /* SOCKS version */
+	buf[0] = 5;                 /* SOCKS version */
 	buf[1] = SOCKS_CMD_CONNECT; /* command */
-	buf[2] = 0; /* 3rd octet is reserved x00 */
-	buf[3] = SOCKS_ADDR_FQDN; /* addr.type */
-	buf[4] = hostnlen; /* DST.ADDR */
+	buf[2] = 0;                 /* 3rd octet is reserved x00 */
+	buf[3] = SOCKS_ADDR_FQDN;   /* addr.type */
+	buf[4] = hostnlen;          /* DST.ADDR */
 	memcpy(buf + 5, hostname, hostnlen);
 	/* follows DST.PORT in netw. format */
 	buf[hostnlen + 5] = (port >> 8) & 0xff;

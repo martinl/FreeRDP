@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <stddef.h>
@@ -41,7 +41,7 @@ int freerdp_handle_signals(void)
 
 #else
 
-#include <pthread.h>
+#	include <pthread.h>
 
 volatile sig_atomic_t terminal_needs_reset = 0;
 int terminal_fildes = 0;
@@ -67,41 +67,23 @@ static void fatal_handler(int signum)
 	raise(signum);
 }
 
-const int fatal_signals[] =
-{
-	SIGABRT,
-	SIGALRM,
-	SIGBUS,
-	SIGFPE,
-	SIGHUP,
-	SIGILL,
-	SIGINT,
-	SIGKILL,
-	SIGQUIT,
-	SIGSEGV,
-	SIGSTOP,
-	SIGTERM,
-	SIGTSTP,
-	SIGTTIN,
-	SIGTTOU,
-	SIGUSR1,
-	SIGUSR2,
-#ifdef SIGPOLL
-	SIGPOLL,
-#endif
-#ifdef SIGPROF
-	SIGPROF,
-#endif
-#ifdef SIGSYS
-	SIGSYS,
-#endif
-	SIGTRAP,
-#ifdef SIGVTALRM
-	SIGVTALRM,
-#endif
-	SIGXCPU,
-	SIGXFSZ
-};
+const int fatal_signals[] = { SIGABRT,   SIGALRM, SIGBUS,  SIGFPE,  SIGHUP,  SIGILL,
+	                          SIGINT,    SIGKILL, SIGQUIT, SIGSEGV, SIGSTOP, SIGTERM,
+	                          SIGTSTP,   SIGTTIN, SIGTTOU, SIGUSR1, SIGUSR2,
+#	ifdef SIGPOLL
+	                          SIGPOLL,
+#	endif
+#	ifdef SIGPROF
+	                          SIGPROF,
+#	endif
+#	ifdef SIGSYS
+	                          SIGSYS,
+#	endif
+	                          SIGTRAP,
+#	ifdef SIGVTALRM
+	                          SIGVTALRM,
+#	endif
+	                          SIGXCPU,   SIGXFSZ };
 
 int freerdp_handle_signals(void)
 {
@@ -114,7 +96,7 @@ int freerdp_handle_signals(void)
 	sigdelset(&(fatal_sigaction.sa_mask), SIGCONT);
 	pthread_sigmask(SIG_BLOCK, &(fatal_sigaction.sa_mask), &orig_set);
 	fatal_sigaction.sa_handler = fatal_handler;
-	fatal_sigaction.sa_flags  = 0;
+	fatal_sigaction.sa_flags = 0;
 
 	for (signal_index = 0; signal_index < ARRAYSIZE(fatal_signals); signal_index++)
 	{

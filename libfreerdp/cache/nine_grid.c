@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <stdio.h>
@@ -30,7 +30,6 @@
 #include <freerdp/freerdp.h>
 #include <winpr/stream.h>
 
-
 #include <freerdp/cache/nine_grid.h>
 
 #define TAG FREERDP_TAG("cache.nine_grid")
@@ -38,16 +37,15 @@
 static void* nine_grid_cache_get(rdpNineGridCache* nine_grid, UINT32 index);
 static void nine_grid_cache_put(rdpNineGridCache* nine_grid, UINT32 index, void* entry);
 
-
 static BOOL update_gdi_draw_nine_grid(rdpContext* context,
-					  const DRAW_NINE_GRID_ORDER* draw_nine_grid)
+                                      const DRAW_NINE_GRID_ORDER* draw_nine_grid)
 {
 	rdpCache* cache = context->cache;
 	return IFCALLRESULT(TRUE, cache->nine_grid->DrawNineGrid, context, draw_nine_grid);
 }
 
 static BOOL update_gdi_multi_draw_nine_grid(rdpContext* context,
-						const MULTI_DRAW_NINE_GRID_ORDER* multi_draw_nine_grid)
+                                            const MULTI_DRAW_NINE_GRID_ORDER* multi_draw_nine_grid)
 {
 	rdpCache* cache = context->cache;
 	return IFCALLRESULT(TRUE, cache->nine_grid->MultiDrawNineGrid, context, multi_draw_nine_grid);
@@ -56,10 +54,8 @@ static BOOL update_gdi_multi_draw_nine_grid(rdpContext* context,
 void nine_grid_cache_register_callbacks(rdpUpdate* update)
 {
 	rdpCache* cache = update->context->cache;
-
 	cache->nine_grid->DrawNineGrid = update->primary->DrawNineGrid;
 	cache->nine_grid->MultiDrawNineGrid = update->primary->MultiDrawNineGrid;
-
 	update->primary->DrawNineGrid = update_gdi_draw_nine_grid;
 	update->primary->MultiDrawNineGrid = update_gdi_multi_draw_nine_grid;
 }
@@ -70,7 +66,7 @@ void* nine_grid_cache_get(rdpNineGridCache* nine_grid, UINT32 index)
 
 	if (index >= nine_grid->maxEntries)
 	{
-		WLog_ERR(TAG,  "invalid NineGrid index: 0x%08"PRIX32"", index);
+		WLog_ERR(TAG, "invalid NineGrid index: 0x%08" PRIX32 "", index);
 		return NULL;
 	}
 
@@ -78,7 +74,7 @@ void* nine_grid_cache_get(rdpNineGridCache* nine_grid, UINT32 index)
 
 	if (entry == NULL)
 	{
-		WLog_ERR(TAG,  "invalid NineGrid at index: 0x%08"PRIX32"", index);
+		WLog_ERR(TAG, "invalid NineGrid at index: 0x%08" PRIX32 "", index);
 		return NULL;
 	}
 
@@ -89,7 +85,7 @@ void nine_grid_cache_put(rdpNineGridCache* nine_grid, UINT32 index, void* entry)
 {
 	if (index >= nine_grid->maxEntries)
 	{
-		WLog_ERR(TAG,  "invalid NineGrid index: 0x%08"PRIX32"", index);
+		WLog_ERR(TAG, "invalid NineGrid index: 0x%08" PRIX32 "", index);
 		return;
 	}
 
@@ -100,20 +96,18 @@ void nine_grid_cache_put(rdpNineGridCache* nine_grid, UINT32 index, void* entry)
 rdpNineGridCache* nine_grid_cache_new(rdpSettings* settings)
 {
 	rdpNineGridCache* nine_grid;
+	nine_grid = (rdpNineGridCache*)calloc(1, sizeof(rdpNineGridCache));
 
-	nine_grid = (rdpNineGridCache*) calloc(1, sizeof(rdpNineGridCache));
 	if (!nine_grid)
 		return NULL;
 
 	nine_grid->settings = settings;
-
 	nine_grid->maxSize = 2560;
 	nine_grid->maxEntries = 256;
-
 	nine_grid->settings->DrawNineGridCacheSize = nine_grid->maxSize;
 	nine_grid->settings->DrawNineGridCacheEntries = nine_grid->maxEntries;
+	nine_grid->entries = (NINE_GRID_ENTRY*)calloc(nine_grid->maxEntries, sizeof(NINE_GRID_ENTRY));
 
-	nine_grid->entries = (NINE_GRID_ENTRY*) calloc(nine_grid->maxEntries, sizeof(NINE_GRID_ENTRY));
 	if (!nine_grid->entries)
 	{
 		free(nine_grid);
@@ -131,7 +125,7 @@ void nine_grid_cache_free(rdpNineGridCache* nine_grid)
 	{
 		if (nine_grid->entries != NULL)
 		{
-			for (i = 0; i < (int) nine_grid->maxEntries; i++)
+			for (i = 0; i < (int)nine_grid->maxEntries; i++)
 				free(nine_grid->entries[i].entry);
 
 			free(nine_grid->entries);

@@ -56,10 +56,11 @@
 static void pf_server_handle_client_disconnection(freerdp_peer* client)
 {
 	pServerContext* ps = (pServerContext*)client->context;
-	rdpContext* pc = (rdpContext*) ps->pdata->pc;
+	rdpContext* pc = (rdpContext*)ps->pdata->pc;
 	proxyData* pdata = ps->pdata;
-	WLog_INFO(TAG, "Connection with %s was closed; closing proxy's client <> target server connection %s",
-	          client->hostname, pc->settings->ServerHostname);
+	WLog_INFO(
+	    TAG, "Connection with %s was closed; closing proxy's client <> target server connection %s",
+	    client->hostname, pc->settings->ServerHostname);
 	/* Mark connection closed for sContext */
 	SetEvent(pdata->connectionClosed);
 	freerdp_abort_connect(pc->instance);
@@ -70,14 +71,14 @@ static void pf_server_handle_client_disconnection(freerdp_peer* client)
 	ps->thread = NULL;
 }
 
-static BOOL pf_server_parse_target_from_routing_token(rdpContext* context,
-        char** target, DWORD* port)
+static BOOL pf_server_parse_target_from_routing_token(rdpContext* context, char** target,
+                                                      DWORD* port)
 {
-#define TARGET_MAX	(100)
+#define TARGET_MAX (100)
 #define ROUTING_TOKEN_PREFIX "Cookie: msts="
 	char* colon;
 	size_t len;
-	const size_t prefix_len  = strlen(ROUTING_TOKEN_PREFIX);
+	const size_t prefix_len = strlen(ROUTING_TOKEN_PREFIX);
 	DWORD routing_token_length;
 	const char* routing_token = freerdp_nego_get_routing_token(context, &routing_token_length);
 
@@ -89,8 +90,11 @@ static BOOL pf_server_parse_target_from_routing_token(rdpContext* context,
 
 	if ((routing_token_length <= prefix_len) || (routing_token_length >= TARGET_MAX))
 	{
-		WLog_ERR(TAG, "pf_server_parse_target_from_routing_token(): invalid routing token length: %"PRIu32"",
-		         routing_token_length);
+		WLog_ERR(
+		    TAG,
+		    "pf_server_parse_target_from_routing_token(): invalid routing token length: %" PRIu32
+		    "",
+		    routing_token_length);
 		return FALSE;
 	}
 
@@ -126,7 +130,7 @@ static BOOL pf_server_get_target_info(rdpContext* context, rdpSettings* settings
                                       proxyConfig* config)
 {
 	WLog_INFO(TAG, "pf_server_get_target_info(): fetching target from %s",
-		config->UseLoadBalanceInfo ? "load-balance-info" : "config");
+	          config->UseLoadBalanceInfo ? "load-balance-info" : "config");
 
 	if (config->UseLoadBalanceInfo)
 		return pf_server_parse_target_from_routing_token(context, &settings->ServerHostname,
@@ -158,8 +162,8 @@ static BOOL pf_server_post_connect(freerdp_peer* client)
 	proxyData* pdata;
 	ps = (pServerContext*)client->context;
 	pdata = ps->pdata;
-
 	pc = p_client_context_create(client->settings);
+
 	if (pc == NULL)
 	{
 		WLog_ERR(TAG, "pf_server_post_connect(): p_client_context_create failed!");
@@ -176,9 +180,8 @@ static BOOL pf_server_post_connect(freerdp_peer* client)
 		return FALSE;
 	}
 
-	WLog_INFO(TAG, "pf_server_post_connect(): target == %s:%"PRIu16"", pc->settings->ServerHostname,
-	      pc->settings->ServerPort);
-
+	WLog_INFO(TAG, "pf_server_post_connect(): target == %s:%" PRIu16 "",
+	          pc->settings->ServerHostname, pc->settings->ServerPort);
 	pf_server_rdpgfx_init(ps);
 	pf_server_disp_init(ps);
 
@@ -226,6 +229,7 @@ static DWORD WINAPI pf_server_handle_client(LPVOID arg)
 		goto out_free_peer;
 
 	ps = (pServerContext*)client->context;
+
 	if (!(ps->dynvcReady = CreateEvent(NULL, TRUE, FALSE, NULL)))
 	{
 		WLog_ERR(TAG, "pf_server_post_connect(): CreateEvent failed!");
@@ -308,7 +312,8 @@ static DWORD WINAPI pf_server_handle_client(LPVOID arg)
 
 		if (pf_common_connection_aborted_by_peer(pdata))
 		{
-			WLog_INFO(TAG, "proxy's client disconnected, closing connection with client %s", client->hostname);
+			WLog_INFO(TAG, "proxy's client disconnected, closing connection with client %s",
+			          client->hostname);
 			break;
 		}
 
@@ -366,13 +371,13 @@ fail:
 
 	if (ps->gfx)
 		rdpgfx_server_context_free(ps->gfx);
-		
+
 	if (client->connected && !pf_common_connection_aborted_by_peer(pdata))
 	{
 		pf_server_handle_client_disconnection(client);
 	}
 
-	pc = (rdpContext*) pdata->pc;
+	pc = (rdpContext*)pdata->pc;
 	freerdp_client_stop(pc);
 	proxy_data_free(pdata);
 	freerdp_client_context_free(pc);

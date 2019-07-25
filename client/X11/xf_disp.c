@@ -21,18 +21,17 @@
 #include <X11/Xutil.h>
 
 #ifdef WITH_XRANDR
-#include <X11/extensions/Xrandr.h>
-#include <X11/extensions/randr.h>
+#	include <X11/extensions/Xrandr.h>
+#	include <X11/extensions/randr.h>
 
-#if (RANDR_MAJOR * 100 + RANDR_MINOR) >= 105
-#	define USABLE_XRANDR
-#endif
+#	if (RANDR_MAJOR * 100 + RANDR_MINOR) >= 105
+#		define USABLE_XRANDR
+#	endif
 
 #endif
 
 #include "xf_disp.h"
 #include "xf_monitor.h"
-
 
 #define TAG CLIENT_TAG("x11disp")
 #define RESIZE_MIN_DELAY 200 /* minimum delay in ms between two resizes */
@@ -121,8 +120,8 @@ static BOOL xf_disp_sendResize(xfDispContext* xfDisp)
 
 	if (xfc->fullscreen && (settings->MonitorCount > 0))
 	{
-		if (xf_disp_sendLayout(xfDisp->disp, settings->MonitorDefArray,
-		                       settings->MonitorCount) != CHANNEL_RC_OK)
+		if (xf_disp_sendLayout(xfDisp->disp, settings->MonitorDefArray, settings->MonitorCount) !=
+		    CHANNEL_RC_OK)
 			return FALSE;
 	}
 	else
@@ -214,7 +213,6 @@ static void xf_disp_OnGraphicsReset(void* context, GraphicsResetEventArgs* e)
 	xfContext* xfc;
 	xfDispContext* xfDisp;
 	rdpSettings* settings;
-
 	WINPR_UNUSED(e);
 
 	if (!xf_disp_check_context(context, &xfc, &xfDisp, &settings))
@@ -234,7 +232,6 @@ static void xf_disp_OnTimer(void* context, TimerEventArgs* e)
 	xfContext* xfc;
 	xfDispContext* xfDisp;
 	rdpSettings* settings;
-
 	WINPR_UNUSED(e);
 
 	if (!xf_disp_check_context(context, &xfc, &xfDisp, &settings))
@@ -315,29 +312,29 @@ UINT xf_disp_sendLayout(DispClientContext* disp, rdpMonitor* monitors, int nmoni
 
 		switch (monitors[i].attributes.orientation)
 		{
-			case 90:
-				layouts[i].Orientation = ORIENTATION_PORTRAIT;
-				break;
+		case 90:
+			layouts[i].Orientation = ORIENTATION_PORTRAIT;
+			break;
 
-			case 180:
-				layouts[i].Orientation = ORIENTATION_LANDSCAPE_FLIPPED;
-				break;
+		case 180:
+			layouts[i].Orientation = ORIENTATION_LANDSCAPE_FLIPPED;
+			break;
 
-			case 270:
-				layouts[i].Orientation = ORIENTATION_PORTRAIT_FLIPPED;
-				break;
+		case 270:
+			layouts[i].Orientation = ORIENTATION_PORTRAIT_FLIPPED;
+			break;
 
-			case 0:
-			default:
-				/* MS-RDPEDISP - 2.2.2.2.1:
-				 * Orientation (4 bytes): A 32-bit unsigned integer that specifies the
-				 * orientation of the monitor in degrees. Valid values are 0, 90, 180
-				 * or 270
-				 *
-				 * So we default to ORIENTATION_LANDSCAPE
-				 */
-				layouts[i].Orientation = ORIENTATION_LANDSCAPE;
-				break;
+		case 0:
+		default:
+			/* MS-RDPEDISP - 2.2.2.2.1:
+			 * Orientation (4 bytes): A 32-bit unsigned integer that specifies the
+			 * orientation of the monitor in degrees. Valid values are 0, 90, 180
+			 * or 270
+			 *
+			 * So we default to ORIENTATION_LANDSCAPE
+			 */
+			layouts[i].Orientation = ORIENTATION_LANDSCAPE;
+			break;
 		}
 
 		layouts[i].DesktopScaleFactor = settings->DesktopScaleFactor;
@@ -378,8 +375,8 @@ BOOL xf_disp_handle_xevent(xfContext* xfc, XEvent* event)
 
 #endif
 	xf_detect_monitors(xfc, &maxWidth, &maxHeight);
-	return xf_disp_sendLayout(xfDisp->disp, settings->MonitorDefArray,
-	                          settings->MonitorCount) == CHANNEL_RC_OK;
+	return xf_disp_sendLayout(xfDisp->disp, settings->MonitorDefArray, settings->MonitorCount) ==
+	       CHANNEL_RC_OK;
 }
 
 BOOL xf_disp_handle_configureNotify(xfContext* xfc, int width, int height)
@@ -406,7 +403,8 @@ static UINT xf_DisplayControlCaps(DispClientContext* disp, UINT32 maxNumMonitors
 	xfDispContext* xfDisp = (xfDispContext*)disp->custom;
 	rdpSettings* settings = xfDisp->xfc->context.settings;
 	WLog_DBG(TAG,
-	         "DisplayControlCapsPdu: MaxNumMonitors: %"PRIu32" MaxMonitorAreaFactorA: %"PRIu32" MaxMonitorAreaFactorB: %"PRIu32"",
+	         "DisplayControlCapsPdu: MaxNumMonitors: %" PRIu32 " MaxMonitorAreaFactorA: %" PRIu32
+	         " MaxMonitorAreaFactorB: %" PRIu32 "",
 	         maxNumMonitors, maxMonitorAreaFactorA, maxMonitorAreaFactorB);
 	xfDisp->activated = TRUE;
 
@@ -430,7 +428,7 @@ BOOL xf_disp_init(xfDispContext* xfDisp, DispClientContext* disp)
 		return FALSE;
 
 	xfDisp->disp = disp;
-	disp->custom = (void*) xfDisp;
+	disp->custom = (void*)xfDisp;
 
 	if (settings->DynamicResolutionUpdate)
 	{

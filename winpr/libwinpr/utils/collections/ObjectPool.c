@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -75,10 +75,10 @@ void ObjectPool_Return(wObjectPool* pool, void* obj)
 	if ((pool->size + 1) >= pool->capacity)
 	{
 		size_t new_cap;
-		void **new_arr;
-
+		void** new_arr;
 		new_cap = pool->capacity * 2;
-		new_arr = (void**) realloc(pool->array, sizeof(void*) * new_cap);
+		new_arr = (void**)realloc(pool->array, sizeof(void*) * new_cap);
+
 		if (!new_arr)
 			goto out;
 
@@ -92,6 +92,7 @@ void ObjectPool_Return(wObjectPool* pool, void* obj)
 		pool->object.fnObjectUninit(obj);
 
 out:
+
 	if (pool->synchronized)
 		LeaveCriticalSection(&pool->lock);
 }
@@ -124,24 +125,24 @@ void ObjectPool_Clear(wObjectPool* pool)
 wObjectPool* ObjectPool_New(BOOL synchronized)
 {
 	wObjectPool* pool = NULL;
-
-	pool = (wObjectPool*) calloc(1, sizeof(wObjectPool));
+	pool = (wObjectPool*)calloc(1, sizeof(wObjectPool));
 
 	if (pool)
 	{
 		pool->capacity = 32;
 		pool->size = 0;
-		pool->array = (void**) calloc(pool->capacity, sizeof(void*));
+		pool->array = (void**)calloc(pool->capacity, sizeof(void*));
+
 		if (!pool->array)
 		{
 			free(pool);
 			return NULL;
 		}
+
 		pool->synchronized = synchronized;
 
 		if (pool->synchronized)
 			InitializeCriticalSectionAndSpinCount(&pool->lock, 4000);
-
 	}
 
 	return pool;
@@ -157,7 +158,6 @@ void ObjectPool_Free(wObjectPool* pool)
 			DeleteCriticalSection(&pool->lock);
 
 		free(pool->array);
-
 		free(pool);
 	}
 }

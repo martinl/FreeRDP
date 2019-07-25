@@ -27,14 +27,13 @@
 #include "BinaryAppender.h"
 #include "CallbackAppender.h"
 #ifdef HAVE_JOURNALD_H
-#include "JournaldAppender.h"
+#	include "JournaldAppender.h"
 #endif
 #ifdef HAVE_SYSLOG_H
-#include "SyslogAppender.h"
+#	include "SyslogAppender.h"
 #endif
 #include "UdpAppender.h"
 
 void WLog_Appender_Free(wLog* log, wLogAppender* appender);
 
 #endif /* WINPR_WLOG_APPENDER_PRIVATE_H */
- 

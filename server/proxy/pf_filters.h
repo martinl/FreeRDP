@@ -53,22 +53,24 @@ struct proxy_filter
 BOOL pf_filters_init(filters_list** list);
 BOOL pf_filters_register_new(filters_list* list, const char* module_path, const char* filter_name);
 PF_FILTER_RESULT pf_filters_run_by_type(filters_list* list, PF_FILTER_TYPE type,
-                                        connectionInfo* info,
-                                        void* param);
+                                        connectionInfo* info, void* param);
 void pf_filters_unregister_all(filters_list* list);
 
-#define RUN_FILTER(_filters,_type,_conn_info,_event_info,_ret,_cb,...) do { \
-			switch(pf_filters_run_by_type(_filters,_type,_conn_info,_event_info)) { \
-				case FILTER_PASS:           \
-					_ret = _cb(__VA_ARGS__);       \
-					break; \
-				case FILTER_IGNORE:       \
-					_ret = TRUE;   \
-					break; \
-				case FILTER_DROP:       \
-				default: \
-					_ret = FALSE;   \
-			} \
-		} while(0)
+#define RUN_FILTER(_filters, _type, _conn_info, _event_info, _ret, _cb, ...)      \
+	do                                                                            \
+	{                                                                             \
+		switch (pf_filters_run_by_type(_filters, _type, _conn_info, _event_info)) \
+		{                                                                         \
+		case FILTER_PASS:                                                         \
+			_ret = _cb(__VA_ARGS__);                                              \
+			break;                                                                \
+		case FILTER_IGNORE:                                                       \
+			_ret = TRUE;                                                          \
+			break;                                                                \
+		case FILTER_DROP:                                                         \
+		default:                                                                  \
+			_ret = FALSE;                                                         \
+		}                                                                         \
+	} while (0)
 
 #endif /* FREERDP_SERVER_PROXY_FILTERS_H */

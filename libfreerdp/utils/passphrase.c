@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <errno.h>
@@ -34,13 +34,13 @@ char* freerdp_passphrase_read(const char* prompt, char* buf, size_t bufsiz, int 
 
 #elif !defined(ANDROID)
 
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <termios.h>
-#include <unistd.h>
-#include <freerdp/utils/signal.h>
+#	include <fcntl.h>
+#	include <stdio.h>
+#	include <string.h>
+#	include <sys/stat.h>
+#	include <termios.h>
+#	include <unistd.h>
+#	include <freerdp/utils/signal.h>
 
 char* freerdp_passphrase_read(const char* prompt, char* buf, size_t bufsiz, int from_stdin)
 {
@@ -58,8 +58,8 @@ char* freerdp_passphrase_read(const char* prompt, char* buf, size_t bufsiz, int 
 	}
 
 	ctermid(term_name);
-	if(from_stdin || strcmp(term_name, "") == 0
-		|| (term_file = open(term_name, O_RDWR)) == -1)
+
+	if (from_stdin || strcmp(term_name, "") == 0 || (term_file = open(term_name, O_RDWR)) == -1)
 	{
 		write_file = STDERR_FILENO;
 		terminal_fildes = STDIN_FILENO;
@@ -76,35 +76,41 @@ char* freerdp_passphrase_read(const char* prompt, char* buf, size_t bufsiz, int 
 		new_flags.c_lflag &= ~ECHO;
 		new_flags.c_lflag |= ECHONL;
 		terminal_needs_reset = 1;
+
 		if (tcsetattr(terminal_fildes, TCSAFLUSH, &new_flags) == -1)
 			terminal_needs_reset = 0;
 	}
 
-	if (write(write_file, prompt, strlen(prompt)) == (ssize_t) -1)
+	if (write(write_file, prompt, strlen(prompt)) == (ssize_t)-1)
 		goto error;
 
 	buf_iter = buf;
+
 	while ((nbytes = read(terminal_fildes, &read_char, sizeof read_char)) == (sizeof read_char))
 	{
 		if (read_char == '\n')
 			break;
-		if (read_bytes < (bufsiz - (size_t) 1))
+
+		if (read_bytes < (bufsiz - (size_t)1))
 		{
 			read_bytes++;
 			*buf_iter = read_char;
 			buf_iter++;
 		}
 	}
+
 	*buf_iter = '\0';
 	buf_iter = NULL;
 	read_char = '\0';
-	if (nbytes == (ssize_t) -1)
+
+	if (nbytes == (ssize_t)-1)
 		goto error;
 
 	if (terminal_needs_reset)
 	{
-		if (tcsetattr(terminal_fildes, TCSAFLUSH, &orig_flags) == -1)	
+		if (tcsetattr(terminal_fildes, TCSAFLUSH, &orig_flags) == -1)
 			goto error;
+
 		terminal_needs_reset = 0;
 	}
 
@@ -115,19 +121,21 @@ char* freerdp_passphrase_read(const char* prompt, char* buf, size_t bufsiz, int 
 	}
 
 	return buf;
+error:
+{
+	int saved_errno = errno;
+	buf_iter = NULL;
+	read_char = '\0';
 
-	error:
-	{
-		int saved_errno = errno;
-		buf_iter = NULL;
-		read_char = '\0';
-		if (terminal_needs_reset)
-			tcsetattr(terminal_fildes, TCSAFLUSH, &orig_flags);
-		if (terminal_fildes != STDIN_FILENO)
-			close(terminal_fildes);
-		errno = saved_errno;
-		return NULL;
-	}
+	if (terminal_needs_reset)
+		tcsetattr(terminal_fildes, TCSAFLUSH, &orig_flags);
+
+	if (terminal_fildes != STDIN_FILENO)
+		close(terminal_fildes);
+
+	errno = saved_errno;
+	return NULL;
+}
 }
 
 #else
@@ -138,4 +146,3 @@ char* freerdp_passphrase_read(const char* prompt, char* buf, size_t bufsiz, int 
 }
 
 #endif
-

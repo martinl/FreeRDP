@@ -18,21 +18,20 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #ifdef _WIN32
 
-#include <winpr/crt.h>
-#include <winpr/library.h>
-#include <winpr/smartcard.h>
+#	include <winpr/crt.h>
+#	include <winpr/library.h>
+#	include <winpr/smartcard.h>
 
-#include "smartcard_winscard.h"
+#	include "smartcard_winscard.h"
 
 static HMODULE g_WinSCardModule = NULL;
 
-SCardApiFunctionTable WinSCard_SCardApiFunctionTable =
-{
+SCardApiFunctionTable WinSCard_SCardApiFunctionTable = {
 	0, /* dwVersion */
 	0, /* dwFlags */
 
@@ -111,7 +110,7 @@ SCardApiFunctionTable WinSCard_SCardApiFunctionTable =
 	NULL, /* SCardGetReaderDeviceInstanceIdW */
 	NULL, /* SCardListReadersWithDeviceInstanceIdA */
 	NULL, /* SCardListReadersWithDeviceInstanceIdW */
-	NULL /* SCardAudit */
+	NULL  /* SCardAudit */
 };
 
 PSCardApiFunctionTable WinSCard_GetSCardApiFunctionTable(void)

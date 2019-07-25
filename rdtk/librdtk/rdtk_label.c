@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include "rdtk_font.h"
@@ -25,7 +25,7 @@
 #include "rdtk_label.h"
 
 int rdtk_label_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int nHeight,
-		rdtkLabel* label, const char* text, int hAlign, int vAlign)
+                    rdtkLabel* label, const char* text, int hAlign, int vAlign)
 {
 	int offsetX;
 	int offsetY;
@@ -33,10 +33,8 @@ int rdtk_label_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int 
 	int textHeight;
 	rdtkFont* font;
 	rdtkEngine* engine;
-
 	engine = surface->engine;
 	font = engine->font;
-
 	rdtk_font_text_draw_size(font, &textWidth, &textHeight, text);
 
 	if ((textWidth > 0) && (textHeight > 0))
@@ -59,14 +57,12 @@ int rdtk_label_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int 
 rdtkLabel* rdtk_label_new(rdtkEngine* engine)
 {
 	rdtkLabel* label;
-
-	label = (rdtkLabel*) calloc(1, sizeof(rdtkLabel));
+	label = (rdtkLabel*)calloc(1, sizeof(rdtkLabel));
 
 	if (!label)
 		return NULL;
 
 	label->engine = engine;
-
 	return label;
 }
 

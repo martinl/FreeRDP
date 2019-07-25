@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -27,26 +27,26 @@
 
 #ifndef _WIN32
 
-#include <stdint.h>
-#include <limits.h>
+#	include <stdint.h>
+#	include <limits.h>
 
-#define WINPR_ALIGNED_MEM_SIGNATURE		0x0BA0BAB
+#	define WINPR_ALIGNED_MEM_SIGNATURE 0x0BA0BAB
 
-#define WINPR_ALIGNED_MEM_STRUCT_FROM_PTR(_memptr) \
-	(WINPR_ALIGNED_MEM*) (((size_t)(((BYTE*) _memptr) - sizeof(WINPR_ALIGNED_MEM))));
+#	define WINPR_ALIGNED_MEM_STRUCT_FROM_PTR(_memptr) \
+		(WINPR_ALIGNED_MEM*)(((size_t)(((BYTE*)_memptr) - sizeof(WINPR_ALIGNED_MEM))));
 
-#include <stdlib.h>
+#	include <stdlib.h>
 
-#ifdef __APPLE__
-#include <malloc/malloc.h>
-#elif __FreeBSD__ || __OpenBSD__
-#include <stdlib.h>
-#else
-#include <malloc.h>
-#endif
+#	ifdef __APPLE__
+#		include <malloc/malloc.h>
+#	elif __FreeBSD__ || __OpenBSD__
+#		include <stdlib.h>
+#	else
+#		include <malloc.h>
+#	endif
 
-#include "../log.h"
-#define TAG WINPR_TAG("crt")
+#	include "../log.h"
+#	define TAG WINPR_TAG("crt")
 
 struct winpr_aligned_mem
 {
@@ -137,7 +137,8 @@ void* _aligned_offset_realloc(void* memblock, size_t size, size_t alignment, siz
 
 	if (pMem->sig != WINPR_ALIGNED_MEM_SIGNATURE)
 	{
-		WLog_ERR(TAG, "_aligned_offset_realloc: memory block was not allocated by _aligned_malloc!");
+		WLog_ERR(TAG,
+		         "_aligned_offset_realloc: memory block was not allocated by _aligned_malloc!");
 		return NULL;
 	}
 
@@ -183,7 +184,8 @@ void* _aligned_offset_recalloc(void* memblock, size_t num, size_t size, size_t a
 
 	if (pMem->sig != WINPR_ALIGNED_MEM_SIGNATURE)
 	{
-		WLog_ERR(TAG, "_aligned_offset_recalloc: memory block was not allocated by _aligned_malloc!");
+		WLog_ERR(TAG,
+		         "_aligned_offset_recalloc: memory block was not allocated by _aligned_malloc!");
 		return NULL;
 	}
 

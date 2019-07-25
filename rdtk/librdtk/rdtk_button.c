@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include "rdtk_font.h"
@@ -25,7 +25,7 @@
 #include "rdtk_button.h"
 
 int rdtk_button_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int nHeight,
-		rdtkButton* button, const char* text)
+                     rdtkButton* button, const char* text)
 {
 	int offsetX;
 	int offsetY;
@@ -36,21 +36,17 @@ int rdtk_button_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int
 	rdtkFont* font;
 	rdtkEngine* engine;
 	rdtkNinePatch* ninePatch;
-
 	engine = surface->engine;
 	font = engine->font;
 	button = engine->button;
 	ninePatch = button->ninePatch;
-
 	rdtk_font_text_draw_size(font, &textWidth, &textHeight, text);
-
 	rdtk_nine_patch_draw(surface, nXDst, nYDst, nWidth, nHeight, ninePatch);
 
 	if ((textWidth > 0) && (textHeight > 0))
 	{
 		fillWidth = nWidth - (ninePatch->width - ninePatch->fillWidth);
 		fillHeight = nHeight - (ninePatch->height - ninePatch->fillHeight);
-
 		offsetX = ninePatch->fillLeft;
 		offsetY = ninePatch->fillTop;
 
@@ -73,15 +69,13 @@ int rdtk_button_draw(rdtkSurface* surface, int nXDst, int nYDst, int nWidth, int
 rdtkButton* rdtk_button_new(rdtkEngine* engine, rdtkNinePatch* ninePatch)
 {
 	rdtkButton* button;
-
-	button = (rdtkButton*) calloc(1, sizeof(rdtkButton));
+	button = (rdtkButton*)calloc(1, sizeof(rdtkButton));
 
 	if (!button)
 		return NULL;
 
 	button->engine = engine;
 	button->ninePatch = ninePatch;
-
 	return button;
 }
 
@@ -110,4 +104,3 @@ int rdtk_button_engine_uninit(rdtkEngine* engine)
 
 	return 1;
 }
-

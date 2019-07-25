@@ -47,16 +47,16 @@ int main(int argc, char* argv[])
 
 	switch (ld)
 	{
-		case CONFIG_PARSE_SUCCESS:
-			WLog_DBG(TAG, "Configuration parsed successfully");
-			break;
+	case CONFIG_PARSE_SUCCESS:
+		WLog_DBG(TAG, "Configuration parsed successfully");
+		break;
 
-		case CONFIG_PARSE_ERROR:
-			WLog_ERR(TAG, "An error occured while parsing configuration file, exiting...");
-			goto fail;
+	case CONFIG_PARSE_ERROR:
+		WLog_ERR(TAG, "An error occured while parsing configuration file, exiting...");
+		goto fail;
 
-		case CONFIG_INVALID:
-			goto fail;
+	case CONFIG_INVALID:
+		goto fail;
 	}
 
 	if (config->WhitelistMode)
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 		count = ArrayList_Count(config->AllowedChannels);
 
 		for (i = 0; i < count; i++)
-			WLog_INFO(TAG, "Allowing %s", (char*) ArrayList_GetItem(config->AllowedChannels, i));
+			WLog_INFO(TAG, "Allowing %s", (char*)ArrayList_GetItem(config->AllowedChannels, i));
 	}
 	else
 	{
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 		count = ArrayList_Count(config->BlockedChannels);
 
 		for (i = 0; i < count; i++)
-			WLog_INFO(TAG, "Blocking %s", (char*) ArrayList_GetItem(config->BlockedChannels, i));
+			WLog_INFO(TAG, "Blocking %s", (char*)ArrayList_GetItem(config->BlockedChannels, i));
 	}
 
 	status = pf_server_start(config);

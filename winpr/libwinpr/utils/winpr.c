@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include "buildflags.h"
@@ -33,15 +33,17 @@
 #include <winpr/wlog.h>
 
 #if !defined(WIN32)
-#include <pthread.h>
+#	include <pthread.h>
 #endif
 
 void winpr_get_version(int* major, int* minor, int* revision)
 {
 	if (major)
 		*major = WINPR_VERSION_MAJOR;
+
 	if (minor)
 		*minor = WINPR_VERSION_MINOR;
+
 	if (revision)
 		*revision = WINPR_VERSION_REVISION;
 }
@@ -54,7 +56,6 @@ const char* winpr_get_version_string(void)
 const char* winpr_get_build_date(void)
 {
 	static char build_date[] = __DATE__ " " __TIME__;
-
 	return build_date;
 }
 
@@ -66,12 +67,10 @@ const char* winpr_get_build_revision(void)
 const char* winpr_get_build_config(void)
 {
 	static const char build_config[] =
-		"Build configuration: " BUILD_CONFIG "\n"
-		"Build type:          " BUILD_TYPE "\n"
-		"CFLAGS:              " CFLAGS "\n"
-		"Compiler:            " COMPILER_ID ", " COMPILER_VERSION "\n"
-		"Target architecture: " TARGET_ARCH "\n";
-
+	    "Build configuration: " BUILD_CONFIG "\n"
+	    "Build type:          " BUILD_TYPE "\n"
+	    "CFLAGS:              " CFLAGS "\n"
+	    "Compiler:            " COMPILER_ID ", " COMPILER_VERSION "\n"
+	    "Target architecture: " TARGET_ARCH "\n";
 	return build_config;
 }
-

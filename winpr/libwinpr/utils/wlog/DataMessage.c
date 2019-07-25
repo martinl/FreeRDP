@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include "wlog.h"
@@ -32,17 +32,17 @@ BOOL WLog_DataMessage_Write(char* filename, void* data, int length)
 {
 	FILE* fp;
 	BOOL ret = TRUE;
-
 	fp = fopen(filename, "w+b");
 
 	if (!fp)
 	{
-		//WLog_ERR(TAG, "failed to open file %s", filename);
+		// WLog_ERR(TAG, "failed to open file %s", filename);
 		return FALSE;
 	}
 
 	if (fwrite(data, length, 1, fp) != 1)
 		ret = FALSE;
+
 	fclose(fp);
 	return ret;
 }

@@ -30,13 +30,13 @@
 #define _GNU_SOURCE
 
 #if defined(__FreeBSD__) || defined(__DragonFly__)
-#define USE_SHM
+#	define USE_SHM
 #endif
 
 #include <sys/types.h>
 #include <sys/socket.h>
 #ifdef USE_SHM
-#include <sys/mman.h>
+#	include <sys/mman.h>
 #endif
 #include <unistd.h>
 #include <fcntl.h>
@@ -120,8 +120,7 @@ static ssize_t recvmsg_cloexec_fallback(int sockfd, struct msghdr* msg, int flag
 
 	for (; cmsg != NULL; cmsg = CMSG_NXTHDR(msg, cmsg))
 	{
-		if (cmsg->cmsg_level != SOL_SOCKET ||
-		    cmsg->cmsg_type != SCM_RIGHTS)
+		if (cmsg->cmsg_level != SOL_SOCKET || cmsg->cmsg_type != SCM_RIGHTS)
 			continue;
 
 		data = CMSG_DATA(cmsg);

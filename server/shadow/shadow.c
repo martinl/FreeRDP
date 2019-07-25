@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -45,9 +45,7 @@ int main(int argc, char** argv)
 	DWORD dwExitCode;
 	rdpSettings* settings;
 	rdpShadowServer* server;
-
 	shadow_subsystem_set_entry_builtin(NULL);
-
 	server = shadow_server_new();
 
 	if (!server)
@@ -58,11 +56,9 @@ int main(int argc, char** argv)
 	}
 
 	settings = server->settings;
-
 	settings->NlaSecurity = FALSE;
 	settings->TlsSecurity = TRUE;
 	settings->RdpSecurity = TRUE;
-
 #ifdef WITH_SHADOW_X11
 	server->authentication = TRUE;
 #else
@@ -102,7 +98,7 @@ int main(int argc, char** argv)
 	if (!GetExitCodeThread(server->thread, &dwExitCode))
 		status = -1;
 	else
-		status = (int) dwExitCode;
+		status = (int)dwExitCode;
 
 fail_server_start:
 	shadow_server_uninit(server);
@@ -112,4 +108,3 @@ fail_parse_command_line:
 fail_server_new:
 	return status;
 }
-

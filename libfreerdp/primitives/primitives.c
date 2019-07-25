@@ -16,7 +16,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <string.h>
@@ -34,7 +34,6 @@ static INIT_ONCE generic_primitives_InitOnce = INIT_ONCE_STATIC_INIT;
 static primitives_t pPrimitives = { 0 };
 static INIT_ONCE primitives_InitOnce = INIT_ONCE_STATIC_INIT;
 #endif
-
 
 /* ------------------------------------------------------------------------- */
 static BOOL CALLBACK primitives_init_generic(PINIT_ONCE once, PVOID param, PVOID* context)
@@ -93,4 +92,3 @@ primitives_t* primitives_get_generic(void)
 	InitOnceExecuteOnce(&generic_primitives_InitOnce, primitives_init_generic, NULL, NULL);
 	return &pPrimitivesGeneric;
 }
-

@@ -22,17 +22,18 @@
 
 #if defined __linux__ && !defined ANDROID
 
-#include "comm_ioctl.h"
+#	include "comm_ioctl.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#	ifdef __cplusplus
+extern "C"
+{
+#	endif
 
-SERIAL_DRIVER* SerCx2Sys_s();
+	SERIAL_DRIVER* SerCx2Sys_s();
 
-#ifdef __cplusplus
+#	ifdef __cplusplus
 }
-#endif
+#	endif
 
 #endif /* __linux__ */
 

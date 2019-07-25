@@ -9,7 +9,7 @@
 
 HRESULT PATH_CCH_ADD_EXTENSION(PWSTR pszPath, size_t cchPath, PCWSTR pszExt)
 {
-#ifdef _WIN32
+#	ifdef _WIN32
 	LPWSTR pDot;
 	BOOL bExtDot;
 	LPWSTR pBackslash;
@@ -25,7 +25,6 @@ HRESULT PATH_CCH_ADD_EXTENSION(PWSTR pszPath, size_t cchPath, PCWSTR pszExt)
 	pszExtLength = lstrlenW(pszExt);
 	pszPathLength = lstrlenW(pszPath);
 	bExtDot = (pszExt[0] == '.') ? TRUE : FALSE;
-
 	pDot = wcsrchr(pszPath, '.');
 	pBackslash = wcsrchr(pszPath, _PATH_SEPARATOR_CHR);
 
@@ -44,7 +43,8 @@ HRESULT PATH_CCH_ADD_EXTENSION(PWSTR pszPath, size_t cchPath, PCWSTR pszExt)
 
 		return S_OK;
 	}
-#endif
+
+#	endif
 	return HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
 }
 
@@ -67,7 +67,6 @@ HRESULT PATH_CCH_ADD_EXTENSION(PSTR pszPath, size_t cchPath, PCSTR pszExt)
 	pszExtLength = lstrlenA(pszExt);
 	pszPathLength = lstrlenA(pszPath);
 	bExtDot = (pszExt[0] == '.') ? TRUE : FALSE;
-
 	pDot = strrchr(pszPath, '.');
 	pBackslash = strrchr(pszPath, _PATH_SEPARATOR_CHR);
 
@@ -97,4 +96,3 @@ HRESULT PATH_CCH_ADD_EXTENSION(PSTR pszPath, size_t cchPath, PCSTR pszExt)
 #undef _PATH_SEPARATOR_CHR
 #undef PATH_CCH_ADD_EXTENSION
 */
-

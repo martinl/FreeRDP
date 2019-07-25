@@ -18,22 +18,22 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include "schannel_openssl.h"
 
 #ifdef WITH_OPENSSL
 
-#include <winpr/crt.h>
-#include <winpr/sspi.h>
-#include <winpr/ssl.h>
-#include <winpr/print.h>
-#include <winpr/crypto.h>
+#	include <winpr/crt.h>
+#	include <winpr/sspi.h>
+#	include <winpr/ssl.h>
+#	include <winpr/print.h>
+#	include <winpr/crypto.h>
 
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include <openssl/bio.h>
+#	include <openssl/ssl.h>
+#	include <openssl/err.h>
+#	include <openssl/bio.h>
 
 struct _SCHANNEL_OPENSSL
 {
@@ -46,27 +46,27 @@ struct _SCHANNEL_OPENSSL
 	BYTE* WriteBuffer;
 };
 
-#include "../../log.h"
-#define TAG WINPR_TAG("sspi.schannel")
+#	include "../../log.h"
+#	define TAG WINPR_TAG("sspi.schannel")
 
 char* openssl_get_ssl_error_string(int ssl_error)
 {
 	switch (ssl_error)
 	{
-		case SSL_ERROR_ZERO_RETURN:
-			return "SSL_ERROR_ZERO_RETURN";
+	case SSL_ERROR_ZERO_RETURN:
+		return "SSL_ERROR_ZERO_RETURN";
 
-		case SSL_ERROR_WANT_READ:
-			return "SSL_ERROR_WANT_READ";
+	case SSL_ERROR_WANT_READ:
+		return "SSL_ERROR_WANT_READ";
 
-		case SSL_ERROR_WANT_WRITE:
-			return "SSL_ERROR_WANT_WRITE";
+	case SSL_ERROR_WANT_WRITE:
+		return "SSL_ERROR_WANT_WRITE";
 
-		case SSL_ERROR_SYSCALL:
-			return "SSL_ERROR_SYSCALL";
+	case SSL_ERROR_SYSCALL:
+		return "SSL_ERROR_SYSCALL";
 
-		case SSL_ERROR_SSL:
-			return "SSL_ERROR_SSL";
+	case SSL_ERROR_SSL:
+		return "SSL_ERROR_SSL";
 	}
 
 	return "SSL_ERROR_UNKNOWN";
@@ -93,9 +93,9 @@ int schannel_openssl_client_init(SCHANNEL_OPENSSL* context)
 	 * and the FreeRDP client, and caused major performance issues,
 	 * which is why we're disabling it.
 	 */
-#ifdef SSL_OP_NO_COMPRESSION
+#	ifdef SSL_OP_NO_COMPRESSION
 	options |= SSL_OP_NO_COMPRESSION;
-#endif
+#	endif
 	/**
 	 * SSL_OP_TLS_BLOCK_PADDING_BUG:
 	 *
@@ -160,7 +160,7 @@ int schannel_openssl_client_init(SCHANNEL_OPENSSL* context)
 	}
 
 	SSL_set_bio(context->ssl, context->bioRead, context->bioWrite);
-	context->ReadBuffer = (BYTE*) malloc(SCHANNEL_CB_MAX_TOKEN);
+	context->ReadBuffer = (BYTE*)malloc(SCHANNEL_CB_MAX_TOKEN);
 
 	if (!context->ReadBuffer)
 	{
@@ -168,7 +168,7 @@ int schannel_openssl_client_init(SCHANNEL_OPENSSL* context)
 		goto out_read_alloc;
 	}
 
-	context->WriteBuffer = (BYTE*) malloc(SCHANNEL_CB_MAX_TOKEN);
+	context->WriteBuffer = (BYTE*)malloc(SCHANNEL_CB_MAX_TOKEN);
 
 	if (!context->WriteBuffer)
 	{
@@ -221,9 +221,9 @@ int schannel_openssl_server_init(SCHANNEL_OPENSSL* context)
 	 * and the FreeRDP client, and caused major performance issues,
 	 * which is why we're disabling it.
 	 */
-#ifdef SSL_OP_NO_COMPRESSION
+#	ifdef SSL_OP_NO_COMPRESSION
 	options |= SSL_OP_NO_COMPRESSION;
-#endif
+#	endif
 	/**
 	 * SSL_OP_TLS_BLOCK_PADDING_BUG:
 	 *
@@ -301,7 +301,7 @@ int schannel_openssl_server_init(SCHANNEL_OPENSSL* context)
 	}
 
 	SSL_set_bio(context->ssl, context->bioRead, context->bioWrite);
-	context->ReadBuffer = (BYTE*) malloc(SCHANNEL_CB_MAX_TOKEN);
+	context->ReadBuffer = (BYTE*)malloc(SCHANNEL_CB_MAX_TOKEN);
 
 	if (!context->ReadBuffer)
 	{
@@ -309,7 +309,7 @@ int schannel_openssl_server_init(SCHANNEL_OPENSSL* context)
 		goto out_read_buffer;
 	}
 
-	context->WriteBuffer = (BYTE*) malloc(SCHANNEL_CB_MAX_TOKEN);
+	context->WriteBuffer = (BYTE*)malloc(SCHANNEL_CB_MAX_TOKEN);
 
 	if (!context->WriteBuffer)
 	{
@@ -337,7 +337,8 @@ out_rsa_key:
 }
 
 SECURITY_STATUS schannel_openssl_client_process_tokens(SCHANNEL_OPENSSL* context,
-        PSecBufferDesc pInput, PSecBufferDesc pOutput)
+                                                       PSecBufferDesc pInput,
+                                                       PSecBufferDesc pOutput)
 {
 	int status;
 	int ssl_error;
@@ -381,7 +382,7 @@ SECURITY_STATUS schannel_openssl_client_process_tokens(SCHANNEL_OPENSSL* context
 
 		if (status > 0)
 		{
-			if (pBuffer->cbBuffer < (unsigned long) status)
+			if (pBuffer->cbBuffer < (unsigned long)status)
 				return SEC_E_INSUFFICIENT_MEMORY;
 
 			CopyMemory(pBuffer->pvBuffer, context->ReadBuffer, status);
@@ -399,7 +400,8 @@ SECURITY_STATUS schannel_openssl_client_process_tokens(SCHANNEL_OPENSSL* context
 }
 
 SECURITY_STATUS schannel_openssl_server_process_tokens(SCHANNEL_OPENSSL* context,
-        PSecBufferDesc pInput, PSecBufferDesc pOutput)
+                                                       PSecBufferDesc pInput,
+                                                       PSecBufferDesc pOutput)
 {
 	int status;
 	int ssl_error;
@@ -439,7 +441,7 @@ SECURITY_STATUS schannel_openssl_server_process_tokens(SCHANNEL_OPENSSL* context
 
 		if (status > 0)
 		{
-			if (pBuffer->cbBuffer < (unsigned long) status)
+			if (pBuffer->cbBuffer < (unsigned long)status)
 				return SEC_E_INSUFFICIENT_MEMORY;
 
 			CopyMemory(pBuffer->pvBuffer, context->ReadBuffer, status);
@@ -485,19 +487,17 @@ SECURITY_STATUS schannel_openssl_encrypt_message(SCHANNEL_OPENSSL* context, PSec
 		size_t ustatus = (size_t)status;
 		size_t length;
 		size_t offset = 0;
-
-		length = (pStreamHeaderBuffer->cbBuffer > ustatus) ? ustatus :
-		         pStreamHeaderBuffer->cbBuffer;
+		length =
+		    (pStreamHeaderBuffer->cbBuffer > ustatus) ? ustatus : pStreamHeaderBuffer->cbBuffer;
 		CopyMemory(pStreamHeaderBuffer->pvBuffer, &context->ReadBuffer[offset], length);
 		ustatus -= length;
 		offset += length;
-		length = (pStreamBodyBuffer->cbBuffer > ustatus) ? ustatus :
-		         pStreamBodyBuffer->cbBuffer;
+		length = (pStreamBodyBuffer->cbBuffer > ustatus) ? ustatus : pStreamBodyBuffer->cbBuffer;
 		CopyMemory(pStreamBodyBuffer->pvBuffer, &context->ReadBuffer[offset], length);
 		ustatus -= length;
 		offset += length;
-		length = (pStreamTrailerBuffer->cbBuffer > ustatus) ? ustatus :
-		         pStreamTrailerBuffer->cbBuffer;
+		length =
+		    (pStreamTrailerBuffer->cbBuffer > ustatus) ? ustatus : pStreamTrailerBuffer->cbBuffer;
 		CopyMemory(pStreamTrailerBuffer->pvBuffer, &context->ReadBuffer[offset], length);
 	}
 
@@ -542,7 +542,7 @@ SECURITY_STATUS schannel_openssl_decrypt_message(SCHANNEL_OPENSSL* context, PSec
 SCHANNEL_OPENSSL* schannel_openssl_new()
 {
 	SCHANNEL_OPENSSL* context;
-	context = (SCHANNEL_OPENSSL*) calloc(1, sizeof(SCHANNEL_OPENSSL));
+	context = (SCHANNEL_OPENSSL*)calloc(1, sizeof(SCHANNEL_OPENSSL));
 
 	if (context != NULL)
 	{
@@ -576,13 +576,15 @@ int schannel_openssl_server_init(SCHANNEL_OPENSSL* context)
 }
 
 SECURITY_STATUS schannel_openssl_client_process_tokens(SCHANNEL_OPENSSL* context,
-        PSecBufferDesc pInput, PSecBufferDesc pOutput)
+                                                       PSecBufferDesc pInput,
+                                                       PSecBufferDesc pOutput)
 {
 	return SEC_E_OK;
 }
 
 SECURITY_STATUS schannel_openssl_server_process_tokens(SCHANNEL_OPENSSL* context,
-        PSecBufferDesc pInput, PSecBufferDesc pOutput)
+                                                       PSecBufferDesc pInput,
+                                                       PSecBufferDesc pOutput)
 {
 	return SEC_E_OK;
 }

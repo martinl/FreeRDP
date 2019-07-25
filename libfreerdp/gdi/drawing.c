@@ -22,7 +22,7 @@
 /* GDI Drawing Functions: http://msdn.microsoft.com/en-us/library/dd162760/ */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <stdio.h>
@@ -111,7 +111,6 @@ UINT32 gdi_GetBkMode(HGDI_DC hdc)
  * @param iBkMode background mode
  * @return previous background mode on success, 0 on failure
  */
-
 
 INT32 gdi_SetBkMode(HGDI_DC hdc, INT32 iBkMode)
 {

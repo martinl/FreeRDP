@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <assert.h>
@@ -34,39 +34,37 @@ BOOL Stream_EnsureCapacity(wStream* s, size_t size)
 		size_t old_capacity;
 		size_t new_capacity;
 		BYTE* new_buf;
-
 		old_capacity = s->capacity;
 		new_capacity = old_capacity;
 
 		do
 		{
 			new_capacity *= 2;
-		}
-		while (new_capacity < size);
-
+		} while (new_capacity < size);
 
 		position = Stream_GetPosition(s);
 
 		if (!s->isOwner)
 		{
-			new_buf = (BYTE *)malloc(new_capacity);
+			new_buf = (BYTE*)malloc(new_capacity);
 			CopyMemory(new_buf, s->buffer, s->capacity);
 			s->isOwner = TRUE;
 		}
 		else
 		{
-			new_buf = (BYTE*) realloc(s->buffer, new_capacity);
+			new_buf = (BYTE*)realloc(s->buffer, new_capacity);
 		}
 
 		if (!new_buf)
 			return FALSE;
+
 		s->buffer = new_buf;
 		s->capacity = new_capacity;
 		s->length = new_capacity;
 		ZeroMemory(&s->buffer[old_capacity], s->capacity - old_capacity);
-
 		Stream_SetPosition(s, position);
 	}
+
 	return TRUE;
 }
 
@@ -74,6 +72,7 @@ BOOL Stream_EnsureRemainingCapacity(wStream* s, size_t size)
 {
 	if (Stream_GetPosition(s) + size > Stream_Capacity(s))
 		return Stream_EnsureCapacity(s, Stream_Capacity(s) + size);
+
 	return TRUE;
 }
 
@@ -85,13 +84,14 @@ wStream* Stream_New(BYTE* buffer, size_t size)
 		return NULL;
 
 	s = malloc(sizeof(wStream));
+
 	if (!s)
 		return NULL;
 
 	if (buffer)
 		s->buffer = buffer;
 	else
-		s->buffer = (BYTE*) malloc(size);
+		s->buffer = (BYTE*)malloc(size);
 
 	if (!s->buffer)
 	{
@@ -102,7 +102,6 @@ wStream* Stream_New(BYTE* buffer, size_t size)
 	s->pointer = s->buffer;
 	s->capacity = size;
 	s->length = size;
-
 	s->pool = NULL;
 	s->count = 0;
 	s->isAllocatedStream = TRUE;
@@ -110,11 +109,10 @@ wStream* Stream_New(BYTE* buffer, size_t size)
 	return s;
 }
 
-void Stream_StaticInit(wStream *s, BYTE *buffer, size_t size)
+void Stream_StaticInit(wStream* s, BYTE* buffer, size_t size)
 {
 	assert(s);
 	assert(buffer);
-
 	s->buffer = s->pointer = buffer;
 	s->capacity = s->length = size;
 	s->pool = NULL;

@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -66,20 +66,20 @@
 
 #if !defined(_WIN32) || defined(_UWP)
 
-#ifndef _WIN32
+#	ifndef _WIN32
 
-#include <dlfcn.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#		include <dlfcn.h>
+#		include <stdio.h>
+#		include <stdlib.h>
+#		include <unistd.h>
+#		include <sys/types.h>
+#		include <sys/stat.h>
 
-#ifdef __MACOSX__
-#include <mach-o/dyld.h>
-#endif
+#		ifdef __MACOSX__
+#			include <mach-o/dyld.h>
+#		endif
 
-#endif
+#	endif
 
 DLL_DIRECTORY_COOKIE AddDllDirectory(PCWSTR NewDirectory)
 {
@@ -107,7 +107,7 @@ BOOL SetDefaultDllDirectories(DWORD DirectoryFlags)
 
 HMODULE LoadLibraryA(LPCSTR lpLibFileName)
 {
-#if defined(_UWP)
+#	if defined(_UWP)
 	int status;
 	HMODULE hModule = NULL;
 	WCHAR* filenameW = NULL;
@@ -123,7 +123,7 @@ HMODULE LoadLibraryA(LPCSTR lpLibFileName)
 	hModule = LoadLibraryW(filenameW);
 	free(filenameW);
 	return hModule;
-#else
+#	else
 	HMODULE library;
 	library = dlopen(lpLibFileName, RTLD_LOCAL | RTLD_LAZY);
 
@@ -134,14 +134,14 @@ HMODULE LoadLibraryA(LPCSTR lpLibFileName)
 	}
 
 	return library;
-#endif
+#	endif
 }
 
 HMODULE LoadLibraryW(LPCWSTR lpLibFileName)
 {
-#if defined(_UWP)
+#	if defined(_UWP)
 	return LoadPackagedLibrary(lpLibFileName, 0);
-#else
+#	else
 	char* name = NULL;
 	HMODULE module;
 	int rc = ConvertFromUnicode(CP_UTF8, 0, lpLibFileName, -1, &name, 0, NULL, NULL);
@@ -152,13 +152,13 @@ HMODULE LoadLibraryW(LPCWSTR lpLibFileName)
 	module = LoadLibraryA(name);
 	free(name);
 	return module;
-#endif
+#	endif
 }
 
 HMODULE LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags)
 {
 	if (dwFlags != 0)
-		WLog_WARN(TAG, "%s does not support dwFlags 0x%08"PRIx32, __FUNCTION__, dwFlags);
+		WLog_WARN(TAG, "%s does not support dwFlags 0x%08" PRIx32, __FUNCTION__, dwFlags);
 
 	if (hFile)
 		WLog_WARN(TAG, "%s does not support hFile != NULL", __FUNCTION__);
@@ -169,7 +169,7 @@ HMODULE LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags)
 HMODULE LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags)
 {
 	if (dwFlags != 0)
-		WLog_WARN(TAG, "%s does not support dwFlags 0x%08"PRIx32, __FUNCTION__, dwFlags);
+		WLog_WARN(TAG, "%s does not support dwFlags 0x%08" PRIx32, __FUNCTION__, dwFlags);
 
 	if (hFile)
 		WLog_WARN(TAG, "%s does not support hFile != NULL", __FUNCTION__);
@@ -189,7 +189,7 @@ FARPROC GetProcAddress(HMODULE hModule, LPCSTR lpProcName)
 	if (proc == NULL)
 	{
 		WLog_ERR(TAG, "GetProcAddress: could not find procedure %s: %s", lpProcName, dlerror());
-		return (FARPROC) NULL;
+		return (FARPROC)NULL;
 	}
 
 	return proc;
@@ -234,11 +234,13 @@ DWORD GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
 {
 	DWORD status;
 	char* name = calloc(nSize, sizeof(char));
+
 	if (!name)
 	{
 		SetLastError(ERROR_INTERNAL_ERROR);
 		return 0;
 	}
+
 	status = GetModuleFileNameA(hModule, name, nSize);
 
 	if ((status > INT_MAX) || (nSize > INT_MAX))
@@ -265,7 +267,7 @@ DWORD GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize)
 
 DWORD GetModuleFileNameA(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
 {
-#if defined(__linux__)
+#	if defined(__linux__)
 	int status;
 	size_t length;
 	char path[64];
@@ -298,7 +300,7 @@ DWORD GetModuleFileNameA(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
 		return nSize;
 	}
 
-#elif defined(__MACOSX__)
+#	elif defined(__MACOSX__)
 	int status;
 	size_t length;
 
@@ -336,11 +338,10 @@ DWORD GetModuleFileNameA(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
 		return nSize;
 	}
 
-#endif
+#	endif
 	WLog_ERR(TAG, "%s is not implemented", __FUNCTION__);
 	SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
 	return 0;
 }
 
 #endif
-

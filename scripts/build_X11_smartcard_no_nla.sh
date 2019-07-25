@@ -176,16 +176,20 @@ function compile_and_test(){
 	    -DWITH_DEBUG_NLA=ON    \
 	    -DWITH_DEBUG_SCARD=ON   \
 	    -DWITH_SMARTCARD_INSPECT=ON   \
+	    -DWITH_CLANG_FORMAT=ON   \
 	    . \
-	    && make \
-	    && make CTEST_OUTPUT_ON_FAILURE=1 test
+	    #&& make \
+	    #&& make CTEST_OUTPUT_ON_FAILURE=1 test
 }
 
 function cmake_cleanup(){
 
   # clean up cached cmakefiles
+  find . -name CTestTestfile.cmake | xargs rm
+  find . -name cmake_install.cmake | xargs rm
   find . -name CMakeCache.txt | xargs rm
   find . -name CMakeFiles | xargs rm -r
+  find . -name Makefile | xargs rm
 
 }
 

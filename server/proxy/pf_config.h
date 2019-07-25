@@ -23,8 +23,8 @@
 #define FREERDP_SERVER_PROXY_PFCONFIG_H
 
 #define CONFIG_PARSE_SUCCESS 0
-#define CONFIG_PARSE_ERROR 	 1
-#define CONFIG_INVALID 		 2
+#define CONFIG_PARSE_ERROR 1
+#define CONFIG_INVALID 2
 
 #include <winpr/ini.h>
 
@@ -35,7 +35,7 @@ struct proxy_config
 	/* server */
 	char* Host;
 	UINT16 Port;
-	BOOL  LocalOnly;
+	BOOL LocalOnly;
 
 	/* target */
 	BOOL UseLoadBalanceInfo;

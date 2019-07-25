@@ -42,7 +42,7 @@ extern const unsigned char SimpleTypeMemorySize[];
 extern const unsigned char NdrTypeFlags[];
 extern const char* FC_TYPE_STRINGS[];
 
-#include "ndr_correlation.h"
+#	include "ndr_correlation.h"
 
 #endif
 

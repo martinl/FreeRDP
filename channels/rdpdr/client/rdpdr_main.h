@@ -39,7 +39,7 @@
 #include <freerdp/channels/log.h>
 
 #ifdef __MACOSX__
-#include <CoreServices/CoreServices.h>
+#	include <CoreServices/CoreServices.h>
 #endif
 
 #define TAG CHANNELS_TAG("rdpdr.client")

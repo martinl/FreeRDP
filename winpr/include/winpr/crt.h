@@ -32,139 +32,133 @@
 
 #ifndef _WIN32
 
-#ifndef _strtoui64
-#define _strtoui64 strtoull
-#endif
+#	ifndef _strtoui64
+#		define _strtoui64 strtoull
+#	endif
 
-#ifndef _strtoi64
-#define _strtoi64 strtoll
-#endif
+#	ifndef _strtoi64
+#		define _strtoi64 strtoll
+#	endif
 
-#ifndef _rotl
+#	ifndef _rotl
 static INLINE UINT32 _rotl(UINT32 value, int shift)
 {
 	return (value << shift) | (value >> (32 - shift));
 }
-#endif
+#	endif
 
-#ifndef _rotl64
+#	ifndef _rotl64
 static INLINE UINT64 _rotl64(UINT64 value, int shift)
 {
 	return (value << shift) | (value >> (64 - shift));
 }
-#endif
+#	endif
 
-#ifndef _rotr
+#	ifndef _rotr
 static INLINE UINT32 _rotr(UINT32 value, int shift)
 {
 	return (value >> shift) | (value << (32 - shift));
 }
-#endif
+#	endif
 
-#ifndef _rotr64
+#	ifndef _rotr64
 static INLINE UINT64 _rotr64(UINT64 value, int shift)
 {
 	return (value >> shift) | (value << (64 - shift));
 }
-#endif
+#	endif
 
-#if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2))
+#	if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2))
 
-#define _byteswap_ulong(_val)	__builtin_bswap32(_val)
-#define _byteswap_uint64(_val)	__builtin_bswap64(_val)
+#		define _byteswap_ulong(_val) __builtin_bswap32(_val)
+#		define _byteswap_uint64(_val) __builtin_bswap64(_val)
 
-#else
+#	else
 
 static INLINE UINT32 _byteswap_ulong(UINT32 _val)
 {
-	return (((_val) >> 24) | \
-	        (((_val) & 0x00FF0000) >> 8) | \
-	        (((_val) & 0x0000FF00) << 8) | \
+	return (((_val) >> 24) | (((_val)&0x00FF0000) >> 8) | (((_val)&0x0000FF00) << 8) |
 	        ((_val) << 24));
 }
 
 static INLINE UINT64 _byteswap_uint64(UINT64 _val)
 {
-	return (((_val) << 56) | \
-	        (((_val) << 40) & 0xFF000000000000) | \
-	        (((_val) << 24) & 0xFF0000000000) | \
-	        (((_val) << 8)  & 0xFF00000000) | \
-	        (((_val) >> 8)  & 0xFF000000) | \
-	        (((_val) >> 24) & 0xFF0000) | \
-	        (((_val) >> 40) & 0xFF00) | \
-	        ((_val)  >> 56));
+	return (((_val) << 56) | (((_val) << 40) & 0xFF000000000000) |
+	        (((_val) << 24) & 0xFF0000000000) | (((_val) << 8) & 0xFF00000000) |
+	        (((_val) >> 8) & 0xFF000000) | (((_val) >> 24) & 0xFF0000) | (((_val) >> 40) & 0xFF00) |
+	        ((_val) >> 56));
 }
 
-#endif
+#	endif
 
-#if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8))
+#	if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8))
 
-#define _byteswap_ushort(_val)	__builtin_bswap16(_val)
+#		define _byteswap_ushort(_val) __builtin_bswap16(_val)
 
-#else
+#	else
 
 static INLINE UINT16 _byteswap_ushort(UINT16 _val)
 {
 	return (((_val) >> 8) | ((_val) << 8));
 }
 
-#endif
+#	endif
 
+#	define CopyMemory(Destination, Source, Length) memcpy((Destination), (Source), (Length))
+#	define MoveMemory(Destination, Source, Length) memmove((Destination), (Source), (Length))
+#	define FillMemory(Destination, Length, Fill) memset((Destination), (Fill), (Length))
+#	define ZeroMemory(Destination, Length) memset((Destination), 0, (Length))
 
+#	ifdef __cplusplus
+extern "C"
+{
+#	endif
 
-#define CopyMemory(Destination, Source, Length)		memcpy((Destination), (Source), (Length))
-#define MoveMemory(Destination, Source, Length)		memmove((Destination), (Source), (Length))
-#define	FillMemory(Destination, Length, Fill)		memset((Destination), (Fill), (Length))
-#define ZeroMemory(Destination, Length)			memset((Destination), 0, (Length))
+	WINPR_API PVOID SecureZeroMemory(PVOID ptr, SIZE_T cnt);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-WINPR_API PVOID SecureZeroMemory(PVOID ptr, SIZE_T cnt);
-
-#ifdef __cplusplus
+#	ifdef __cplusplus
 }
-#endif
+#	endif
 
 /* Data Alignment */
 
-#ifndef _ERRNO_T_DEFINED
-#define _ERRNO_T_DEFINED
+#	ifndef _ERRNO_T_DEFINED
+#		define _ERRNO_T_DEFINED
 typedef int errno_t;
-#endif
+#	endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#	ifdef __cplusplus
+extern "C"
+{
+#	endif
 
-WINPR_API void* _aligned_malloc(size_t size, size_t alignment);
-WINPR_API void* _aligned_realloc(void* memblock, size_t size, size_t alignment);
-WINPR_API void* _aligned_recalloc(void* memblock, size_t num, size_t size, size_t alignment);
+	WINPR_API void* _aligned_malloc(size_t size, size_t alignment);
+	WINPR_API void* _aligned_realloc(void* memblock, size_t size, size_t alignment);
+	WINPR_API void* _aligned_recalloc(void* memblock, size_t num, size_t size, size_t alignment);
 
-WINPR_API void* _aligned_offset_malloc(size_t size, size_t alignment, size_t offset);
-WINPR_API void* _aligned_offset_realloc(void* memblock, size_t size, size_t alignment,
-                                        size_t offset);
-WINPR_API void* _aligned_offset_recalloc(void* memblock, size_t num, size_t size, size_t alignment,
-        size_t offset);
+	WINPR_API void* _aligned_offset_malloc(size_t size, size_t alignment, size_t offset);
+	WINPR_API void* _aligned_offset_realloc(void* memblock, size_t size, size_t alignment,
+	                                        size_t offset);
+	WINPR_API void* _aligned_offset_recalloc(void* memblock, size_t num, size_t size,
+	                                         size_t alignment, size_t offset);
 
-WINPR_API size_t _aligned_msize(void* memblock, size_t alignment, size_t offset);
+	WINPR_API size_t _aligned_msize(void* memblock, size_t alignment, size_t offset);
 
-WINPR_API void _aligned_free(void* memblock);
+	WINPR_API void _aligned_free(void* memblock);
 
-/* Data Conversion */
+	/* Data Conversion */
 
-WINPR_API errno_t _itoa_s(int value, char* buffer, size_t sizeInCharacters, int radix);
+	WINPR_API errno_t _itoa_s(int value, char* buffer, size_t sizeInCharacters, int radix);
 
-/* Buffer Manipulation */
+	/* Buffer Manipulation */
 
-WINPR_API errno_t memmove_s(void* dest, size_t numberOfElements, const void* src, size_t count);
-WINPR_API errno_t wmemmove_s(WCHAR* dest, size_t numberOfElements, const WCHAR* src, size_t count);
+	WINPR_API errno_t memmove_s(void* dest, size_t numberOfElements, const void* src, size_t count);
+	WINPR_API errno_t wmemmove_s(WCHAR* dest, size_t numberOfElements, const WCHAR* src,
+	                             size_t count);
 
-#ifdef __cplusplus
+#	ifdef __cplusplus
 }
-#endif
-
+#	endif
 
 #endif
 

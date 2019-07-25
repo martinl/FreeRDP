@@ -7,26 +7,14 @@
 
 int TestPathShell(int argc, char* argv[])
 {
-	const int paths[] =
-	{
-		KNOWN_PATH_HOME,
-		KNOWN_PATH_TEMP,
-		KNOWN_PATH_XDG_DATA_HOME,
-		KNOWN_PATH_XDG_CONFIG_HOME,
-		KNOWN_PATH_XDG_CACHE_HOME,
-		KNOWN_PATH_XDG_RUNTIME_DIR,
-		KNOWN_PATH_XDG_CONFIG_HOME
-	};
-	const char* names[] =
-	{
-		"KNOWN_PATH_HOME",
-		"KNOWN_PATH_TEMP",
-		"KNOWN_PATH_XDG_DATA_HOME",
-		"KNOWN_PATH_XDG_CONFIG_HOME",
-		"KNOWN_PATH_XDG_CACHE_HOME",
-		"KNOWN_PATH_XDG_RUNTIME_DIR",
-		"KNOWN_PATH_XDG_CONFIG_HOME"
-	};
+	const int paths[] = { KNOWN_PATH_HOME,           KNOWN_PATH_TEMP,
+		                  KNOWN_PATH_XDG_DATA_HOME,  KNOWN_PATH_XDG_CONFIG_HOME,
+		                  KNOWN_PATH_XDG_CACHE_HOME, KNOWN_PATH_XDG_RUNTIME_DIR,
+		                  KNOWN_PATH_XDG_CONFIG_HOME };
+	const char* names[] = { "KNOWN_PATH_HOME",           "KNOWN_PATH_TEMP",
+		                    "KNOWN_PATH_XDG_DATA_HOME",  "KNOWN_PATH_XDG_CONFIG_HOME",
+		                    "KNOWN_PATH_XDG_CACHE_HOME", "KNOWN_PATH_XDG_RUNTIME_DIR",
+		                    "KNOWN_PATH_XDG_CONFIG_HOME" };
 	int rc = 0;
 	size_t x;
 
@@ -45,6 +33,7 @@ int TestPathShell(int argc, char* argv[])
 			{
 				printf("%s Path: %s\n", name, path);
 			}
+
 			free(path);
 		}
 		{
@@ -58,10 +47,10 @@ int TestPathShell(int argc, char* argv[])
 			{
 				printf("%s SubPath: %s\n", name, path);
 			}
+
 			free(path);
 		}
 	}
 
 	return rc;
 }
-

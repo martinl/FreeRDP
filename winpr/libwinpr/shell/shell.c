@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/shell.h>
@@ -32,18 +32,18 @@
 
 #ifndef _WIN32
 
-#include <winpr/crt.h>
+#	include <winpr/crt.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
+#	ifdef HAVE_UNISTD_H
+#		include <unistd.h>
+#	endif
 
-#include <pwd.h>
-#include <grp.h>
+#	include <pwd.h>
+#	include <grp.h>
 
-#include "../handle/handle.h"
+#	include "../handle/handle.h"
 
-#include "../security/security.h"
+#	include "../security/security.h"
 
 BOOL GetUserProfileDirectoryA(HANDLE hToken, LPSTR lpProfileDir, LPDWORD lpcchSize)
 {
@@ -54,7 +54,7 @@ BOOL GetUserProfileDirectoryA(HANDLE hToken, LPSTR lpProfileDir, LPDWORD lpcchSi
 	struct passwd pwd;
 	struct passwd* pw = NULL;
 	WINPR_ACCESS_TOKEN* token;
-	token = (WINPR_ACCESS_TOKEN*) hToken;
+	token = (WINPR_ACCESS_TOKEN*)hToken;
 
 	if (!token || (token->Type != HANDLE_TYPE_ACCESS_TOKEN) || !lpcchSize)
 	{
@@ -67,7 +67,7 @@ BOOL GetUserProfileDirectoryA(HANDLE hToken, LPSTR lpProfileDir, LPDWORD lpcchSi
 	if (buflen == -1)
 		buflen = 8196;
 
-	buf = (char*) malloc(buflen);
+	buf = (char*)malloc(buflen);
 
 	if (!buf)
 		return FALSE;
@@ -115,7 +115,7 @@ BOOL GetUserProfileDirectoryW(HANDLE hToken, LPWSTR lpProfileDir, LPDWORD lpcchS
 
 	if (lpProfileDir)
 	{
-		lpProfileDirA = (LPSTR) malloc(cchSizeA);
+		lpProfileDirA = (LPSTR)malloc(cchSizeA);
 
 		if (lpProfileDirA == NULL)
 		{
@@ -141,4 +141,3 @@ BOOL GetUserProfileDirectoryW(HANDLE hToken, LPWSTR lpProfileDir, LPDWORD lpcchS
 }
 
 #endif
-

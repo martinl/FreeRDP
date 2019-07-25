@@ -49,13 +49,11 @@ NSString *DescriptionForObject(NSObject *object, id locale, NSUInteger indent)
 
 @implementation OrderedDictionary
 
-- (id)init
-{
+- (id)init {
 	return [self initWithCapacity:0];
 }
 
-- (id)initWithCapacity:(NSUInteger)capacity
-{
+- (id)initWithCapacity:(NSUInteger)capacity {
 	self = [super init];
 	if (self != nil)
 	{
@@ -65,20 +63,17 @@ NSString *DescriptionForObject(NSObject *object, id locale, NSUInteger indent)
 	return self;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
 	[dictionary release];
 	[array release];
 	[super dealloc];
 }
 
-- (id)copy
-{
+- (id)copy {
 	return [self mutableCopy];
 }
 
-- (void)setObject:(id)anObject forKey:(id)aKey
-{
+- (void)setObject:(id)anObject forKey:(id)aKey {
 	if (![dictionary objectForKey:aKey])
 	{
 		[array addObject:aKey];
@@ -86,34 +81,28 @@ NSString *DescriptionForObject(NSObject *object, id locale, NSUInteger indent)
 	[dictionary setObject:anObject forKey:aKey];
 }
 
-- (void)removeObjectForKey:(id)aKey
-{
+- (void)removeObjectForKey:(id)aKey {
 	[dictionary removeObjectForKey:aKey];
 	[array removeObject:aKey];
 }
 
-- (NSUInteger)count
-{
+- (NSUInteger)count {
 	return [dictionary count];
 }
 
-- (id)objectForKey:(id)aKey
-{
+- (id)objectForKey:(id)aKey {
 	return [dictionary objectForKey:aKey];
 }
 
-- (NSEnumerator *)keyEnumerator
-{
+- (NSEnumerator *)keyEnumerator {
 	return [array objectEnumerator];
 }
 
-- (NSEnumerator *)reverseKeyEnumerator
-{
+- (NSEnumerator *)reverseKeyEnumerator {
 	return [array reverseObjectEnumerator];
 }
 
-- (void)insertObject:(id)anObject forKey:(id)aKey atIndex:(NSUInteger)anIndex
-{
+- (void)insertObject:(id)anObject forKey:(id)aKey atIndex:(NSUInteger)anIndex {
 	if ([dictionary objectForKey:aKey])
 	{
 		[self removeObjectForKey:aKey];
@@ -122,44 +111,39 @@ NSString *DescriptionForObject(NSObject *object, id locale, NSUInteger indent)
 	[dictionary setObject:anObject forKey:aKey];
 }
 
-- (id)keyAtIndex:(NSUInteger)anIndex
-{
+- (id)keyAtIndex:(NSUInteger)anIndex {
 	return [array objectAtIndex:anIndex];
 }
 
-- (NSUInteger)indexForKey:(id)key
-{
-    return [array indexOfObject:key];
+- (NSUInteger)indexForKey:(id)key {
+	return [array indexOfObject:key];
 }
 
-- (NSUInteger)indexForValue:(id)value
-{
-    NSArray* keys = [self allKeysForObject:value];
-    if ([keys count] > 0)
-    {
-        return [self indexForKey:[keys objectAtIndex:0]];
-    }
-    
-    return NSNotFound;
+- (NSUInteger)indexForValue:(id)value {
+	NSArray *keys = [self allKeysForObject:value];
+	if ([keys count] > 0)
+	{
+		return [self indexForKey:[keys objectAtIndex:0]];
+	}
+
+	return NSNotFound;
 }
 
-- (NSString *)descriptionWithLocale:(id)locale indent:(NSUInteger)level
-{
+- (NSString *)descriptionWithLocale:(id)locale indent:(NSUInteger)level {
 	NSMutableString *indentString = [NSMutableString string];
 	NSUInteger i, count = level;
 	for (i = 0; i < count; i++)
 	{
 		[indentString appendFormat:@"    "];
 	}
-	
+
 	NSMutableString *description = [NSMutableString string];
 	[description appendFormat:@"%@{\n", indentString];
 	for (NSObject *key in self)
 	{
-		[description appendFormat:@"%@    %@ = %@;\n",
-			indentString,
-			DescriptionForObject(key, locale, level),
-			DescriptionForObject([self objectForKey:key], locale, level)];
+		[description appendFormat:@"%@    %@ = %@;\n", indentString,
+		                          DescriptionForObject(key, locale, level),
+		                          DescriptionForObject([self objectForKey:key], locale, level)];
 	}
 	[description appendFormat:@"%@}\n", indentString];
 	return description;

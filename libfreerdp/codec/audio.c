@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -53,18 +53,20 @@ UINT32 audio_format_compute_time_length(const AUDIO_FORMAT* format, size_t size)
 
 			if ((format->cbSize == 2) && (format->data))
 			{
-				nSamplesPerBlock = *((UINT16*) format->data);
+				nSamplesPerBlock = *((UINT16*)format->data);
 				wSamples = (size / format->nBlockAlign) * nSamplesPerBlock;
 				mstime = (((wSamples * 1000) / format->nSamplesPerSec) / format->nChannels);
 			}
 			else
 			{
-				WLog_ERR(TAG,  "audio_format_compute_time_length: invalid WAVE_FORMAT_GSM610 format");
+				WLog_ERR(TAG,
+				         "audio_format_compute_time_length: invalid WAVE_FORMAT_GSM610 format");
 			}
 		}
 		else
 		{
-			WLog_ERR(TAG,  "audio_format_compute_time_length: unknown format %"PRIu16"", format->wFormatTag);
+			WLog_ERR(TAG, "audio_format_compute_time_length: unknown format %" PRIu16 "",
+			         format->wFormatTag);
 		}
 	}
 
@@ -75,38 +77,38 @@ char* audio_format_get_tag_string(UINT16 wFormatTag)
 {
 	switch (wFormatTag)
 	{
-		case WAVE_FORMAT_PCM:
-			return "WAVE_FORMAT_PCM";
+	case WAVE_FORMAT_PCM:
+		return "WAVE_FORMAT_PCM";
 
-		case WAVE_FORMAT_ADPCM:
-			return "WAVE_FORMAT_ADPCM";
+	case WAVE_FORMAT_ADPCM:
+		return "WAVE_FORMAT_ADPCM";
 
-		case WAVE_FORMAT_ALAW:
-			return "WAVE_FORMAT_ALAW";
+	case WAVE_FORMAT_ALAW:
+		return "WAVE_FORMAT_ALAW";
 
-		case WAVE_FORMAT_MULAW:
-			return "WAVE_FORMAT_MULAW";
+	case WAVE_FORMAT_MULAW:
+		return "WAVE_FORMAT_MULAW";
 
-		case WAVE_FORMAT_DVI_ADPCM:
-			return "WAVE_FORMAT_DVI_ADPCM";
+	case WAVE_FORMAT_DVI_ADPCM:
+		return "WAVE_FORMAT_DVI_ADPCM";
 
-		case WAVE_FORMAT_GSM610:
-			return "WAVE_FORMAT_GSM610";
+	case WAVE_FORMAT_GSM610:
+		return "WAVE_FORMAT_GSM610";
 
-		case WAVE_FORMAT_MSG723:
-			return "WAVE_FORMAT_MSG723";
+	case WAVE_FORMAT_MSG723:
+		return "WAVE_FORMAT_MSG723";
 
-		case WAVE_FORMAT_DSPGROUP_TRUESPEECH:
-			return "WAVE_FORMAT_DSPGROUP_TRUESPEECH	";
+	case WAVE_FORMAT_DSPGROUP_TRUESPEECH:
+		return "WAVE_FORMAT_DSPGROUP_TRUESPEECH	";
 
-		case WAVE_FORMAT_MPEGLAYER3:
-			return "WAVE_FORMAT_MPEGLAYER3";
+	case WAVE_FORMAT_MPEGLAYER3:
+		return "WAVE_FORMAT_MPEGLAYER3";
 
-		case WAVE_FORMAT_WMAUDIO2:
-			return "WAVE_FORMAT_WMAUDIO2";
+	case WAVE_FORMAT_WMAUDIO2:
+		return "WAVE_FORMAT_WMAUDIO2";
 
-		case WAVE_FORMAT_AAC_MS:
-			return "WAVE_FORMAT_AAC_MS";
+	case WAVE_FORMAT_AAC_MS:
+		return "WAVE_FORMAT_AAC_MS";
 	}
 
 	return "WAVE_FORMAT_UNKNOWN";
@@ -115,8 +117,10 @@ char* audio_format_get_tag_string(UINT16 wFormatTag)
 void audio_format_print(wLog* log, DWORD level, const AUDIO_FORMAT* format)
 {
 	WLog_Print(log, level,
-	           "%s:\t wFormatTag: 0x%04"PRIX16" nChannels: %"PRIu16" nSamplesPerSec: %"PRIu32" "
-	           "nAvgBytesPerSec: %"PRIu32" nBlockAlign: %"PRIu16" wBitsPerSample: %"PRIu16" cbSize: %"PRIu16"",
+	           "%s:\t wFormatTag: 0x%04" PRIX16 " nChannels: %" PRIu16 " nSamplesPerSec: %" PRIu32
+	           " "
+	           "nAvgBytesPerSec: %" PRIu32 " nBlockAlign: %" PRIu16 " wBitsPerSample: %" PRIu16
+	           " cbSize: %" PRIu16 "",
 	           audio_format_get_tag_string(format->wFormatTag), format->wFormatTag,
 	           format->nChannels, format->nSamplesPerSec, format->nAvgBytesPerSec,
 	           format->nBlockAlign, format->wBitsPerSample, format->cbSize);
@@ -129,16 +133,16 @@ void audio_formats_print(wLog* log, DWORD level, const AUDIO_FORMAT* formats, UI
 
 	if (formats)
 	{
-		WLog_Print(log, level,  "AUDIO_FORMATS (%"PRIu16") ={", count);
+		WLog_Print(log, level, "AUDIO_FORMATS (%" PRIu16 ") ={", count);
 
 		for (index = 0; index < count; index++)
 		{
 			format = &formats[index];
-			WLog_Print(log, level,  "\t");
+			WLog_Print(log, level, "\t");
 			audio_format_print(log, level, format);
 		}
 
-		WLog_Print(log, level,  "}");
+		WLog_Print(log, level, "}");
 	}
 }
 
@@ -184,13 +188,13 @@ BOOL audio_format_write(wStream* s, const AUDIO_FORMAT* format)
 	if (!Stream_EnsureRemainingCapacity(s, 18 + format->cbSize))
 		return FALSE;
 
-	Stream_Write_UINT16(s, format->wFormatTag); /* wFormatTag (WAVE_FORMAT_PCM) */
-	Stream_Write_UINT16(s, format->nChannels); /* nChannels */
-	Stream_Write_UINT32(s, format->nSamplesPerSec); /* nSamplesPerSec */
+	Stream_Write_UINT16(s, format->wFormatTag);      /* wFormatTag (WAVE_FORMAT_PCM) */
+	Stream_Write_UINT16(s, format->nChannels);       /* nChannels */
+	Stream_Write_UINT32(s, format->nSamplesPerSec);  /* nSamplesPerSec */
 	Stream_Write_UINT32(s, format->nAvgBytesPerSec); /* nAvgBytesPerSec */
-	Stream_Write_UINT16(s, format->nBlockAlign); /* nBlockAlign */
-	Stream_Write_UINT16(s, format->wBitsPerSample); /* wBitsPerSample */
-	Stream_Write_UINT16(s, format->cbSize); /* cbSize */
+	Stream_Write_UINT16(s, format->nBlockAlign);     /* nBlockAlign */
+	Stream_Write_UINT16(s, format->wBitsPerSample);  /* wBitsPerSample */
+	Stream_Write_UINT16(s, format->cbSize);          /* cbSize */
 
 	if (format->cbSize > 0)
 		Stream_Write(s, format->data, format->cbSize);

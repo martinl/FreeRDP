@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include "shadow.h"
@@ -59,10 +59,7 @@ void shadow_client_channels_free(rdpShadowClient* client)
 	}
 
 	shadow_client_audin_uninit(client);
-
 	shadow_client_rdpsnd_uninit(client);
-
 	shadow_client_remdesk_uninit(client);
-
 	shadow_client_encomsp_uninit(client);
 }

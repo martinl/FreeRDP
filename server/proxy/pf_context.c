@@ -1,33 +1,32 @@
 /**
-* FreeRDP: A Remote Desktop Protocol Implementation
-* FreeRDP Proxy Server
-*
-* Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
-* Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
-* Copyright 2019 Idan Freiberg <speidy@gmail.com>
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * FreeRDP: A Remote Desktop Protocol Implementation
+ * FreeRDP Proxy Server
+ *
+ * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+ * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+ * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include "pf_client.h"
 #include "pf_context.h"
 #include "pf_common.h"
 
 /* Proxy context initialization callback */
-static BOOL client_to_proxy_context_new(freerdp_peer* client,
-                                        pServerContext* context)
+static BOOL client_to_proxy_context_new(freerdp_peer* client, pServerContext* context)
 {
-	context->vcm = WTSOpenServerA((LPSTR) client->context);
+	context->vcm = WTSOpenServerA((LPSTR)client->context);
 
 	if (!context->vcm || context->vcm == INVALID_HANDLE_VALUE)
 		goto fail_open_server;
@@ -39,15 +38,14 @@ fail_open_server:
 }
 
 /* Proxy context free callback */
-static void client_to_proxy_context_free(freerdp_peer* client,
-        pServerContext* context)
+static void client_to_proxy_context_free(freerdp_peer* client, pServerContext* context)
 {
 	WINPR_UNUSED(client);
 
 	if (!context)
 		return;
 
-	WTSCloseServer((HANDLE) context->vcm);
+	WTSCloseServer((HANDLE)context->vcm);
 
 	if (context->dynvcReady)
 	{
@@ -59,14 +57,15 @@ static void client_to_proxy_context_free(freerdp_peer* client,
 BOOL init_p_server_context(freerdp_peer* client)
 {
 	client->ContextSize = sizeof(pServerContext);
-	client->ContextNew = (psPeerContextNew) client_to_proxy_context_new;
-	client->ContextFree = (psPeerContextFree) client_to_proxy_context_free;
+	client->ContextNew = (psPeerContextNew)client_to_proxy_context_new;
+	client->ContextFree = (psPeerContextFree)client_to_proxy_context_free;
 	return freerdp_peer_context_new(client);
 }
 
 void pf_context_copy_settings(rdpSettings* dst, const rdpSettings* src, BOOL is_server)
 {
 	rdpSettings* before_copy = freerdp_settings_clone(dst);
+
 	if (!before_copy)
 		return;
 
@@ -85,7 +84,6 @@ void pf_context_copy_settings(rdpSettings* dst, const rdpSettings* src, BOOL is_
 	free(dst->CertificateName);
 	free(dst->CertificateContent);
 	free(dst->ClientRandom);
-
 	/* adjust pointer to instance pointer */
 	dst->ServerMode = is_server;
 	dst->ConfigPath = _strdup(before_copy->ConfigPath);
@@ -108,7 +106,6 @@ void pf_context_copy_settings(rdpSettings* dst, const rdpSettings* src, BOOL is_
 	{
 		/* adjust instance pointer for client's context */
 		dst->instance = before_copy->instance;
-
 		/* RdpServerRsaKey must be set to NULL if `dst` is client's context */
 		dst->RdpServerRsaKey = NULL;
 	}
@@ -192,6 +189,7 @@ out_fail:
 void proxy_data_free(proxyData* pdata)
 {
 	connection_info_free(pdata->info);
+
 	if (pdata->connectionClosed)
 	{
 		CloseHandle(pdata->connectionClosed);

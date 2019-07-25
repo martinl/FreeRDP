@@ -49,7 +49,8 @@
 void usage_and_exit()
 {
 	printf("winpr-hash: NTLM hashing tool\n");
-	printf("Usage: winpr-hash -u <username> -p <password> [-d <domain>] [-f <_default_,sam>] [-v <_1_,2>]\n");
+	printf("Usage: winpr-hash -u <username> -p <password> [-d <domain>] [-f <_default_,sam>] [-v "
+	       "<_1_,2>]\n");
 	exit(1);
 }
 
@@ -151,8 +152,8 @@ int main(int argc, char* argv[])
 		printf("missing username or password\n\n");
 		usage_and_exit();
 	}
-	winpr_InitializeSSL(WINPR_SSL_INIT_DEFAULT);
 
+	winpr_InitializeSSL(WINPR_SSL_INIT_DEFAULT);
 	UserLength = strlen(User);
 	PasswordLength = strlen(Password);
 	DomainLength = (Domain) ? strlen(Domain) : 0;
@@ -173,7 +174,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		if(!NTOWFv1A(Password, PasswordLength, NtHash))
+		if (!NTOWFv1A(Password, PasswordLength, NtHash))
 		{
 			fprintf(stderr, "Hash creation failed\n");
 			return 1;
@@ -183,7 +184,7 @@ int main(int argc, char* argv[])
 	if (format == 0)
 	{
 		for (index = 0; index < 16; index++)
-			printf("%02"PRIx8"", NtHash[index]);
+			printf("%02" PRIx8 "", NtHash[index]);
 
 		printf("\n");
 	}
@@ -199,7 +200,7 @@ int main(int argc, char* argv[])
 		printf(":");
 
 		for (index = 0; index < 16; index++)
-			printf("%02"PRIx8"", NtHash[index]);
+			printf("%02" PRIx8 "", NtHash[index]);
 
 		printf(":::");
 		printf("\n");

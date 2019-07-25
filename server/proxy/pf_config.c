@@ -45,8 +45,8 @@ wArrayList* parse_string_array_from_str(const char* str)
 		return NULL;
 	}
 
-	
- 	temp = s = _strdup(str);
+	temp = s = _strdup(str);
+
 	if (!s)
 	{
 		WLog_ERR(TAG, "parse_string_array_from_str(): strdup failed!");
@@ -187,7 +187,7 @@ DWORD pf_server_load_config(const char* path, proxyConfig* config)
 
 	if (!pf_filters_init(&config->Filters))
 		goto out;
-		
+
 	filters_names = IniFile_GetSectionKeyNames(ini, "Filters", &filters_count);
 
 	for (index = 0; index < filters_count; index++)
@@ -201,7 +201,8 @@ DWORD pf_server_load_config(const char* path, proxyConfig* config)
 		}
 		else
 		{
-			WLog_DBG(TAG, "pf_server_load_config(): registered filter %s (%s) successfully", filter_name, path);
+			WLog_DBG(TAG, "pf_server_load_config(): registered filter %s (%s) successfully",
+			         filter_name, path);
 		}
 	}
 

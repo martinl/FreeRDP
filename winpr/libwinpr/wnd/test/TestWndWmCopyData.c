@@ -10,26 +10,26 @@ static LRESULT CALLBACK TestWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 	switch (uMsg)
 	{
-		case WM_COPYDATA:
-			{
-				pCopyData = (PCOPYDATASTRUCT) lParam;
+	case WM_COPYDATA:
+	{
+		pCopyData = (PCOPYDATASTRUCT)lParam;
 
-				if (!pCopyData)
-					break;
-
-				printf("WM_COPYDATA: cbData: %"PRIu32" dwData: %"PRIu32"\n",
-						(int) pCopyData->cbData, (int) pCopyData->dwData);
-			}
+		if (!pCopyData)
 			break;
 
-		case WM_CLOSE:
-			printf("WM_CLOSE\n");
-			break;
+		printf("WM_COPYDATA: cbData: %" PRIu32 " dwData: %" PRIu32 "\n", (int)pCopyData->cbData,
+		       (int)pCopyData->dwData);
+	}
+	break;
 
-		default:
-			printf("TestWndProc: uMsg: 0x%08"PRIX32"\n", uMsg);
-			return DefWindowProc(hwnd, uMsg, wParam, lParam);
-			break;
+	case WM_CLOSE:
+		printf("WM_CLOSE\n");
+		break;
+
+	default:
+		printf("TestWndProc: uMsg: 0x%08" PRIX32 "\n", uMsg);
+		return DefWindowProc(hwnd, uMsg, wParam, lParam);
+		break;
 	}
 
 	return 0;
@@ -41,9 +41,7 @@ int TestWndWmCopyData(int argc, char* argv[])
 	HMODULE hModule;
 	HINSTANCE hInstance;
 	WNDCLASSEX wndClassEx;
-
 	hModule = GetModuleHandle(NULL);
-
 	ZeroMemory(&wndClassEx, sizeof(WNDCLASSEX));
 	wndClassEx.cbSize = sizeof(WNDCLASSEX);
 	wndClassEx.style = 0;
@@ -65,9 +63,8 @@ int TestWndWmCopyData(int argc, char* argv[])
 	}
 
 	hInstance = wndClassEx.hInstance;
-
-	hWnd = CreateWindowEx(0, wndClassEx.lpszClassName,
-		0, 0, 0, 0, 0, 0, HWND_MESSAGE, 0, hInstance, NULL);
+	hWnd = CreateWindowEx(0, wndClassEx.lpszClassName, 0, 0, 0, 0, 0, 0, HWND_MESSAGE, 0, hInstance,
+	                      NULL);
 
 	if (!hWnd)
 	{
@@ -76,9 +73,6 @@ int TestWndWmCopyData(int argc, char* argv[])
 	}
 
 	SendMessage(hWnd, WM_CLOSE, 0, 0);
-
 	DestroyWindow(hWnd);
-
 	return 0;
 }
-

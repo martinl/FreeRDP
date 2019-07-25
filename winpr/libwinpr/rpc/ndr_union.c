@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <stdio.h>
@@ -28,15 +28,17 @@
 
 #ifndef _WIN32
 
-#include "ndr_union.h"
-#include "ndr_private.h"
+#	include "ndr_union.h"
+#	include "ndr_private.h"
 
-void NdrEncapsulatedUnionBufferSize(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory, PFORMAT_STRING pFormat)
+void NdrEncapsulatedUnionBufferSize(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory,
+                                    PFORMAT_STRING pFormat)
 {
 	WLog_ERR(TAG, "warning: NdrEncapsulatedUnionBufferSize unimplemented");
 }
 
-void NdrNonEncapsulatedUnionBufferSize(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory, PFORMAT_STRING pFormat)
+void NdrNonEncapsulatedUnionBufferSize(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory,
+                                       PFORMAT_STRING pFormat)
 {
 	WLog_ERR(TAG, "warning: NdrNonEncapsulatedUnionBufferSize unimplemented");
 }

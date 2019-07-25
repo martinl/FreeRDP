@@ -84,28 +84,28 @@ BOOL wlf_handle_pointer_buttons(freerdp* instance, const UwacPointerButtonEvent*
 
 	switch (ev->button)
 	{
-		case BTN_LEFT:
-			flags |= PTR_FLAGS_BUTTON1;
-			break;
+	case BTN_LEFT:
+		flags |= PTR_FLAGS_BUTTON1;
+		break;
 
-		case BTN_RIGHT:
-			flags |= PTR_FLAGS_BUTTON2;
-			break;
+	case BTN_RIGHT:
+		flags |= PTR_FLAGS_BUTTON2;
+		break;
 
-		case BTN_MIDDLE:
-			flags |= PTR_FLAGS_BUTTON3;
-			break;
+	case BTN_MIDDLE:
+		flags |= PTR_FLAGS_BUTTON3;
+		break;
 
-		case BTN_SIDE:
-			xflags |= PTR_XFLAGS_BUTTON1;
-			break;
+	case BTN_SIDE:
+		xflags |= PTR_XFLAGS_BUTTON1;
+		break;
 
-		case BTN_EXTRA:
-			xflags |= PTR_XFLAGS_BUTTON2;
-			break;
+	case BTN_EXTRA:
+		xflags |= PTR_XFLAGS_BUTTON2;
+		break;
 
-		default:
-			return TRUE;
+	default:
+		return TRUE;
 	}
 
 	if ((flags & ~PTR_FLAGS_DOWN) != 0)
@@ -116,7 +116,6 @@ BOOL wlf_handle_pointer_buttons(freerdp* instance, const UwacPointerButtonEvent*
 
 	return FALSE;
 }
-
 
 BOOL wlf_handle_pointer_axis(freerdp* instance, const UwacPointerAxisEvent* ev)
 {
@@ -136,31 +135,36 @@ BOOL wlf_handle_pointer_axis(freerdp* instance, const UwacPointerAxisEvent* ev)
 		return FALSE;
 
 	input = instance->input;
-
 	direction = wl_fixed_to_int(ev->value);
+
 	switch (ev->axis)
 	{
-		case WL_POINTER_AXIS_VERTICAL_SCROLL:
-			flags |= PTR_FLAGS_WHEEL;
-			if (direction > 0)
-				flags |= PTR_FLAGS_WHEEL_NEGATIVE;
-			break;
+	case WL_POINTER_AXIS_VERTICAL_SCROLL:
+		flags |= PTR_FLAGS_WHEEL;
 
-		case WL_POINTER_AXIS_HORIZONTAL_SCROLL:
-			flags |= PTR_FLAGS_HWHEEL;
-			if (direction < 0)
-				flags |= PTR_FLAGS_WHEEL_NEGATIVE;
-			break;
+		if (direction > 0)
+			flags |= PTR_FLAGS_WHEEL_NEGATIVE;
 
-		default:
-			return FALSE;
+		break;
+
+	case WL_POINTER_AXIS_HORIZONTAL_SCROLL:
+		flags |= PTR_FLAGS_HWHEEL;
+
+		if (direction < 0)
+			flags |= PTR_FLAGS_WHEEL_NEGATIVE;
+
+		break;
+
+	default:
+		return FALSE;
 	}
 
 	step = (uint32_t)abs(direction);
+
 	if (step > WheelRotationMask)
 		step = WheelRotationMask;
-	flags |=  step;
 
+	flags |= step;
 	return freerdp_input_send_mouse_event(input, flags, (UINT16)x, (UINT16)y);
 }
 

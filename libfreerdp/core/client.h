@@ -36,7 +36,7 @@
 #include <freerdp/channels/channels.h>
 
 #ifndef CHANNEL_MAX_COUNT
-#define CHANNEL_MAX_COUNT 30
+#	define CHANNEL_MAX_COUNT 30
 #endif
 
 struct rdp_channel_client_data
@@ -117,13 +117,9 @@ struct rdp_channels
 };
 
 FREERDP_LOCAL rdpChannels* freerdp_channels_new(freerdp* instance);
-FREERDP_LOCAL UINT freerdp_channels_disconnect(rdpChannels* channels,
-        freerdp* instance);
-FREERDP_LOCAL void freerdp_channels_close(rdpChannels* channels,
-        freerdp* instance);
+FREERDP_LOCAL UINT freerdp_channels_disconnect(rdpChannels* channels, freerdp* instance);
+FREERDP_LOCAL void freerdp_channels_close(rdpChannels* channels, freerdp* instance);
 FREERDP_LOCAL void freerdp_channels_free(rdpChannels* channels);
-FREERDP_LOCAL UINT freerdp_channels_pre_connect(rdpChannels* channels,
-        freerdp* instance);
-FREERDP_LOCAL UINT freerdp_channels_post_connect(rdpChannels* channels,
-        freerdp* instance);
+FREERDP_LOCAL UINT freerdp_channels_pre_connect(rdpChannels* channels, freerdp* instance);
+FREERDP_LOCAL UINT freerdp_channels_post_connect(rdpChannels* channels, freerdp* instance);
 #endif /* FREERDP_LIB_CORE_CLIENT_H */

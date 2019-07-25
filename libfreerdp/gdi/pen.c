@@ -20,7 +20,7 @@
 /* GDI Pen Functions: http://msdn.microsoft.com/en-us/library/dd162790 */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <stdio.h>
@@ -41,12 +41,14 @@
  * @return new pen
  */
 
-HGDI_PEN gdi_CreatePen(UINT32 fnPenStyle, UINT32 nWidth, UINT32 crColor,
-			   UINT32 format, const gdiPalette* palette)
+HGDI_PEN gdi_CreatePen(UINT32 fnPenStyle, UINT32 nWidth, UINT32 crColor, UINT32 format,
+                       const gdiPalette* palette)
 {
-	HGDI_PEN hPen = (HGDI_PEN) calloc(1, sizeof(GDI_PEN));
+	HGDI_PEN hPen = (HGDI_PEN)calloc(1, sizeof(GDI_PEN));
+
 	if (!hPen)
 		return NULL;
+
 	hPen->objectType = GDIOBJECT_PEN;
 	hPen->style = fnPenStyle;
 	hPen->color = crColor;

@@ -21,7 +21,7 @@
 #define FREERDP_CHANNEL_VIDEO_CLIENT_MAIN_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <freerdp/dvc.h>
@@ -30,6 +30,4 @@
 
 #include <freerdp/channels/video.h>
 
-
 #endif /* FREERDP_CHANNEL_GEOMETRY_CLIENT_MAIN_H */
-

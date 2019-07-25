@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -29,12 +29,13 @@
 
 #ifdef WINPR_THREAD_POOL
 
-#ifdef _WIN32
+#	ifdef _WIN32
 static INIT_ONCE init_once_module = INIT_ONCE_STATIC_INIT;
 static PTP_CLEANUP_GROUP(WINAPI* pCreateThreadpoolCleanupGroup)();
-static VOID (WINAPI* pCloseThreadpoolCleanupGroupMembers)(PTP_CLEANUP_GROUP ptpcg,
-        BOOL fCancelPendingCallbacks, PVOID pvCleanupContext);
-static VOID (WINAPI* pCloseThreadpoolCleanupGroup)(PTP_CLEANUP_GROUP ptpcg);
+static VOID(WINAPI* pCloseThreadpoolCleanupGroupMembers)(PTP_CLEANUP_GROUP ptpcg,
+                                                         BOOL fCancelPendingCallbacks,
+                                                         PVOID pvCleanupContext);
+static VOID(WINAPI* pCloseThreadpoolCleanupGroup)(PTP_CLEANUP_GROUP ptpcg);
 
 static BOOL CALLBACK init_module(PINIT_ONCE once, PVOID param, PVOID* context)
 {
@@ -42,28 +43,30 @@ static BOOL CALLBACK init_module(PINIT_ONCE once, PVOID param, PVOID* context)
 
 	if (kernel32)
 	{
-		pCreateThreadpoolCleanupGroup = (void*)GetProcAddress(kernel32, "CreateThreadpoolCleanupGroup");
-		pCloseThreadpoolCleanupGroupMembers = (void*)GetProcAddress(kernel32,
-		                                      "CloseThreadpoolCleanupGroupMembers");
-		pCloseThreadpoolCleanupGroup = (void*)GetProcAddress(kernel32, "CloseThreadpoolCleanupGroup");
+		pCreateThreadpoolCleanupGroup =
+		    (void*)GetProcAddress(kernel32, "CreateThreadpoolCleanupGroup");
+		pCloseThreadpoolCleanupGroupMembers =
+		    (void*)GetProcAddress(kernel32, "CloseThreadpoolCleanupGroupMembers");
+		pCloseThreadpoolCleanupGroup =
+		    (void*)GetProcAddress(kernel32, "CloseThreadpoolCleanupGroup");
 	}
 
 	return TRUE;
 }
-#endif
+#	endif
 
 PTP_CLEANUP_GROUP winpr_CreateThreadpoolCleanupGroup(void)
 {
 	PTP_CLEANUP_GROUP cleanupGroup = NULL;
-#ifdef _WIN32
+#	ifdef _WIN32
 	InitOnceExecuteOnce(&init_once_module, init_module, NULL, NULL);
 
 	if (pCreateThreadpoolCleanupGroup)
 		return pCreateThreadpoolCleanupGroup();
 
 	return cleanupGroup;
-#else
-	cleanupGroup = (PTP_CLEANUP_GROUP) calloc(1, sizeof(TP_CLEANUP_GROUP));
+#	else
+	cleanupGroup = (PTP_CLEANUP_GROUP)calloc(1, sizeof(TP_CLEANUP_GROUP));
 
 	if (!cleanupGroup)
 		return NULL;
@@ -77,23 +80,23 @@ PTP_CLEANUP_GROUP winpr_CreateThreadpoolCleanupGroup(void)
 	}
 
 	return cleanupGroup;
-#endif
+#	endif
 }
 
 VOID winpr_SetThreadpoolCallbackCleanupGroup(PTP_CALLBACK_ENVIRON pcbe, PTP_CLEANUP_GROUP ptpcg,
-        PTP_CLEANUP_GROUP_CANCEL_CALLBACK pfng)
+                                             PTP_CLEANUP_GROUP_CANCEL_CALLBACK pfng)
 {
 	pcbe->CleanupGroup = ptpcg;
 	pcbe->CleanupGroupCancelCallback = pfng;
-#ifndef _WIN32
+#	ifndef _WIN32
 	pcbe->CleanupGroup->env = pcbe;
-#endif
+#	endif
 }
 
 VOID winpr_CloseThreadpoolCleanupGroupMembers(PTP_CLEANUP_GROUP ptpcg, BOOL fCancelPendingCallbacks,
-        PVOID pvCleanupContext)
+                                              PVOID pvCleanupContext)
 {
-#ifdef _WIN32
+#	ifdef _WIN32
 	InitOnceExecuteOnce(&init_once_module, init_module, NULL, NULL);
 
 	if (pCloseThreadpoolCleanupGroupMembers)
@@ -102,7 +105,7 @@ VOID winpr_CloseThreadpoolCleanupGroupMembers(PTP_CLEANUP_GROUP ptpcg, BOOL fCan
 		return;
 	}
 
-#else
+#	else
 
 	while (ArrayList_Count(ptpcg->groups) > 0)
 	{
@@ -110,12 +113,12 @@ VOID winpr_CloseThreadpoolCleanupGroupMembers(PTP_CLEANUP_GROUP ptpcg, BOOL fCan
 		winpr_CloseThreadpoolWork(work);
 	}
 
-#endif
+#	endif
 }
 
 VOID winpr_CloseThreadpoolCleanupGroup(PTP_CLEANUP_GROUP ptpcg)
 {
-#ifdef _WIN32
+#	ifdef _WIN32
 	InitOnceExecuteOnce(&init_once_module, init_module, NULL, NULL);
 
 	if (pCloseThreadpoolCleanupGroup)
@@ -124,7 +127,7 @@ VOID winpr_CloseThreadpoolCleanupGroup(PTP_CLEANUP_GROUP ptpcg)
 		return;
 	}
 
-#else
+#	else
 
 	if (ptpcg && ptpcg->groups)
 		ArrayList_Free(ptpcg->groups);
@@ -133,8 +136,7 @@ VOID winpr_CloseThreadpoolCleanupGroup(PTP_CLEANUP_GROUP ptpcg)
 		ptpcg->env->CleanupGroup = NULL;
 
 	free(ptpcg);
-#endif
+#	endif
 }
 
 #endif /* WINPR_THREAD_POOL defined */
-

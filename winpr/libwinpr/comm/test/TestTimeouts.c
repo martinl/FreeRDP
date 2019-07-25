@@ -21,7 +21,7 @@
 #include <sys/stat.h>
 
 #ifndef _WIN32
-#include <termios.h>
+#	include <termios.h>
 #endif
 
 #include <winpr/comm.h>
@@ -32,12 +32,11 @@
 static BOOL test_generic(HANDLE hComm)
 {
 	COMMTIMEOUTS timeouts, timeouts2;
-
-	timeouts.ReadIntervalTimeout         = 1;
-	timeouts.ReadTotalTimeoutMultiplier  = 2;
-	timeouts.ReadTotalTimeoutConstant    = 3;
+	timeouts.ReadIntervalTimeout = 1;
+	timeouts.ReadTotalTimeoutMultiplier = 2;
+	timeouts.ReadTotalTimeoutConstant = 3;
 	timeouts.WriteTotalTimeoutMultiplier = 4;
-	timeouts.WriteTotalTimeoutConstant   = 5;
+	timeouts.WriteTotalTimeoutConstant = 5;
 
 	if (!SetCommTimeouts(hComm, &timeouts))
 	{
@@ -46,6 +45,7 @@ static BOOL test_generic(HANDLE hComm)
 	}
 
 	ZeroMemory(&timeouts2, sizeof(COMMTIMEOUTS));
+
 	if (!GetCommTimeouts(hComm, &timeouts2))
 	{
 		fprintf(stderr, "GetCommTimeouts failure, GetLastError: 0x%08x\n", GetLastError());
@@ -59,23 +59,29 @@ static BOOL test_generic(HANDLE hComm)
 	}
 
 	/* not supported combination */
-	timeouts.ReadIntervalTimeout         = MAXULONG;
-	timeouts.ReadTotalTimeoutConstant    = MAXULONG;
+	timeouts.ReadIntervalTimeout = MAXULONG;
+	timeouts.ReadTotalTimeoutConstant = MAXULONG;
+
 	if (SetCommTimeouts(hComm, &timeouts))
 	{
-		fprintf(stderr, "SetCommTimeouts succeeded with ReadIntervalTimeout and ReadTotalTimeoutConstant set to MAXULONG. GetLastError: 0x%08x\n", GetLastError());
+		fprintf(stderr,
+		        "SetCommTimeouts succeeded with ReadIntervalTimeout and ReadTotalTimeoutConstant "
+		        "set to MAXULONG. GetLastError: 0x%08x\n",
+		        GetLastError());
 		return FALSE;
 	}
 
 	if (GetLastError() != ERROR_INVALID_PARAMETER)
 	{
-		fprintf(stderr, "SetCommTimeouts failure, expected GetLastError to return ERROR_INVALID_PARAMETER and got: 0x%08x\n", GetLastError());
+		fprintf(stderr,
+		        "SetCommTimeouts failure, expected GetLastError to return ERROR_INVALID_PARAMETER "
+		        "and got: 0x%08x\n",
+		        GetLastError());
 		return FALSE;
 	}
 
 	return TRUE;
 }
-
 
 int TestTimeouts(int argc, char* argv[])
 {
@@ -90,15 +96,15 @@ int TestTimeouts(int argc, char* argv[])
 	}
 
 	result = DefineCommDevice("COM1", "/dev/ttyS0");
+
 	if (!result)
 	{
 		fprintf(stderr, "DefineCommDevice failure: 0x%x\n", GetLastError());
 		return EXIT_FAILURE;
 	}
 
-	hComm = CreateFile("COM1",
-			GENERIC_READ | GENERIC_WRITE,
-			0, NULL, OPEN_EXISTING, 0, NULL);
+	hComm = CreateFile("COM1", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+
 	if (hComm == INVALID_HANDLE_VALUE)
 	{
 		fprintf(stderr, "CreateFileA failure: 0x%x\n", GetLastError());
@@ -106,6 +112,7 @@ int TestTimeouts(int argc, char* argv[])
 	}
 
 	_comm_setServerSerialDriver(hComm, SerialDriverSerialSys);
+
 	if (!test_generic(hComm))
 	{
 		fprintf(stderr, "test_SerialSys failure\n");
@@ -113,6 +120,7 @@ int TestTimeouts(int argc, char* argv[])
 	}
 
 	_comm_setServerSerialDriver(hComm, SerialDriverSerCxSys);
+
 	if (!test_generic(hComm))
 	{
 		fprintf(stderr, "test_SerCxSys failure\n");
@@ -120,6 +128,7 @@ int TestTimeouts(int argc, char* argv[])
 	}
 
 	_comm_setServerSerialDriver(hComm, SerialDriverSerCx2Sys);
+
 	if (!test_generic(hComm))
 	{
 		fprintf(stderr, "test_SerCx2Sys failure\n");

@@ -27,49 +27,48 @@ static int test_CommDevice(LPCTSTR lpDeviceName, BOOL expectedResult)
 	BOOL result;
 	TCHAR lpTargetPath[MAX_PATH];
 	size_t tcslen;
-
 	result = DefineCommDevice(lpDeviceName, _T("/dev/test"));
+
 	if ((!expectedResult && result) || (expectedResult && !result)) /* logical XOR */
 	{
 		_tprintf(_T("DefineCommDevice failure: device name: %s, expected result: %s, result: %s\n"),
-			lpDeviceName,
-			(expectedResult ? "TRUE" : "FALSE"),
-			(result ? "TRUE" : "FALSE"));
-
+		         lpDeviceName, (expectedResult ? "TRUE" : "FALSE"), (result ? "TRUE" : "FALSE"));
 		return FALSE;
 	}
 
 	result = IsCommDevice(lpDeviceName);
+
 	if ((!expectedResult && result) || (expectedResult && !result)) /* logical XOR */
 	{
 		_tprintf(_T("IsCommDevice failure: device name: %s, expected result: %s, result: %s\n"),
-			lpDeviceName,
-			(expectedResult ? "TRUE" : "FALSE"),
-			(result ? "TRUE" : "FALSE"));
-
+		         lpDeviceName, (expectedResult ? "TRUE" : "FALSE"), (result ? "TRUE" : "FALSE"));
 		return FALSE;
 	}
 
-	tcslen = (size_t) QueryCommDevice(lpDeviceName, lpTargetPath, MAX_PATH);
+	tcslen = (size_t)QueryCommDevice(lpDeviceName, lpTargetPath, MAX_PATH);
+
 	if (expectedResult)
 	{
 		if (tcslen <= _tcslen(lpTargetPath)) /* at least 2 more TCHAR are expected */
 		{
-			_tprintf(_T("QueryCommDevice failure: didn't find the device name: %s\n"), lpDeviceName);
+			_tprintf(_T("QueryCommDevice failure: didn't find the device name: %s\n"),
+			         lpDeviceName);
 			return FALSE;
 		}
 
 		if (_tcscmp(_T("/dev/test"), lpTargetPath) != 0)
 		{
-			_tprintf(_T("QueryCommDevice failure: device name: %s, expected result: %s, result: %s\n"),
-				lpDeviceName, _T("/dev/test"), lpTargetPath);
-
+			_tprintf(
+			    _T("QueryCommDevice failure: device name: %s, expected result: %s, result: %s\n"),
+			    lpDeviceName, _T("/dev/test"), lpTargetPath);
 			return FALSE;
 		}
 
 		if (lpTargetPath[_tcslen(lpTargetPath) + 1] != 0)
 		{
-			_tprintf(_T("QueryCommDevice failure: device name: %s, the second NULL character is missing at the end of the buffer\n"), lpDeviceName);
+			_tprintf(_T("QueryCommDevice failure: device name: %s, the second NULL character is ")
+			         _T("missing at the end of the buffer\n"),
+			         lpDeviceName);
 			return FALSE;
 		}
 	}
@@ -77,16 +76,15 @@ static int test_CommDevice(LPCTSTR lpDeviceName, BOOL expectedResult)
 	{
 		if (tcslen > 0)
 		{
-			_tprintf(_T("QueryCommDevice failure: device name: %s, expected result: <none>, result: %")_T(PRIuz)_T(" %s\n"),
-				lpDeviceName, tcslen, lpTargetPath);
-
+			_tprintf(_T("QueryCommDevice failure: device name: %s, expected result: <none>, ")
+			         _T("result: %") _T(PRIuz) _T(" %s\n"),
+			         lpDeviceName, tcslen, lpTargetPath);
 			return FALSE;
 		}
 	}
 
 	return TRUE;
 }
-
 
 int TestCommDevice(int argc, char* argv[])
 {

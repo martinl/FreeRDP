@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -31,32 +31,32 @@
 #include <winpr/pipe.h>
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#	include <unistd.h>
 #endif
 
 #ifndef _WIN32
 
-#include "../handle/handle.h"
+#	include "../handle/handle.h"
 
-#include <fcntl.h>
-#include <errno.h>
-#include <sys/un.h>
-#include <sys/socket.h>
-#include <assert.h>
-#include <unistd.h>
+#	include <fcntl.h>
+#	include <errno.h>
+#	include <sys/un.h>
+#	include <sys/socket.h>
+#	include <assert.h>
+#	include <unistd.h>
 
-#ifdef HAVE_SYS_AIO_H
-#undef HAVE_SYS_AIO_H /* disable for now, incomplete */
-#endif
+#	ifdef HAVE_SYS_AIO_H
+#		undef HAVE_SYS_AIO_H /* disable for now, incomplete */
+#	endif
 
-#ifdef HAVE_SYS_AIO_H
-#include <aio.h>
-#endif
+#	ifdef HAVE_SYS_AIO_H
+#		include <aio.h>
+#	endif
 
-#include "pipe.h"
+#	include "pipe.h"
 
-#include "../log.h"
-#define TAG WINPR_TAG("pipe")
+#	include "../log.h"
+#	define TAG WINPR_TAG("pipe")
 
 /*
  * Since the WinPR implementation of named pipes makes use of UNIX domain
@@ -80,10 +80,9 @@ typedef struct _NamedPipeServerSocketEntry
 	int references;
 } NamedPipeServerSocketEntry;
 
-
 static BOOL PipeIsHandled(HANDLE handle)
 {
-	WINPR_PIPE* pPipe = (WINPR_PIPE*) handle;
+	WINPR_PIPE* pPipe = (WINPR_PIPE*)handle;
 
 	if (!pPipe || (pPipe->Type != HANDLE_TYPE_ANONYMOUS_PIPE))
 	{
@@ -140,8 +139,7 @@ static BOOL PipeRead(PVOID Object, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 	do
 	{
 		io_status = read(pipe->fd, lpBuffer, nNumberOfBytesToRead);
-	}
-	while ((io_status < 0) && (errno == EINTR));
+	} while ((io_status < 0) && (errno == EINTR));
 
 	if (io_status < 0)
 	{
@@ -149,9 +147,9 @@ static BOOL PipeRead(PVOID Object, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 
 		switch (errno)
 		{
-			case EWOULDBLOCK:
-				SetLastError(ERROR_NO_DATA);
-				break;
+		case EWOULDBLOCK:
+			SetLastError(ERROR_NO_DATA);
+			break;
 		}
 	}
 
@@ -179,8 +177,7 @@ static BOOL PipeWrite(PVOID Object, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrit
 	do
 	{
 		io_status = write(pipe->fd, lpBuffer, nNumberOfBytesToWrite);
-	}
-	while ((io_status < 0) && (errno == EINTR));
+	} while ((io_status < 0) && (errno == EINTR));
 
 	if ((io_status < 0) && (errno == EWOULDBLOCK))
 		io_status = 0;
@@ -189,36 +186,28 @@ static BOOL PipeWrite(PVOID Object, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrit
 	return TRUE;
 }
 
-
-static HANDLE_OPS ops =
-{
-	PipeIsHandled,
-	PipeCloseHandle,
-	PipeGetFd,
-	NULL, /* CleanupHandle */
-	PipeRead,
-	NULL, /* FileReadEx */
-	NULL, /* FileReadScatter */
-	PipeWrite,
-	NULL, /* FileWriteEx */
-	NULL, /* FileWriteGather */
-	NULL, /* FileGetFileSize */
-	NULL, /*  FlushFileBuffers */
-	NULL, /* FileSetEndOfFile */
-	NULL, /* FileSetFilePointer */
-	NULL, /* SetFilePointerEx */
-	NULL, /* FileLockFile */
-	NULL, /* FileLockFileEx */
-	NULL, /* FileUnlockFile */
-	NULL, /* FileUnlockFileEx */
-	NULL  /* SetFileTime */
+static HANDLE_OPS ops = {
+	PipeIsHandled, PipeCloseHandle,
+	PipeGetFd,     NULL, /* CleanupHandle */
+	PipeRead,      NULL, /* FileReadEx */
+	NULL,                /* FileReadScatter */
+	PipeWrite,     NULL, /* FileWriteEx */
+	NULL,                /* FileWriteGather */
+	NULL,                /* FileGetFileSize */
+	NULL,                /*  FlushFileBuffers */
+	NULL,                /* FileSetEndOfFile */
+	NULL,                /* FileSetFilePointer */
+	NULL,                /* SetFilePointerEx */
+	NULL,                /* FileLockFile */
+	NULL,                /* FileLockFileEx */
+	NULL,                /* FileUnlockFile */
+	NULL,                /* FileUnlockFileEx */
+	NULL                 /* SetFileTime */
 };
-
-
 
 static BOOL NamedPipeIsHandled(HANDLE handle)
 {
-	WINPR_NAMED_PIPE* pPipe = (WINPR_NAMED_PIPE*) handle;
+	WINPR_NAMED_PIPE* pPipe = (WINPR_NAMED_PIPE*)handle;
 
 	if (!pPipe || (pPipe->Type != HANDLE_TYPE_NAMED_PIPE) || (pPipe == INVALID_HANDLE_VALUE))
 	{
@@ -245,14 +234,15 @@ static int NamedPipeGetFd(HANDLE handle)
 static BOOL NamedPipeCloseHandle(HANDLE handle)
 {
 	WINPR_NAMED_PIPE* pNamedPipe = (WINPR_NAMED_PIPE*)handle;
-
 	/* This check confuses the analyzer. Since not all handle
 	 * types are handled here, it guesses that the memory of a
 	 * NamedPipeHandle may leak. */
-#ifndef __clang_analyzer__
+#	ifndef __clang_analyzer__
+
 	if (!NamedPipeIsHandled(handle))
 		return FALSE;
-#endif
+
+#	endif
 
 	if (pNamedPipe->pfnUnrefNamedPipe)
 		pNamedPipe->pfnUnrefNamedPipe(pNamedPipe);
@@ -295,8 +285,7 @@ BOOL NamedPipeRead(PVOID Object, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 		do
 		{
 			io_status = read(pipe->clientfd, lpBuffer, nNumberOfBytesToRead);
-		}
-		while ((io_status < 0) && (errno == EINTR));
+		} while ((io_status < 0) && (errno == EINTR));
 
 		if (io_status == 0)
 		{
@@ -309,13 +298,13 @@ BOOL NamedPipeRead(PVOID Object, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 
 			switch (errno)
 			{
-				case EWOULDBLOCK:
-					SetLastError(ERROR_NO_DATA);
-					break;
+			case EWOULDBLOCK:
+				SetLastError(ERROR_NO_DATA);
+				break;
 
-				default:
-					SetLastError(ERROR_BROKEN_PIPE);
-					break;
+			default:
+				SetLastError(ERROR_BROKEN_PIPE);
+				break;
 			}
 		}
 
@@ -332,7 +321,7 @@ BOOL NamedPipeRead(PVOID Object, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 			return FALSE;
 
 		pipe->lpOverlapped = lpOverlapped;
-#ifdef HAVE_SYS_AIO_H
+#	ifdef HAVE_SYS_AIO_H
 		{
 			int aio_status;
 			struct aiocb cb;
@@ -343,7 +332,7 @@ BOOL NamedPipeRead(PVOID Object, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 			cb.aio_offset = lpOverlapped->Offset;
 			cb.aio_sigevent.sigev_notify = SIGEV_SIGNAL;
 			cb.aio_sigevent.sigev_signo = SIGIO;
-			cb.aio_sigevent.sigev_value.sival_ptr = (void*) lpOverlapped;
+			cb.aio_sigevent.sigev_value.sival_ptr = (void*)lpOverlapped;
 			InstallAioSignalHandler();
 			aio_status = aio_read(&cb);
 			WLog_DBG(TAG, "aio_read status: %d", aio_status);
@@ -353,13 +342,13 @@ BOOL NamedPipeRead(PVOID Object, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 
 			return status;
 		}
-#else
+#	else
 		/* synchronous behavior */
 		lpOverlapped->Internal = 0;
-		lpOverlapped->InternalHigh = (ULONG_PTR) nNumberOfBytesToRead;
-		lpOverlapped->Pointer = (PVOID) lpBuffer;
+		lpOverlapped->InternalHigh = (ULONG_PTR)nNumberOfBytesToRead;
+		lpOverlapped->Pointer = (PVOID)lpBuffer;
 		SetEvent(lpOverlapped->hEvent);
-#endif
+#	endif
 	}
 
 	return status;
@@ -379,7 +368,7 @@ BOOL NamedPipeWrite(PVOID Object, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
 		return FALSE;
 	}
 
-	pipe = (WINPR_NAMED_PIPE*) Object;
+	pipe = (WINPR_NAMED_PIPE*)Object;
 
 	if (!(pipe->dwFlagsAndAttributes & FILE_FLAG_OVERLAPPED))
 	{
@@ -389,8 +378,7 @@ BOOL NamedPipeWrite(PVOID Object, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
 		do
 		{
 			io_status = write(pipe->clientfd, lpBuffer, nNumberOfBytesToWrite);
-		}
-		while ((io_status < 0) && (errno == EINTR));
+		} while ((io_status < 0) && (errno == EINTR));
 
 		if (io_status < 0)
 		{
@@ -398,13 +386,13 @@ BOOL NamedPipeWrite(PVOID Object, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
 
 			switch (errno)
 			{
-				case EWOULDBLOCK:
-					io_status = 0;
-					status = TRUE;
-					break;
+			case EWOULDBLOCK:
+				io_status = 0;
+				status = TRUE;
+				break;
 
-				default:
-					status = FALSE;
+			default:
+				status = FALSE;
 			}
 		}
 
@@ -421,17 +409,17 @@ BOOL NamedPipeWrite(PVOID Object, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
 			return FALSE;
 
 		pipe->lpOverlapped = lpOverlapped;
-#ifdef HAVE_SYS_AIO_H
+#	ifdef HAVE_SYS_AIO_H
 		{
 			struct aiocb cb;
 			ZeroMemory(&cb, sizeof(struct aiocb));
 			cb.aio_fildes = pipe->clientfd;
-			cb.aio_buf = (void*) lpBuffer;
+			cb.aio_buf = (void*)lpBuffer;
 			cb.aio_nbytes = nNumberOfBytesToWrite;
 			cb.aio_offset = lpOverlapped->Offset;
 			cb.aio_sigevent.sigev_notify = SIGEV_SIGNAL;
 			cb.aio_sigevent.sigev_signo = SIGIO;
-			cb.aio_sigevent.sigev_value.sival_ptr = (void*) lpOverlapped;
+			cb.aio_sigevent.sigev_value.sival_ptr = (void*)lpOverlapped;
 			InstallAioSignalHandler();
 			io_status = aio_write(&cb);
 			WLog_DBG("aio_write status: %d", io_status);
@@ -441,41 +429,38 @@ BOOL NamedPipeWrite(PVOID Object, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
 
 			return status;
 		}
-#else
+#	else
 		/* synchronous behavior */
 		lpOverlapped->Internal = 1;
-		lpOverlapped->InternalHigh = (ULONG_PTR) nNumberOfBytesToWrite;
-		lpOverlapped->Pointer = (PVOID) lpBuffer;
+		lpOverlapped->InternalHigh = (ULONG_PTR)nNumberOfBytesToWrite;
+		lpOverlapped->Pointer = (PVOID)lpBuffer;
 		SetEvent(lpOverlapped->hEvent);
-#endif
+#	endif
 	}
 
 	return TRUE;
 }
 
-static HANDLE_OPS namedOps =
-{
-	NamedPipeIsHandled,
-	NamedPipeCloseHandle,
-	NamedPipeGetFd,
-	NULL, /* CleanupHandle */
-	NamedPipeRead,
-	NULL,
-	NULL,
-	NamedPipeWrite,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+static HANDLE_OPS namedOps = { NamedPipeIsHandled,
+	                           NamedPipeCloseHandle,
+	                           NamedPipeGetFd,
+	                           NULL, /* CleanupHandle */
+	                           NamedPipeRead,
+	                           NULL,
+	                           NULL,
+	                           NamedPipeWrite,
+	                           NULL,
+	                           NULL,
+	                           NULL,
+	                           NULL,
+	                           NULL,
+	                           NULL,
+	                           NULL,
+	                           NULL,
+	                           NULL,
+	                           NULL,
+	                           NULL,
+	                           NULL };
 
 static BOOL InitWinPRPipeModule()
 {
@@ -505,8 +490,8 @@ BOOL CreatePipe(PHANDLE hReadPipe, PHANDLE hWritePipe, LPSECURITY_ATTRIBUTES lpP
 		return FALSE;
 	}
 
-	pReadPipe = (WINPR_PIPE*) calloc(1, sizeof(WINPR_PIPE));
-	pWritePipe = (WINPR_PIPE*) calloc(1, sizeof(WINPR_PIPE));
+	pReadPipe = (WINPR_PIPE*)calloc(1, sizeof(WINPR_PIPE));
+	pWritePipe = (WINPR_PIPE*)calloc(1, sizeof(WINPR_PIPE));
 
 	if (!pReadPipe || !pWritePipe)
 	{
@@ -519,10 +504,10 @@ BOOL CreatePipe(PHANDLE hReadPipe, PHANDLE hWritePipe, LPSECURITY_ATTRIBUTES lpP
 	pWritePipe->fd = pipe_fd[1];
 	WINPR_HANDLE_SET_TYPE_AND_MODE(pReadPipe, HANDLE_TYPE_ANONYMOUS_PIPE, WINPR_FD_READ);
 	pReadPipe->ops = &ops;
-	*((ULONG_PTR*) hReadPipe) = (ULONG_PTR) pReadPipe;
+	*((ULONG_PTR*)hReadPipe) = (ULONG_PTR)pReadPipe;
 	WINPR_HANDLE_SET_TYPE_AND_MODE(pWritePipe, HANDLE_TYPE_ANONYMOUS_PIPE, WINPR_FD_READ);
 	pWritePipe->ops = &ops;
-	*((ULONG_PTR*) hWritePipe) = (ULONG_PTR) pWritePipe;
+	*((ULONG_PTR*)hWritePipe) = (ULONG_PTR)pWritePipe;
 	return TRUE;
 }
 
@@ -540,13 +525,13 @@ static void winpr_unref_named_pipe(WINPR_NAMED_PIPE* pNamedPipe)
 
 	assert(pNamedPipe->name);
 	assert(g_NamedPipeServerSockets);
-	//WLog_VRB(TAG, "%p (%s)", (void*) pNamedPipe, pNamedPipe->name);
+	// WLog_VRB(TAG, "%p (%s)", (void*) pNamedPipe, pNamedPipe->name);
 	ArrayList_Lock(g_NamedPipeServerSockets);
 
 	for (index = 0; index < ArrayList_Count(g_NamedPipeServerSockets); index++)
 	{
-		baseSocket = (NamedPipeServerSocketEntry*) ArrayList_GetItem(
-		                 g_NamedPipeServerSockets, index);
+		baseSocket =
+		    (NamedPipeServerSocketEntry*)ArrayList_GetItem(g_NamedPipeServerSockets, index);
 		assert(baseSocket->name);
 
 		if (!strcmp(baseSocket->name, pNamedPipe->name))
@@ -556,8 +541,8 @@ static void winpr_unref_named_pipe(WINPR_NAMED_PIPE* pNamedPipe)
 
 			if (--baseSocket->references == 0)
 			{
-				//WLog_DBG(TAG, "removing shared server socked resource");
-				//WLog_DBG(TAG, "closing shared serverfd %d", baseSocket->serverfd);
+				// WLog_DBG(TAG, "removing shared server socked resource");
+				// WLog_DBG(TAG, "closing shared serverfd %d", baseSocket->serverfd);
 				ArrayList_Remove(g_NamedPipeServerSockets, baseSocket);
 				close(baseSocket->serverfd);
 				free(baseSocket->name);
@@ -570,7 +555,6 @@ static void winpr_unref_named_pipe(WINPR_NAMED_PIPE* pNamedPipe)
 
 	ArrayList_Unlock(g_NamedPipeServerSockets);
 }
-
 
 HANDLE CreateNamedPipeA(LPCSTR lpName, DWORD dwOpenMode, DWORD dwPipeMode, DWORD nMaxInstances,
                         DWORD nOutBufferSize, DWORD nInBufferSize, DWORD nDefaultTimeOut,
@@ -596,7 +580,7 @@ HANDLE CreateNamedPipeA(LPCSTR lpName, DWORD dwOpenMode, DWORD dwPipeMode, DWORD
 	if (!InitWinPRPipeModule())
 		return INVALID_HANDLE_VALUE;
 
-	pNamedPipe = (WINPR_NAMED_PIPE*) calloc(1, sizeof(WINPR_NAMED_PIPE));
+	pNamedPipe = (WINPR_NAMED_PIPE*)calloc(1, sizeof(WINPR_NAMED_PIPE));
 
 	if (!pNamedPipe)
 		return INVALID_HANDLE_VALUE;
@@ -628,13 +612,14 @@ HANDLE CreateNamedPipeA(LPCSTR lpName, DWORD dwOpenMode, DWORD dwPipeMode, DWORD
 
 	for (index = 0; index < ArrayList_Count(g_NamedPipeServerSockets); index++)
 	{
-		baseSocket = (NamedPipeServerSocketEntry*) ArrayList_GetItem(
-		                 g_NamedPipeServerSockets, index);
+		baseSocket =
+		    (NamedPipeServerSocketEntry*)ArrayList_GetItem(g_NamedPipeServerSockets, index);
 
 		if (!strcmp(baseSocket->name, lpName))
 		{
 			serverfd = baseSocket->serverfd;
-			//WLog_DBG(TAG, "using shared socked resource for pipe %p (%s)", (void*) pNamedPipe, lpName);
+			// WLog_DBG(TAG, "using shared socked resource for pipe %p (%s)", (void*) pNamedPipe,
+			// lpName);
 			break;
 		}
 	}
@@ -672,7 +657,7 @@ HANDLE CreateNamedPipeA(LPCSTR lpName, DWORD dwOpenMode, DWORD dwPipeMode, DWORD
 		s.sun_family = AF_UNIX;
 		sprintf_s(s.sun_path, ARRAYSIZE(s.sun_path), "%s", pNamedPipe->lpFilePath);
 
-		if (bind(serverfd, (struct sockaddr*) &s, sizeof(struct sockaddr_un)) == -1)
+		if (bind(serverfd, (struct sockaddr*)&s, sizeof(struct sockaddr_un)) == -1)
 		{
 			WLog_ERR(TAG, "CreateNamedPipeA: bind error, %s", strerror(errno));
 			goto out;
@@ -686,7 +671,7 @@ HANDLE CreateNamedPipeA(LPCSTR lpName, DWORD dwOpenMode, DWORD dwPipeMode, DWORD
 
 		UnixChangeFileMode(pNamedPipe->lpFilePath, 0xFFFF);
 
-		if (!(baseSocket = (NamedPipeServerSocketEntry*) malloc(sizeof(NamedPipeServerSocketEntry))))
+		if (!(baseSocket = (NamedPipeServerSocketEntry*)malloc(sizeof(NamedPipeServerSocketEntry))))
 			goto out;
 
 		if (!(baseSocket->name = _strdup(lpName)))
@@ -704,23 +689,25 @@ HANDLE CreateNamedPipeA(LPCSTR lpName, DWORD dwOpenMode, DWORD dwPipeMode, DWORD
 			goto out;
 		}
 
-		//WLog_DBG(TAG, "created shared socked resource for pipe %p (%s). base serverfd = %d", (void*) pNamedPipe, lpName, serverfd);
+		// WLog_DBG(TAG, "created shared socked resource for pipe %p (%s). base serverfd = %d",
+		// (void*) pNamedPipe, lpName, serverfd);
 	}
 
 	pNamedPipe->serverfd = dup(baseSocket->serverfd);
-	//WLog_DBG(TAG, "using serverfd %d (duplicated from %d)", pNamedPipe->serverfd, baseSocket->serverfd);
+	// WLog_DBG(TAG, "using serverfd %d (duplicated from %d)", pNamedPipe->serverfd,
+	// baseSocket->serverfd);
 	pNamedPipe->pfnUnrefNamedPipe = winpr_unref_named_pipe;
 	baseSocket->references++;
 
 	if (dwOpenMode & FILE_FLAG_OVERLAPPED)
 	{
-#if 0
+#	if 0
 		int flags = fcntl(pNamedPipe->serverfd, F_GETFL);
 
 		if (flags != -1)
 			fcntl(pNamedPipe->serverfd, F_SETFL, flags | O_NONBLOCK);
 
-#endif
+#	endif
 	}
 
 	ArrayList_Unlock(g_NamedPipeServerSockets);
@@ -761,13 +748,13 @@ BOOL ConnectNamedPipe(HANDLE hNamedPipe, LPOVERLAPPED lpOverlapped)
 	if (!hNamedPipe)
 		return FALSE;
 
-	pNamedPipe = (WINPR_NAMED_PIPE*) hNamedPipe;
+	pNamedPipe = (WINPR_NAMED_PIPE*)hNamedPipe;
 
 	if (!(pNamedPipe->dwFlagsAndAttributes & FILE_FLAG_OVERLAPPED))
 	{
 		length = sizeof(struct sockaddr_un);
 		ZeroMemory(&s, sizeof(struct sockaddr_un));
-		status = accept(pNamedPipe->serverfd, (struct sockaddr*) &s, &length);
+		status = accept(pNamedPipe->serverfd, (struct sockaddr*)&s, &length);
 
 		if (status < 0)
 		{
@@ -789,8 +776,8 @@ BOOL ConnectNamedPipe(HANDLE hNamedPipe, LPOVERLAPPED lpOverlapped)
 		pNamedPipe->lpOverlapped = lpOverlapped;
 		/* synchronous behavior */
 		lpOverlapped->Internal = 2;
-		lpOverlapped->InternalHigh = (ULONG_PTR) 0;
-		lpOverlapped->Pointer = (PVOID) NULL;
+		lpOverlapped->InternalHigh = (ULONG_PTR)0;
+		lpOverlapped->Pointer = (PVOID)NULL;
 		SetEvent(lpOverlapped->hEvent);
 	}
 
@@ -800,7 +787,7 @@ BOOL ConnectNamedPipe(HANDLE hNamedPipe, LPOVERLAPPED lpOverlapped)
 BOOL DisconnectNamedPipe(HANDLE hNamedPipe)
 {
 	WINPR_NAMED_PIPE* pNamedPipe;
-	pNamedPipe = (WINPR_NAMED_PIPE*) hNamedPipe;
+	pNamedPipe = (WINPR_NAMED_PIPE*)hNamedPipe;
 
 	if (pNamedPipe->clientfd != -1)
 	{
@@ -811,8 +798,8 @@ BOOL DisconnectNamedPipe(HANDLE hNamedPipe)
 	return TRUE;
 }
 
-BOOL PeekNamedPipe(HANDLE hNamedPipe, LPVOID lpBuffer, DWORD nBufferSize,
-                   LPDWORD lpBytesRead, LPDWORD lpTotalBytesAvail, LPDWORD lpBytesLeftThisMessage)
+BOOL PeekNamedPipe(HANDLE hNamedPipe, LPVOID lpBuffer, DWORD nBufferSize, LPDWORD lpBytesRead,
+                   LPDWORD lpTotalBytesAvail, LPDWORD lpBytesLeftThisMessage)
 {
 	WLog_ERR(TAG, "%s: Not implemented", __FUNCTION__);
 	SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
@@ -820,8 +807,8 @@ BOOL PeekNamedPipe(HANDLE hNamedPipe, LPVOID lpBuffer, DWORD nBufferSize,
 }
 
 BOOL TransactNamedPipe(HANDLE hNamedPipe, LPVOID lpInBuffer, DWORD nInBufferSize,
-                       LPVOID lpOutBuffer,
-                       DWORD nOutBufferSize, LPDWORD lpBytesRead, LPOVERLAPPED lpOverlapped)
+                       LPVOID lpOutBuffer, DWORD nOutBufferSize, LPDWORD lpBytesRead,
+                       LPOVERLAPPED lpOverlapped)
 {
 	WLog_ERR(TAG, "%s: Not implemented", __FUNCTION__);
 	SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
@@ -879,7 +866,7 @@ BOOL SetNamedPipeHandleState(HANDLE hNamedPipe, LPDWORD lpMode, LPDWORD lpMaxCol
 	int fd;
 	int flags;
 	WINPR_NAMED_PIPE* pNamedPipe;
-	pNamedPipe = (WINPR_NAMED_PIPE*) hNamedPipe;
+	pNamedPipe = (WINPR_NAMED_PIPE*)hNamedPipe;
 
 	if (lpMode)
 	{

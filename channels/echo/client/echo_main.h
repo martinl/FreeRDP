@@ -21,7 +21,7 @@
 #define FREERDP_CHANNEL_ECHO_CLIENT_MAIN_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <freerdp/dvc.h>
@@ -31,10 +31,12 @@
 
 #define DVC_TAG CHANNELS_TAG("echo.client")
 #ifdef WITH_DEBUG_DVC
-#define DEBUG_DVC(...) WLog_DBG(DVC_TAG, __VA_ARGS__)
+#	define DEBUG_DVC(...) WLog_DBG(DVC_TAG, __VA_ARGS__)
 #else
-#define DEBUG_DVC(...) do { } while (0)
+#	define DEBUG_DVC(...) \
+		do                 \
+		{                  \
+		} while (0)
 #endif
 
 #endif /* FREERDP_CHANNEL_ECHO_CLIENT_MAIN_H */
-

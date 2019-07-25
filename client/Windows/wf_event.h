@@ -26,16 +26,18 @@
 #include <freerdp/log.h>
 
 LRESULT CALLBACK wf_ll_kbd_proc(int nCode, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam,
-                               LPARAM lParam);
+LRESULT CALLBACK wf_event_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 void wf_event_focus_in(wfContext* wfc);
 
 #define KBD_TAG CLIENT_TAG("windows")
 #ifdef WITH_DEBUG_KBD
-#define DEBUG_KBD(...) WLog_DBG(KBD_TAG, __VA_ARGS__)
+#	define DEBUG_KBD(...) WLog_DBG(KBD_TAG, __VA_ARGS__)
 #else
-#define DEBUG_KBD(...) do { } while (0)
+#	define DEBUG_KBD(...) \
+		do                 \
+		{                  \
+		} while (0)
 #endif
 
 #endif /* FREERDP_CLIENT_WIN_EVENT_H */

@@ -673,6 +673,7 @@ static INLINE BOOL freerdp_split_color_planes(const BYTE* data, UINT32 format, U
                                               UINT32 height, UINT32 scanline, BYTE* planes[4])
 {
 	INT32 i, j, k;
+
 	if ((width > INT32_MAX) || (height > INT32_MAX) || (scanline > INT32_MAX))
 		return FALSE;
 

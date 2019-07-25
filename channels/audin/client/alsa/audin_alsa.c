@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <stdio.h>
@@ -63,53 +63,49 @@ static snd_pcm_format_t audin_alsa_format(UINT32 wFormatTag, UINT32 bitPerChanne
 {
 	switch (wFormatTag)
 	{
-		case WAVE_FORMAT_PCM:
-			switch (bitPerChannel)
-			{
-				case 16:
-					return SND_PCM_FORMAT_S16_LE;
+	case WAVE_FORMAT_PCM:
+		switch (bitPerChannel)
+		{
+		case 16:
+			return SND_PCM_FORMAT_S16_LE;
 
-				case 8:
-					return SND_PCM_FORMAT_S8;
-
-				default:
-					return SND_PCM_FORMAT_UNKNOWN;
-			}
-
-		case WAVE_FORMAT_ALAW:
-			return SND_PCM_FORMAT_A_LAW;
-
-		case WAVE_FORMAT_MULAW:
-			return SND_PCM_FORMAT_MU_LAW;
+		case 8:
+			return SND_PCM_FORMAT_S8;
 
 		default:
 			return SND_PCM_FORMAT_UNKNOWN;
+		}
+
+	case WAVE_FORMAT_ALAW:
+		return SND_PCM_FORMAT_A_LAW;
+
+	case WAVE_FORMAT_MULAW:
+		return SND_PCM_FORMAT_MU_LAW;
+
+	default:
+		return SND_PCM_FORMAT_UNKNOWN;
 	}
 }
 
-static BOOL audin_alsa_set_params(AudinALSADevice* alsa,
-                                  snd_pcm_t* capture_handle)
+static BOOL audin_alsa_set_params(AudinALSADevice* alsa, snd_pcm_t* capture_handle)
 {
 	int error;
 	UINT32 channels = alsa->aformat.nChannels;
 	snd_pcm_hw_params_t* hw_params;
-	snd_pcm_format_t format = audin_alsa_format(alsa->aformat.wFormatTag, alsa->aformat.wBitsPerSample);
+	snd_pcm_format_t format =
+	    audin_alsa_format(alsa->aformat.wFormatTag, alsa->aformat.wBitsPerSample);
 
 	if ((error = snd_pcm_hw_params_malloc(&hw_params)) < 0)
 	{
-		WLog_Print(alsa->log, WLOG_ERROR, "snd_pcm_hw_params_malloc (%s)",
-		           snd_strerror(error));
+		WLog_Print(alsa->log, WLOG_ERROR, "snd_pcm_hw_params_malloc (%s)", snd_strerror(error));
 		return FALSE;
 	}
 
 	snd_pcm_hw_params_any(capture_handle, hw_params);
-	snd_pcm_hw_params_set_access(capture_handle, hw_params,
-	                             SND_PCM_ACCESS_RW_INTERLEAVED);
+	snd_pcm_hw_params_set_access(capture_handle, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
 	snd_pcm_hw_params_set_format(capture_handle, hw_params, format);
-	snd_pcm_hw_params_set_rate_near(capture_handle, hw_params,
-	                                &alsa->aformat.nSamplesPerSec, NULL);
-	snd_pcm_hw_params_set_channels_near(capture_handle, hw_params,
-	                                    &channels);
+	snd_pcm_hw_params_set_rate_near(capture_handle, hw_params, &alsa->aformat.nSamplesPerSec, NULL);
+	snd_pcm_hw_params_set_channels_near(capture_handle, hw_params, &channels);
 	snd_pcm_hw_params(capture_handle, hw_params);
 	snd_pcm_hw_params_free(hw_params);
 	snd_pcm_prepare(capture_handle);
@@ -123,12 +119,11 @@ static DWORD WINAPI audin_alsa_thread_func(LPVOID arg)
 	long error;
 	BYTE* buffer;
 	snd_pcm_t* capture_handle = NULL;
-	AudinALSADevice* alsa = (AudinALSADevice*) arg;
+	AudinALSADevice* alsa = (AudinALSADevice*)arg;
 	DWORD status;
 	WLog_Print(alsa->log, WLOG_DEBUG, "in");
 
-	if ((error = snd_pcm_open(&capture_handle, alsa->device_name,
-	                          SND_PCM_STREAM_CAPTURE, 0)) < 0)
+	if ((error = snd_pcm_open(&capture_handle, alsa->device_name, SND_PCM_STREAM_CAPTURE, 0)) < 0)
 	{
 		WLog_Print(alsa->log, WLOG_ERROR, "snd_pcm_open (%s)", snd_strerror(error));
 		error = CHANNEL_RC_INITIALIZATION_ERROR;
@@ -141,7 +136,8 @@ static DWORD WINAPI audin_alsa_thread_func(LPVOID arg)
 		goto out;
 	}
 
-	buffer = (BYTE*) calloc(alsa->frames_per_packet + alsa->aformat.nBlockAlign, alsa->bytes_per_frame);
+	buffer =
+	    (BYTE*)calloc(alsa->frames_per_packet + alsa->aformat.nBlockAlign, alsa->bytes_per_frame);
 
 	if (!buffer)
 	{
@@ -181,12 +177,13 @@ static DWORD WINAPI audin_alsa_thread_func(LPVOID arg)
 			break;
 		}
 
-		error = alsa->receive(&alsa->aformat,
-		                      buffer, error * alsa->bytes_per_frame, alsa->user_data);
+		error =
+		    alsa->receive(&alsa->aformat, buffer, error * alsa->bytes_per_frame, alsa->user_data);
 
 		if (error)
 		{
-			WLog_Print(alsa->log, WLOG_ERROR, "audin_alsa_thread_receive failed with error %ld", error);
+			WLog_Print(alsa->log, WLOG_ERROR, "audin_alsa_thread_receive failed with error %ld",
+			           error);
 			break;
 		}
 	}
@@ -200,8 +197,7 @@ out:
 	WLog_Print(alsa->log, WLOG_DEBUG, "out");
 
 	if (error && alsa->rdpcontext)
-		setChannelError(alsa->rdpcontext, error,
-		                "audin_alsa_thread_func reported an error");
+		setChannelError(alsa->rdpcontext, error, "audin_alsa_thread_func reported an error");
 
 	ExitThread(error);
 	return error;
@@ -214,7 +210,7 @@ out:
  */
 static UINT audin_alsa_free(IAudinDevice* device)
 {
-	AudinALSADevice* alsa = (AudinALSADevice*) device;
+	AudinALSADevice* alsa = (AudinALSADevice*)device;
 
 	if (alsa)
 		free(alsa->device_name);
@@ -223,31 +219,29 @@ static UINT audin_alsa_free(IAudinDevice* device)
 	return CHANNEL_RC_OK;
 }
 
-static BOOL audin_alsa_format_supported(IAudinDevice* device,
-                                        const AUDIO_FORMAT* format)
+static BOOL audin_alsa_format_supported(IAudinDevice* device, const AUDIO_FORMAT* format)
 {
 	if (!device || !format)
 		return FALSE;
 
 	switch (format->wFormatTag)
 	{
-		case WAVE_FORMAT_PCM:
-			if (format->cbSize == 0 &&
-			    (format->nSamplesPerSec <= 48000) &&
-			    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
-			    (format->nChannels == 1 || format->nChannels == 2))
-			{
-				return TRUE;
-			}
-
-			break;
-
-		case WAVE_FORMAT_ALAW:
-		case WAVE_FORMAT_MULAW:
+	case WAVE_FORMAT_PCM:
+		if (format->cbSize == 0 && (format->nSamplesPerSec <= 48000) &&
+		    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
+		    (format->nChannels == 1 || format->nChannels == 2))
+		{
 			return TRUE;
+		}
 
-		default:
-			return FALSE;
+		break;
+
+	case WAVE_FORMAT_ALAW:
+	case WAVE_FORMAT_MULAW:
+		return TRUE;
+
+	default:
+		return FALSE;
 	}
 
 	return FALSE;
@@ -261,7 +255,7 @@ static BOOL audin_alsa_format_supported(IAudinDevice* device,
 static UINT audin_alsa_set_format(IAudinDevice* device, const AUDIO_FORMAT* format,
                                   UINT32 FramesPerPacket)
 {
-	AudinALSADevice* alsa = (AudinALSADevice*) device;
+	AudinALSADevice* alsa = (AudinALSADevice*)device;
 
 	if (!alsa || !format)
 		return ERROR_INVALID_PARAMETER;
@@ -280,10 +274,9 @@ static UINT audin_alsa_set_format(IAudinDevice* device, const AUDIO_FORMAT* form
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT audin_alsa_open(IAudinDevice* device, AudinReceive receive,
-                            void* user_data)
+static UINT audin_alsa_open(IAudinDevice* device, AudinReceive receive, void* user_data)
 {
-	AudinALSADevice* alsa = (AudinALSADevice*) device;
+	AudinALSADevice* alsa = (AudinALSADevice*)device;
 
 	if (!device || !receive || !user_data)
 		return ERROR_INVALID_PARAMETER;
@@ -297,8 +290,7 @@ static UINT audin_alsa_open(IAudinDevice* device, AudinReceive receive,
 		goto error_out;
 	}
 
-	if (!(alsa->thread = CreateThread(NULL, 0,
-	                                  audin_alsa_thread_func, alsa, 0, NULL)))
+	if (!(alsa->thread = CreateThread(NULL, 0, audin_alsa_thread_func, alsa, 0, NULL)))
 	{
 		WLog_Print(alsa->log, WLOG_ERROR, "CreateThread failed!");
 		goto error_out;
@@ -319,7 +311,7 @@ error_out:
 static UINT audin_alsa_close(IAudinDevice* device)
 {
 	UINT error = CHANNEL_RC_OK;
-	AudinALSADevice* alsa = (AudinALSADevice*) device;
+	AudinALSADevice* alsa = (AudinALSADevice*)device;
 
 	if (!alsa)
 		return ERROR_INVALID_PARAMETER;
@@ -331,7 +323,8 @@ static UINT audin_alsa_close(IAudinDevice* device)
 		if (WaitForSingleObject(alsa->thread, INFINITE) == WAIT_FAILED)
 		{
 			error = GetLastError();
-			WLog_Print(alsa->log, WLOG_ERROR, "WaitForSingleObject failed with error %"PRIu32"", error);
+			WLog_Print(alsa->log, WLOG_ERROR, "WaitForSingleObject failed with error %" PRIu32 "",
+			           error);
 			return error;
 		}
 
@@ -346,8 +339,7 @@ static UINT audin_alsa_close(IAudinDevice* device)
 	return error;
 }
 
-static COMMAND_LINE_ARGUMENT_A audin_alsa_args[] =
-{
+static COMMAND_LINE_ARGUMENT_A audin_alsa_args[] = {
 	{ "dev", COMMAND_LINE_VALUE_REQUIRED, "<device>", NULL, NULL, -1, NULL, "audio device name" },
 	{ NULL, 0, NULL, NULL, NULL, -1, NULL, NULL }
 };
@@ -357,17 +349,16 @@ static COMMAND_LINE_ARGUMENT_A audin_alsa_args[] =
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-static UINT audin_alsa_parse_addin_args(AudinALSADevice* device,
-                                        ADDIN_ARGV* args)
+static UINT audin_alsa_parse_addin_args(AudinALSADevice* device, ADDIN_ARGV* args)
 {
 	int status;
 	DWORD flags;
 	COMMAND_LINE_ARGUMENT_A* arg;
-	AudinALSADevice* alsa = (AudinALSADevice*) device;
-	flags = COMMAND_LINE_SIGIL_NONE | COMMAND_LINE_SEPARATOR_COLON |
-	        COMMAND_LINE_IGN_UNKNOWN_KEYWORD;
-	status = CommandLineParseArgumentsA(args->argc, args->argv,
-	                                    audin_alsa_args, flags, alsa, NULL, NULL);
+	AudinALSADevice* alsa = (AudinALSADevice*)device;
+	flags =
+	    COMMAND_LINE_SIGIL_NONE | COMMAND_LINE_SEPARATOR_COLON | COMMAND_LINE_IGN_UNKNOWN_KEYWORD;
+	status = CommandLineParseArgumentsA(args->argc, args->argv, audin_alsa_args, flags, alsa, NULL,
+	                                    NULL);
 
 	if (status < 0)
 		return ERROR_INVALID_PARAMETER;
@@ -379,8 +370,7 @@ static UINT audin_alsa_parse_addin_args(AudinALSADevice* device,
 		if (!(arg->Flags & COMMAND_LINE_VALUE_PRESENT))
 			continue;
 
-		CommandLineSwitchStart(arg)
-		CommandLineSwitchCase(arg, "dev")
+		CommandLineSwitchStart(arg) CommandLineSwitchCase(arg, "dev")
 		{
 			alsa->device_name = _strdup(arg->Value);
 
@@ -391,16 +381,15 @@ static UINT audin_alsa_parse_addin_args(AudinALSADevice* device,
 			}
 		}
 		CommandLineSwitchEnd(arg)
-	}
-	while ((arg = CommandLineFindNextArgumentA(arg)) != NULL);
+	} while ((arg = CommandLineFindNextArgumentA(arg)) != NULL);
 
 	return CHANNEL_RC_OK;
 }
 
 #ifdef BUILTIN_CHANNELS
-#define freerdp_audin_client_subsystem_entry	alsa_freerdp_audin_client_subsystem_entry
+#	define freerdp_audin_client_subsystem_entry alsa_freerdp_audin_client_subsystem_entry
 #else
-#define freerdp_audin_client_subsystem_entry	FREERDP_API freerdp_audin_client_subsystem_entry
+#	define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
 #endif
 
 /**
@@ -408,13 +397,12 @@ static UINT audin_alsa_parse_addin_args(AudinALSADevice* device,
  *
  * @return 0 on success, otherwise a Win32 error code
  */
-UINT freerdp_audin_client_subsystem_entry(PFREERDP_AUDIN_DEVICE_ENTRY_POINTS
-        pEntryPoints)
+UINT freerdp_audin_client_subsystem_entry(PFREERDP_AUDIN_DEVICE_ENTRY_POINTS pEntryPoints)
 {
 	ADDIN_ARGV* args;
 	AudinALSADevice* alsa;
 	UINT error;
-	alsa = (AudinALSADevice*) calloc(1, sizeof(AudinALSADevice));
+	alsa = (AudinALSADevice*)calloc(1, sizeof(AudinALSADevice));
 
 	if (!alsa)
 	{
@@ -433,8 +421,8 @@ UINT freerdp_audin_client_subsystem_entry(PFREERDP_AUDIN_DEVICE_ENTRY_POINTS
 
 	if ((error = audin_alsa_parse_addin_args(alsa, args)))
 	{
-		WLog_Print(alsa->log, WLOG_ERROR, "audin_alsa_parse_addin_args failed with errorcode %"PRIu32"!",
-		           error);
+		WLog_Print(alsa->log, WLOG_ERROR,
+		           "audin_alsa_parse_addin_args failed with errorcode %" PRIu32 "!", error);
 		goto error_out;
 	}
 
@@ -456,10 +444,10 @@ UINT freerdp_audin_client_subsystem_entry(PFREERDP_AUDIN_DEVICE_ENTRY_POINTS
 	alsa->aformat.wFormatTag = WAVE_FORMAT_PCM;
 	alsa->aformat.nSamplesPerSec = 44100;
 
-	if ((error = pEntryPoints->pRegisterAudinDevice(pEntryPoints->plugin,
-	             (IAudinDevice*) alsa)))
+	if ((error = pEntryPoints->pRegisterAudinDevice(pEntryPoints->plugin, (IAudinDevice*)alsa)))
 	{
-		WLog_Print(alsa->log, WLOG_ERROR, "RegisterAudinDevice failed with error %"PRIu32"!", error);
+		WLog_Print(alsa->log, WLOG_ERROR, "RegisterAudinDevice failed with error %" PRIu32 "!",
+		           error);
 		goto error_out;
 	}
 

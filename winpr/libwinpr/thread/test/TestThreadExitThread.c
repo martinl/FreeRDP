@@ -13,20 +13,15 @@ static DWORD WINAPI thread_func(LPVOID arg)
 
 int TestThreadExitThread(int argc, char* argv[])
 {
-	HANDLE thread; 
+	HANDLE thread;
 	DWORD waitResult;
 	int i;
 
 	/* FIXME: create some noise to better guaranty the test validity and
-         * decrease the number of loops */
-	for (i=0; i<50000; i++)
+	 * decrease the number of loops */
+	for (i = 0; i < 50000; i++)
 	{
-		thread = CreateThread(NULL,
-				0,
-				thread_func,
-				NULL,
-				0,
-				NULL);
+		thread = CreateThread(NULL, 0, thread_func, NULL, 0, NULL);
 
 		if (thread == INVALID_HANDLE_VALUE)
 		{
@@ -35,6 +30,7 @@ int TestThreadExitThread(int argc, char* argv[])
 		}
 
 		waitResult = WaitForSingleObject(thread, 1000);
+
 		if (waitResult != WAIT_OBJECT_0)
 		{
 			/* When the thread exits before the internal thread_list
@@ -43,11 +39,13 @@ int TestThreadExitThread(int argc, char* argv[])
 			 * the end of the thread. Therefore WaitForSingleObject
 			 * never get the signal.
 			 */
-			fprintf(stderr, "1 second should have been enough for the thread to be in a signaled state\n");
+			fprintf(stderr,
+			        "1 second should have been enough for the thread to be in a signaled state\n");
 			return -1;
 		}
 
 		CloseHandle(thread);
 	}
+
 	return 0;
 }

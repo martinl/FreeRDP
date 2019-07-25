@@ -27,14 +27,14 @@
 #include "measure.h"
 
 #ifdef WITH_IPP
-#include <ipps.h>
-#include <ippi.h>
+#	include <ipps.h>
+#	include <ippi.h>
 #endif
 
 #ifdef _WIN32
-#define ALIGN(x) x
+#	define ALIGN(x) x
 #else
-#define ALIGN(x) x DECLSPEC_ALIGN(MEMORY_ALLOCATION_ALIGNMENT)
+#	define ALIGN(x) x DECLSPEC_ALIGN(MEMORY_ALLOCATION_ALIGNMENT)
 #endif
 
 #define ABS(_x_) ((_x_) < 0 ? (-(_x_)) : (_x_))
@@ -53,8 +53,7 @@ void prim_test_setup(BOOL performance);
 
 typedef pstatus_t (*speed_test_fkt)();
 
-BOOL speed_test(const char* name, const char* dsc, UINT32 iterations,
-		speed_test_fkt generic, speed_test_fkt optimized,
-		...);
+BOOL speed_test(const char* name, const char* dsc, UINT32 iterations, speed_test_fkt generic,
+                speed_test_fkt optimized, ...);
 
 #endif /* FREERDP_LIB_PRIMTEST_H */

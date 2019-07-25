@@ -7,7 +7,6 @@
 int TestFilePatternMatch(int argc, char* argv[])
 {
 	/* '*' expression */
-
 	if (!FilePatternMatchA("document.txt", "*"))
 	{
 		printf("FilePatternMatchA error: FileName: %s Pattern: %s\n", "document.txt", "*");
@@ -52,13 +51,15 @@ int TestFilePatternMatch(int argc, char* argv[])
 
 	if (!FilePatternMatchA("document.docx", "document.doc?"))
 	{
-		printf("FilePatternMatchA error: FileName: %s Pattern: %s\n", "document.docx", "document.doc?");
+		printf("FilePatternMatchA error: FileName: %s Pattern: %s\n", "document.docx",
+		       "document.doc?");
 		return -1;
 	}
 
 	if (FilePatternMatchA("document.doc", "document.doc?"))
 	{
-		printf("FilePatternMatchA error: FileName: %s Pattern: %s\n", "document.doc", "document.doc?");
+		printf("FilePatternMatchA error: FileName: %s Pattern: %s\n", "document.doc",
+		       "document.doc?");
 		return -1;
 	}
 
@@ -66,7 +67,8 @@ int TestFilePatternMatch(int argc, char* argv[])
 
 	if (!FilePatternMatchA("document.txt", "document.txt"))
 	{
-		printf("FilePatternMatchA error: FileName: %s Pattern: %s\n", "document.txt", "document.txt");
+		printf("FilePatternMatchA error: FileName: %s Pattern: %s\n", "document.txt",
+		       "document.txt");
 		return -1;
 	}
 
@@ -174,7 +176,5 @@ int TestFilePatternMatch(int argc, char* argv[])
 		return -1;
 	}
 
-
 	return 0;
 }
-

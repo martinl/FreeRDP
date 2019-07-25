@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <freerdp/gdi/gfx.h>
@@ -41,10 +41,9 @@
 
 #define TAG PROXY_TAG("channels")
 
-void pf_OnChannelConnectedEventHandler(void* context,
-                                       ChannelConnectedEventArgs* e)
+void pf_OnChannelConnectedEventHandler(void* context, ChannelConnectedEventArgs* e)
 {
-	pClientContext* pc = (pClientContext*) context;
+	pClientContext* pc = (pClientContext*)context;
 	pServerContext* ps = pc->pdata->ps;
 	RdpgfxClientContext* gfx;
 	RdpgfxServerContext* server;
@@ -52,11 +51,11 @@ void pf_OnChannelConnectedEventHandler(void* context,
 
 	if (strcmp(e->name, RDPEI_DVC_CHANNEL_NAME) == 0)
 	{
-		pc->rdpei = (RdpeiClientContext*) e->pInterface;
+		pc->rdpei = (RdpeiClientContext*)e->pInterface;
 	}
 	else if (strcmp(e->name, RDPGFX_DVC_CHANNEL_NAME) == 0)
 	{
-		gfx = (RdpgfxClientContext*) e->pInterface;
+		gfx = (RdpgfxClientContext*)e->pInterface;
 		pc->gfx = gfx;
 		server = ps->gfx;
 		pf_rdpgfx_pipeline_init(gfx, server, pc->pdata);
@@ -64,7 +63,7 @@ void pf_OnChannelConnectedEventHandler(void* context,
 	else if (strcmp(e->name, DISP_DVC_CHANNEL_NAME) == 0)
 	{
 		UINT error;
-		pc->disp = (DispClientContext*) e->pInterface;
+		pc->disp = (DispClientContext*)e->pInterface;
 		ps->dispOpened = FALSE;
 
 		if ((error = ps->disp->Open(ps->disp)) != CHANNEL_RC_OK)
@@ -84,10 +83,9 @@ void pf_OnChannelConnectedEventHandler(void* context,
 	}
 }
 
-void pf_OnChannelDisconnectedEventHandler(void* context,
-        ChannelDisconnectedEventArgs* e)
+void pf_OnChannelDisconnectedEventHandler(void* context, ChannelDisconnectedEventArgs* e)
 {
-	pClientContext* pc = (pClientContext*) context;
+	pClientContext* pc = (pClientContext*)context;
 	rdpSettings* settings;
 	settings = ((rdpContext*)pc)->settings;
 
@@ -97,7 +95,8 @@ void pf_OnChannelDisconnectedEventHandler(void* context,
 	}
 	else if (strcmp(e->name, RDPGFX_DVC_CHANNEL_NAME) == 0)
 	{
-		gdi_graphics_pipeline_uninit(((rdpContext*)context)->gdi, (RdpgfxClientContext*) e->pInterface);
+		gdi_graphics_pipeline_uninit(((rdpContext*)context)->gdi,
+		                             (RdpgfxClientContext*)e->pInterface);
 	}
 	else if (strcmp(e->name, DISP_DVC_CHANNEL_NAME) == 0)
 	{

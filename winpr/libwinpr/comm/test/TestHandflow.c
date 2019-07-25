@@ -21,7 +21,7 @@
 #include <sys/stat.h>
 
 #ifndef _WIN32
-#include <termios.h>
+#	include <termios.h>
 #endif
 
 #include <winpr/comm.h>
@@ -34,7 +34,6 @@ static BOOL test_SerialSys(HANDLE hComm)
 	// TMP: TODO:
 	return TRUE;
 }
-
 
 int TestHandflow(int argc, char* argv[])
 {
@@ -49,15 +48,15 @@ int TestHandflow(int argc, char* argv[])
 	}
 
 	result = DefineCommDevice("COM1", "/dev/ttyS0");
+
 	if (!result)
 	{
 		fprintf(stderr, "DefineCommDevice failure: 0x%x\n", GetLastError());
 		return EXIT_FAILURE;
 	}
 
-	hComm = CreateFile("COM1",
-			GENERIC_READ | GENERIC_WRITE,
-			0, NULL, OPEN_EXISTING, 0, NULL);
+	hComm = CreateFile("COM1", GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+
 	if (hComm == INVALID_HANDLE_VALUE)
 	{
 		fprintf(stderr, "CreateFileA failure: 0x%x\n", GetLastError());
@@ -65,6 +64,7 @@ int TestHandflow(int argc, char* argv[])
 	}
 
 	_comm_setServerSerialDriver(hComm, SerialDriverSerialSys);
+
 	if (!test_SerialSys(hComm))
 	{
 		fprintf(stderr, "test_SerCxSys failure\n");
@@ -84,7 +84,6 @@ int TestHandflow(int argc, char* argv[])
 	/* 	fprintf(stderr, "test_SerCxSys failure\n"); */
 	/* 	return EXIT_FAILURE; */
 	/* } */
-
 
 	if (!CloseHandle(hComm))
 	{

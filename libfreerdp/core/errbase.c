@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <stdio.h>
@@ -30,7 +30,10 @@
 
 #define TAG FREERDP_TAG("core")
 
-#define ERRBASE_DEFINE(_code)	    { ERRBASE_##_code , "ERRBASE_" #_code , ERRBASE_##_code##_STRING }
+#define ERRBASE_DEFINE(_code)                                        \
+	{                                                                \
+		ERRBASE_##_code, "ERRBASE_" #_code, ERRBASE_##_code##_STRING \
+	}
 
 /* Protocol-independent codes */
 
@@ -38,17 +41,13 @@
 #define ERRBASE_SUCCESS_STRING "Success."
 #define ERRBASE_NONE_STRING ""
 
-static const ERRINFO ERRBASE_CODES[] =
-{
-		ERRBASE_DEFINE(SUCCESS),
+static const ERRINFO ERRBASE_CODES[] = { ERRBASE_DEFINE(SUCCESS),
 
-		ERRBASE_DEFINE(NONE)
-};
+	                                     ERRBASE_DEFINE(NONE) };
 
 const char* freerdp_get_error_base_string(UINT32 code)
 {
 	const ERRINFO* errInfo;
-
 	errInfo = &ERRBASE_CODES[0];
 
 	while (errInfo->code != ERRBASE_NONE)
@@ -67,7 +66,6 @@ const char* freerdp_get_error_base_string(UINT32 code)
 const char* freerdp_get_error_base_name(UINT32 code)
 {
 	const ERRINFO* errInfo;
-
 	errInfo = &ERRBASE_CODES[0];
 
 	while (errInfo->code != ERRBASE_NONE)
@@ -82,4 +80,3 @@ const char* freerdp_get_error_base_name(UINT32 code)
 
 	return "ERRBASE_UNKNOWN";
 }
-

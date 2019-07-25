@@ -26,9 +26,9 @@
 FREERDP_LOCAL void nsc_init_sse2(NSC_CONTEXT* context);
 
 #ifdef WITH_SSE2
-#ifndef NSC_INIT_SIMD
-#define NSC_INIT_SIMD(_context) nsc_init_sse2(_context)
-#endif
+#	ifndef NSC_INIT_SIMD
+#		define NSC_INIT_SIMD(_context) nsc_init_sse2(_context)
+#	endif
 #endif
 
 #endif /* FREERDP_LIB_CODEC_NSC_SSE2_H */

@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <stdio.h>
@@ -29,18 +29,18 @@
 
 #ifndef _WIN32
 
-#include "ndr_array.h"
-#include "ndr_context.h"
-#include "ndr_pointer.h"
-#include "ndr_simple.h"
-#include "ndr_string.h"
-#include "ndr_structure.h"
-#include "ndr_union.h"
+#	include "ndr_array.h"
+#	include "ndr_context.h"
+#	include "ndr_pointer.h"
+#	include "ndr_simple.h"
+#	include "ndr_string.h"
+#	include "ndr_structure.h"
+#	include "ndr_union.h"
 
-#include "ndr_private.h"
+#	include "ndr_private.h"
 
-#include "../log.h"
-#define TAG WINPR_TAG("rpc")
+#	include "../log.h"
+#	define TAG WINPR_TAG("rpc")
 
 /**
  * MSRPC NDR Types Technical Overview:
@@ -86,7 +86,8 @@ void NdrPrintParamAttributes(PARAM_ATTRIBUTES attributes)
 		WLog_INFO(TAG, "MustSize, ");
 }
 
-void NdrProcessParam(PMIDL_STUB_MESSAGE pStubMsg, NDR_PHASE phase, unsigned char* pMemory, NDR_PARAM* param)
+void NdrProcessParam(PMIDL_STUB_MESSAGE pStubMsg, NDR_PHASE phase, unsigned char* pMemory,
+                     NDR_PARAM* param)
 {
 	unsigned char type;
 	PFORMAT_STRING pFormat;
@@ -98,14 +99,14 @@ void NdrProcessParam(PMIDL_STUB_MESSAGE pStubMsg, NDR_PHASE phase, unsigned char
 		pFormat = &param->Type.FormatChar;
 
 		if (param->Attributes.IsSimpleRef)
-			pMemory = *(unsigned char**) pMemory;
+			pMemory = *(unsigned char**)pMemory;
 	}
 	else
 	{
 		pFormat = &pStubMsg->StubDesc->pFormatTypes[param->Type.Offset];
 
 		if (!(param->Attributes.IsByValue))
-			pMemory = *(unsigned char**) pMemory;
+			pMemory = *(unsigned char**)pMemory;
 	}
 
 	type = (pFormat[0] & 0x7F);
@@ -143,34 +144,34 @@ void NdrProcessParam(PMIDL_STUB_MESSAGE pStubMsg, NDR_PHASE phase, unsigned char
 	}
 }
 
-void NdrProcessParams(PMIDL_STUB_MESSAGE pStubMsg, PFORMAT_STRING pFormat, NDR_PHASE phase, void** fpuArgs, unsigned short numberParams)
+void NdrProcessParams(PMIDL_STUB_MESSAGE pStubMsg, PFORMAT_STRING pFormat, NDR_PHASE phase,
+                      void** fpuArgs, unsigned short numberParams)
 {
 	unsigned int i;
 	NDR_PARAM* params;
 	PFORMAT_STRING fmt;
 	unsigned char* arg;
 	unsigned char type;
-	params = (NDR_PARAM*) pFormat;
+	params = (NDR_PARAM*)pFormat;
 	WLog_INFO(TAG, "Params = ");
 
 	for (i = 0; i < numberParams; i++)
 	{
-#ifdef __x86_64__
+#	ifdef __x86_64__
 		float tmp;
-#endif
+#	endif
 		arg = pStubMsg->StackTop + params[i].StackOffset;
-		fmt = (PFORMAT_STRING) &pStubMsg->StubDesc->pFormatTypes[params[i].Type.Offset];
-#ifdef __x86_64__
+		fmt = (PFORMAT_STRING)&pStubMsg->StubDesc->pFormatTypes[params[i].Type.Offset];
+#	ifdef __x86_64__
 
-		if ((params[i].Attributes.IsBasetype) &&
-				!(params[i].Attributes.IsSimpleRef) &&
-				((params[i].Type.FormatChar) == FC_FLOAT) && !fpuArgs)
+		if ((params[i].Attributes.IsBasetype) && !(params[i].Attributes.IsSimpleRef) &&
+		    ((params[i].Type.FormatChar) == FC_FLOAT) && !fpuArgs)
 		{
-			tmp = *(double*) arg;
-			arg = (unsigned char*) &tmp;
+			tmp = *(double*)arg;
+			arg = (unsigned char*)&tmp;
 		}
 
-#endif
+#	endif
 		type = (params[i].Attributes.IsBasetype) ? params[i].Type.FormatChar : *fmt;
 		WLog_INFO(TAG, "'\t#%u\ttype %s (0x%02X) ", i, FC_TYPE_STRINGS[type], type);
 		NdrPrintParamAttributes(params[i].Attributes);
@@ -183,7 +184,7 @@ void NdrProcessParams(PMIDL_STUB_MESSAGE pStubMsg, PFORMAT_STRING pFormat, NDR_P
 }
 
 void NdrClientInitializeNew(PRPC_MESSAGE pRpcMessage, PMIDL_STUB_MESSAGE pStubMsg,
-							PMIDL_STUB_DESC pStubDesc, unsigned int ProcNum)
+                            PMIDL_STUB_DESC pStubDesc, unsigned int ProcNum)
 {
 	pRpcMessage->Handle = NULL;
 	pRpcMessage->RpcFlags = 0;
@@ -243,7 +244,8 @@ void NdrPrintExtFlags(INTERPRETER_OPT_FLAGS2 extFlags)
 		WLog_INFO(TAG, "HasNotify2, ");
 }
 
-CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING pFormat, void** stackTop, void** fpuStack)
+CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING pFormat,
+                                 void** stackTop, void** fpuStack)
 {
 	RPC_MESSAGE rpcMsg;
 	unsigned short procNum;
@@ -257,7 +259,7 @@ CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING
 	NDR_OI2_PROC_HEADER* oi2ProcHeader;
 	CLIENT_CALL_RETURN client_call_return;
 	procNum = stackSize = numberParams = 0;
-	procHeader = (NDR_PROC_HEADER*) &pFormat[0];
+	procHeader = (NDR_PROC_HEADER*)&pFormat[0];
 	client_call_return.Pointer = NULL;
 	handleType = procHeader->HandleType;
 	flags = procHeader->OldOiFlags;
@@ -265,34 +267,34 @@ CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING
 	stackSize = procHeader->StackSize;
 	pFormat += sizeof(NDR_PROC_HEADER);
 	/* The Header: http://msdn.microsoft.com/en-us/library/windows/desktop/aa378707/ */
-	/* Procedure Header Descriptor: http://msdn.microsoft.com/en-us/library/windows/desktop/aa374387/ */
+	/* Procedure Header Descriptor:
+	 * http://msdn.microsoft.com/en-us/library/windows/desktop/aa374387/ */
 	/* Handles: http://msdn.microsoft.com/en-us/library/windows/desktop/aa373932/ */
 	WLog_DBG(TAG, "Oi Header: HandleType: 0x%02X OiFlags: 0x%02X ProcNum: %hu StackSize: 0x%04X",
-			 handleType, *((unsigned char*) &flags),
-			 procNum, stackSize);
+	         handleType, *((unsigned char*)&flags), procNum, stackSize);
 
 	if (handleType > 0)
 	{
 		/* implicit handle */
 		WLog_INFO(TAG, "Implicit Handle");
-		oi2ProcHeader = (NDR_OI2_PROC_HEADER*) &pFormat[0];
+		oi2ProcHeader = (NDR_OI2_PROC_HEADER*)&pFormat[0];
 		pFormat += sizeof(NDR_OI2_PROC_HEADER);
 	}
 	else
 	{
 		/* explicit handle */
 		WLog_INFO(TAG, "Explicit Handle");
-		oi2ProcHeader = (NDR_OI2_PROC_HEADER*) &pFormat[6];
+		oi2ProcHeader = (NDR_OI2_PROC_HEADER*)&pFormat[6];
 		pFormat += sizeof(NDR_OI2_PROC_HEADER) + 6;
 	}
 
 	optFlags = oi2ProcHeader->Oi2Flags;
 	numberParams = oi2ProcHeader->NumberParams;
-	WLog_DBG(TAG, "Oi2 Header: Oi2Flags: 0x%02X, NumberParams: %u ClientBufferSize: %hu ServerBufferSize: %hu",
-			 *((unsigned char*) &optFlags),
-			 numberParams,
-			 oi2ProcHeader->ClientBufferSize,
-			 oi2ProcHeader->ServerBufferSize);
+	WLog_DBG(TAG,
+	         "Oi2 Header: Oi2Flags: 0x%02X, NumberParams: %u ClientBufferSize: %hu "
+	         "ServerBufferSize: %hu",
+	         *((unsigned char*)&optFlags), numberParams, oi2ProcHeader->ClientBufferSize,
+	         oi2ProcHeader->ServerBufferSize);
 	WLog_INFO(TAG, "Oi2Flags: ");
 	NdrPrintOptFlags(optFlags);
 	NdrClientInitializeNew(&rpcMsg, &stubMsg, pStubDescriptor, procNum);
@@ -300,12 +302,12 @@ CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING
 	if (optFlags.HasExtensions)
 	{
 		INTERPRETER_OPT_FLAGS2 extFlags;
-		NDR_PROC_HEADER_EXTS* extensions = (NDR_PROC_HEADER_EXTS*) pFormat;
+		NDR_PROC_HEADER_EXTS* extensions = (NDR_PROC_HEADER_EXTS*)pFormat;
 		pFormat += extensions->Size;
 		extFlags = extensions->Flags2;
-		WLog_DBG(TAG, "Extensions: Size: %hhu, flags2: 0x%02X",
-				 extensions->Size, *((unsigned char*) &extensions->Flags2));
-#ifdef __x86_64__
+		WLog_DBG(TAG, "Extensions: Size: %hhu, flags2: 0x%02X", extensions->Size,
+		         *((unsigned char*)&extensions->Flags2));
+#	ifdef __x86_64__
 
 		if (extensions->Size > sizeof(*extensions) && fpuStack)
 		{
@@ -316,25 +318,25 @@ CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING
 			{
 				switch (fpuMask & 3)
 				{
-					case 1:
-						*(float*) &stackTop[i] = *(float*) &fpuStack[i];
-						break;
+				case 1:
+					*(float*)&stackTop[i] = *(float*)&fpuStack[i];
+					break;
 
-					case 2:
-						*(double*) &stackTop[i] = *(double*) &fpuStack[i];
-						break;
+				case 2:
+					*(double*)&stackTop[i] = *(double*)&fpuStack[i];
+					break;
 				}
 			}
 		}
 
-#endif
+#	endif
 		WLog_INFO(TAG, "ExtFlags: ");
 		NdrPrintExtFlags(extFlags);
 	}
 
-	stubMsg.StackTop = (unsigned char*) stackTop;
+	stubMsg.StackTop = (unsigned char*)stackTop;
 	NdrProcessParams(&stubMsg, pFormat, NDR_PHASE_SIZE, fpuStack, numberParams);
-	WLog_DBG(TAG, "stubMsg BufferLength: %"PRIu32"", stubMsg.BufferLength);
+	WLog_DBG(TAG, "stubMsg BufferLength: %" PRIu32 "", stubMsg.BufferLength);
 	return client_call_return;
 }
 

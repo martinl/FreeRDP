@@ -22,18 +22,17 @@
 #define FREERDP_LIB_CODEC_NSC_TYPES_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/crt.h>
 #include <winpr/wlog.h>
 #include <winpr/collections.h>
 
-
 #include <freerdp/utils/profiler.h>
 
-#define ROUND_UP_TO(_b, _n) (_b + ((~(_b & (_n-1)) + 0x1) & (_n-1)))
-#define MINMAX(_v,_l,_h) ((_v) < (_l) ? (_l) : ((_v) > (_h) ? (_h) : (_v)))
+#define ROUND_UP_TO(_b, _n) (_b + ((~(_b & (_n - 1)) + 0x1) & (_n - 1)))
+#define MINMAX(_v, _l, _h) ((_v) < (_l) ? (_l) : ((_v) > (_h) ? (_h) : (_v)))
 
 struct _NSC_CONTEXT_PRIV
 {
@@ -41,8 +40,8 @@ struct _NSC_CONTEXT_PRIV
 
 	wBufferPool* PlanePool;
 
-	BYTE* PlaneBuffers[5];		/* Decompressed Plane Buffers in the respective order */
-	UINT32 PlaneBuffersLength;	/* Lengths of each plane buffer */
+	BYTE* PlaneBuffers[5];     /* Decompressed Plane Buffers in the respective order */
+	UINT32 PlaneBuffersLength; /* Lengths of each plane buffer */
 
 	/* profilers */
 	PROFILER_DEFINE(prof_nsc_rle_decompress_data)

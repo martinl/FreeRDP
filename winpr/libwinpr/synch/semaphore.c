@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <winpr/synch.h>
@@ -26,21 +26,21 @@
 #include "synch.h"
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#	include <unistd.h>
 #endif
 
 #ifndef _WIN32
 
-#include <errno.h>
-#include "../handle/handle.h"
-#include "../log.h"
-#define TAG WINPR_TAG("synch.semaphore")
+#	include <errno.h>
+#	include "../handle/handle.h"
+#	include "../log.h"
+#	define TAG WINPR_TAG("synch.semaphore")
 
 static BOOL SemaphoreCloseHandle(HANDLE handle);
 
 static BOOL SemaphoreIsHandled(HANDLE handle)
 {
-	WINPR_TIMER* pSemaphore = (WINPR_TIMER*) handle;
+	WINPR_TIMER* pSemaphore = (WINPR_TIMER*)handle;
 
 	if (!pSemaphore || (pSemaphore->Type != HANDLE_TYPE_SEMAPHORE))
 	{
@@ -82,12 +82,12 @@ static DWORD SemaphoreCleanupHandle(HANDLE handle)
 
 BOOL SemaphoreCloseHandle(HANDLE handle)
 {
-	WINPR_SEMAPHORE* semaphore = (WINPR_SEMAPHORE*) handle;
+	WINPR_SEMAPHORE* semaphore = (WINPR_SEMAPHORE*)handle;
 
 	if (!SemaphoreIsHandled(handle))
 		return FALSE;
 
-#ifdef WINPR_PIPE_SEMAPHORE
+#	ifdef WINPR_PIPE_SEMAPHORE
 
 	if (semaphore->pipe_fd[0] != -1)
 	{
@@ -101,56 +101,53 @@ BOOL SemaphoreCloseHandle(HANDLE handle)
 		}
 	}
 
-#else
-#if defined __APPLE__
-	semaphore_destroy(mach_task_self(), *((winpr_sem_t*) semaphore->sem));
-#else
-	sem_destroy((winpr_sem_t*) semaphore->sem);
-#endif
-#endif
+#	else
+#		if defined __APPLE__
+	semaphore_destroy(mach_task_self(), *((winpr_sem_t*)semaphore->sem));
+#		else
+	sem_destroy((winpr_sem_t*)semaphore->sem);
+#		endif
+#	endif
 	free(semaphore);
 	return TRUE;
 }
 
-static HANDLE_OPS ops =
-{
-	SemaphoreIsHandled,
-	SemaphoreCloseHandle,
-	SemaphoreGetFd,
-	SemaphoreCleanupHandle,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+static HANDLE_OPS ops = { SemaphoreIsHandled,
+	                      SemaphoreCloseHandle,
+	                      SemaphoreGetFd,
+	                      SemaphoreCleanupHandle,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL,
+	                      NULL };
 
 HANDLE CreateSemaphoreW(LPSECURITY_ATTRIBUTES lpSemaphoreAttributes, LONG lInitialCount,
                         LONG lMaximumCount, LPCWSTR lpName)
 {
 	HANDLE handle;
 	WINPR_SEMAPHORE* semaphore;
-	semaphore = (WINPR_SEMAPHORE*) calloc(1, sizeof(WINPR_SEMAPHORE));
+	semaphore = (WINPR_SEMAPHORE*)calloc(1, sizeof(WINPR_SEMAPHORE));
 
 	if (!semaphore)
 		return NULL;
 
 	semaphore->pipe_fd[0] = -1;
 	semaphore->pipe_fd[1] = -1;
-	semaphore->sem = (winpr_sem_t*) NULL;
+	semaphore->sem = (winpr_sem_t*)NULL;
 	semaphore->ops = &ops;
-#ifdef WINPR_PIPE_SEMAPHORE
+#	ifdef WINPR_PIPE_SEMAPHORE
 
 	if (pipe(semaphore->pipe_fd) < 0)
 	{
@@ -172,8 +169,8 @@ HANDLE CreateSemaphoreW(LPSECURITY_ATTRIBUTES lpSemaphoreAttributes, LONG lIniti
 		lInitialCount--;
 	}
 
-#else
-	semaphore->sem = (winpr_sem_t*) malloc(sizeof(winpr_sem_t));
+#	else
+	semaphore->sem = (winpr_sem_t*)malloc(sizeof(winpr_sem_t));
 
 	if (!semaphore->sem)
 	{
@@ -182,13 +179,13 @@ HANDLE CreateSemaphoreW(LPSECURITY_ATTRIBUTES lpSemaphoreAttributes, LONG lIniti
 		return NULL;
 	}
 
-#if defined __APPLE__
+#		if defined __APPLE__
 
-	if (semaphore_create(mach_task_self(), semaphore->sem, SYNC_POLICY_FIFO,
-	                     lMaximumCount) != KERN_SUCCESS)
-#else
+	if (semaphore_create(mach_task_self(), semaphore->sem, SYNC_POLICY_FIFO, lMaximumCount) !=
+	    KERN_SUCCESS)
+#		else
 	if (sem_init(semaphore->sem, 0, lMaximumCount) == -1)
-#endif
+#		endif
 	{
 		WLog_ERR(TAG, "failed to create semaphore");
 		free(semaphore->sem);
@@ -196,9 +193,9 @@ HANDLE CreateSemaphoreW(LPSECURITY_ATTRIBUTES lpSemaphoreAttributes, LONG lIniti
 		return NULL;
 	}
 
-#endif
+#	endif
 	WINPR_HANDLE_SET_TYPE_AND_MODE(semaphore, HANDLE_TYPE_SEMAPHORE, WINPR_FD_READ);
-	handle = (HANDLE) semaphore;
+	handle = (HANDLE)semaphore;
 	return handle;
 }
 
@@ -231,8 +228,8 @@ BOOL ReleaseSemaphore(HANDLE hSemaphore, LONG lReleaseCount, LPLONG lpPreviousCo
 
 	if (Type == HANDLE_TYPE_SEMAPHORE)
 	{
-		semaphore = (WINPR_SEMAPHORE*) Object;
-#ifdef WINPR_PIPE_SEMAPHORE
+		semaphore = (WINPR_SEMAPHORE*)Object;
+#	ifdef WINPR_PIPE_SEMAPHORE
 
 		if (semaphore->pipe_fd[0] != -1)
 		{
@@ -245,18 +242,18 @@ BOOL ReleaseSemaphore(HANDLE hSemaphore, LONG lReleaseCount, LPLONG lpPreviousCo
 			}
 		}
 
-#else
+#	else
 
 		while (lReleaseCount > 0)
 		{
-#if defined __APPLE__
-			semaphore_signal(*((winpr_sem_t*) semaphore->sem));
-#else
-			sem_post((winpr_sem_t*) semaphore->sem);
-#endif
+#		if defined __APPLE__
+			semaphore_signal(*((winpr_sem_t*)semaphore->sem));
+#		else
+			sem_post((winpr_sem_t*)semaphore->sem);
+#		endif
 		}
 
-#endif
+#	endif
 		return TRUE;
 	}
 

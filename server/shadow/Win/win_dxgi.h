@@ -25,31 +25,32 @@
 
 #ifdef WITH_DXGI_1_2
 
-#ifndef CINTERFACE
-#define CINTERFACE
-#endif
+#	ifndef CINTERFACE
+#		define CINTERFACE
+#	endif
 
-#include <D3D11.h>
-#include <dxgi1_2.h>
+#	include <D3D11.h>
+#	include <dxgi1_2.h>
 
 #endif
 
 #include "win_shadow.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #ifdef WITH_DXGI_1_2
 
-int win_shadow_dxgi_init(winShadowSubsystem* subsystem);
-int win_shadow_dxgi_uninit(winShadowSubsystem* subsystem);
+	int win_shadow_dxgi_init(winShadowSubsystem* subsystem);
+	int win_shadow_dxgi_uninit(winShadowSubsystem* subsystem);
 
-int win_shadow_dxgi_fetch_frame_data(winShadowSubsystem* subsystem,
-	BYTE** ppDstData, int* pnDstStep, int x, int y, int width, int height);
+	int win_shadow_dxgi_fetch_frame_data(winShadowSubsystem* subsystem, BYTE** ppDstData,
+	                                     int* pnDstStep, int x, int y, int width, int height);
 
-int win_shadow_dxgi_get_next_frame(winShadowSubsystem* subsystem);
-int win_shadow_dxgi_get_invalid_region(winShadowSubsystem* subsystem);
+	int win_shadow_dxgi_get_next_frame(winShadowSubsystem* subsystem);
+	int win_shadow_dxgi_get_invalid_region(winShadowSubsystem* subsystem);
 
 #endif
 

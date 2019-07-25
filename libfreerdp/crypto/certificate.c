@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <errno.h>
@@ -45,26 +45,25 @@ static const char certificate_legacy_hosts_file[] = "known_hosts";
 
 #define TAG FREERDP_TAG("crypto")
 
-static BOOL certificate_split_line(char* line, char** host, UINT16* port,
-                                   char** subject, char** issuer,
-                                   char** fingerprint);
+static BOOL certificate_split_line(char* line, char** host, UINT16* port, char** subject,
+                                   char** issuer, char** fingerprint);
 static BOOL certificate_line_is_comment(const char* line, size_t length)
 {
 	while (length > 0)
 	{
 		switch (*line)
 		{
-			case ' ':
-			case '\t':
-				line++;
-				length--;
-				break;
+		case ' ':
+		case '\t':
+			line++;
+			length--;
+			break;
 
-			case '#':
-				return TRUE;
+		case '#':
+			return TRUE;
 
-			default:
-				return FALSE;
+		default:
+			return FALSE;
 		}
 	}
 
@@ -91,8 +90,8 @@ BOOL certificate_store_init(rdpCertificateStore* certificate_store)
 		WLog_INFO(TAG, "creating directory %s", settings->ConfigPath);
 	}
 
-	if (!(certificate_store->path = GetCombinedPath(settings->ConfigPath,
-	                                (char*) certificate_store_dir)))
+	if (!(certificate_store->path =
+	          GetCombinedPath(settings->ConfigPath, (char*)certificate_store_dir)))
 		goto fail;
 
 	if (!PathFileExistsA(certificate_store->path))
@@ -106,7 +105,7 @@ BOOL certificate_store_init(rdpCertificateStore* certificate_store)
 		WLog_INFO(TAG, "creating directory [%s]", certificate_store->path);
 	}
 
-	if (!(server_path = GetCombinedPath(settings->ConfigPath, (char*) certificate_server_dir)))
+	if (!(server_path = GetCombinedPath(settings->ConfigPath, (char*)certificate_server_dir)))
 		goto fail;
 
 	if (!PathFileExistsA(server_path))
@@ -120,12 +119,12 @@ BOOL certificate_store_init(rdpCertificateStore* certificate_store)
 		WLog_INFO(TAG, "created directory [%s]", server_path);
 	}
 
-	if (!(certificate_store->file = GetCombinedPath(settings->ConfigPath,
-	                                (char*) certificate_known_hosts_file)))
+	if (!(certificate_store->file =
+	          GetCombinedPath(settings->ConfigPath, (char*)certificate_known_hosts_file)))
 		goto fail;
 
-	if (!(certificate_store->legacy_file = GetCombinedPath(settings->ConfigPath,
-	                                       (char*) certificate_legacy_hosts_file)))
+	if (!(certificate_store->legacy_file =
+	          GetCombinedPath(settings->ConfigPath, (char*)certificate_legacy_hosts_file)))
 		goto fail;
 
 	free(server_path);
@@ -141,7 +140,7 @@ fail:
 }
 
 static int certificate_data_match_legacy(rdpCertificateStore* certificate_store,
-        rdpCertificateData* certificate_data)
+                                         rdpCertificateData* certificate_data)
 {
 	HANDLE fp;
 	int match = 1;
@@ -156,15 +155,15 @@ static int certificate_data_match_legacy(rdpCertificateStore* certificate_store,
 	/* Assure POSIX style paths, CreateFile expects either '/' or '\\' */
 	PathCchConvertStyleA(certificate_store->legacy_file, strlen(certificate_store->legacy_file),
 	                     PATH_STYLE_UNIX);
-	fp = CreateFileA(certificate_store->legacy_file, GENERIC_READ, FILE_SHARE_READ,
-	                 NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	fp = CreateFileA(certificate_store->legacy_file, GENERIC_READ, FILE_SHARE_READ, NULL,
+	                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (fp == INVALID_HANDLE_VALUE)
 		return match;
 
 	if ((lowSize = GetFileSize(fp, &highSize)) == INVALID_FILE_SIZE)
 	{
-		WLog_ERR(TAG, "GetFileSize(%s) returned %s [0x%08"PRIX32"]",
+		WLog_ERR(TAG, "GetFileSize(%s) returned %s [0x%08" PRIX32 "]",
 		         certificate_store->legacy_file, strerror(errno), GetLastError());
 		CloseHandle(fp);
 		return match;
@@ -178,7 +177,7 @@ static int certificate_data_match_legacy(rdpCertificateStore* certificate_store,
 		return match;
 	}
 
-	mdata = (char*) malloc(size + 2);
+	mdata = (char*)malloc(size + 2);
 
 	if (!mdata)
 	{
@@ -209,8 +208,8 @@ static int certificate_data_match_legacy(rdpCertificateStore* certificate_store,
 			hostname = StrSep(&pline, " \t");
 
 			if (!hostname || !pline)
-				WLog_WARN(TAG, "Invalid %s entry %s %s!", certificate_legacy_hosts_file,
-				          hostname, pline);
+				WLog_WARN(TAG, "Invalid %s entry %s %s!", certificate_legacy_hosts_file, hostname,
+				          pline);
 			else if (strcmp(hostname, certificate_data->hostname) == 0)
 			{
 				const int diff = strcmp(pline, certificate_data->fingerprint);
@@ -226,11 +225,8 @@ static int certificate_data_match_legacy(rdpCertificateStore* certificate_store,
 	 * copy to new file in new format. */
 	if (0 == match)
 	{
-		rdpCertificateData* data = certificate_data_new(
-		                               hostname,
-		                               certificate_data->port,
-		                               NULL, NULL,
-		                               certificate_data->fingerprint);
+		rdpCertificateData* data = certificate_data_new(hostname, certificate_data->port, NULL,
+		                                                NULL, certificate_data->fingerprint);
 
 		if (data)
 		{
@@ -267,9 +263,8 @@ static int certificate_data_match_legacy(rdpCertificateStore* certificate_store,
 }
 
 static int certificate_data_match_raw(rdpCertificateStore* certificate_store,
-                                      rdpCertificateData* certificate_data,
-                                      char** psubject, char** pissuer,
-                                      char** fprint)
+                                      rdpCertificateData* certificate_data, char** psubject,
+                                      char** pissuer, char** fprint)
 {
 	BOOL found = FALSE;
 	HANDLE fp;
@@ -288,15 +283,15 @@ static int certificate_data_match_raw(rdpCertificateStore* certificate_store,
 	DWORD read;
 	/* Assure POSIX style paths, CreateFile expects either '/' or '\\' */
 	PathCchConvertStyleA(certificate_store->file, strlen(certificate_store->file), PATH_STYLE_UNIX);
-	fp = CreateFileA(certificate_store->file, GENERIC_READ, FILE_SHARE_READ,
-	                 NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_NORMAL, NULL);
+	fp = CreateFileA(certificate_store->file, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_ALWAYS,
+	                 FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (fp == INVALID_HANDLE_VALUE)
 		return match;
 
 	if ((lowSize = GetFileSize(fp, &highSize)) == INVALID_FILE_SIZE)
 	{
-		WLog_ERR(TAG, "GetFileSize(%s) returned %s [0x%08"PRIX32"]",
+		WLog_ERR(TAG, "GetFileSize(%s) returned %s [0x%08" PRIX32 "]",
 		         certificate_store->legacy_file, strerror(errno), GetLastError());
 		CloseHandle(fp);
 		return match;
@@ -310,7 +305,7 @@ static int certificate_data_match_raw(rdpCertificateStore* certificate_store,
 		return match;
 	}
 
-	mdata = (char*) malloc(size + 2);
+	mdata = (char*)malloc(size + 2);
 
 	if (!mdata)
 	{
@@ -341,10 +336,9 @@ static int certificate_data_match_raw(rdpCertificateStore* certificate_store,
 			if (certificate_line_is_comment(pline, length))
 			{
 			}
-			else if (!certificate_split_line(pline, &hostname, &port,
-			                                 &subject, &issuer, &fingerprint))
-				WLog_WARN(TAG, "Invalid %s entry %s!",
-				          certificate_known_hosts_file, pline);
+			else if (!certificate_split_line(pline, &hostname, &port, &subject, &issuer,
+			                                 &fingerprint))
+				WLog_WARN(TAG, "Invalid %s entry %s!", certificate_known_hosts_file, pline);
 			else if (strcmp(pline, certificate_data->hostname) == 0)
 			{
 				int outLen;
@@ -384,12 +378,11 @@ static int certificate_data_match_raw(rdpCertificateStore* certificate_store,
 }
 
 BOOL certificate_get_stored_data(rdpCertificateStore* certificate_store,
-                                 rdpCertificateData* certificate_data,
-                                 char** subject, char** issuer,
-                                 char** fingerprint)
+                                 rdpCertificateData* certificate_data, char** subject,
+                                 char** issuer, char** fingerprint)
 {
-	int rc = certificate_data_match_raw(certificate_store, certificate_data,
-	                                    subject, issuer, fingerprint);
+	int rc = certificate_data_match_raw(certificate_store, certificate_data, subject, issuer,
+	                                    fingerprint);
 
 	if ((rc == 0) || (rc == -1))
 		return TRUE;
@@ -400,8 +393,7 @@ BOOL certificate_get_stored_data(rdpCertificateStore* certificate_store,
 int certificate_data_match(rdpCertificateStore* certificate_store,
                            rdpCertificateData* certificate_data)
 {
-	return certificate_data_match_raw(certificate_store, certificate_data,
-	                                  NULL, NULL, NULL);
+	return certificate_data_match_raw(certificate_store, certificate_data, NULL, NULL, NULL);
 }
 
 BOOL certificate_data_replace(rdpCertificateStore* certificate_store,
@@ -418,15 +410,15 @@ BOOL certificate_data_replace(rdpCertificateStore* certificate_store,
 	DWORD lowSize, highSize;
 	/* Assure POSIX style paths, CreateFile expects either '/' or '\\' */
 	PathCchConvertStyleA(certificate_store->file, strlen(certificate_store->file), PATH_STYLE_UNIX);
-	fp = CreateFileA(certificate_store->file, GENERIC_READ | GENERIC_WRITE, 0,
-	                 NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	fp = CreateFileA(certificate_store->file, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+	                 FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (fp == INVALID_HANDLE_VALUE)
 		return FALSE;
 
 	if ((lowSize = GetFileSize(fp, &highSize)) == INVALID_FILE_SIZE)
 	{
-		WLog_ERR(TAG, "GetFileSize(%s) returned %s [0x%08"PRIX32"]",
+		WLog_ERR(TAG, "GetFileSize(%s) returned %s [0x%08" PRIX32 "]",
 		         certificate_store->legacy_file, strerror(errno), GetLastError());
 		CloseHandle(fp);
 		return FALSE;
@@ -440,7 +432,7 @@ BOOL certificate_data_replace(rdpCertificateStore* certificate_store,
 		return FALSE;
 	}
 
-	data = (char*) malloc(size + 2);
+	data = (char*)malloc(size + 2);
 
 	if (!data)
 	{
@@ -457,8 +449,8 @@ BOOL certificate_data_replace(rdpCertificateStore* certificate_store,
 
 	if (SetFilePointer(fp, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
 	{
-		WLog_ERR(TAG, "SetFilePointer(%s) returned %s [0x%08"PRIX32"]",
-		         certificate_store->file, strerror(errno), GetLastError());
+		WLog_ERR(TAG, "SetFilePointer(%s) returned %s [0x%08" PRIX32 "]", certificate_store->file,
+		         strerror(errno), GetLastError());
 		free(data);
 		CloseHandle(fp);
 		return FALSE;
@@ -466,8 +458,8 @@ BOOL certificate_data_replace(rdpCertificateStore* certificate_store,
 
 	if (!SetEndOfFile(fp))
 	{
-		WLog_ERR(TAG, "SetEndOfFile(%s) returned %s [0x%08"PRIX32"]",
-		         certificate_store->file, strerror(errno), GetLastError());
+		WLog_ERR(TAG, "SetEndOfFile(%s) returned %s [0x%08" PRIX32 "]", certificate_store->file,
+		         strerror(errno), GetLastError());
 		free(data);
 		CloseHandle(fp);
 		return FALSE;
@@ -495,9 +487,10 @@ BOOL certificate_data_replace(rdpCertificateStore* certificate_store,
 			if (certificate_line_is_comment(pline, length))
 			{
 			}
-			else if (!certificate_split_line(pline, &hostname, &port, &subject, &issuer, &fingerprint))
-				WLog_WARN(TAG, "Skipping invalid %s entry %s!",
-				          certificate_known_hosts_file, pline);
+			else if (!certificate_split_line(pline, &hostname, &port, &subject, &issuer,
+			                                 &fingerprint))
+				WLog_WARN(TAG, "Skipping invalid %s entry %s!", certificate_known_hosts_file,
+				          pline);
 			else
 			{
 				int res;
@@ -510,28 +503,31 @@ BOOL certificate_data_replace(rdpCertificateStore* certificate_store,
 					rc = TRUE;
 				}
 
-				res = _snprintf(NULL, 0, "%s %"PRIu16" %s %s %s\n", hostname, port, fingerprint, subject, issuer);
+				res = _snprintf(NULL, 0, "%s %" PRIu16 " %s %s %s\n", hostname, port, fingerprint,
+				                subject, issuer);
+
 				if (res < 0)
 				{
 					free(data);
 					CloseHandle(fp);
 					return FALSE;
 				}
-				size = (size_t)res;
 
+				size = (size_t)res;
 				tdata = malloc(size + 1);
 
 				if (!tdata)
 				{
-					WLog_ERR(TAG, "malloc(%s) returned %s [0x%08X]",
-					         certificate_store->file, strerror(errno), errno);
+					WLog_ERR(TAG, "malloc(%s) returned %s [0x%08X]", certificate_store->file,
+					         strerror(errno), errno);
 					free(data);
 					CloseHandle(fp);
 					return FALSE;
 				}
 
-				res = _snprintf(tdata, size + 1, "%s %"PRIu16" %s %s %s\n", hostname, port, fingerprint, subject,
-				              issuer);
+				res = _snprintf(tdata, size + 1, "%s %" PRIu16 " %s %s %s\n", hostname, port,
+				                fingerprint, subject, issuer);
+
 				if (res < 0)
 				{
 					free(tdata);
@@ -542,8 +538,8 @@ BOOL certificate_data_replace(rdpCertificateStore* certificate_store,
 
 				if ((size_t)res != size)
 				{
-					WLog_ERR(TAG, "_snprintf(%s) returned %s [0x%08X]",
-					         certificate_store->file, strerror(errno), errno);
+					WLog_ERR(TAG, "_snprintf(%s) returned %s [0x%08X]", certificate_store->file,
+					         strerror(errno), errno);
 					free(tdata);
 					free(data);
 					CloseHandle(fp);
@@ -552,8 +548,8 @@ BOOL certificate_data_replace(rdpCertificateStore* certificate_store,
 
 				if (!WriteFile(fp, tdata, size, &written, NULL) || (written != size))
 				{
-					WLog_ERR(TAG, "WriteFile(%s) returned %s [0x%08X]",
-					         certificate_store->file, strerror(errno), errno);
+					WLog_ERR(TAG, "WriteFile(%s) returned %s [0x%08X]", certificate_store->file,
+					         strerror(errno), errno);
 					free(tdata);
 					free(data);
 					CloseHandle(fp);
@@ -572,8 +568,8 @@ BOOL certificate_data_replace(rdpCertificateStore* certificate_store,
 	return rc;
 }
 
-BOOL certificate_split_line(char* line, char** host, UINT16* port, char** subject,
-                            char** issuer, char** fingerprint)
+BOOL certificate_split_line(char* line, char** host, UINT16* port, char** subject, char** issuer,
+                            char** fingerprint)
 {
 	char* cur;
 	size_t length = strlen(line);
@@ -627,47 +623,46 @@ BOOL certificate_data_print(rdpCertificateStore* certificate_store,
 	/* reopen in append mode */
 	/* Assure POSIX style paths, CreateFile expects either '/' or '\\' */
 	PathCchConvertStyleA(certificate_store->file, strlen(certificate_store->file), PATH_STYLE_UNIX);
-	fp = CreateFileA(certificate_store->file, GENERIC_WRITE, 0,
-	                 NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	fp = CreateFileA(certificate_store->file, GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+	                 FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (fp == INVALID_HANDLE_VALUE)
 		return FALSE;
 
 	if (SetFilePointer(fp, 0, NULL, FILE_END) == INVALID_SET_FILE_POINTER)
 	{
-		WLog_ERR(TAG, "SetFilePointer(%s) returned %s [0x%08"PRIX32"]",
-		         certificate_store->file, strerror(errno), GetLastError());
+		WLog_ERR(TAG, "SetFilePointer(%s) returned %s [0x%08" PRIX32 "]", certificate_store->file,
+		         strerror(errno), GetLastError());
 		CloseHandle(fp);
 		return FALSE;
 	}
 
-	rc = _snprintf(NULL, 0, "%s %"PRIu16" %s %s %s\n", certificate_data->hostname,
-	                 certificate_data->port,
-	                 certificate_data->fingerprint, certificate_data->subject,
-	                 certificate_data->issuer);
+	rc = _snprintf(NULL, 0, "%s %" PRIu16 " %s %s %s\n", certificate_data->hostname,
+	               certificate_data->port, certificate_data->fingerprint, certificate_data->subject,
+	               certificate_data->issuer);
+
 	if (rc < 0)
 		return FALSE;
-	size = (size_t)rc;
 
+	size = (size_t)rc;
 	tdata = malloc(size + 1);
 
 	if (!tdata)
 	{
-		WLog_ERR(TAG, "malloc(%s) returned %s [0x%08X]",
-		         certificate_store->file, strerror(errno), errno);
+		WLog_ERR(TAG, "malloc(%s) returned %s [0x%08X]", certificate_store->file, strerror(errno),
+		         errno);
 		CloseHandle(fp);
 		return FALSE;
 	}
 
-	rc = _snprintf(tdata, size + 1, "%s %"PRIu16" %s %s %s\n", certificate_data->hostname,
-	              certificate_data->port,
-	              certificate_data->fingerprint, certificate_data->subject,
-	              certificate_data->issuer);
+	rc = _snprintf(tdata, size + 1, "%s %" PRIu16 " %s %s %s\n", certificate_data->hostname,
+	               certificate_data->port, certificate_data->fingerprint, certificate_data->subject,
+	               certificate_data->issuer);
 
 	if ((rc < 0) || ((size_t)rc != size))
 	{
-		WLog_ERR(TAG, "_snprintf(%s) returned %s [0x%08X]",
-		         certificate_store->file, strerror(errno), errno);
+		WLog_ERR(TAG, "_snprintf(%s) returned %s [0x%08X]", certificate_store->file,
+		         strerror(errno), errno);
 		free(tdata);
 		CloseHandle(fp);
 		return FALSE;
@@ -675,8 +670,8 @@ BOOL certificate_data_print(rdpCertificateStore* certificate_store,
 
 	if (!WriteFile(fp, tdata, size, &written, NULL) || (written != size))
 	{
-		WLog_ERR(TAG, "WriteFile(%s) returned %s [0x%08X]",
-		         certificate_store->file, strerror(errno), errno);
+		WLog_ERR(TAG, "WriteFile(%s) returned %s [0x%08X]", certificate_store->file,
+		         strerror(errno), errno);
 		free(tdata);
 		CloseHandle(fp);
 		return FALSE;
@@ -688,7 +683,7 @@ BOOL certificate_data_print(rdpCertificateStore* certificate_store,
 }
 
 rdpCertificateData* certificate_data_new(const char* hostname, UINT16 port, const char* subject,
-        const char* issuer, const char* fingerprint)
+                                         const char* issuer, const char* fingerprint)
 {
 	size_t i;
 	rdpCertificateData* certdata;
@@ -719,8 +714,7 @@ rdpCertificateData* certificate_data_new(const char* hostname, UINT16 port, cons
 
 	certdata->fingerprint = _strdup(fingerprint);
 
-	if (!certdata->hostname || !certdata->subject ||
-	    !certdata->issuer || !certdata->fingerprint)
+	if (!certdata->hostname || !certdata->subject || !certdata->issuer || !certdata->fingerprint)
 		goto fail;
 
 	for (i = 0; i < strlen(hostname); i++)
@@ -751,7 +745,7 @@ void certificate_data_free(rdpCertificateData* certificate_data)
 rdpCertificateStore* certificate_store_new(rdpSettings* settings)
 {
 	rdpCertificateStore* certificate_store;
-	certificate_store = (rdpCertificateStore*) calloc(1, sizeof(rdpCertificateStore));
+	certificate_store = (rdpCertificateStore*)calloc(1, sizeof(rdpCertificateStore));
 
 	if (!certificate_store)
 		return NULL;

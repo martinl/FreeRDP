@@ -18,18 +18,18 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
 #ifdef WITH_XCURSOR
-#include <X11/Xcursor/Xcursor.h>
+#	include <X11/Xcursor/Xcursor.h>
 #endif
 
 #ifdef WITH_XI
-#include <X11/extensions/XInput2.h>
+#	include <X11/extensions/XInput2.h>
 #endif
 
 #include <math.h>
@@ -42,12 +42,12 @@
 
 #ifdef WITH_XI
 
-#define MAX_CONTACTS 2
+#	define MAX_CONTACTS 2
 
-#define PAN_THRESHOLD 50
-#define ZOOM_THRESHOLD 10
+#	define PAN_THRESHOLD 50
+#	define ZOOM_THRESHOLD 10
 
-#define MIN_FINGER_DIST 5
+#	define MIN_FINGER_DIST 5
 
 typedef struct touch_contact
 {
@@ -87,7 +87,6 @@ const char* xf_input_get_class_string(int class)
 
 	return "XIUnknownClass";
 }
-
 
 int xf_input_init(xfContext* xfc, Window window)
 {
@@ -137,7 +136,7 @@ int xf_input_init(xfContext* xfc, Window window)
 		for (j = 0; j < dev->num_classes; j++)
 		{
 			XIAnyClassInfo* class = dev->classes[j];
-			XITouchClassInfo* t = (XITouchClassInfo*) class;
+			XITouchClassInfo* t = (XITouchClassInfo*)class;
 
 			if ((class->type == XITouchClass) && (t->mode == XIDirectTouch) &&
 			    (strcmp(dev->name, "Virtual core pointer") != 0))
@@ -149,12 +148,11 @@ int xf_input_init(xfContext* xfc, Window window)
 		for (j = 0; j < dev->num_classes; j++)
 		{
 			XIAnyClassInfo* class = dev->classes[j];
-			XITouchClassInfo* t = (XITouchClassInfo*) class;
+			XITouchClassInfo* t = (XITouchClassInfo*)class;
 
 			if (xfc->context.settings->MultiTouchInput)
 			{
-				WLog_INFO(TAG, "%s (%d) \"%s\" id: %d",
-				          xf_input_get_class_string(class->type),
+				WLog_INFO(TAG, "%s (%d) \"%s\" id: %d", xf_input_get_class_string(class->type),
 				          class->type, dev->name, dev->deviceid);
 			}
 
@@ -181,12 +179,11 @@ int xf_input_init(xfContext* xfc, Window window)
 
 			if (xfc->use_xinput)
 			{
-				if (!touch && (class->type == XIButtonClass)
-				    && strcmp(dev->name, "Virtual core pointer"))
+				if (!touch && (class->type == XIButtonClass) &&
+				    strcmp(dev->name, "Virtual core pointer"))
 				{
-					WLog_INFO(TAG, "%s button device (id: %d, mode: %d)",
-					          dev->name,
-					          dev->deviceid, t->mode);
+					WLog_INFO(TAG, "%s button device (id: %d, mode: %d)", dev->name, dev->deviceid,
+					          t->mode);
 					XISetMask(masks[nmasks], XI_ButtonPress);
 					XISetMask(masks[nmasks], XI_ButtonRelease);
 					XISetMask(masks[nmasks], XI_Motion);
@@ -209,10 +206,8 @@ static BOOL xf_input_is_duplicate(XGenericEventCookie* cookie)
 	XIDeviceEvent* event;
 	event = cookie->data;
 
-	if ((lastEvent.time == event->time) &&
-	    (lastEvType == cookie->evtype) &&
-	    (lastEvent.detail == event->detail) &&
-	    (lastEvent.event_x == event->event_x) &&
+	if ((lastEvent.time == event->time) && (lastEvType == cookie->evtype) &&
+	    (lastEvent.detail == event->detail) && (lastEvent.event_x == event->event_x) &&
 	    (lastEvent.event_y == event->event_y))
 	{
 		return TRUE;
@@ -384,8 +379,8 @@ static void xf_input_detect_pinch(xfContext* xfc)
 static void xf_input_touch_begin(xfContext* xfc, XIDeviceEvent* event)
 {
 	int i;
-
 	WINPR_UNUSED(xfc);
+
 	for (i = 0; i < MAX_CONTACTS; i++)
 	{
 		if (contacts[i].id == 0)
@@ -423,8 +418,8 @@ static void xf_input_touch_update(xfContext* xfc, XIDeviceEvent* event)
 static void xf_input_touch_end(xfContext* xfc, XIDeviceEvent* event)
 {
 	int i;
-
 	WINPR_UNUSED(xfc);
+
 	for (i = 0; i < MAX_CONTACTS; i++)
 	{
 		if (contacts[i].id == event->detail)
@@ -446,30 +441,30 @@ static int xf_input_handle_event_local(xfContext* xfc, XEvent* event)
 	{
 		switch (cookie->evtype)
 		{
-			case XI_TouchBegin:
-				if (xf_input_is_duplicate(cookie) == FALSE)
-					xf_input_touch_begin(xfc, cookie->data);
+		case XI_TouchBegin:
+			if (xf_input_is_duplicate(cookie) == FALSE)
+				xf_input_touch_begin(xfc, cookie->data);
 
-				xf_input_save_last_event(cookie);
-				break;
+			xf_input_save_last_event(cookie);
+			break;
 
-			case XI_TouchUpdate:
-				if (xf_input_is_duplicate(cookie) == FALSE)
-					xf_input_touch_update(xfc, cookie->data);
+		case XI_TouchUpdate:
+			if (xf_input_is_duplicate(cookie) == FALSE)
+				xf_input_touch_update(xfc, cookie->data);
 
-				xf_input_save_last_event(cookie);
-				break;
+			xf_input_save_last_event(cookie);
+			break;
 
-			case XI_TouchEnd:
-				if (xf_input_is_duplicate(cookie) == FALSE)
-					xf_input_touch_end(xfc, cookie->data);
+		case XI_TouchEnd:
+			if (xf_input_is_duplicate(cookie) == FALSE)
+				xf_input_touch_end(xfc, cookie->data);
 
-				xf_input_save_last_event(cookie);
-				break;
+			xf_input_save_last_event(cookie);
+			break;
 
-			default:
-				WLog_ERR(TAG, "unhandled xi type= %d", cookie->evtype);
-				break;
+		default:
+			WLog_ERR(TAG, "unhandled xi type= %d", cookie->evtype);
+			break;
 		}
 	}
 
@@ -477,7 +472,7 @@ static int xf_input_handle_event_local(xfContext* xfc, XEvent* event)
 	return 0;
 }
 
-#ifdef WITH_DEBUG_X11
+#	ifdef WITH_DEBUG_X11
 static char* xf_input_touch_state_string(DWORD flags)
 {
 	if (flags & CONTACT_FLAG_DOWN)
@@ -489,11 +484,11 @@ static char* xf_input_touch_state_string(DWORD flags)
 	else
 		return "TouchUnknown";
 }
-#endif
+#	endif
 
 static void xf_input_hide_cursor(xfContext* xfc)
 {
-#ifdef WITH_XCURSOR
+#	ifdef WITH_XCURSOR
 
 	if (!xfc->cursorHidden)
 	{
@@ -516,12 +511,12 @@ static void xf_input_hide_cursor(xfContext* xfc)
 		xf_unlock_x11(xfc, FALSE);
 	}
 
-#endif
+#	endif
 }
 
 static void xf_input_show_cursor(xfContext* xfc)
 {
-#ifdef WITH_XCURSOR
+#	ifdef WITH_XCURSOR
 	xf_lock_x11(xfc, FALSE);
 
 	if (xfc->cursorHidden)
@@ -538,7 +533,7 @@ static void xf_input_show_cursor(xfContext* xfc)
 	}
 
 	xf_unlock_x11(xfc, FALSE);
-#endif
+#	endif
 }
 
 static int xf_input_touch_remote(xfContext* xfc, XIDeviceEvent* event, int evtype)
@@ -553,8 +548,8 @@ static int xf_input_touch_remote(xfContext* xfc, XIDeviceEvent* event, int evtyp
 
 	xf_input_hide_cursor(xfc);
 	touchId = event->detail;
-	x = (int) event->event_x;
-	y = (int) event->event_y;
+	x = (int)event->event_x;
+	y = (int)event->event_y;
 	xf_event_adjust_coordinates(xfc, &x, &y);
 
 	if (evtype == XI_TouchBegin)
@@ -582,20 +577,20 @@ static int xf_input_event(xfContext* xfc, XIDeviceEvent* event, int evtype)
 
 	switch (evtype)
 	{
-		case XI_ButtonPress:
-			xf_generic_ButtonEvent(xfc, (int) event->event_x, (int) event->event_y,
-			                       event->detail, event->event, xfc->remote_app, TRUE);
-			break;
+	case XI_ButtonPress:
+		xf_generic_ButtonEvent(xfc, (int)event->event_x, (int)event->event_y, event->detail,
+		                       event->event, xfc->remote_app, TRUE);
+		break;
 
-		case XI_ButtonRelease:
-			xf_generic_ButtonEvent(xfc, (int) event->event_x, (int) event->event_y,
-			                       event->detail, event->event, xfc->remote_app, FALSE);
-			break;
+	case XI_ButtonRelease:
+		xf_generic_ButtonEvent(xfc, (int)event->event_x, (int)event->event_y, event->detail,
+		                       event->event, xfc->remote_app, FALSE);
+		break;
 
-		case XI_Motion:
-			xf_generic_MotionNotify(xfc, (int) event->event_x, (int) event->event_y,
-			                        event->detail, event->event, xfc->remote_app);
-			break;
+	case XI_Motion:
+		xf_generic_MotionNotify(xfc, (int)event->event_x, (int)event->event_y, event->detail,
+		                        event->event, xfc->remote_app);
+		break;
 	}
 
 	return 0;
@@ -610,21 +605,21 @@ static int xf_input_handle_event_remote(xfContext* xfc, XEvent* event)
 	{
 		switch (cookie->evtype)
 		{
-			case XI_TouchBegin:
-				xf_input_touch_remote(xfc, cookie->data, XI_TouchBegin);
-				break;
+		case XI_TouchBegin:
+			xf_input_touch_remote(xfc, cookie->data, XI_TouchBegin);
+			break;
 
-			case XI_TouchUpdate:
-				xf_input_touch_remote(xfc, cookie->data, XI_TouchUpdate);
-				break;
+		case XI_TouchUpdate:
+			xf_input_touch_remote(xfc, cookie->data, XI_TouchUpdate);
+			break;
 
-			case XI_TouchEnd:
-				xf_input_touch_remote(xfc, cookie->data, XI_TouchEnd);
-				break;
+		case XI_TouchEnd:
+			xf_input_touch_remote(xfc, cookie->data, XI_TouchEnd);
+			break;
 
-			default:
-				xf_input_event(xfc, cookie->data, cookie->evtype);
-				break;
+		default:
+			xf_input_event(xfc, cookie->data, cookie->evtype);
+			break;
 		}
 	}
 

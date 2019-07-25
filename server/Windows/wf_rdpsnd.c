@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
 #include <stdio.h>
@@ -33,11 +33,11 @@
 
 #ifdef WITH_RDPSND_DSOUND
 
-#include "wf_directsound.h"
+#	include "wf_directsound.h"
 
 #else
 
-#include "wf_wasapi.h"
+#	include "wf_wasapi.h"
 
 #endif
 
@@ -53,15 +53,16 @@ static void wf_peer_rdpsnd_activated(RdpsndServerContext* context)
 
 	for (i = 0; i < context->num_client_formats; i++)
 	{
-		//TODO: improve the way we agree on a format
+		// TODO: improve the way we agree on a format
 		for (j = 0; j < context->num_server_formats; j++)
 		{
 			if ((context->client_formats[i].wFormatTag == context->server_formats[j].wFormatTag) &&
 			    (context->client_formats[i].nChannels == context->server_formats[j].nChannels) &&
-			    (context->client_formats[i].nSamplesPerSec == context->server_formats[j].nSamplesPerSec))
+			    (context->client_formats[i].nSamplesPerSec ==
+			     context->server_formats[j].nSamplesPerSec))
 			{
 				WLog_DBG(TAG, "agreed on format!");
-				wfi->agreed_format = (AUDIO_FORMAT*) &context->server_formats[j];
+				wfi->agreed_format = (AUDIO_FORMAT*)&context->server_formats[j];
 				break;
 			}
 		}
@@ -94,19 +95,19 @@ int wf_rdpsnd_lock()
 
 	switch (dRes)
 	{
-		case WAIT_ABANDONED:
-		case WAIT_OBJECT_0:
-			return TRUE;
-			break;
+	case WAIT_ABANDONED:
+	case WAIT_OBJECT_0:
+		return TRUE;
+		break;
 
-		case WAIT_TIMEOUT:
-			return FALSE;
-			break;
+	case WAIT_TIMEOUT:
+		return FALSE;
+		break;
 
-		case WAIT_FAILED:
-			WLog_ERR(TAG, "wf_rdpsnd_lock failed with 0x%08lX", GetLastError());
-			return -1;
-			break;
+	case WAIT_FAILED:
+		WLog_ERR(TAG, "wf_rdpsnd_lock failed with 0x%08lX", GetLastError());
+		return -1;
+		break;
 	}
 
 	return -1;
@@ -139,7 +140,8 @@ BOOL wf_peer_rdpsnd_init(wfPeerContext* context)
 	context->rdpsnd = rdpsnd_server_context_new(context->vcm);
 	context->rdpsnd->rdpcontext = &context->_p;
 	context->rdpsnd->data = context;
-	context->rdpsnd->num_server_formats = server_rdpsnd_get_formats(&context->rdpsnd->server_formats);
+	context->rdpsnd->num_server_formats =
+	    server_rdpsnd_get_formats(&context->rdpsnd->server_formats);
 
 	if (context->rdpsnd->num_server_formats > 0)
 		context->rdpsnd->src_format = &context->rdpsnd->server_formats[0];
@@ -150,4 +152,3 @@ BOOL wf_peer_rdpsnd_init(wfPeerContext* context)
 	wfi->snd_stop = FALSE;
 	return TRUE;
 }
-

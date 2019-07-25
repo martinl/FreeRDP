@@ -34,7 +34,6 @@ typedef struct rdp_license rdpLicense;
 
 #include <winpr/stream.h>
 
-
 typedef struct
 {
 	UINT32 dwVersion;
@@ -90,7 +89,7 @@ struct rdp_license
 	LICENSE_BLOB* PlatformChallenge;
 	LICENSE_BLOB* EncryptedPremasterSecret;
 	LICENSE_BLOB* EncryptedPlatformChallenge;
-	LICENSE_BLOB *EncryptedPlatformChallengeResponse;
+	LICENSE_BLOB* EncryptedPlatformChallengeResponse;
 	LICENSE_BLOB* EncryptedHardwareId;
 	SCOPE_LIST* ScopeList;
 	UINT32 PacketHeaderLength;
@@ -98,15 +97,17 @@ struct rdp_license
 
 FREERDP_LOCAL int license_recv(rdpLicense* license, wStream* s);
 
-
 FREERDP_LOCAL rdpLicense* license_new(rdpRdp* rdp);
 FREERDP_LOCAL void license_free(rdpLicense* license);
 
 #define LICENSE_TAG FREERDP_TAG("core.license")
 #ifdef WITH_DEBUG_LICENSE
-#define DEBUG_LICENSE(...) WLog_DBG(LICENSE_TAG, __VA_ARGS__)
+#	define DEBUG_LICENSE(...) WLog_DBG(LICENSE_TAG, __VA_ARGS__)
 #else
-#define DEBUG_LICENSE(...) do { } while (0)
+#	define DEBUG_LICENSE(...) \
+		do                     \
+		{                      \
+		} while (0)
 #endif
 
 #endif /* FREERDP_LIB_CORE_LICENSE_H */
