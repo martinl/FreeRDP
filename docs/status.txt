@@ -1,4 +1,4 @@
-Test report for FreeRDP smartcard authentication support
+Test report for FreeRDP smartcard authentication and redirect support
 
 Last update: 2019-07-25
 
