@@ -1,0 +1,1103 @@
+--- winpr/libwinpr/comm/comm.c	2019-07-25 19:51:08.001932825 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/comm/comm.c	2019-07-25 20:11:31.848001920 +0300
+@@ -125,14 +125,14 @@
+ 	return TRUE;
+ }
+ 
+-void CommLog_Print(DWORD level, ...)
++void CommLog_Print(DWORD level, const char* format, ...)
+ {
+ 	if (!CommInitialized())
+ 		return;
+ 
+ 	va_list ap;
+-	va_start(ap, level);
+-	WLog_PrintVA(_Log, level, ap);
++	va_start(ap, format);
++	WLog_PrintVA(_Log, level, format, ap);
+ 	va_end(ap);
+ }
+ 
+--- winpr/libwinpr/comm/comm.h	2019-07-25 19:51:08.005932845 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/comm/comm.h	2019-07-25 20:11:31.848001920 +0300
+@@ -94,7 +94,7 @@
+ #	define FREERDP_PURGE_TXABORT 0x00000001 /* abort pending transmission */
+ #	define FREERDP_PURGE_RXABORT 0x00000002 /* abort pending reception */
+ 
+-void CommLog_Print(DWORD wlog_level, ...);
++void CommLog_Print(DWORD wlog_level, const char* format, ...);
+ 
+ BOOL CommIsHandled(HANDLE handle);
+ BOOL CommCloseHandle(HANDLE handle);
+--- winpr/libwinpr/smartcard/smartcard.c	2019-07-25 19:51:09.217938854 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/smartcard/smartcard.c	2019-07-25 20:11:33.048007871 +0300
+@@ -563,6 +563,11 @@
+ 	SCARDAPI_STUB_CALL_LONG(SCardAudit, hContext, dwEvent);
+ }
+ 
++WINSCARDAPI LONG WINAPI SCardAddReaderName(HANDLE* key, LPSTR readerName)
++{
++	SCARDAPI_STUB_CALL_LONG(SCardAddReaderName, key, readerName);
++}
++
+ /**
+  * Extended API
+  */
+--- winpr/libwinpr/smartcard/smartcard_pcsc.h	2019-07-25 19:51:09.305939291 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/smartcard/smartcard_pcsc.h	2019-07-25 20:11:33.136008307 +0300
+@@ -156,6 +156,7 @@
+ 	(SCARDHANDLE hCard, PCSC_DWORD dwAttrId, LPBYTE pbAttr, PCSC_LPDWORD pcbAttrLen);
+ 	PCSC_LONG (*pfnSCardSetAttrib)
+ 	(SCARDHANDLE hCard, PCSC_DWORD dwAttrId, LPCBYTE pbAttr, PCSC_DWORD cbAttrLen);
++	PCSC_LONG (*pfnSCardAddReaderName)(HANDLE* key, LPSTR readerName);
+ };
+ typedef struct _PCSCFunctionTable PCSCFunctionTable;
+ 
+--- winpr/libwinpr/smartcard/smartcard_winscard.c	2019-07-25 19:51:09.309939311 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/smartcard/smartcard_winscard.c	2019-07-25 20:11:33.140008327 +0300
+@@ -110,7 +110,8 @@
+ 	NULL, /* SCardGetReaderDeviceInstanceIdW */
+ 	NULL, /* SCardListReadersWithDeviceInstanceIdA */
+ 	NULL, /* SCardListReadersWithDeviceInstanceIdW */
+-	NULL  /* SCardAudit */
++	NULL, /* SCardAudit */
++	NULL  /* SCardAddReaderName */
+ };
+ 
+ PSCardApiFunctionTable WinSCard_GetSCardApiFunctionTable(void)
+--- winpr/libwinpr/sspi/Kerberos/kerberos.c	2019-07-25 19:51:09.337939450 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/sspi/Kerberos/kerberos.c	2019-07-25 20:11:33.172008486 +0300
+@@ -393,7 +393,7 @@
+ 	/* Set buffer */
+ 	_snprintf(krb_name, krb_name_len + 1, "%s@%s", lusername, lrealm);
+ #	ifdef WITH_DEBUG_NLA
+-	WLog_DBG(TAG, "copied string is %s\n", krb_name);
++	WLog_DBG(TAG, "copied string is %s", krb_name);
+ #	endif
+ 	pstr = strchr(lusername, '@');
+ 
+@@ -495,11 +495,17 @@
+ 				 * If we use smartcard-logon, the credentials have already
+ 				 * been acquired by pkinit process. If not, returned error previously.
+ 				 */
+-				if (init_creds(context->credentials->identity.User,
++				if ((context->credentials->identity.User == NULL) ||
++				    (context->credentials->identity.UserLength == 0) ||
++				    (context->credentials->identity.Password == NULL) ||
++				    (context->credentials->identity.PasswordLength == 0) ||
++				    init_creds(context->credentials->identity.User,
+ 				               context->credentials->identity.UserLength,
+ 				               context->credentials->identity.Password,
+ 				               context->credentials->identity.PasswordLength))
++				{
+ 					return SEC_E_NO_CREDENTIALS;
++				}
+ 
+ 				WLog_INFO(TAG, "Authenticated to Kerberos v5 via login/password");
+ 				/* retry GSSAPI call */
+@@ -513,7 +519,9 @@
+ 				if (SSPI_GSS_ERROR(context->major_status))
+ 				{
+ 					/* We can't use Kerberos */
+-					WLog_ERR(TAG, "Init GSS security context failed : can't use Kerberos");
++					WLog_ERR(TAG,
++					         "Init GSS security context failed : can't use Kerberos because % s",
++					         krb5_get_error_message(NULL, context->minor_status));
+ 					return SEC_E_INTERNAL_ERROR;
+ 				}
+ 			}
+--- winpr/libwinpr/sspi/sspi_winpr.c	2019-07-25 19:51:09.549940500 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/sspi/sspi_winpr.c	2019-07-25 20:11:33.384009536 +0300
+@@ -218,6 +218,17 @@
+ 	return credentials;
+ }
+ 
++void memory_clear_and_free(void** memory, size_t size)
++{
++	if (*memory != NULL)
++	{
++		memset(*memory, 0, size);
++		free(*memory);
++	}
++
++	(*memory) = NULL;
++}
++
+ void sspi_CredentialsFree(SSPI_CREDENTIALS* credentials)
+ {
+ 	size_t userLength = 0;
+@@ -241,12 +252,9 @@
+ 		passwordLength *= 2;
+ 	}
+ 
+-	memset(credentials->identity.User, 0, userLength);
+-	memset(credentials->identity.Domain, 0, domainLength);
+-	memset(credentials->identity.Password, 0, passwordLength);
+-	free(credentials->identity.User);
+-	free(credentials->identity.Domain);
+-	free(credentials->identity.Password);
++	memory_clear_and_free((void**)&credentials->identity.User, userLength);
++	memory_clear_and_free((void**)&credentials->identity.Domain, domainLength);
++	memory_clear_and_free((void**)&credentials->identity.Password, passwordLength);
+ 	free(credentials);
+ }
+ 
+@@ -666,9 +674,6 @@
+ 	SecPkgInfoA* pPackageInfo = (SecPkgInfoA*)contextBuffer;
+ 	cPackages = sizeof(SecPkgInfoA_LIST) / sizeof(*(SecPkgInfoA_LIST));
+ 
+-	if (!pPackageInfo)
+-		return;
+-
+ 	for (index = 0; index < (int)cPackages; index++)
+ 	{
+ 		free(pPackageInfo[index].Name);
+--- winpr/libwinpr/utils/cmdline.c	2019-07-25 19:51:10.617945796 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/utils/cmdline.c	2019-07-25 20:11:34.448014813 +0300
+@@ -21,19 +21,46 @@
+ #	include "config.h"
+ #endif
+ 
++#include <winpr/wlog.h>
+ #include <winpr/crt.h>
+-
+ #include <winpr/cmdline.h>
+ 
+-#include "../log.h"
+-
+-#define TAG WINPR_TAG("commandline")
+-
+ /**
+  * Command-line syntax: some basic concepts:
+  * https://pythonconquerstheuniverse.wordpress.com/2010/07/25/command-line-syntax-some-basic-concepts/
+  */
+ 
++#define TAG "winpr.utils.cmdline"
++
++/*
++find_option_by_name_or_alias
++return the index of the first entry in options that has keyword as Name or Alias,  or -1 if not
++found.
++*/
++static int find_option_by_name_or_alias(COMMAND_LINE_ARGUMENT_A* options, char* keyword,
++                                        SSIZE_T keyword_length)
++{
++	size_t index;
++
++	for (index = 0; options[index].Name != NULL; index++)
++	{
++		if ((strncmp(options[index].Name, keyword, keyword_length) == 0) &&
++		    (strlen(options[index].Name) == keyword_length))
++		{
++			return index;
++		}
++
++		if ((options[index].Alias != NULL) &&
++		    (strncmp(options[index].Alias, keyword, keyword_length) == 0) &&
++		    (strlen(options[index].Alias) == keyword_length))
++		{
++			return index;
++		}
++	}
++
++	return -1;
++}
++
+ /**
+  * Command-Line Syntax:
+  *
+@@ -49,12 +76,6 @@
+  *
+  */
+ 
+-static void log_error(DWORD flags, LPCSTR message, int index, LPCSTR argv)
+-{
+-	if ((flags & COMMAND_LINE_SILENCE_PARSER) == 0)
+-		WLog_ERR(TAG, message, index, argv);
+-}
+-
+ int CommandLineParseArgumentsA(int argc, LPSTR* argv, COMMAND_LINE_ARGUMENT_A* options, DWORD flags,
+                                void* context, COMMAND_LINE_PRE_FILTER_FN_A preFilter,
+                                COMMAND_LINE_POST_FILTER_FN_A postFilter)
+@@ -67,7 +88,7 @@
+ 	const char* sigil;
+ 	size_t sigil_length;
+ 	char* keyword;
+-	size_t keyword_length;
++	SSIZE_T keyword_length;
+ 	SSIZE_T keyword_index;
+ 	char* separator;
+ 	char* value;
+@@ -90,7 +111,6 @@
+ 
+ 	for (i = 1; i < argc; i++)
+ 	{
+-		BOOL found = FALSE;
+ 		BOOL escaped = TRUE;
+ 
+ 		if (preFilter)
+@@ -99,8 +119,7 @@
+ 
+ 			if (count < 0)
+ 			{
+-				log_error(flags, "Failed for index %d [%s]: PreFilter rule could not be applied", i,
+-				          argv[i]);
++				WLog_ERR(TAG, "Prefilter signaled an error.");
+ 				status = COMMAND_LINE_ERROR;
+ 				return status;
+ 			}
+@@ -145,7 +164,7 @@
+ 		{
+ 			if (notescaped)
+ 			{
+-				log_error(flags, "Failed at index %d [%s]: Unescaped sigil", i, argv[i]);
++				WLog_DBG(TAG, "Option sigil not escaped: %s", sigil);
+ 				return COMMAND_LINE_ERROR;
+ 			}
+ 
+@@ -155,7 +174,8 @@
+ 		}
+ 		else
+ 		{
+-			log_error(flags, "Failed at index %d [%s]: Invalid sigil", i, argv[i]);
++			/* Note: this case seems to be handled by the caller. */
++			WLog_DBG(TAG, "Invalid option syntax: %s", sigil);
+ 			return COMMAND_LINE_ERROR;
+ 		}
+ 
+@@ -214,29 +234,17 @@
+ 			if (!escaped)
+ 				continue;
+ 
+-			for (j = 0; options[j].Name != NULL; j++)
+-			{
+-				BOOL match = FALSE;
+-
+-				if (strncmp(options[j].Name, keyword, keyword_length) == 0)
+-				{
+-					if (strlen(options[j].Name) == keyword_length)
+-						match = TRUE;
+-				}
++			j = find_option_by_name_or_alias(options, keyword, keyword_length);
+ 
+-				if ((!match) && (options[j].Alias != NULL))
++			if (j < 0)
++			{
++				if ((flags & COMMAND_LINE_IGN_UNKNOWN_KEYWORD) == 0)
+ 				{
+-					if (strncmp(options[j].Alias, keyword, keyword_length) == 0)
+-					{
+-						if (strlen(options[j].Alias) == keyword_length)
+-							match = TRUE;
+-					}
++					return COMMAND_LINE_ERROR_NO_KEYWORD;
+ 				}
+-
+-				if (!match)
+-					continue;
+-
+-				found = match;
++			}
++			else
++			{
+ 				options[j].Index = i;
+ 
+ 				if ((flags & COMMAND_LINE_SEPARATOR_SPACE) && ((i + 1) < argc))
+@@ -279,7 +287,7 @@
+ 					}
+ 					else if (!value_present && argument)
+ 					{
+-						log_error(flags, "Failed at index %d [%s]: Argument required", i, argv[i]);
++						WLog_ERR(TAG, "Missing mandatory value for option: %s", argv[i + 1]);
+ 						return COMMAND_LINE_ERROR;
+ 					}
+ 				}
+@@ -287,10 +295,7 @@
+ 				if (!(flags & COMMAND_LINE_SEPARATOR_SPACE))
+ 				{
+ 					if (value && (options[j].Flags & COMMAND_LINE_VALUE_FLAG))
+-					{
+-						log_error(flags, "Failed at index %d [%s]: Unexpected value", i, argv[i]);
+ 						return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+-					}
+ 				}
+ 				else
+ 				{
+@@ -303,7 +308,6 @@
+ 
+ 				if (!value && (options[j].Flags & COMMAND_LINE_VALUE_REQUIRED))
+ 				{
+-					log_error(flags, "Failed at index %d [%s]: Missing value", i, argv[i]);
+ 					status = COMMAND_LINE_ERROR_MISSING_VALUE;
+ 					return status;
+ 				}
+@@ -313,10 +317,7 @@
+ 				if (value)
+ 				{
+ 					if (options[j].Flags & (COMMAND_LINE_VALUE_FLAG | COMMAND_LINE_VALUE_BOOL))
+-					{
+-						log_error(flags, "Failed at index %d [%s]: Unexpected value", i, argv[i]);
+ 						return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+-					}
+ 
+ 					options[j].Value = value;
+ 					options[j].Flags |= COMMAND_LINE_VALUE_PRESENT;
+@@ -332,18 +333,14 @@
+ 					{
+ 						if (flags & COMMAND_LINE_SIGIL_ENABLE_DISABLE)
+ 						{
+-							if (toggle == -1)
+-								options[j].Value = BoolValueTrue;
+-							else if (!toggle)
++							if (toggle == 0)
+ 								options[j].Value = BoolValueFalse;
+ 							else
+ 								options[j].Value = BoolValueTrue;
+ 						}
+ 						else
+ 						{
+-							if (sigil[0] == '+')
+-								options[j].Value = BoolValueTrue;
+-							else if (sigil[0] == '-')
++							if (sigil[0] == '-')
+ 								options[j].Value = BoolValueFalse;
+ 							else
+ 								options[j].Value = BoolValueTrue;
+@@ -359,9 +356,8 @@
+ 
+ 					if (count < 0)
+ 					{
+-						log_error(flags,
+-						          "Failed at index %d [%s]: PostFilter rule could not be applied",
+-						          i, argv[i]);
++						WLog_ERR(TAG, "Postfilter signaled an error for option %s",
++						         options[j].Name);
+ 						status = COMMAND_LINE_ERROR;
+ 						return status;
+ 					}
+@@ -376,12 +372,6 @@
+ 				else if (options[j].Flags & COMMAND_LINE_PRINT_BUILDCONFIG)
+ 					return COMMAND_LINE_STATUS_PRINT_BUILDCONFIG;
+ 			}
+-
+-			if (!found && (flags & COMMAND_LINE_IGN_UNKNOWN_KEYWORD) == 0)
+-			{
+-				log_error(flags, "Failed at index %d [%s]: Unexpected keyword", i, argv[i]);
+-				return COMMAND_LINE_ERROR_NO_KEYWORD;
+-			}
+ 		}
+ 	}
+ 
+--- winpr/libwinpr/utils/strlst.c	2019-07-25 19:51:10.917947284 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/utils/strlst.c	2019-07-25 20:11:34.744016280 +0300
+@@ -20,6 +20,7 @@
+ #	include "config.h"
+ #endif
+ 
++#include <stdarg.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -29,54 +30,300 @@
+ 
+ void string_list_free(char** string_list)
+ {
+-	int i;
+-
+-	for (i = 0; string_list[i]; i++)
++	if (string_list != NULL)
+ 	{
+-		free(string_list[i]);
+-	}
++		int i;
++
++		for (i = 0; string_list[i]; i++)
++		{
++			free(string_list[i]);
++		}
+ 
+-	free(string_list);
++		free(string_list);
++	}
+ }
+ 
+-int string_list_length(const char* const* string_list)
++int string_list_length(char** string_list)
+ {
+ 	int i;
+ 
++	if (string_list == NULL)
++	{
++		return 0;
++	}
++
+ 	for (i = 0; string_list[i]; i++)
+ 		;
+ 
+ 	return i;
+ }
+ 
+-char** string_list_copy(const char* const* string_list)
++char** string_list_copy(char** string_list)
+ {
+ 	int i;
+ 	int length = string_list_length(string_list);
+-	char** copy = calloc(length + 1, sizeof(char*));
++	char** copy = malloc((length + 1) * sizeof(char*));
+ 
+-	if (!copy)
++	if (copy == NULL)
+ 	{
+-		return 0;
++		return NULL;
+ 	}
+ 
+ 	for (i = 0; i < length; i++)
+ 	{
+ 		copy[i] = _strdup(string_list[i]);
++
++		if (copy[i] == NULL)
++		{
++			string_list_free(copy);
++			return NULL;
++		}
+ 	}
+ 
+-	copy[length] = 0;
++	copy[length] = NULL;
+ 	return copy;
+ }
+ 
+-void string_list_print(FILE* out, const char* const* string_list)
++void string_list_print(FILE* out, char** string_list)
+ {
+-	int j;
+-
+-	for (j = 0; string_list[j]; j++)
++	if (string_list == NULL)
++	{
++		fprintf(out, "NULL\n");
++	}
++	else
+ 	{
+-		fprintf(out, "[%2d]: %s\n", j, string_list[j]);
++		int j;
++
++		for (j = 0; string_list[j]; j++)
++		{
++			fprintf(out, "[%2d]: %s\n", j, string_list[j]);
++		}
+ 	}
+ 
+ 	fflush(out);
+ }
++
++char* string_list_join(char** string_list, const char* separator)
++{
++	char* result;
++	char* current;
++	size_t maximum_size;
++	size_t i;
++	size_t count = string_list_length(string_list);
++	size_t separator_length = strlen(separator);
++	size_t* string_lengths = malloc(sizeof(*string_lengths) * count);
++	size_t total_length = 0;
++
++	if (string_lengths == NULL)
++	{
++		return NULL;
++	}
++
++	for (i = 0; i < count; i++)
++	{
++		string_lengths[i] = strlen(string_list[i]);
++		total_length += string_lengths[i];
++	}
++
++	maximum_size = (((count == 0) ? 0 : (count - 1) * separator_length) + total_length + 1);
++	result = malloc(maximum_size);
++
++	if (result == NULL)
++	{
++		goto done;
++	}
++
++	strcpy(result, "");
++	current = result;
++
++	for (i = 0; i < count; i++)
++	{
++		strcpy(current, string_list[i]);
++		current += string_lengths[i];
++
++		if (i < count - 1)
++		{
++			strcpy(current, separator);
++			current += separator_length;
++		}
++	}
++
++done:
++	free(string_lengths);
++	return result;
++}
++
++char* string_concatenate(const char* string, ...)
++{
++	char* result;
++	char* current;
++	/* sum the lengths of the strings */
++	const char* arg = string;
++	int total_length = 0;
++	va_list strings;
++	va_start(strings, string);
++
++	while (arg)
++	{
++		total_length += strlen(arg);
++		arg = va_arg(strings, const char*);
++	}
++
++	va_end(strings);
++	total_length += 1; /*  null byte */
++
++	if (NULL == (result = malloc(total_length)))
++	{
++		return NULL;
++	}
++
++	/* start copying */
++	current = result;
++	strcpy(current, string);
++	current += strlen(string);
++	va_start(strings, string);
++	arg = va_arg(strings, const char*);
++
++	while (arg)
++	{
++		strcpy(current, arg);
++		current += strlen(arg);
++		arg = va_arg(strings, const char*);
++	}
++
++	va_end(strings);
++	/* strcpy copied the terminating null byte */
++	return result;
++}
++
++static int extract_separated_substrings(const char* string, const char* separator,
++                                        int remove_empty_substring, char** result)
++{
++	/*
++	PRECONDITION: (string != NULL) && (strlen(string) > 0) && (separator != NULL) &&
++	(strlen(separator) > 0)
++	*/
++	size_t seplen = strlen(separator);
++	int i = 0;
++	int done = 0;
++
++	do
++	{
++		char* next = strstr(string, separator);
++		size_t sublen = 0;
++		/*
++		 * When there are no remaining separator,
++		 * we still need to add the rest of the string
++		 * so we find the end-of-string
++		 */
++		done = (next == NULL);
++
++		if (done)
++		{
++			next = strchr(string, '\0');
++		}
++
++		sublen = next - string;
++
++		if (!remove_empty_substring || (sublen > 0))
++		{
++			if (result != NULL)
++			{
++				result[i] = strndup(string, sublen);
++			}
++
++			i++;
++		}
++
++		if (!done)
++		{
++			string = next + seplen;
++		}
++	} while (!done);
++
++	return i;
++}
++
++char** string_list_split_string(const char* string, const char* separator,
++                                int remove_empty_substring)
++{
++	char** result = NULL;
++	size_t seplen = ((separator == NULL) ? 0 : strlen(separator));
++	size_t count = 0;
++
++	if (string == NULL)
++	{
++		goto empty_result;
++	}
++
++	if (seplen == 0)
++	{
++		if (remove_empty_substring && (strlen(string) == 0))
++		{
++			goto empty_result;
++		}
++
++		result = calloc(2, sizeof(*result));
++
++		if (result == NULL)
++		{
++			return NULL;
++		}
++
++		result[0] = strdup(string);
++
++		if (result[0] == NULL)
++		{
++			free(result);
++			return NULL;
++		}
++
++		return result;
++	}
++
++	count = extract_separated_substrings(string, separator, remove_empty_substring, NULL);
++	result = calloc(count + 1, sizeof(*result));
++
++	if (result == NULL)
++	{
++		return NULL;
++	}
++
++	extract_separated_substrings(string, separator, remove_empty_substring, result);
++
++	if (count != string_list_length((char**)result))
++	{
++		/* at least one of the strdup couldn't allocate */
++		string_list_free(result);
++		return NULL;
++	}
++
++	return result;
++empty_result:
++	return calloc(1, sizeof(*result));
++}
++
++int string_list_mismatch(char** a, char** b)
++{
++	int i = 0;
++
++	while (a[i] && b[i])
++	{
++		if ((a[i] != b[i]) && (strcmp(a[i], b[i]) != 0))
++		{
++			return i;
++		}
++
++		i++;
++	}
++
++	return i;
++}
++
++BOOL string_list_equal(char** a, char** b)
++{
++	int result = string_list_mismatch(a, b);
++	return a[result] == b[result];
++}
++
++/**** THE END ****/
+--- winpr/libwinpr/utils/test/CMakeLists.txt	2019-07-24 06:11:52.562198023 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/utils/test/CMakeLists.txt	2019-07-19 20:00:34.149156310 +0300
+@@ -17,6 +17,7 @@
+ 	TestBitStream.c
+ 	TestArrayList.c
+ 	TestLinkedList.c
++	TestStringList.c
+ 	TestListDictionary.c
+ 	TestCmdLine.c
+ 	TestWLog.c
+--- winpr/libwinpr/utils/test/TestCmdLine.c	2019-07-25 19:51:10.957947482 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/utils/test/TestCmdLine.c	2019-07-25 20:11:34.780016459 +0300
+@@ -69,8 +69,8 @@
+ 	int testArgc;
+ 	char** command_line;
+ 	flags = COMMAND_LINE_SIGIL_SLASH | COMMAND_LINE_SEPARATOR_COLON | COMMAND_LINE_SIGIL_PLUS_MINUS;
+-	testArgc = string_list_length(testArgv);
+-	command_line = string_list_copy(testArgv);
++	testArgc = string_list_length((char**)testArgv);
++	command_line = string_list_copy((char**)testArgv);
+ 
+ 	if (!command_line)
+ 	{
+--- winpr/libwinpr/utils/test/TestStringList.c	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/utils/test/TestStringList.c	2019-07-25 20:11:34.816016638 +0300
+@@ -0,0 +1,134 @@
++#include <stdio.h>
++#include <string.h>
++
++#include <winpr/strlst.h>
++
++#define printref() printf("%s:%d: in function %-40s:", __FILE__, __LINE__, __FUNCTION__)
++
++#define ERROR(format, ...)                      \
++	do                                          \
++	{                                           \
++		fprintf(stderr, format, ##__VA_ARGS__); \
++		printref();                             \
++		printf(format "\n", ##__VA_ARGS__);     \
++		fflush(stdout);                         \
++	} while (0)
++
++#define FAILURE(format, ...)                \
++	do                                      \
++	{                                       \
++		printref();                         \
++		printf(" FAILURE ");                \
++		printf(format "\n", ##__VA_ARGS__); \
++		fflush(stdout);                     \
++	} while (0)
++
++#define TEST(condition, format, ...)                                \
++	if (!(condition))                                               \
++	{                                                               \
++		FAILURE("test %s " format "\n", #condition, ##__VA_ARGS__); \
++	}
++
++static void print_test_title(int argc, char** argv)
++{
++	int i;
++	printf("Running test:");
++
++	for (i = 0; i < argc; i++)
++	{
++		printf(" %s", argv[i]);
++	}
++
++	printf("\n");
++}
++
++static char* sl0[] = { NULL };
++static char* sl1[] = { "Niflheim", NULL };
++static char* sl40[] = { "Hello", "", "World", "!", NULL };
++static char* sl40n[] = { "Hello", "World", "!", NULL };
++static char* sl44[] = { "Good", "Bye", "Cruel", "World", NULL };
++static char* sl44e[] = { "Good", "Bye", "Cruel", "World!", NULL };
++static char* separator = "<space>";
++static char* sl40string = "Hello<space><space>World<space>!";
++static char* sl44string = "Good<space>Bye<space>Cruel<space>World";
++
++#define TEST_COPY(sl, length)                                                     \
++	do                                                                            \
++	{                                                                             \
++		copy = string_list_copy(sl);                                              \
++		TEST(copy != NULL, "string_list_copy(" #sl ") returned NULL");            \
++		TEST(string_list_length(copy) == length, "got %d instead of expected %d", \
++		     string_list_length(copy), length);                                   \
++		TEST(string_list_equal(copy, sl), "copy is not equal to original!");      \
++		if (!string_list_equal(copy, sl))                                         \
++		{                                                                         \
++			printf("original = \n");                                              \
++			string_list_print(stdout, sl);                                        \
++			printf("copy = \n");                                                  \
++			string_list_print(stdout, copy);                                      \
++		}                                                                         \
++		string_list_free(copy);                                                   \
++	} while (0)
++
++int TestStringList(int argc, char* argv[])
++{
++	char* string;
++	char** copy;
++	print_test_title(argc, argv);
++	TEST(string_list_length(sl0) == 0, "got %d instead", string_list_length(sl0));
++	TEST(string_list_length(sl1) == 1, "got %d instead", string_list_length(sl1));
++	TEST(string_list_length(sl40) == 4, "got %d instead", string_list_length(sl40));
++	TEST(string_list_length(sl44) == 4, "got %d instead", string_list_length(sl44));
++	TEST(string_list_equal(sl0, sl0), "sl0 should be equal to itself!");
++	TEST(string_list_equal(sl1, sl1), "sl1 should be equal to itself!");
++	TEST(string_list_equal(sl40, sl40), "sl40 should be equal to itself!")
++	TEST(string_list_equal(sl44, sl44), "sl44 should be equal to itself!");
++	TEST(string_list_mismatch(sl0, sl0) == string_list_length(sl0),
++	     "sl0 should mismatch itself at its length,  not at %d", string_list_mismatch(sl0, sl0));
++	TEST(string_list_mismatch(sl1, sl1) == string_list_length(sl1),
++	     "sl1 should mismatch itself at its length,  not at %d", string_list_mismatch(sl1, sl1));
++	TEST(string_list_mismatch(sl40, sl40) == string_list_length(sl40),
++	     "sl40 should mismatch itself at its length,  not at %d", string_list_mismatch(sl40, sl40));
++	TEST(string_list_mismatch(sl44, sl44) == string_list_length(sl44),
++	     "sl44 should mismatch itself at its length,  not at %d", string_list_mismatch(sl44, sl44));
++	TEST(string_list_mismatch(sl0, sl1) == 0, "sl0 and sl1 should mismatch at 0!");
++	TEST(string_list_mismatch(sl1, sl1) == 1, "sl1 mismatch at 1!");
++	TEST(string_list_mismatch(sl44, sl44e) == 3, "sl44 and sl44e should mismatch at 3!");
++	TEST(string_list_equal(sl40, sl40), "sl40 should be equal to itself!");
++	TEST(string_list_equal(sl44, sl44), "sl44 should be equal to itself!");
++	TEST_COPY(sl0, 0);
++	TEST_COPY(sl1, 1);
++	TEST_COPY(sl40, 4);
++	TEST_COPY(sl44, 4);
++	{
++		string = string_list_join(sl44, separator);
++		TEST(strcmp(string, sl44string) == 0,
++		     "string_list_join of sl44 should be \"%s\",  not \"%s\".", sl44string, string);
++		{
++			copy = string_list_split_string(string, separator, 0);
++			TEST(string_list_equal(copy, sl44), "splitting \"%s\" returns a mismatch at %d", string,
++			     string_list_mismatch(copy, sl44));
++			string_list_free(copy);
++		}
++		free(string);
++	}
++	{
++		string = string_list_join(sl40, separator);
++		TEST(strcmp(string, sl40string) == 0,
++		     "string_list_join of sl40 should be \"%s\",  not \"%s\".", sl40string, string);
++		{
++			copy = string_list_split_string(string, separator, 0);
++			TEST(string_list_equal(copy, sl40), "splitting \"%s\" returns a mismatch at %d", string,
++			     string_list_mismatch(copy, sl40));
++			string_list_free(copy);
++		}
++		{
++			copy = string_list_split_string(string, separator, 1);
++			TEST(!string_list_equal(copy, sl40n), "splitting \"%s\" returns a mismatch at %d",
++			     string, string_list_mismatch(copy, sl40n));
++			string_list_free(copy);
++		}
++		free(string);
++	}
++	return 0;
++}
+--- winpr/libwinpr/utils/wlog/wlog.c	2019-07-25 19:51:12.373954503 +0300
++++ ../../informatimago/FreeRDP/winpr/libwinpr/utils/wlog/wlog.c	2019-07-25 20:11:36.188023440 +0300
+@@ -45,8 +45,6 @@
+ };
+ typedef struct _wLogFilter wLogFilter;
+ 
+-#define WLOG_FILTER_NOT_FILTERED -1
+-#define WLOG_FILTER_NOT_INITIALIZED -2
+ /**
+  * References for general logging concepts:
+  *
+@@ -334,7 +332,7 @@
+ }
+ 
+ BOOL WLog_PrintMessageVA(wLog* log, DWORD type, DWORD level, DWORD line, const char* file,
+-                         const char* function, va_list args)
++                         const char* function, const void* format, va_list args)
+ {
+ 	BOOL status = FALSE;
+ 	wLogMessage message = { 0 };
+@@ -346,7 +344,7 @@
+ 	switch (type)
+ 	{
+ 	case WLOG_MESSAGE_TEXT:
+-		message.FormatString = va_arg(args, const char*);
++		message.FormatString = format;
+ 
+ 		if (!strchr(message.FormatString, '%'))
+ 		{
+@@ -396,47 +394,29 @@
+ }
+ 
+ BOOL WLog_PrintMessage(wLog* log, DWORD type, DWORD level, DWORD line, const char* file,
+-                       const char* function, ...)
++                       const char* function, const void* format, ...)
+ {
+ 	BOOL status;
+ 	va_list args;
+-	va_start(args, function);
+-	status = WLog_PrintMessageVA(log, type, level, line, file, function, args);
++	va_start(args, format);
++	status = WLog_PrintMessageVA(log, type, level, line, file, function, format, args);
+ 	va_end(args);
+ 	return status;
+ }
+ 
+ DWORD WLog_GetLogLevel(wLog* log)
+ {
+-	if (!log)
+-		return WLOG_OFF;
+-
+-	if (log->FilterLevel <= WLOG_FILTER_NOT_INITIALIZED)
++	if (log->FilterLevel < 0)
+ 		log->FilterLevel = WLog_GetFilterLogLevel(log);
+ 
+-	if (log->FilterLevel > WLOG_FILTER_NOT_FILTERED)
+-		return (DWORD)log->FilterLevel;
++	if ((log->FilterLevel >= 0) && (log->FilterLevel != WLOG_LEVEL_INHERIT))
++		return log->FilterLevel;
+ 	else if (log->Level == WLOG_LEVEL_INHERIT)
+ 		log->Level = WLog_GetLogLevel(log->Parent);
+ 
+ 	return log->Level;
+ }
+ 
+-BOOL WLog_IsLevelActive(wLog* _log, DWORD _log_level)
+-{
+-	DWORD level;
+-
+-	if (!_log)
+-		return FALSE;
+-
+-	level = WLog_GetLogLevel(_log);
+-
+-	if (level == WLOG_OFF)
+-		return FALSE;
+-
+-	return _log_level >= level;
+-}
+-
+ BOOL WLog_SetStringLogLevel(wLog* log, LPCSTR level)
+ {
+ 	int lvl;
+@@ -449,27 +429,7 @@
+ 	if (lvl < 0)
+ 		return FALSE;
+ 
+-	return WLog_SetLogLevel(log, (DWORD)lvl);
+-}
+-
+-static BOOL WLog_reset_log_filters(wLog* log)
+-{
+-	DWORD x;
+-
+-	if (!log)
+-		return FALSE;
+-
+-	log->FilterLevel = WLOG_FILTER_NOT_INITIALIZED;
+-
+-	for (x = 0; x < log->ChildrenCount; x++)
+-	{
+-		wLog* child = log->Children[x];
+-
+-		if (!WLog_reset_log_filters(child))
+-			return FALSE;
+-	}
+-
+-	return TRUE;
++	return WLog_SetLogLevel(log, lvl);
+ }
+ 
+ BOOL WLog_AddStringLogFilters(LPCSTR filter)
+@@ -537,35 +497,11 @@
+ 
+ 	g_FilterCount = size;
+ 	free(cp);
+-	return WLog_reset_log_filters(WLog_GetRoot());
+-}
+-
+-static BOOL WLog_UpdateInheritLevel(wLog* log, DWORD logLevel)
+-{
+-	if (!log)
+-		return FALSE;
+-
+-	if (log->inherit)
+-	{
+-		DWORD x;
+-		log->Level = logLevel;
+-
+-		for (x = 0; x < log->ChildrenCount; x++)
+-		{
+-			wLog* child = log->Children[x];
+-
+-			if (!WLog_UpdateInheritLevel(child, logLevel))
+-				return FALSE;
+-		}
+-	}
+-
+ 	return TRUE;
+ }
+ 
+ BOOL WLog_SetLogLevel(wLog* log, DWORD logLevel)
+ {
+-	DWORD x;
+-
+ 	if (!log)
+ 		return FALSE;
+ 
+@@ -573,17 +509,7 @@
+ 		logLevel = WLOG_OFF;
+ 
+ 	log->Level = logLevel;
+-	log->inherit = (logLevel == WLOG_LEVEL_INHERIT) ? TRUE : FALSE;
+-
+-	for (x = 0; x < log->ChildrenCount; x++)
+-	{
+-		wLog* child = log->Children[x];
+-
+-		if (!WLog_UpdateInheritLevel(child, logLevel))
+-			return FALSE;
+-	}
+-
+-	return WLog_reset_log_filters(log);
++	return TRUE;
+ }
+ 
+ int WLog_ParseLogLevel(LPCSTR level)
+@@ -697,7 +623,6 @@
+ 	BOOL res = FALSE;
+ 	char* env;
+ 	DWORD nSize;
+-	free(g_Filters);
+ 	g_Filters = NULL;
+ 	g_FilterCount = 0;
+ 	nSize = GetEnvironmentVariableA(filter, NULL, 0);
+@@ -755,7 +680,7 @@
+ 	if (match)
+ 		log->FilterLevel = g_Filters[i].Level;
+ 	else
+-		log->FilterLevel = WLOG_FILTER_NOT_FILTERED;
++		log->FilterLevel = WLOG_LEVEL_INHERIT;
+ 
+ 	return log->FilterLevel;
+ }
+@@ -827,7 +752,7 @@
+ 	log->Parent = rootLogger;
+ 	log->ChildrenCount = 0;
+ 	log->ChildrenSize = 16;
+-	log->FilterLevel = WLOG_FILTER_NOT_INITIALIZED;
++	log->FilterLevel = -1;
+ 
+ 	if (!(log->Children = (wLog**)calloc(log->ChildrenSize, sizeof(wLog*))))
+ 		goto out_fail;
+@@ -837,7 +762,6 @@
+ 	if (rootLogger)
+ 	{
+ 		log->Level = WLOG_LEVEL_INHERIT;
+-		log->inherit = TRUE;
+ 	}
+ 	else
+ 	{
+@@ -863,20 +787,14 @@
+ 			free(env);
+ 
+ 			if (iLevel >= 0)
+-			{
+-				if (!WLog_SetLogLevel(log, (DWORD)iLevel))
+-					goto out_fail;
+-			}
++				log->Level = (DWORD)iLevel;
+ 		}
+ 	}
+ 
+ 	iLevel = WLog_GetFilterLogLevel(log);
+ 
+-	if (iLevel >= 0)
+-	{
+-		if (!WLog_SetLogLevel(log, (DWORD)iLevel))
+-			goto out_fail;
+-	}
++	if ((iLevel >= 0) && (iLevel != WLOG_LEVEL_INHERIT))
++		log->Level = (DWORD)iLevel;
+ 
+ 	return log;
+ out_fail:

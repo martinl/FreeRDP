@@ -1,0 +1,1118 @@
+--- client/common/cmdline.c	2019-07-25 19:51:00.305894664 +0300
++++ ../../informatimago/FreeRDP/client/common/cmdline.c	2019-07-25 20:11:24.323964613 +0300
+@@ -226,11 +226,6 @@
+ BOOL freerdp_client_print_command_line_help_ex(int argc, char** argv,
+                                                COMMAND_LINE_ARGUMENT_A* custom)
+ {
+-	const char* name = "FreeRDP";
+-
+-	if (argc > 0)
+-		name = argv[0];
+-
+ 	printf("\n");
+ 	printf("FreeRDP - A Free Remote Desktop Protocol Implementation\n");
+ 	printf("See www.freerdp.com for more information\n");
+@@ -246,22 +241,36 @@
+ 	freerdp_client_print_command_line_args(args);
+ 	printf("\n");
+ 	printf("Examples:\n");
+-	printf("    %s connection.rdp /p:Pwd123! /f\n", name);
+-	printf("    %s /u:CONTOSO\\JohnDoe /p:Pwd123! /v:rdp.contoso.com\n", name);
+-	printf("    %s /u:JohnDoe /p:Pwd123! /w:1366 /h:768 /v:192.168.1.100:4489\n", name);
+-	printf("    %s /u:JohnDoe /p:Pwd123! /vmconnect:C824F53E-95D2-46C6-9A18-23A5BB403532 "
+-	       "/v:192.168.1.100\n",
+-	       name);
++	printf("    xfreerdp connection.rdp /p:Pwd123! /f\n");
++	printf("    xfreerdp /u:CONTOSO\\JohnDoe /p:Pwd123! /v:rdp.contoso.com\n");
++	printf("    xfreerdp /u:JohnDoe /p:Pwd123! /w:1366 /h:768 /v:192.168.1.100:4489\n");
++	printf("    xfreerdp /u:JohnDoe /p:Pwd123! /vmconnect:C824F53E-95D2-46C6-9A18-23A5BB403532 "
++	       "/v:192.168.1.100\n");
+ 	printf("\n");
+ 	printf("Clipboard Redirection: +clipboard\n");
+ 	printf("\n");
+ 	printf("Drive Redirection: /drive:home,/home/user\n");
+ 	printf("Smartcard Redirection: /smartcard:<device>\n");
++	printf("Smartcard logon with rdp only:                /smartcard-logon [/sec:rdp]\n");
++	printf("Smartcard logon with Kerberos authentication: /smartcard-logon /sec:nla\n");
++	printf("Those options are only accepted with /smartcard-logon:\n");
++	printf("    PIN code: /pin:<PIN code>\n");
++	printf("    PKCS11 module to load: /pkcs11-module:<module>\n");
++	printf("    PKINIT anchors: /pkinit-anchors:<pkinit_anchors>\n");
++	printf("    Kerberos Ticket start time: /start-time:<delay to issue ticket>\n");
++	printf("    Kerberos Ticket lifetime: /lifetime:<ticket lifetime>\n");
++	printf("    Kerberos Ticket renewable lifetime: /renewable-lifetime:<ticket renewable "
++	       "lifetime>\n");
++	/* See also http://web.mit.edu/kerberos/krb5-latest/doc/basic/date_format.html */
++	printf("    The delay and lifetime have the following syntax: <integer>[s|m|h|d] (for seconds, "
++	       " minutes,  hours and days)\n");
++	printf("    Activate Kerberos PKINIT trace: /T\n");
++	printf("    CSP Name: /csp:<csp name>\n");
++	printf("    Card Name: /card:<card name>\n");
+ 	printf("Serial Port Redirection: /serial:<name>,<device>,[SerCx2|SerCx|Serial],[permissive]\n");
+ 	printf("Serial Port Redirection: /serial:COM1,/dev/ttyS0\n");
+ 	printf("Parallel Port Redirection: /parallel:<name>,<device>\n");
+ 	printf("Printer Redirection: /printer:<device>,<driver>\n");
+-	printf("TCP redirection: /rdp2tcp:/usr/bin/rdp2tcp\n");
+ 	printf("\n");
+ 	printf("Audio Output Redirection: /sound:sys:oss,dev:1,format:1\n");
+ 	printf("Audio Output Redirection: /sound:sys:alsa\n");
+@@ -278,7 +287,7 @@
+ #else
+ 	printf("    export https_proxy=http://proxy.contoso.com:3128/\n");
+ #endif
+-	printf("    %s /g:rdp.contoso.com ...\n", name);
++	printf("    xfreerdp /g:rdp.contoso.com ...\n");
+ 	printf("\n");
+ 	printf("More documentation is coming, in the meantime consult source files\n");
+ 	printf("\n");
+@@ -291,10 +300,6 @@
+ 	{
+ 		size_t length;
+ 		rdpSettings* settings;
+-
+-		if (argc <= index)
+-			return -1;
+-
+ 		length = strlen(argv[index]);
+ 
+ 		if (length > 4)
+@@ -334,13 +339,19 @@
+ 		RDPDR_DRIVE* drive;
+ 
+ 		if (count < 3)
++		{
++			WLog_ERR(TAG, "Missing argument for the %s option", params[0]);
+ 			return FALSE;
++		}
+ 
+ 		settings->DeviceRedirection = TRUE;
+ 		drive = (RDPDR_DRIVE*)calloc(1, sizeof(RDPDR_DRIVE));
+ 
+ 		if (!drive)
++		{
++			WLog_ERR(TAG, "Could not allocate memory for the drive %s", params[1]);
+ 			return FALSE;
++		}
+ 
+ 		drive->Type = RDPDR_DTYP_FILESYSTEM;
+ 
+@@ -349,6 +360,7 @@
+ 			if (!(drive->Name = _strdup(params[1])))
+ 			{
+ 				free(drive);
++				WLog_ERR(TAG, "Could not allocate memory for the drive name %s", params[1]);
+ 				return FALSE;
+ 			}
+ 		}
+@@ -359,8 +371,20 @@
+ 			const BOOL isSpecial =
+ 			    (strncmp(params[2], "*", 2) == 0) || (strncmp(params[2], "%", 2) == 0) ? TRUE
+ 			                                                                           : FALSE;
++			BOOL bad = FALSE;
++
++			if (!isPath && !isSpecial)
++			{
++				WLog_ERR(TAG, "Drive argument is not a path or special: %s", params[2]);
++				bad = TRUE;
++			}
++			else if (!(drive->Path = _strdup(params[2])))
++			{
++				WLog_ERR(TAG, "Could not allocate memory for the drive path %s", params[2]);
++				bad = TRUE;
++			}
+ 
+-			if ((!isPath && !isSpecial) || !(drive->Path = _strdup(params[2])))
++			if (bad)
+ 			{
+ 				free(drive->Name);
+ 				free(drive);
+@@ -370,6 +394,7 @@
+ 
+ 		if (!freerdp_device_collection_add(settings, (RDPDR_DEVICE*)drive))
+ 		{
++			WLog_ERR(TAG, "Could not add the drive %s", drive->Name);
+ 			free(drive->Path);
+ 			free(drive->Name);
+ 			free(drive);
+@@ -397,10 +422,13 @@
+ 
+ 			printer->Type = RDPDR_DTYP_PRINT;
+ 
+-			if (!(printer->Name = _strdup(params[1])))
++			if (count > 1)
+ 			{
+-				free(printer);
+-				return FALSE;
++				if (!(printer->Name = _strdup(params[1])))
++				{
++					free(printer);
++					return FALSE;
++				}
+ 			}
+ 
+ 			if (count > 2)
+@@ -574,6 +602,7 @@
+ 		return TRUE;
+ 	}
+ 
++	WLog_ERR(TAG, "Invalid device %s", params[0]);
+ 	return FALSE;
+ }
+ 
+@@ -582,7 +611,7 @@
+ 	int index;
+ 	ADDIN_ARGV* args;
+ 
+-	if (!settings || !params || !params[0] || (count < 0))
++	if (!settings || !params || !params[0])
+ 		return FALSE;
+ 
+ 	if (freerdp_static_channel_collection_find(settings, params[0]))
+@@ -594,7 +623,7 @@
+ 		return FALSE;
+ 
+ 	args->argc = count;
+-	args->argv = (char**)calloc((size_t)args->argc, sizeof(char*));
++	args->argv = (char**)calloc(args->argc, sizeof(char*));
+ 
+ 	if (!args->argv)
+ 		goto error_argv;
+@@ -633,7 +662,7 @@
+ 	int index;
+ 	ADDIN_ARGV* args;
+ 
+-	if (!settings || !params || !params[0] || (count < 0))
++	if (!settings || !params || !params[0])
+ 		return FALSE;
+ 
+ 	if (freerdp_dynamic_channel_collection_find(settings, params[0]))
+@@ -645,7 +674,7 @@
+ 		return FALSE;
+ 
+ 	args->argc = count;
+-	args->argv = (char**)calloc((size_t)args->argc, sizeof(char*));
++	args->argv = (char**)calloc(args->argc, sizeof(char*));
+ 
+ 	if (!args->argv)
+ 		goto error_argv;
+@@ -679,81 +708,111 @@
+ 	return FALSE;
+ }
+ 
++/*
++string_list_allocate
++
++Allocate and clear memory for a string list (array of char*) with additionnal bytes.
++Return the string list, set (*tail) to point to the additionnal bytes.
++
++Note: One purpose is to store the strings in the string list in the
++additionnal bytes, so the whole string list can be freed with a simple
++call to free(), instead of calling string_list_free().
++*/
++static char** string_list_allocate(size_t entry_count, size_t additionnal_size, char** tail)
++{
++	size_t total_size = entry_count * sizeof(char*) + additionnal_size * sizeof(char);
++	char** list = malloc(total_size);
++
++	if (list == NULL)
++	{
++		return NULL;
++	}
++
++	memset(list, 0, total_size);
++	(*tail) = (char*)&list[entry_count];
++	return list;
++}
++
++static size_t string_count_char(const char* string, char character)
++{
++	size_t count = 0;
++	const char* it = string;
++
++	while ((it = strchr(it, character)) != NULL)
++	{
++		it++;
++		count++;
++	}
++
++	return count;
++}
++
+ static char** freerdp_command_line_parse_comma_separated_values_ex(const char* name,
+                                                                    const char* list, size_t* count)
+ {
+-	char** p;
+-	char* str;
+-	size_t nArgs;
+-	size_t index;
+-	size_t nCommas;
+-	size_t prefix, len;
+-	nCommas = 0;
+ 	assert(NULL != count);
+ 	*count = 0;
+ 
+-	if (!list)
++	if (list == NULL)
+ 	{
+-		if (name)
++		char** p = NULL;
++		char* copy = NULL;
++
++		if (name == NULL)
+ 		{
+-			size_t len = strlen(name);
+-			p = (char**)calloc(2UL + len, sizeof(char*));
++			return NULL;
++		}
+ 
+-			if (p)
+-			{
+-				char* dst = (char*)&p[1];
+-				p[0] = dst;
+-				sprintf_s(dst, len + 1, "%s", name);
+-				*count = 1;
+-				return p;
+-			}
++		p = string_list_allocate(1, 1 + strlen(name), &copy);
++
++		if (p == NULL)
++		{
++			return NULL;
+ 		}
+ 
+-		return NULL;
++		strcpy(copy, name);
++		p[0] = copy;
++		(*count) = 1;
++		return p;
+ 	}
+-
++	else
+ 	{
+-		const char* it = list;
++		size_t index = 0;
++		size_t nCommas = string_count_char(list, ',');
++		size_t nArgs = nCommas + 1 + ((name == NULL) ? 0 : 1);
++		size_t namelen = (name == NULL) ? 0 : strlen(name);
++		char* store = NULL;
++		char** p = string_list_allocate(nArgs, namelen + 1 + strlen(list) + 1, &store);
+ 
+-		while ((it = strchr(it, ',')) != NULL)
++		if (p == NULL)
+ 		{
+-			it++;
+-			nCommas++;
++			return NULL;
+ 		}
+-	}
+-
+-	nArgs = nCommas + 1;
+ 
+-	if (name)
+-		nArgs++;
+-
+-	prefix = (nArgs + 1UL) * sizeof(char*);
+-	len = strlen(list);
+-	p = (char**)calloc(len + prefix + 1, sizeof(char*));
+-
+-	if (!p)
+-		return NULL;
+-
+-	str = &((char*)p)[prefix];
+-	memcpy(str, list, len);
++		if (name != NULL)
++		{
++			strcpy(store, name);
++			p[index++] = store;
++			store = strchr(store, '\0') + 1;
++		}
+ 
+-	if (name)
+-		p[0] = (char*)name;
++		strcpy(store, list);
+ 
+-	for (index = name ? 1 : 0; index < nArgs; index++)
+-	{
+-		char* comma = strchr(str, ',');
+-		p[index] = str;
+-
+-		if (comma)
++		while (index < nArgs)
+ 		{
+-			str = comma + 1;
+-			*comma = '\0';
++			char* comma = strchr(store, ',');
++			p[index++] = store;
++
++			if (comma)
++			{
++				store = comma + 1;
++				*comma = '\0';
++			}
+ 		}
+-	}
+ 
+-	*count = nArgs;
+-	return p;
++		*count = nArgs;
++		return p;
++	}
+ }
+ 
+ static char** freerdp_command_line_parse_comma_separated_values(char* list, size_t* count)
+@@ -926,14 +985,14 @@
+ BOOL freerdp_parse_username(const char* username, char** user, char** domain)
+ {
+ 	char* p;
+-	size_t length = 0;
++	int length = 0;
+ 	p = strchr(username, '\\');
+ 	*user = NULL;
+ 	*domain = NULL;
+ 
+ 	if (p)
+ 	{
+-		length = (size_t)(p - username);
++		length = (int)(p - username);
+ 		*user = _strdup(&p[1]);
+ 
+ 		if (!*user)
+@@ -984,7 +1043,7 @@
+ 
+ 	if (p)
+ 	{
+-		size_t length = (size_t)(p - hostname);
++		size_t length = (p - hostname);
+ 		LONGLONG val;
+ 
+ 		if (!value_to_int(p + 1, &val, 1, UINT16_MAX))
+@@ -1012,7 +1071,7 @@
+ 	return TRUE;
+ }
+ 
+-BOOL freerdp_set_connection_type(rdpSettings* settings, UINT32 type)
++BOOL freerdp_set_connection_type(rdpSettings* settings, int type)
+ {
+ 	settings->ConnectionType = type;
+ 
+@@ -1146,15 +1205,11 @@
+ 
+ static int freerdp_detect_command_line_pre_filter(void* context, int index, int argc, LPSTR* argv)
+ {
+-	size_t length;
+-	WINPR_UNUSED(context);
++	int length;
+ 
+ 	if (index == 1)
+ 	{
+-		if (argc < index)
+-			return -1;
+-
+-		length = strlen(argv[index]);
++		length = (int)strlen(argv[index]);
+ 
+ 		if (length > 4)
+ 		{
+@@ -1183,7 +1238,7 @@
+ 	DWORD flags;
+ 	int detect_status;
+ 	COMMAND_LINE_ARGUMENT_A* arg;
+-	flags = COMMAND_LINE_SEPARATOR_COLON | COMMAND_LINE_SILENCE_PARSER;
++	flags = COMMAND_LINE_SEPARATOR_COLON;
+ 	flags |= COMMAND_LINE_SIGIL_SLASH | COMMAND_LINE_SIGIL_PLUS_MINUS;
+ 
+ 	if (ignoreUnknown)
+@@ -1223,7 +1278,7 @@
+ 	DWORD flags;
+ 	int detect_status;
+ 	COMMAND_LINE_ARGUMENT_A* arg;
+-	flags = COMMAND_LINE_SEPARATOR_SPACE | COMMAND_LINE_SILENCE_PARSER;
++	flags = COMMAND_LINE_SEPARATOR_SPACE;
+ 	flags |= COMMAND_LINE_SIGIL_DASH | COMMAND_LINE_SIGIL_DOUBLE_DASH;
+ 	flags |= COMMAND_LINE_SIGIL_ENABLE_DISABLE;
+ 
+@@ -1257,16 +1312,16 @@
+ 	return detect_status;
+ }
+ 
+-static BOOL freerdp_client_detect_command_line(int argc, char** argv, DWORD* flags)
++static BOOL freerdp_client_detect_command_line(int argc, char** argv, DWORD* flags,
++                                               BOOL ignoreUnknown)
+ {
+ 	int old_cli_status;
+-	size_t old_cli_count;
++	int old_cli_count;
+ 	int posix_cli_status;
+ 	size_t posix_cli_count;
+ 	int windows_cli_status;
+ 	size_t windows_cli_count;
+ 	BOOL compatibility = FALSE;
+-	const BOOL ignoreUnknown = TRUE;
+ 	windows_cli_status = freerdp_detect_windows_style_command_line_syntax(
+ 	    argc, argv, &windows_cli_count, ignoreUnknown);
+ 	posix_cli_status =
+@@ -1392,11 +1447,22 @@
+ 	return strncmp(&str[strLen - extLen], ext, extLen) == 0;
+ }
+ 
+-static void activate_smartcard_logon_rdp(rdpSettings* settings)
++static void activate_smartcard_logon(rdpSettings* settings)
+ {
+ 	settings->SmartcardLogon = TRUE;
+-	/* TODO: why not? settings->UseRdpSecurityLayer = TRUE; */
+-	freerdp_settings_set_bool(settings, FreeRDP_PasswordIsSmartcardPin, TRUE);
++	/* We initialize all the settings, for all the variants of smartcard logon: */
++	settings->Pin = NULL;
++	settings->PinPadIsPresent = FALSE;
++	copy_value("0s", &settings->KerberosStartTime);
++	/* Ticket lifetime value in seconds ; KDC default value : 600mn (i.e. 36000s) ; 600mn at maximum
++	 */
++	copy_value("10h", &settings->KerberosLifeTime);
++	/* Ticket renewable lifetime value in seconds ; KDC default value : 1 day (i.e. 86400s) ; 7 days
++	 * at maximum */
++	copy_value("1d", &settings->KerberosRenewableLifeTime);
++	settings->Krb5Trace = FALSE;
++	freerdp_set_param_bool(settings, FreeRDP_PasswordIsSmartcardPin,
++	                       TRUE); /* TODO: why not? settings->UseRdpSecurityLayer = TRUE; */
+ }
+ 
+ /**
+@@ -1440,6 +1506,16 @@
+ 	return TRUE;
+ }
+ 
++#define CHECK_MEMORY(pointer)                                              \
++	do                                                                     \
++	{                                                                      \
++		if (!(pointer))                                                    \
++		{                                                                  \
++			WLog_ERR(TAG, "%s:%d: out of memory", __FUNCTION__, __LINE__); \
++			return COMMAND_LINE_ERROR_MEMORY;                              \
++		}                                                                  \
++	} while (0)
++
+ int freerdp_client_settings_parse_command_line_arguments(rdpSettings* settings, int argc,
+                                                          char** argv, BOOL allowUnknown)
+ {
+@@ -1466,9 +1542,10 @@
+ 	}
+ 
+ 	if (!ext && !assist)
+-		compatibility = freerdp_client_detect_command_line(argc, argv, &flags);
++		compatibility = freerdp_client_detect_command_line(argc, argv, &flags, allowUnknown);
+ 	else
+-		compatibility = freerdp_client_detect_command_line(argc - 1, &argv[1], &flags);
++		compatibility =
++		    freerdp_client_detect_command_line(argc - 1, &argv[1], &flags, allowUnknown);
+ 
+ 	settings->ProxyHostname = NULL;
+ 	settings->ProxyUsername = NULL;
+@@ -1518,7 +1595,6 @@
+ 
+ 		CommandLineSwitchStart(arg) CommandLineSwitchCase(arg, "v")
+ 		{
+-			assert(arg->Value);
+ 			free(settings->ServerHostname);
+ 			settings->ServerHostname = NULL;
+ 			p = strchr(arg->Value, '[');
+@@ -1535,7 +1611,7 @@
+ 					if (!value_to_int(&p[1], &val, 1, UINT16_MAX))
+ 						return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+ 
+-					length = (size_t)(p - arg->Value);
++					length = (int)(p - arg->Value);
+ 					settings->ServerPort = (UINT16)val;
+ 
+ 					if (!(settings->ServerHostname = (char*)calloc(length + 1UL, sizeof(char))))
+@@ -1558,7 +1634,7 @@
+ 				if (!p2)
+ 					continue;
+ 
+-				length = (size_t)(p2 - p);
++				length = p2 - p;
+ 
+ 				if (!(settings->ServerHostname = (char*)calloc(length, sizeof(char))))
+ 					return COMMAND_LINE_ERROR_MEMORY;
+@@ -1588,7 +1664,6 @@
+ 		{
+ 			size_t count = 0;
+ 			char* cur = arg->Value;
+-			assert(arg->Value);
+ 			settings->RedirectionPreferType = 0;
+ 
+ 			do
+@@ -1658,7 +1733,6 @@
+ 		}
+ 		CommandLineSwitchCase(arg, "size")
+ 		{
+-			assert(arg->Value);
+ 			p = strchr(arg->Value, 'x');
+ 
+ 			if (p)
+@@ -1668,8 +1742,8 @@
+ 				if (!parseSizeValue(arg->Value, &w, &h) || (w > UINT16_MAX) || (h > UINT16_MAX))
+ 					return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+ 
+-				settings->DesktopWidth = (UINT32)w;
+-				settings->DesktopHeight = (UINT32)h;
++				settings->DesktopWidth = w;
++				settings->DesktopHeight = h;
+ 			}
+ 			else
+ 			{
+@@ -1816,8 +1890,8 @@
+ 				if (!parseSizeValue(arg->Value, &w, &h) || (w > UINT16_MAX) || (h > UINT16_MAX))
+ 					return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+ 
+-				settings->SmartSizingWidth = (UINT32)w;
+-				settings->SmartSizingHeight = (UINT32)h;
++				settings->SmartSizingWidth = w;
++				settings->SmartSizingHeight = h;
+ 			}
+ 		}
+ 		CommandLineSwitchCase(arg, "bpp")
+@@ -1936,7 +2010,6 @@
+ 
+ 			if (arg->Flags & COMMAND_LINE_VALUE_PRESENT)
+ 			{
+-				assert(arg->Value);
+ 				p = strchr(arg->Value, ':');
+ 
+ 				if (p)
+@@ -1947,7 +2020,7 @@
+ 					if (!value_to_int(&p[1], &val, 0, UINT32_MAX))
+ 						return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+ 
+-					s = (size_t)(p - arg->Value);
++					s = (p - arg->Value);
+ 					settings->GatewayPort = (UINT32)val;
+ 
+ 					if (!(settings->GatewayHostname = (char*)calloc(s + 1UL, sizeof(char))))
+@@ -1980,7 +2053,6 @@
+ 			if (arg->Flags & COMMAND_LINE_VALUE_PRESENT)
+ 			{
+ 				char* atPtr;
+-				assert(arg->Value);
+ 				/* value is [scheme://][user:password@]hostname:port */
+ 				p = strstr(arg->Value, "://");
+ 
+@@ -2056,7 +2128,7 @@
+ 					if (!value_to_int(&p[1], &val, 0, UINT16_MAX))
+ 						return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+ 
+-					length = (size_t)(p - arg->Value);
++					length = (p - arg->Value);
+ 					settings->ProxyPort = (UINT16)val;
+ 					settings->ProxyHostname = (char*)malloc(length + 1);
+ 					strncpy(settings->ProxyHostname, arg->Value, length);
+@@ -2147,11 +2219,6 @@
+ 			settings->DisableWallpaper = TRUE;
+ 			settings->DisableFullWindowDrag = TRUE;
+ 		}
+-		CommandLineSwitchCase(arg, "app-workdir")
+-		{
+-			if (!copy_value(arg->Value, &settings->RemoteApplicationWorkingDir))
+-				return COMMAND_LINE_ERROR_MEMORY;
+-		}
+ 		CommandLineSwitchCase(arg, "load-balance-info")
+ 		{
+ 			if (!copy_value(arg->Value, (char**)&settings->LoadBalanceInfo))
+@@ -2251,7 +2318,7 @@
+ 		}
+ 		CommandLineSwitchCase(arg, "network")
+ 		{
+-			UINT32 type = 0;
++			int type = 0;
+ 
+ 			if (_stricmp(arg->Value, "modem") == 0)
+ 				type = CONNECTION_TYPE_MODEM;
+@@ -2277,11 +2344,14 @@
+ 				if (!value_to_int(arg->Value, &val, 1, 7))
+ 					return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+ 
+-				type = (UINT32)val;
++				type = (int)val;
+ 			}
+ 
+ 			if (!freerdp_set_connection_type(settings, type))
++			{
++				WLog_ERR(TAG, "Cannot set the connection type %ld", type);
+ 				return COMMAND_LINE_ERROR;
++			}
+ 		}
+ 		CommandLineSwitchCase(arg, "fonts")
+ 		{
+@@ -2308,8 +2378,8 @@
+ 				return COMMAND_LINE_ERROR_MISSING_ARGUMENT;
+ 			}
+ 
+-			settings->DesktopPosX = (UINT32)x;
+-			settings->DesktopPosY = (UINT32)y;
++			settings->DesktopPosX = x;
++			settings->DesktopPosY = y;
+ 		}
+ 		CommandLineSwitchCase(arg, "menu-anims")
+ 		{
+@@ -2350,7 +2420,16 @@
+ 				else
+ #endif
+ 				    if (_strnicmp("RFX", arg->Value, 4) != 0)
++				{
++					WLog_ERR(TAG,
++					         "Bad value for gfx option: %s, should be "
++#ifdef WITH_GFX_H264
++					         "AVC444,  AVC420 or "
++#endif
++					         "RFX",
++					         arg->Value);
+ 					return COMMAND_LINE_ERROR;
++				}
+ 			}
+ 		}
+ 		CommandLineSwitchCase(arg, "gfx-thin-client")
+@@ -2390,7 +2469,11 @@
+ 					settings->GfxAVC444 = TRUE;
+ 				}
+ 				else if (_strnicmp("AVC420", arg->Value, 7) != 0)
++				{
++					WLog_ERR(TAG, "Bad value for gfx-h264 option: %s, should be AVC444 or AVC420",
++					         arg->Value);
+ 					return COMMAND_LINE_ERROR;
++				}
+ 			}
+ 		}
+ #endif
+@@ -2400,8 +2483,6 @@
+ 		}
+ 		CommandLineSwitchCase(arg, "rfx-mode")
+ 		{
+-			assert(arg->Value);
+-
+ 			if (strcmp(arg->Value, "video") == 0)
+ 				settings->RemoteFxCodecMode = 0x00;
+ 			else if (strcmp(arg->Value, "image") == 0)
+@@ -2459,8 +2540,6 @@
+ 		}
+ 		CommandLineSwitchCase(arg, "sec")
+ 		{
+-			assert(arg->Value);
+-
+ 			if (strcmp("rdp", arg->Value) == 0) /* Standard RDP */
+ 			{
+ 				settings->RdpSecurity = TRUE;
+@@ -2527,11 +2606,14 @@
+ 
+ 			if (arg->Flags & COMMAND_LINE_VALUE_PRESENT)
+ 			{
+-				assert(arg->Value);
+ 				promptForPassword = (strncmp(arg->Value, "force", 6) == 0);
+ 
+ 				if (!promptForPassword)
++				{
++					WLog_ERR(TAG, "Bad value for from-stdin option: %s, should be force",
++					         arg->Value);
+ 					return COMMAND_LINE_ERROR;
++				}
+ 			}
+ 		}
+ 		CommandLineSwitchCase(arg, "log-level")
+@@ -2539,12 +2621,18 @@
+ 			wLog* root = WLog_GetRoot();
+ 
+ 			if (!WLog_SetStringLogLevel(root, arg->Value))
++			{
++				WLog_ERR(TAG, "Could not set the log-level: %s", arg->Value);
+ 				return COMMAND_LINE_ERROR;
++			}
+ 		}
+ 		CommandLineSwitchCase(arg, "log-filters")
+ 		{
+ 			if (!WLog_AddStringLogFilters(arg->Value))
++			{
++				WLog_ERR(TAG, "Could not add the log-filter: %s", arg->Value);
+ 				return COMMAND_LINE_ERROR;
++			}
+ 		}
+ 		CommandLineSwitchCase(arg, "sec-rdp")
+ 		{
+@@ -2564,7 +2652,6 @@
+ 		}
+ 		CommandLineSwitchCase(arg, "tls-ciphers")
+ 		{
+-			assert(arg->Value);
+ 			free(settings->AllowedTlsCiphers);
+ 
+ 			if (strcmp(arg->Value, "netmon") == 0)
+@@ -2605,10 +2692,6 @@
+ 		{
+ 			settings->AutoAcceptCertificate = enable;
+ 		}
+-		CommandLineSwitchCase(arg, "cert-deny")
+-		{
+-			settings->AutoDenyCertificate = enable;
+-		}
+ 		CommandLineSwitchCase(arg, "authentication")
+ 		{
+ 			settings->Authentication = enable;
+@@ -2714,7 +2797,7 @@
+ 		}
+ 		CommandLineSwitchCase(arg, "offscreen-cache")
+ 		{
+-			settings->OffscreenSupportLevel = (UINT32)enable;
++			settings->OffscreenSupportLevel = enable;
+ 		}
+ 		CommandLineSwitchCase(arg, "glyph-cache")
+ 		{
+@@ -2723,7 +2806,6 @@
+ 		CommandLineSwitchCase(arg, "codec-cache")
+ 		{
+ 			settings->BitmapCacheV3Enabled = TRUE;
+-			assert(arg->Value);
+ 
+ 			if (strcmp(arg->Value, "rfx") == 0)
+ 			{
+@@ -2811,19 +2893,26 @@
+ 			if (!value_to_int(arg->Value, &val, 0, 1000))
+ 				return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+ 
++			if (val > 1000)
++			{
++				WLog_ERR(TAG,
++				         "auto-reconnect-max-retries value is too big %lu,  should be in [0..1000]",
++				         settings->AutoReconnectMaxRetries);
++				return COMMAND_LINE_ERROR;
++			}
++
+ 			settings->AutoReconnectMaxRetries = (UINT32)val;
+ 		}
+ 		CommandLineSwitchCase(arg, "reconnect-cookie")
+ 		{
+ 			BYTE* base64 = NULL;
+ 			int length;
+-			assert(arg->Value);
+ 			crypto_base64_decode((const char*)(arg->Value), (int)strlen(arg->Value), &base64,
+ 			                     &length);
+ 
+ 			if ((base64 != NULL) && (length == sizeof(ARC_SC_PRIVATE_PACKET)))
+ 			{
+-				memcpy(settings->ServerAutoReconnectCookie, base64, (size_t)length);
++				memcpy(settings->ServerAutoReconnectCookie, base64, length);
+ 			}
+ 			else
+ 			{
+@@ -2919,21 +3008,127 @@
+ 			if (!copy_value(arg->Value, &settings->ActionScript))
+ 				return COMMAND_LINE_ERROR_MEMORY;
+ 		}
+-		CommandLineSwitchCase(arg, "rdp2tcp")
++		CommandLineSwitchCase(arg, "fipsmode")
++		{
++			settings->FIPSMode = enable;
++		}
++		CommandLineSwitchCase(arg, "smartcard-logon")
++		{
++			if (!settings->SmartcardLogon)
++				activate_smartcard_logon(settings);
++		}
++		CommandLineSwitchCase(arg, "pin")
+ 		{
+-			free(settings->RDP2TCPArgs);
++			if (!settings->SmartcardLogon)
++			{
++				WLog_ERR(TAG, "/pin option can only be given after /smartcard-logon");
++				return COMMAND_LINE_ERROR;
++			}
++			else if (!copy_value(arg->Value, &settings->Pin))
++			{
++				return COMMAND_LINE_ERROR_MEMORY;
++			}
++
++			/* overwrite argument so it won't appear in ps */
++			p = arg->Value;
+ 
+-			if (!(settings->RDP2TCPArgs = _strdup(arg->Value)))
++			while (*p)
++				*(p++) = 'X';
++
++			while (*arg->Value)
++				*(arg->Value++) = 'X';
++		}
++		CommandLineSwitchCase(arg, "pkcs11-module")
++		{
++			if (!settings->SmartcardLogon)
++			{
++				WLog_ERR(TAG, "/pkcs11-module option can only be given after /smartcard-logon");
++				return COMMAND_LINE_ERROR;
++			}
++			else if (!copy_value(arg->Value, &settings->Pkcs11Module))
++			{
+ 				return COMMAND_LINE_ERROR_MEMORY;
++			}
+ 		}
+-		CommandLineSwitchCase(arg, "fipsmode")
++		CommandLineSwitchCase(arg, "pkinit-anchors")
+ 		{
+-			settings->FIPSMode = enable;
++			if (!settings->SmartcardLogon)
++			{
++				WLog_ERR(TAG, "/pkinit-anchors option can only be given after /smartcard-logon");
++				return COMMAND_LINE_ERROR;
++			}
++			else if (!copy_value(arg->Value, &settings->PkinitAnchors))
++			{
++				return COMMAND_LINE_ERROR_MEMORY;
++			}
+ 		}
+-		CommandLineSwitchCase(arg, "smartcard-logon")
++		CommandLineSwitchCase(arg, "start-time")
++		{
++			if (!settings->SmartcardLogon)
++			{
++				WLog_ERR(TAG, "/start-time option can only be given after /smartcard-logon");
++				return COMMAND_LINE_ERROR;
++			}
++
++			/* Let kinit parse time strings according to krb5_string_to_deltat syntax. */
++			CHECK_MEMORY(copy_value(arg->Value, &settings->KerberosStartTime));
++		}
++		CommandLineSwitchCase(arg, "lifetime")
++		{
++			if (!settings->SmartcardLogon)
++			{
++				WLog_ERR(TAG, "/lifetime option can only be given after /smartcard-logon");
++				return COMMAND_LINE_ERROR;
++			}
++
++			/* Let kinit parse time strings according to krb5_string_to_deltat syntax. */
++			CHECK_MEMORY(copy_value(arg->Value, &settings->KerberosLifeTime));
++		}
++		CommandLineSwitchCase(arg, "renewable-lifetime")
++		{
++			if (!settings->SmartcardLogon)
++			{
++				WLog_ERR(TAG,
++				         "/renewable-lifetime option can only be given after /smartcard-logon");
++				return COMMAND_LINE_ERROR;
++			}
++
++			/* Let kinit parse time strings according to krb5_string_to_deltat syntax. */
++			CHECK_MEMORY(copy_value(arg->Value, &settings->KerberosRenewableLifeTime));
++		}
++		CommandLineSwitchCase(arg, "T")
+ 		{
+ 			if (!settings->SmartcardLogon)
+-				activate_smartcard_logon_rdp(settings);
++			{
++				WLog_ERR(TAG, "/T option can only be given after /smartcard-logon");
++				return COMMAND_LINE_ERROR;
++			}
++
++			settings->Krb5Trace = TRUE;
++		}
++		CommandLineSwitchCase(arg, "csp")
++		{
++			if (!settings->SmartcardLogon)
++			{
++				WLog_ERR(TAG, "/csp option can only be given after /smartcard-logon");
++				return COMMAND_LINE_ERROR;
++			}
++			else if (!copy_value(arg->Value, &settings->CspName))
++			{
++				return COMMAND_LINE_ERROR_MEMORY;
++			}
++		}
++		CommandLineSwitchCase(arg, "card")
++		{
++			if (!settings->SmartcardLogon)
++			{
++				WLog_ERR(TAG, "/card option can only be given after /smartcard-logon");
++				return COMMAND_LINE_ERROR;
++			}
++			else if (!copy_value(arg->Value, &settings->CardName))
++			{
++				return COMMAND_LINE_ERROR_MEMORY;
++			}
+ 		}
+ 		CommandLineSwitchDefault(arg)
+ 		{
+@@ -2950,13 +3145,27 @@
+ 			BOOL ret;
+ 			free(settings->Domain);
+ 			ret = freerdp_parse_username(user, &settings->Username, &settings->Domain);
+-			free(user);
+ 
+ 			if (!ret)
++			{
++				WLog_ERR(TAG, "Could not parse username %s", user);
++				free(user);
+ 				return COMMAND_LINE_ERROR;
++			}
++
++			free(user);
+ 		}
+ 		else
++		{
+ 			settings->Username = user;
++		}
++
++		if (settings->SmartcardLogon)
++		{
++			/* We don't need the Username for smartcard logon */
++			free(settings->Username);
++			settings->Username = NULL;
++		}
+ 	}
+ 
+ 	if (gwUser)
+@@ -2972,7 +3181,10 @@
+ 			free(gwUser);
+ 
+ 			if (!ret)
++			{
++				WLog_ERR(TAG, "Could not parse gateway username %s", gwUser);
+ 				return COMMAND_LINE_ERROR;
++			}
+ 		}
+ 		else
+ 			settings->GatewayUsername = gwUser;
+@@ -2987,10 +3199,15 @@
+ 			settings->Password = calloc(size, sizeof(char));
+ 
+ 			if (!settings->Password)
+-				return COMMAND_LINE_ERROR;
++			{
++				return COMMAND_LINE_ERROR_MEMORY;
++			}
+ 
+ 			if (!freerdp_passphrase_read("Password: ", settings->Password, size, 1))
++			{
++				WLog_ERR(TAG, "Could not read password.");
+ 				return COMMAND_LINE_ERROR;
++			}
+ 		}
+ 
+ 		if (settings->GatewayEnabled && !settings->GatewayUseSameCredentials)
+@@ -3000,11 +3217,14 @@
+ 				settings->GatewayPassword = calloc(size, sizeof(char));
+ 
+ 				if (!settings->GatewayPassword)
+-					return COMMAND_LINE_ERROR;
++					return COMMAND_LINE_ERROR_MEMORY;
+ 
+ 				if (!freerdp_passphrase_read("Gateway Password: ", settings->GatewayPassword, size,
+ 				                             1))
++				{
++					WLog_ERR(TAG, "Could not read gateway password.");
+ 					return COMMAND_LINE_ERROR;
++				}
+ 			}
+ 		}
+ 	}
+@@ -3053,7 +3273,7 @@
+ {
+ 	PVIRTUALCHANNELENTRY entry = NULL;
+ 	PVIRTUALCHANNELENTRYEX entryEx = NULL;
+-	entryEx = (PVIRTUALCHANNELENTRYEX)(void*)freerdp_load_channel_addin_entry(
++	entryEx = (PVIRTUALCHANNELENTRYEX)freerdp_load_channel_addin_entry(
+ 	    name, NULL, NULL, FREERDP_ADDIN_CHANNEL_STATIC | FREERDP_ADDIN_CHANNEL_ENTRYEX);
+ 
+ 	if (!entryEx)
+@@ -3223,13 +3443,6 @@
+ 			return FALSE;
+ 	}
+ 
+-	if (settings->RDP2TCPArgs)
+-	{
+-		if (!freerdp_client_load_static_channel_addin(channels, settings, "rdp2tcp",
+-		                                              settings->RDP2TCPArgs))
+-			return FALSE;
+-	}
+-
+ 	for (index = 0; index < settings->StaticChannelCount; index++)
+ 	{
+ 		args = settings->StaticChannelArray[index];
+--- client/common/cmdline.h	2019-07-25 19:51:00.421895240 +0300
++++ ../../informatimago/FreeRDP/client/common/cmdline.h	2019-07-25 20:11:24.439965189 +0300
+@@ -42,8 +42,6 @@
+ 	  "Remote application icon for user interface" },
+ 	{ "app-name", COMMAND_LINE_VALUE_REQUIRED, "<app-name>", NULL, NULL, -1, NULL,
+ 	  "Remote application name for user interface" },
+-	{ "app-workdir", COMMAND_LINE_VALUE_REQUIRED, "<workspace path>", NULL, NULL, -1, NULL,
+-	  "Remote application workspace path" },
+ 	{ "assistance", COMMAND_LINE_VALUE_REQUIRED, "<password>", NULL, NULL, -1, NULL,
+ 	  "Remote assistance password" },
+ 	{ "async-channels", COMMAND_LINE_VALUE_BOOL, NULL, BoolValueFalse, NULL, -1, NULL,
+@@ -62,14 +60,12 @@
+ 	  "Automatic reconnection" },
+ 	{ "auto-reconnect-max-retries", COMMAND_LINE_VALUE_REQUIRED, "<retries>", NULL, NULL, -1, NULL,
+ 	  "Automatic reconnection maximum retries, 0 for unlimited [0,1000]" },
+-	{ "bitmap-cache", COMMAND_LINE_VALUE_BOOL, NULL, BoolValueFalse, NULL, -1, NULL,
++	{ "bitmap-cache", COMMAND_LINE_VALUE_BOOL, NULL, BoolValueTrue, NULL, -1, NULL,
+ 	  "bitmap cache" },
+ 	{ "bpp", COMMAND_LINE_VALUE_REQUIRED, "<depth>", "16", NULL, -1, NULL,
+ 	  "Session bpp (color depth)" },
+ 	{ "buildconfig", COMMAND_LINE_VALUE_FLAG | COMMAND_LINE_PRINT_BUILDCONFIG, NULL, NULL, NULL, -1,
+ 	  NULL, "Print the build configuration" },
+-	{ "cert-deny", COMMAND_LINE_VALUE_FLAG, NULL, NULL, NULL, -1, NULL,
+-	  "Automatically abort connection for any certificate that can not be validated." },
+ 	{ "cert-ignore", COMMAND_LINE_VALUE_FLAG, NULL, NULL, NULL, -1, NULL, "Ignore certificate" },
+ 	{ "cert-name", COMMAND_LINE_VALUE_REQUIRED, "<name>", NULL, NULL, -1, NULL,
+ 	  "Certificate name" },
+@@ -112,8 +108,7 @@
+ 	{ "fipsmode", COMMAND_LINE_VALUE_BOOL, NULL, NULL, NULL, -1, NULL, "FIPS mode" },
+ 	{ "floatbar", COMMAND_LINE_VALUE_OPTIONAL,
+ 	  "sticky:[on|off],default:[visible|hidden],show:[always|fullscreen||window]", NULL, NULL, -1,
+-	  NULL,
+-	  "floatbar is disabled by default (when enabled defaults to sticky in fullscreen mode)" },
++	  NULL, "floatbar (default sticky in fullscreen mode)" },
+ 	{ "fonts", COMMAND_LINE_VALUE_BOOL, NULL, BoolValueTrue, NULL, -1, NULL,
+ 	  "smooth fonts (ClearType)" },
+ 	{ "frame-ack", COMMAND_LINE_VALUE_REQUIRED, "<number>", NULL, NULL, -1, NULL,
+@@ -158,7 +153,7 @@
+ 	{ "gat", COMMAND_LINE_VALUE_REQUIRED, "<access token>", NULL, NULL, -1, NULL,
+ 	  "Gateway Access Token" },
+ 	{ "h", COMMAND_LINE_VALUE_REQUIRED, "<height>", "768", NULL, -1, NULL, "Height" },
+-	{ "heartbeat", COMMAND_LINE_VALUE_BOOL, NULL, BoolValueTrue, NULL, -1, NULL,
++	{ "heartbeat", COMMAND_LINE_VALUE_BOOL, NULL, BoolValueFalse, NULL, -1, NULL,
+ 	  "Support heartbeat PDUs" },
+ 	{ "help", COMMAND_LINE_VALUE_FLAG | COMMAND_LINE_PRINT_HELP, NULL, NULL, NULL, -1, "?",
+ 	  "Print help" },
+@@ -215,7 +210,7 @@
+ 	  "[modem|broadband|broadband-low|broadband-high|wan|lan|auto]", NULL, NULL, -1, NULL,
+ 	  "Network connection type" },
+ 	{ "nsc", COMMAND_LINE_VALUE_FLAG, NULL, NULL, NULL, -1, "nscodec", "NSCodec support" },
+-	{ "offscreen-cache", COMMAND_LINE_VALUE_BOOL, NULL, BoolValueFalse, NULL, -1, NULL,
++	{ "offscreen-cache", COMMAND_LINE_VALUE_BOOL, NULL, BoolValueTrue, NULL, -1, NULL,
+ 	  "offscreen bitmap cache" },
+ 	{ "orientation", COMMAND_LINE_VALUE_REQUIRED, "[0|90|180|270]", NULL, NULL, -1, NULL,
+ 	  "Orientation of display in degrees" },
+@@ -250,8 +245,6 @@
+ 	  "Pass the hash (restricted admin mode)" },
+ 	{ "pwidth", COMMAND_LINE_VALUE_REQUIRED, "<width>", NULL, NULL, -1, NULL,
+ 	  "Physical width of display (in millimeters)" },
+-	{ "rdp2tcp", COMMAND_LINE_VALUE_REQUIRED, "<executable path[:arg...]>", NULL, NULL, -1, NULL,
+-	  "TCP redirection" },
+ 	{ "reconnect-cookie", COMMAND_LINE_VALUE_REQUIRED, "<base64-cookie>", NULL, NULL, -1, NULL,
+ 	  "Pass base64 reconnect cookie to the connection" },
+ 	{ "redirect-prefer", COMMAND_LINE_VALUE_REQUIRED, "<FQDN|IP|NETBIOS>,[...]", NULL, NULL, -1,
+@@ -293,6 +286,20 @@
+ 	  "Redirect the smartcard devices containing any of the <str> in their names." },
+ 	{ "smartcard-logon", COMMAND_LINE_VALUE_FLAG, NULL, NULL, NULL, -1, NULL,
+ 	  "Activates Smartcard Logon authentication. (EXPERIMENTAL: NLA not supported)" },
++	{ "pin", COMMAND_LINE_VALUE_OPTIONAL, "<PIN code>", NULL, NULL, -1, NULL, "PIN code" },
++	{ "pkcs11-module", COMMAND_LINE_VALUE_OPTIONAL, "<module>", NULL, NULL, -1, NULL,
++	  "Module PKCS11" },
++	{ "pkinit-anchors", COMMAND_LINE_VALUE_OPTIONAL, "<pkinit anchors>", NULL, NULL, -1, NULL,
++	  "PKINIT anchors" },
++	{ "start-time", COMMAND_LINE_VALUE_OPTIONAL, "<start time>", NULL, NULL, -1, NULL,
++	  "Kerberos Ticket start time" },
++	{ "lifetime", COMMAND_LINE_VALUE_OPTIONAL, "<lifetime>", NULL, NULL, -1, NULL,
++	  "Kerberos Ticket lifetime" },
++	{ "renewable-lifetime", COMMAND_LINE_VALUE_OPTIONAL, "<renewable lifetime>", NULL, NULL, -1,
++	  NULL, "Kerberos Ticket renewable lifetime" },
++	{ "T", COMMAND_LINE_VALUE_OPTIONAL, NULL, NULL, NULL, -1, NULL, "Activate KRB5 PKINIT Trace" },
++	{ "csp", COMMAND_LINE_VALUE_OPTIONAL, "<csp name>", NULL, NULL, -1, NULL, "CSP Name" },
++	{ "card", COMMAND_LINE_VALUE_OPTIONAL, "<card name>", NULL, NULL, -1, NULL, "Card Name" },
+ 	{ "sound", COMMAND_LINE_VALUE_OPTIONAL,
+ 	  "[sys:<sys>,][dev:<dev>,][format:<format>,][rate:<rate>,][channel:<channel>,][latency:<"
+ 	  "latency>,][quality:<quality>]",

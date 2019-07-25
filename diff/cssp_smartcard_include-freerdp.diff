@@ -1,0 +1,582 @@
+--- include/freerdp/freerdp.h	2019-07-25 19:51:01.009898156 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/freerdp.h	2019-07-25 20:11:24.999967965 +0300
+@@ -180,10 +180,6 @@
+ 	typedef int (*pReceiveChannelData)(freerdp* instance, UINT16 channelId, BYTE* data, int size,
+ 	                                   int flags, int totalSize);
+ 
+-	typedef BOOL (*pPresentGatewayMessage)(freerdp* instance, UINT32 type, BOOL isDisplayMandatory,
+-	                                       BOOL isConsentMandatory, size_t length,
+-	                                       const WCHAR* message);
+-
+ 	/**
+ 	 * Defines the context for a given instance of RDP connection.
+ 	 * It is embedded in the rdp_freerdp structure, and allocated by a call to
+@@ -267,6 +263,12 @@
+ 
+ #include <freerdp/client.h>
+ 
++	typedef struct freerdp_blob
++	{
++		void* data;
++		void (*free)(struct freerdp_blob*);
++	} freerdp_blob;
++
+ 	/** Defines the options for a given instance of RDP connection.
+ 	 *  This is built by the client and given to the FreeRDP library to create the connection
+ 	 *  with the expected options.
+@@ -276,88 +278,79 @@
+ 	 */
+ 	struct rdp_freerdp
+ 	{
+-		ALIGN64
+-		    rdpContext* context; /**< (offset 0)
+-		                      Pointer to a rdpContext structure.
+-		                      Client applications can use the ContextSize field to register a
+-		                      context bigger than the rdpContext structure. This allow clients to
+-		                      use additional context information. When using this capability, client
+-		                      application should ALWAYS declare their structure with the rdpContext
+-		                      field first, and any additional content following it. Can be allocated
+-		                      by a call to freerdp_context_new(). Must be deallocated by a call to
+-		                      freerdp_context_free() before deallocating the current instance. */
++		ALIGN64 rdpContext* context; /**< (offset 0)
++		                 Pointer to a rdpContext structure.
++		                 Client applications can use the ContextSize field to register a context
++		                 bigger than the rdpContext structure. This allow clients to use additional
++		                 context information. When using this capability, client application should
++		                 ALWAYS declare their structure with the rdpContext field first, and any
++		                 additional content following it. Can be allocated by a call to
++		                 freerdp_context_new(). Must be deallocated by a call to
++		                 freerdp_context_free() before deallocating the current instance. */
+ 
+ 		ALIGN64 RDP_CLIENT_ENTRY_POINTS* pClientEntryPoints;
+ 
+ 		UINT64 paddingA[16 - 2]; /* 2 */
+ 
+-		ALIGN64 rdpInput* input; /* (offset 16)
+-		                    Input handle for the connection.
+-		                    Will be initialized by a call to freerdp_context_new() */
+-		ALIGN64 rdpUpdate*
+-		    update; /* (offset 17)
+-		       Update display parameters. Used to register display events callbacks and settings.
+-		       Will be initialized by a call to freerdp_context_new() */
+-		ALIGN64 rdpSettings*
+-		    settings;                      /**< (offset 18)
+-		                                Pointer to a rdpSettings structure. Will be used to maintain the required RDP
+-		                                settings.		              Will be initialized by a call to freerdp_context_new() */
++		ALIGN64 rdpInput* input;           /* (offset 16)
++		                       Input handle for the connection.
++		                       Will be initialized by a call to freerdp_context_new() */
++		ALIGN64 rdpUpdate* update;         /* (offset 17)
++		                       Update display parameters. Used to register display events callbacks and
++		                       settings.		 Will be initialized by a call to freerdp_context_new() */
++		ALIGN64 rdpSettings* settings;     /**< (offset 18)
++		                       Pointer to a rdpSettings structure. Will be used to maintain the required
++		                       RDP settings.	 Will be initialized by a call to freerdp_context_new() */
+ 		ALIGN64 rdpAutoDetect* autodetect; /* (offset 19)
+-		                                Auto-Detect handle for the connection.
+-		                                Will be initialized by a call to freerdp_context_new() */
++		                   Auto-Detect handle for the connection.
++		                   Will be initialized by a call to freerdp_context_new() */
+ 		UINT64 paddingB[32 - 20];          /* 20 */
+ 
+-		ALIGN64 size_t
+-		    ContextSize; /* (offset 32)
+-		             Specifies the size of the 'context' field. freerdp_context_new() will use this
+-		             size to allocate the context buffer. freerdp_new() sets it to
+-		             sizeof(rdpContext). If modifying it, there should always be a minimum of
+-		             sizeof(rdpContext), as the freerdp library will assume it can use the 'context'
+-		             field to set the required informations in it. Clients will typically make it
+-		             bigger, and use a context structure embedding the rdpContext, and adding
+-		             additional information after that.
+-		          */
+-
+-		ALIGN64 pContextNew
+-		    ContextNew; /**< (offset 33)
+-		             Callback for context allocation
+-		             Can be set before calling freerdp_context_new() to have it executed after
+-		             allocation and initialization. Must be set to NULL if not needed. */
+-
+-		ALIGN64 pContextFree
+-		    ContextFree;          /**< (offset 34)
+-		                       Callback for context deallocation
+-		                       Can be set before calling freerdp_context_free() to have it executed before
+-		                       deallocation.		  Must be set to NULL if not needed. */
+-		UINT64 paddingC[47 - 35]; /* 35 */
++		ALIGN64 size_t ContextSize; /* (offset 32)
++		                Specifies the size of the 'context' field. freerdp_context_new() will use
++		                this size to allocate the context buffer. freerdp_new() sets it to
++		                sizeof(rdpContext). If modifying it, there should always be a minimum of
++		                sizeof(rdpContext), as the freerdp library will assume it can use the
++		                'context' field to set the required informations in it.
++		                Clients will typically make it bigger, and use a context structure embedding
++		                the rdpContext, and adding additional information after that.
++		                */
++
++		ALIGN64 pContextNew ContextNew; /**< (offset 33)
++		                Callback for context allocation
++		                Can be set before calling freerdp_context_new() to have it executed after
++		                allocation and initialization. Must be set to NULL if not needed. */
++
++		ALIGN64 pContextFree ContextFree; /**< (offset 34)
++		                  Callback for context deallocation
++		                  Can be set before calling freerdp_context_free() to have it executed
++		                  before deallocation. Must be set to NULL if not needed. */
++		UINT64 paddingC[47 - 35];         /* 35 */
+ 
+ 		ALIGN64 UINT ConnectionCallbackState; /* 47 */
+ 
+-		ALIGN64 pPreConnect
+-		    PreConnect; /**< (offset 48)
+-		             Callback for pre-connect operations.
+-		             Can be set before calling freerdp_connect() to have it executed before the
+-		             actual connection happens. Must be set to NULL if not needed. */
+-
+-		ALIGN64 pPostConnect
+-		    PostConnect; /**< (offset 49)
+-		              Callback for post-connect operations.
+-		              Can be set before calling freerdp_connect() to have it executed after the
+-		              actual connection has succeeded. Must be set to NULL if not needed. */
+-
+-		ALIGN64 pAuthenticate Authenticate;           /**< (offset 50)
+-		                                           Callback for authentication.
+-		                                           It is used to get the username/password when it was not
+-		                                           provided at connection time. */
+-		ALIGN64 pVerifyCertificate VerifyCertificate; /**< (offset 51)
+-		                                           Callback for certificate validation.
+-		                                           Used to verify that an unknown certificate is
+-	 trusted. DEPRECATED: Use VerifyChangedCertificateEx*/
+-		ALIGN64 pVerifyChangedCertificate
+-		    VerifyChangedCertificate; /**< (offset 52)
+-		                           Callback for changed certificate validation.
+-		                           Used when a certificate differs from stored fingerprint.
+-DEPRECATED: Use VerifyChangedCertificateEx */
++		ALIGN64 pPreConnect PreConnect; /**< (offset 48)
++		                Callback for pre-connect operations.
++		                Can be set before calling freerdp_connect() to have it executed before the
++		                actual connection happens. Must be set to NULL if not needed. */
++
++		ALIGN64 pPostConnect PostConnect; /**< (offset 49)
++		                  Callback for post-connect operations.
++		                  Can be set before calling freerdp_connect() to have it executed after the
++		                  actual connection has succeeded. Must be set to NULL if not needed. */
++
++		ALIGN64 pAuthenticate
++		    Authenticate;                                           /**< (offset 50)
++		                                            Callback for authentication.
++		                                            It is used to get the username/password when it was not provided at connection time. */
++		ALIGN64 pVerifyCertificate VerifyCertificate;               /**< (offset 51)
++		                                        Callback for certificate validation.
++		                                        Used to verify that an unknown certificate is trusted.
++		                                        DEPRECATED: Use VerifyChangedCertificateEx*/
++		ALIGN64 pVerifyChangedCertificate VerifyChangedCertificate; /**< (offset 52)
++		                                Callback for changed certificate validation.
++		                                Used when a certificate differs from stored fingerprint.
++		                                DEPRECATED: Use VerifyChangedCertificateEx */
+ 
+ 		ALIGN64 pVerifyX509Certificate
+ 		    VerifyX509Certificate; /**< (offset 53)  Callback for X509 certificate verification (PEM
+@@ -367,43 +360,35 @@
+ 		    LogonErrorInfo; /**< (offset 54)  Callback for logon error info, important for logon
+ 		                       system messages with RemoteApp */
+ 
+-		ALIGN64 pPostDisconnect
+-		    PostDisconnect; /**< (offset 55)
+-		                                                                Callback for cleaning up
+-		                       resources allocated by connect callbacks. */
+-
+-		ALIGN64 pAuthenticate GatewayAuthenticate; /**< (offset 56)
+-		                                 Callback for gateway authentication.
+-		                                 It is used to get the username/password when it was not
+-		                                 provided at connection time. */
+-
+-		ALIGN64 pPresentGatewayMessage PresentGatewayMessage; /**< (offset 57)
+-		                                  Callback for gateway consent messages.
+-		                                  It is used to present consent messages to the user. */
+-
+-		UINT64 paddingD[64 - 58]; /* 58 */
+-
+-		ALIGN64 pSendChannelData
+-		    SendChannelData; /* (offset 64)
+-		                Callback for sending data to a channel.
+-		                By default, it is set by freerdp_new() to freerdp_send_channel_data(), which
+-		                eventually calls freerdp_channel_send() */
+-		ALIGN64 pReceiveChannelData
+-		    ReceiveChannelData; /* (offset 65)
+-		                   Callback for receiving data from a channel.
+-		                   This is called by freerdp_channel_process() (if not NULL).
+-		                   Clients will typically use a function that calls freerdp_channels_data()
+-		                   to perform the needed tasks. */
+-
+-		ALIGN64 pVerifyCertificateEx
+-		    VerifyCertificateEx; /**< (offset 66)
+-		                  Callback for certificate validation.
+-		                  Used to verify that an unknown certificate is trusted. */
+-		ALIGN64 pVerifyChangedCertificateEx
+-		    VerifyChangedCertificateEx; /**< (offset 67)
+-		                         Callback for changed certificate validation.
+-		                         Used when a certificate differs from stored fingerprint. */
+-		UINT64 paddingE[80 - 68];       /* 68 */
++		ALIGN64 pPostDisconnect PostDisconnect; /**< (offset 55)
++		                    Callback for cleaning up resources allocated
++		                    by connect callbacks. */
++
++		ALIGN64 pAuthenticate
++		    GatewayAuthenticate; /**< (offset 56)
++		     Callback for gateway authentication.
++		     It is used to get the username/password when it was not provided at connection time. */
++
++		UINT64 paddingD[64 - 57]; /* 57 */
++
++		ALIGN64 pSendChannelData SendChannelData;       /* (offset 64)
++		                            Callback for sending data to a channel.
++		                            By default, it is set by freerdp_new() to freerdp_send_channel_data(),
++		                            which eventually calls	   freerdp_channel_send() */
++		ALIGN64 pReceiveChannelData ReceiveChannelData; /* (offset 65)
++		                        Callback for receiving data from a channel.
++		                        This is called by freerdp_channel_process() (if not NULL).
++		                        Clients will typically use a function that calls
++		                        freerdp_channels_data() to perform the needed tasks. */
++
++		ALIGN64 pVerifyCertificateEx VerifyCertificateEx;               /**< (offset 66)
++		                                        Callback for certificate validation.
++		                                        Used to verify that an unknown certificate is trusted. */
++		ALIGN64 pVerifyChangedCertificateEx VerifyChangedCertificateEx; /**< (offset 67)
++		                                Callback for changed certificate validation.
++		                                Used when a certificate differs from stored fingerprint. */
++		UINT64 paddingE[79 - 68];                                       /* 68 */
++		ALIGN64 freerdp_blob* saved_identity;
+ 	};
+ 
+ 	struct rdp_channel_handles
+@@ -456,7 +441,6 @@
+ 
+ 	FREERDP_API UINT32 freerdp_error_info(freerdp* instance);
+ 	FREERDP_API void freerdp_set_error_info(rdpRdp* rdp, UINT32 error);
+-	FREERDP_API BOOL freerdp_send_error_info(rdpRdp* rdp);
+ 
+ 	FREERDP_API void freerdp_get_version(int* major, int* minor, int* revision);
+ 	FREERDP_API const char* freerdp_get_version_string(void);
+@@ -482,9 +466,6 @@
+ 
+ 	FREERDP_API ULONG freerdp_get_transport_sent(rdpContext* context, BOOL resetCount);
+ 
+-	FREERDP_API BOOL freerdp_nla_impersonate(rdpContext* context);
+-	FREERDP_API BOOL freerdp_nla_revert_to_self(rdpContext* context);
+-
+ 	FREERDP_API void clearChannelError(rdpContext* context);
+ 	FREERDP_API HANDLE getChannelErrorEventHandle(rdpContext* context);
+ 	FREERDP_API UINT getChannelError(rdpContext* context);
+@@ -492,7 +473,8 @@
+ 	FREERDP_API void setChannelError(rdpContext* context, UINT errorNum, char* description);
+ 	FREERDP_API BOOL checkChannelErrorEvent(rdpContext* context);
+ 
+-	FREERDP_API const char* freerdp_nego_get_routing_token(rdpContext* context, DWORD* length);
++	FREERDP_API freerdp_blob* freerdp_saved_identity(freerdp* instance);
++	FREERDP_API void freerdp_save_identity(freerdp* instance, freerdp_blob* identity);
+ 
+ #ifdef __cplusplus
+ }
+--- include/freerdp/settings.h	2019-07-25 19:51:01.201899108 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/settings.h	2019-07-25 20:11:25.179968858 +0300
+@@ -27,16 +27,6 @@
+ #include <freerdp/api.h>
+ #include <freerdp/types.h>
+ 
+-/* RAIL Support Level */
+-#define RAIL_LEVEL_SUPPORTED 0x00000001
+-#define RAIL_LEVEL_DOCKED_LANGBAR_SUPPORTED 0x00000002
+-#define RAIL_LEVEL_SHELL_INTEGRATION_SUPPORTED 0x00000004
+-#define RAIL_LEVEL_LANGUAGE_IME_SYNC_SUPPORTED 0x00000008
+-#define RAIL_LEVEL_SERVER_TO_CLIENT_IME_SYNC_SUPPORTED 0x00000010
+-#define RAIL_LEVEL_HIDE_MINIMIZED_APPS_SUPPORTED 0x00000020
+-#define RAIL_LEVEL_WINDOW_CLOAKING_SUPPORTED 0x00000040
+-#define RAIL_LEVEL_HANDSHAKE_EX_SUPPORTED 0x00000080
+-
+ /* Performance Flags */
+ #define PERF_FLAG_NONE 0x00000000
+ #define PERF_DISABLE_WALLPAPER 0x00000001
+@@ -82,13 +72,13 @@
+ {
+ 	RDP_VERSION_4 = 0x00080001,
+ 	RDP_VERSION_5_PLUS = 0x00080004,
+-	RDP_VERSION_10_0 = 0x00080005,
+-	RDP_VERSION_10_1 = 0x00080006,
+-	RDP_VERSION_10_2 = 0x00080007,
+-	RDP_VERSION_10_3 = 0x00080008,
+-	RDP_VERSION_10_4 = 0x00080009,
+-	RDP_VERSION_10_5 = 0x0008000a,
+-	RDP_VERSION_10_6 = 0x0008000b,
++	RDP_VERSION_10_0 = 0x00800005,
++	RDP_VERSION_10_1 = 0x00800006,
++	RDP_VERSION_10_2 = 0x00800007,
++	RDP_VERSION_10_3 = 0x00800008,
++	RDP_VERSION_10_4 = 0x00800009,
++	RDP_VERSION_10_5 = 0x0080000a,
++	RDP_VERSION_10_6 = 0x0080000b,
+ } RDP_VERSION;
+ 
+ /* Color depth */
+@@ -297,6 +287,11 @@
+ #define ORIENTATION_LANDSCAPE_FLIPPED 180
+ #define ORIENTATION_PORTRAIT_FLIPPED 270
+ 
++/* KeySpec https://docs.microsoft.com/en-us/windows/desktop/api/wincrypt/nf-wincrypt-cryptgenkey */
++#define AT_KEYEXCHANGE (1)
++#define AT_SIGNATURE (2)
++#define AT_AUTHENTICATE (3)
++
+ /* ARC_CS_PRIVATE_PACKET */
+ typedef struct
+ {
+@@ -677,7 +672,33 @@
+ #define FreeRDP_Password51 (1280)
+ #define FreeRDP_Password51Length (1281)
+ #define FreeRDP_SmartcardLogon (1282)
+-#define FreeRDP_PromptForCredentials (1283)
++#define FreeRDP_Pkcs11Module (1283)
++#define FreeRDP_PinLoginRequired (1284)
++#define FreeRDP_PinPadIsPresent (1285)
++#define FreeRDP_Pin (1286)
++#define FreeRDP_KeySpec (1287)
++#define FreeRDP_CardName (1288)
++#define FreeRDP_ReaderName (1289)
++#define FreeRDP_ContainerName (1290)
++#define FreeRDP_CspName (1291)
++#define FreeRDP_UserHint (1292)
++#define FreeRDP_DomainHint (1293)
++#define FreeRDP_CredentialsType (1294)
++#define FreeRDP_UserPrincipalName (1295)
++#define FreeRDP_CanonicalizedUserHint (1296)
++#define FreeRDP_IdCertificate (1297)
++#define FreeRDP_IdCertificateLength (1298)
++#define FreeRDP_PkinitIdentity (1299)
++#define FreeRDP_PkinitAnchors (1300)
++#define FreeRDP_SlotID (1301)
++#define FreeRDP_TokenLabel (1302)
++#define FreeRDP_TokenFlags (1303)
++#define FreeRDP_KerberosStartTime (1304)
++#define FreeRDP_KerberosLifeTime (1305)
++#define FreeRDP_KerberosRenewableLifeTime (1306)
++#define FreeRDP_Pkinit (1307)
++#define FreeRDP_PkinitCertificate (1308)
++#define FreeRDP_Krb5Trace (1309)
+ #define FreeRDP_KerberosKdc (1344)
+ #define FreeRDP_KerberosRealm (1345)
+ #define FreeRDP_IgnoreCertificate (1408)
+@@ -692,7 +713,6 @@
+ #define FreeRDP_PrivateKeyContent (1417)
+ #define FreeRDP_RdpKeyContent (1418)
+ #define FreeRDP_AutoAcceptCertificate (1419)
+-#define FreeRDP_AutoDenyCertificate (1420)
+ #define FreeRDP_Workarea (1536)
+ #define FreeRDP_Fullscreen (1537)
+ #define FreeRDP_PercentScreen (1538)
+@@ -766,9 +786,6 @@
+ #define FreeRDP_RemoteAppNumIconCacheEntries (2123)
+ #define FreeRDP_RemoteAppLanguageBarSupported (2124)
+ #define FreeRDP_RemoteWndSupportLevel (2125)
+-#define FreeRDP_RemoteApplicationSupportLevel (2126)
+-#define FreeRDP_RemoteApplicationSupportMask (2127)
+-#define FreeRDP_RemoteApplicationWorkingDir (2128)
+ #define FreeRDP_ReceivedCapabilities (2240)
+ #define FreeRDP_ReceivedCapabilitiesSize (2241)
+ #define FreeRDP_OsMajorType (2304)
+@@ -847,7 +864,6 @@
+ #define FreeRDP_GfxAVC444 (3845)
+ #define FreeRDP_GfxSendQoeAck (3846)
+ #define FreeRDP_GfxAVC444v2 (3847)
+-#define FreeRDP_GfxCapsFilter (3848)
+ #define FreeRDP_BitmapCacheV3CodecId (3904)
+ #define FreeRDP_DrawNineGridEnabled (3968)
+ #define FreeRDP_DrawNineGridCacheSize (3969)
+@@ -879,7 +895,6 @@
+ #define FreeRDP_SupportGeometryTracking (5186)
+ #define FreeRDP_SupportSSHAgentChannel (5187)
+ #define FreeRDP_SupportVideoOptimized (5188)
+-#define FreeRDP_RDP2TCPArgs (5189)
+ 
+ /**
+  * FreeRDP Settings Data Structure
+@@ -1040,10 +1055,10 @@
+ 	UINT64 padding0896[896 - 837];                            /* 837 */
+ 
+ 	/* Client Info (Time Zone) */
+-	ALIGN64 TIME_ZONE_INFORMATION* ClientTimeZone; /* 896 */
+-	ALIGN64 char* DynamicDSTTimeZoneKeyName;       /* 897 */
+-	ALIGN64 BOOL DynamicDaylightTimeDisabled;      /* 898 */
+-	UINT64 padding0960[960 - 899];                 /* 899 */
++	ALIGN64 LPTIME_ZONE_INFORMATION ClientTimeZone; /* 896 */
++	ALIGN64 char* DynamicDSTTimeZoneKeyName;        /* 897 */
++	ALIGN64 BOOL DynamicDaylightTimeDisabled;       /* 898 */
++	UINT64 padding0960[960 - 899];                  /* 899 */
+ 
+ 	/* Client Info (Performance Flags) */
+ 	ALIGN64 UINT32 PerformanceFlags;      /* 960 */
+@@ -1127,11 +1142,38 @@
+ 	 */
+ 
+ 	/* Credentials Cache */
+-	ALIGN64 BYTE* Password51;          /* 1280 */
+-	ALIGN64 UINT32 Password51Length;   /* 1281 */
+-	ALIGN64 BOOL SmartcardLogon;       /* 1282 */
+-	ALIGN64 BOOL PromptForCredentials; /* 1283 */
+-	UINT64 padding1344[1344 - 1284];   /* 1284 */
++
++	ALIGN64 BYTE* Password51; /* 1280 */        /* NOT USED */
++	ALIGN64 UINT32 Password51Length; /* 1281 */ /* NOT USED */
++	ALIGN64 BOOL SmartcardLogon;                /* 1282 */
++	ALIGN64 char* Pkcs11Module;                 /* 1283 */
++	ALIGN64 BOOL PinLoginRequired;              /* 1284 */
++	ALIGN64 BOOL PinPadIsPresent;               /* 1285 */
++	ALIGN64 char* Pin;                          /* 1286 */
++	ALIGN64 UINT32 KeySpec;                     /* 1287 */
++	ALIGN64 char* CardName;                     /* 1288 */
++	ALIGN64 char* ReaderName;                   /* 1289 */
++	ALIGN64 char* ContainerName;                /* 1290 */
++	ALIGN64 char* CspName;                      /* 1291 */
++	ALIGN64 char* UserHint;                     /* 1292 */
++	ALIGN64 char* DomainHint;                   /* 1293 */
++	ALIGN64 UINT32 CredentialsType;             /* 1294 */
++	ALIGN64 char* UserPrincipalName;            /* 1295 */
++	ALIGN64 char* CanonicalizedUserHint;        /* 1296 */
++	ALIGN64 char* IdCertificate;                /* 1297 */
++	ALIGN64 UINT64 IdCertificateLength;         /* 1298 */
++	ALIGN64 char* PkinitIdentity;               /* 1299 */
++	ALIGN64 char* PkinitAnchors;                /* 1300 */
++	ALIGN64 UINT64 SlotID;                      /* 1301 */
++	ALIGN64 char* TokenLabel;                   /* 1302 */
++	ALIGN64 INT32 TokenFlags;                   /* 1303 */
++	ALIGN64 char* KerberosStartTime;            /* 1304 */
++	ALIGN64 char* KerberosLifeTime;             /* 1305 */
++	ALIGN64 char* KerberosRenewableLifeTime;    /* 1306 */
++	ALIGN64 BOOL Pkinit;                        /* 1307 */
++	ALIGN64 char* PkinitCertificate;            /* 1308 */
++	ALIGN64 BOOL Krb5Trace;                     /* 1309 */
++	UINT64 padding1344[1344 - 1310];            /* 1310 */
+ 
+ 	/* Kerberos Authentication */
+ 	ALIGN64 char* KerberosKdc;       /* 1344 */
+@@ -1151,8 +1193,7 @@
+ 	ALIGN64 char* PrivateKeyContent;              /* 1417 */
+ 	ALIGN64 char* RdpKeyContent;                  /* 1418 */
+ 	ALIGN64 BOOL AutoAcceptCertificate;           /* 1419 */
+-	ALIGN64 BOOL AutoDenyCertificate;             /* 1420 */
+-	UINT64 padding1472[1472 - 1421];              /* 1421 */
++	UINT64 padding1472[1472 - 1420];              /* 1420 */
+ 	UINT64 padding1536[1536 - 1472];              /* 1472 */
+ 
+ 	/**
+@@ -1176,8 +1217,8 @@
+ 	ALIGN64 char* WmClass;                /* 1549 */
+ 	ALIGN64 BOOL EmbeddedWindow;          /* 1550 */
+ 	ALIGN64 BOOL SmartSizing;             /* 1551 */
+-	ALIGN64 INT32 XPan;                   /* 1552 */
+-	ALIGN64 INT32 YPan;                   /* 1553 */
++	ALIGN64 int XPan;                     /* 1552 */
++	ALIGN64 int YPan;                     /* 1553 */
+ 	ALIGN64 UINT32 SmartSizingWidth;      /* 1554 */
+ 	ALIGN64 UINT32 SmartSizingHeight;     /* 1555 */
+ 	ALIGN64 BOOL PercentScreenUseWidth;   /* 1556 */
+@@ -1267,10 +1308,7 @@
+ 	ALIGN64 UINT32 RemoteAppNumIconCacheEntries;      /* 2123 */
+ 	ALIGN64 BOOL RemoteAppLanguageBarSupported;       /* 2124 */
+ 	ALIGN64 UINT32 RemoteWndSupportLevel;             /* 2125 */
+-	ALIGN64 UINT32 RemoteApplicationSupportLevel;     /* 2126 */
+-	ALIGN64 UINT32 RemoteApplicationSupportMask;      /* 2127 */
+-	ALIGN64 char* RemoteApplicationWorkingDir;        /* 2128 */
+-	UINT64 padding2176[2176 - 2129];                  /* 2129 */
++	UINT64 padding2176[2176 - 2126];                  /* 2126 */
+ 	UINT64 padding2240[2240 - 2176];                  /* 2176 */
+ 
+ 	/**
+@@ -1434,8 +1472,7 @@
+ 	ALIGN64 BOOL GfxAVC444;          /* 3845 */
+ 	ALIGN64 BOOL GfxSendQoeAck;      /* 3846 */
+ 	ALIGN64 BOOL GfxAVC444v2;        /* 3847 */
+-	ALIGN64 UINT32 GfxCapsFilter;    /* 3848 */
+-	UINT64 padding3904[3904 - 3849]; /* 3849 */
++	UINT64 padding3904[3904 - 3848]; /* 3848 */
+ 
+ 	/**
+ 	 * Caches
+@@ -1519,8 +1556,7 @@
+ 	ALIGN64 BOOL SupportGeometryTracking; /* 5186 */
+ 	ALIGN64 BOOL SupportSSHAgentChannel;  /* 5187 */
+ 	ALIGN64 BOOL SupportVideoOptimized;   /* 5188 */
+-	ALIGN64 char* RDP2TCPArgs;            /* 5189 */
+-	UINT64 padding5312[5312 - 5190];      /* 5190 */
++	UINT64 padding5312[5312 - 5189];      /* 5189 */
+ 
+ 	/**
+ 	 * WARNING: End of ABI stable zone!
+@@ -1534,7 +1570,7 @@
+ 	 */
+ 
+ 	/* Extensions */
+-	ALIGN64 INT32 num_extensions;              /*  */
++	ALIGN64 int num_extensions;                /*  */
+ 	ALIGN64 struct rdp_ext_set extensions[16]; /*  */
+ 
+ 	ALIGN64 BYTE* SettingsModified; /* byte array marking fields that have been modified from their
+@@ -1555,8 +1591,7 @@
+ #define FREERDP_SETTINGS_SERVER_MODE 0x00000001
+ 
+ 	FREERDP_API rdpSettings* freerdp_settings_new(DWORD flags);
+-	FREERDP_API rdpSettings* freerdp_settings_clone(const rdpSettings* settings);
+-	FREERDP_API BOOL freerdp_settings_copy(rdpSettings* dst, const rdpSettings* src);
++	FREERDP_API rdpSettings* freerdp_settings_clone(rdpSettings* settings);
+ 	FREERDP_API void freerdp_settings_free(rdpSettings* settings);
+ 
+ 	FREERDP_API int freerdp_addin_set_argument(ADDIN_ARGV* args, char* argument);
+@@ -1593,16 +1628,12 @@
+ 	FREERDP_API void freerdp_performance_flags_make(rdpSettings* settings);
+ 	FREERDP_API void freerdp_performance_flags_split(rdpSettings* settings);
+ 
+-	FREERDP_API BOOL freerdp_set_gateway_usage_method(rdpSettings* settings,
++	FREERDP_API void freerdp_set_gateway_usage_method(rdpSettings* settings,
+ 	                                                  UINT32 GatewayUsageMethod);
+ 	FREERDP_API void freerdp_update_gateway_usage_method(rdpSettings* settings,
+ 	                                                     UINT32 GatewayEnabled,
+ 	                                                     UINT32 GatewayBypassLocal);
+ 
+-	/* DEPRECATED:
+-	 * the functions freerdp_get_param_* and freerdp_set_param_* are deprecated.
+-	 * use freerdp_settings_get_* and freerdp_settings_set_* as a replacement!
+-	 */
+ 	FREERDP_API BOOL freerdp_get_param_bool(rdpSettings* settings, int id);
+ 	FREERDP_API int freerdp_set_param_bool(rdpSettings* settings, int id, BOOL param);
+ 
+@@ -1618,33 +1649,6 @@
+ 	FREERDP_API char* freerdp_get_param_string(rdpSettings* settings, int id);
+ 	FREERDP_API int freerdp_set_param_string(rdpSettings* settings, int id, const char* param);
+ 
+-	FREERDP_API BOOL freerdp_settings_get_bool(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_bool(rdpSettings* settings, size_t id, BOOL param);
+-
+-	FREERDP_API INT16 freerdp_settings_get_int16(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_int16(rdpSettings* settings, size_t id, INT16 param);
+-
+-	FREERDP_API UINT16 freerdp_settings_get_uint16(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_uint16(rdpSettings* settings, size_t id, UINT16 param);
+-
+-	FREERDP_API INT32 freerdp_settings_get_int32(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_int32(rdpSettings* settings, size_t id, INT32 param);
+-
+-	FREERDP_API UINT32 freerdp_settings_get_uint32(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_uint32(rdpSettings* settings, size_t id, UINT32 param);
+-
+-	FREERDP_API INT64 freerdp_settings_get_int64(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_int64(rdpSettings* settings, size_t id, INT64 param);
+-
+-	FREERDP_API UINT64 freerdp_settings_get_uint64(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_uint64(rdpSettings* settings, size_t id, UINT64 param);
+-
+-	FREERDP_API const char* freerdp_settings_get_string(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_string(rdpSettings* settings, size_t id,
+-	                                             const char* param);
+-
+-	FREERDP_API const void* freerdp_settings_get_pointer(rdpSettings* settings, size_t id);
+-
+ #ifdef __cplusplus
+ }
+ #endif

@@ -1,0 +1,2587 @@
+--- libfreerdp/scquery/CMakeLists.txt	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/CMakeLists.txt	2019-07-19 20:00:34.133156354 +0300
+@@ -0,0 +1,41 @@
++# FreeRDP: A Remote Desktop Protocol Implementation
++# libfreerdp-scquery cmake build script
++#
++# Copyright 2018 Pascal Bourguignon <pjb@informatimago.com>
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++
++set(MODULE_NAME "freerdp-scquery")
++set(MODULE_PREFIX "FREERDP_SCQUERY")
++
++set(${MODULE_PREFIX}_SRCS
++    buffer.c
++    certificate.c
++    certificate_list.c
++    pkcs11errors.c
++    pkcs11module.c
++    scquery.c
++    scquery_error.c
++    scquery_string.c
++    smartcard_certificate.c
++    x509_alt_names.c
++)
++
++freerdp_module_add(${${MODULE_PREFIX}_SRCS})
++
++# freerdp_include_directory_add(${OPENSSL_INCLUDE_DIR})
++# freerdp_library_add(${OPENSSL_LIBRARIES})
++
++# if(BUILD_TESTING)
++# 	add_subdirectory(test)
++# endif()
+--- libfreerdp/scquery/buffer.c	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/buffer.c	2019-07-25 20:11:29.283989207 +0300
+@@ -0,0 +1,87 @@
++#include <stdlib.h>
++#include <string.h>
++#include "buffer.h"
++#include "scquery_error.h"
++
++enum
++{
++	buffer_flag_allocated = (1 << 0)
++};
++
++typedef struct
++{
++	CK_ULONG flags;
++	CK_ULONG size;
++	CK_BYTE* data;
++} buffer_t;
++
++CK_ULONG buffer_size(buffer buf)
++{
++	buffer_t* buffer = buf;
++	return buffer->size;
++}
++
++CK_BYTE* buffer_data(buffer buf)
++{
++	buffer_t* buffer = buf;
++	return buffer->data;
++}
++
++buffer buffer_new_copy(CK_ULONG size, CK_BYTE* data)
++{
++	buffer_t* buffer = checked_malloc(sizeof(*buffer));
++
++	if (buffer == NULL)
++	{
++		return NULL;
++	}
++
++	buffer->flags = buffer_flag_allocated;
++	buffer->size = size;
++	buffer->data = checked_malloc(buffer->size);
++
++	if (buffer->data == NULL)
++	{
++		free(buffer);
++		return NULL;
++	}
++
++	memcpy(buffer->data, data, buffer->size);
++	return buffer;
++}
++
++buffer buffer_new(CK_ULONG size, CK_BYTE* data)
++{
++	buffer_t* buffer = checked_malloc(sizeof(*buffer));
++
++	if (buffer == NULL)
++	{
++		return NULL;
++	}
++
++	buffer->flags = 0;
++	buffer->size = size;
++	buffer->data = data;
++	return buffer;
++}
++
++void buffer_free(buffer buf)
++{
++	buffer_t* buffer = buf;
++
++	if (buffer == NULL)
++	{
++		return;
++	}
++
++	if (buffer->flags & buffer_flag_allocated)
++	{
++		memset(buffer->data, 0, buffer->size);
++		free(buffer->data);
++	}
++
++	memset(buffer, 0, sizeof(*buffer));
++	free(buffer);
++}
++
++/**** THE END ****/
+--- libfreerdp/scquery/buffer.h	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/buffer.h	2019-07-25 20:11:29.287989227 +0300
+@@ -0,0 +1,13 @@
++#ifndef LIBFREERDP_SCQUERY_BUFFER_H
++#define LIBFREERDP_SCQUERY_BUFFER_H
++#include <pkcs11-helper-1.0/pkcs11.h>
++
++typedef void* buffer;
++CK_ULONG buffer_size(buffer buf);
++CK_BYTE* buffer_data(buffer buf);
++
++buffer buffer_new_copy(CK_ULONG size, CK_BYTE* data);
++buffer buffer_new(CK_ULONG size, CK_BYTE* data);
++void buffer_free(buffer buf);
++
++#endif
+--- libfreerdp/scquery/certificate.c	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/certificate.c	2019-07-25 20:11:29.287989227 +0300
+@@ -0,0 +1,79 @@
++#include <stdlib.h>
++#include "certificate.h"
++#include "scquery_error.h"
++
++/* ========================================================================== */
++/* smartcard_certificate */
++
++smartcard_certificate scquery_certificate_allocate()
++{
++	smartcard_certificate certificate = checked_malloc(sizeof(*certificate));
++
++	if (certificate)
++	{
++		certificate->slot_id = 0;
++		certificate->slot_description = NULL;
++		certificate->token_label = NULL;
++		certificate->token_serial = NULL;
++		certificate->id = NULL;
++		certificate->label = NULL;
++		certificate->type = 0;
++		certificate->issuer = NULL;
++		certificate->subject = NULL;
++		certificate->value = NULL;
++		certificate->key_type = 0;
++		certificate->protected_authentication_path = 0;
++	}
++
++	return certificate;
++}
++
++smartcard_certificate scquery_certificate_new(CK_SLOT_ID slot_id, char* slot_description,
++                                              char* token_label, char* token_serial, char* id,
++                                              char* label, CK_CERTIFICATE_TYPE type, buffer issuer,
++                                              buffer subject, buffer value, CK_KEY_TYPE key_type,
++                                              int protected_authentication_path)
++{
++	smartcard_certificate certificate = scquery_certificate_allocate();
++
++	if (certificate)
++	{
++		certificate->slot_id = slot_id;
++		certificate->slot_description = slot_description;
++		certificate->token_label = token_label;
++		certificate->token_serial = token_serial;
++		certificate->id = id;
++		certificate->label = label;
++		certificate->type = type;
++		certificate->issuer = issuer;
++		certificate->subject = subject;
++		certificate->value = value;
++		certificate->key_type = key_type;
++		certificate->protected_authentication_path = protected_authentication_path;
++	}
++
++	return certificate;
++}
++
++void scquery_certificate_deepfree(smartcard_certificate certificate)
++{
++	if (certificate)
++	{
++		free(certificate->slot_description);
++		free(certificate->token_label);
++		free(certificate->token_serial);
++		free(certificate->id);
++		free(certificate->label);
++		buffer_free(certificate->issuer);
++		buffer_free(certificate->subject);
++		buffer_free(certificate->value);
++		scquery_certificate_free(certificate);
++	}
++}
++
++void scquery_certificate_free(smartcard_certificate certificate)
++{
++	free(certificate);
++}
++
++/**** THE END ****/
+--- libfreerdp/scquery/certificate.h	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/certificate.h	2019-07-25 20:11:29.291989247 +0300
+@@ -0,0 +1,41 @@
++#ifndef LIBFREERDP_SCQUERY_CERTIFICATE_H
++#define LIBFREERDP_SCQUERY_CERTIFICATE_H
++#include <stddef.h>
++#include "buffer.h"
++
++typedef struct
++{
++	CK_SLOT_ID slot_id;
++	char* slot_description; /* ReaderName */
++	char* token_label;      /* CardName */
++	char* token_serial;
++	char* id;
++	char* label;
++	CK_CERTIFICATE_TYPE type;
++	buffer issuer;
++	buffer subject;
++	buffer value;
++	CK_KEY_TYPE key_type;
++	int protected_authentication_path;
++} smartcard_certificate_t, *smartcard_certificate;
++
++/* scquery_certificate_new
++allocates and initialize a new smartcard_certificate */
++smartcard_certificate scquery_certificate_new(CK_SLOT_ID slot_id, char* slot_description,
++                                              char* token_label, char* token_serial, char* id,
++                                              char* label, CK_CERTIFICATE_TYPE type, buffer issuer,
++                                              buffer subject, buffer value, CK_KEY_TYPE key_type,
++                                              int protected_authentication_path);
++
++/* scquery_certificate_free
++frees only the smartcard_certificate structure (not the fields). */
++void scquery_certificate_free(smartcard_certificate certificate);
++/* scquery_certificate_deepfree
++deepfrees smartcard_certificate structure and all its fields. */
++void scquery_certificate_deepfree(smartcard_certificate certificate);
++
++/* scquery_certificate_allocate
++allocates an empty smartcard_certificate structure. */
++smartcard_certificate scquery_certificate_allocate();
++
++#endif
+--- libfreerdp/scquery/certificate_list.c	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/certificate_list.c	2019-07-25 20:11:29.291989247 +0300
+@@ -0,0 +1,70 @@
++#include <stdlib.h>
++#include "certificate_list.h"
++#include "scquery_error.h"
++
++certificate_list certificate_list_cons(smartcard_certificate certificate, certificate_list rest)
++{
++	certificate_list list = checked_malloc(sizeof(*list));
++
++	if (list)
++	{
++		list->certificate = certificate;
++		list->rest = rest;
++	}
++
++	return list;
++}
++
++void certificate_list_deepfree(certificate_list list)
++{
++	if (list)
++	{
++		scquery_certificate_deepfree(list->certificate);
++		certificate_list_deepfree(list->rest);
++		certificate_list_free(list);
++	}
++}
++
++smartcard_certificate certificate_list_first(certificate_list list)
++{
++	return ((list == NULL) ? NULL : list->certificate);
++}
++certificate_list certificate_list_rest(certificate_list list)
++{
++	return ((list == NULL) ? NULL : list->rest);
++}
++void certificate_list_free(certificate_list list)
++{
++	free(list);
++}
++
++certificate_list certificate_list_delete(smartcard_certificate certificate, certificate_list list)
++{
++	if (certificate_list_first(list) == certificate)
++	{
++		certificate_list result = certificate_list_rest(list);
++		certificate_list_free(list);
++		return result;
++	}
++	else
++	{
++		certificate_list previous = list;
++
++		while ((certificate_list_rest(previous) != NULL) &&
++		       (certificate_list_first(certificate_list_rest(previous)) != certificate))
++		{
++			previous = certificate_list_rest(previous);
++		}
++
++		if (certificate_list_rest(previous) != NULL)
++		{
++			certificate_list old = certificate_list_rest(previous);
++			previous->rest = certificate_list_rest(old);
++			certificate_list_free(old);
++		}
++
++		return list;
++	}
++}
++
++/**** THE END ****/
+--- libfreerdp/scquery/certificate_list.h	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/certificate_list.h	2019-07-25 20:11:29.291989247 +0300
+@@ -0,0 +1,41 @@
++
++#ifndef LIBFREERDP_SCQUERY_CERTIFICATE_LIST_H
++#define LIBFREERDP_SCQUERY_CERTIFICATE_LIST_H
++#include "certificate.h"
++
++typedef struct certificate_list
++{
++	smartcard_certificate certificate;
++	struct certificate_list* rest;
++} certificate_list_t, *certificate_list;
++
++smartcard_certificate certificate_list_first(certificate_list list);
++certificate_list certificate_list_rest(certificate_list list);
++
++#define DO_CERTIFICATE_LIST(certificate, current, list)                                           \
++	for ((current = list,                                                                         \
++	    certificate = ((current != NULL) ? certificate_list_first(current) : CK_INVALID_HANDLE)); \
++	     (current != NULL);                                                                       \
++	     (current = certificate_list_rest(current),                                               \
++	     certificate = ((current != NULL) ? certificate_list_first(current) : CK_INVALID_HANDLE)))
++
++/* certificate_list_cons
++allocates a new list node containing the certificate and the next list. */
++certificate_list certificate_list_cons(smartcard_certificate certificate, certificate_list rest);
++
++/* certificate_list_delete
++removes the certificate from the certificate list.
++returns the list (or the rest of the list when the certificate was the first element).
++The node that held the certificate is freed, but not the certificate!
++*/
++certificate_list certificate_list_delete(smartcard_certificate certificate, certificate_list list);
++
++/* certificate_list_deepfree
++deepfrees the certificates and the list nodes */
++void certificate_list_deepfree(certificate_list list);
++
++/* certificate_list_free
++frees only the current list nodes (not the next ones). */
++void certificate_list_free(certificate_list list);
++
++#endif
+--- libfreerdp/scquery/pkcs11errors.c	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/pkcs11errors.c	2019-07-25 20:11:29.299989286 +0300
+@@ -0,0 +1,113 @@
++#include <stdio.h>
++#include <string.h>
++
++#include "pkcs11errors.h"
++
++const char* pkcs11_return_value_label(CK_RV rv)
++{
++	static struct
++	{
++		CK_RV rv;
++		const char* label;
++	} labels[] = { { CKR_OK, "CKR_OK" },
++		           { CKR_CANCEL, "CKR_CANCEL" },
++		           { CKR_HOST_MEMORY, "CKR_HOST_MEMORY" },
++		           { CKR_SLOT_ID_INVALID, "CKR_SLOT_ID_INVALID" },
++		           { CKR_GENERAL_ERROR, "CKR_GENERAL_ERROR" },
++		           { CKR_FUNCTION_FAILED, "CKR_FUNCTION_FAILED" },
++		           { CKR_ARGUMENTS_BAD, "CKR_ARGUMENTS_BAD" },
++		           { CKR_NO_EVENT, "CKR_NO_EVENT" },
++		           { CKR_NEED_TO_CREATE_THREADS, "CKR_NEED_TO_CREATE_THREADS" },
++		           { CKR_CANT_LOCK, "CKR_CANT_LOCK" },
++		           { CKR_ATTRIBUTE_READ_ONLY, "CKR_ATTRIBUTE_READ_ONLY" },
++		           { CKR_ATTRIBUTE_SENSITIVE, "CKR_ATTRIBUTE_SENSITIVE" },
++		           { CKR_ATTRIBUTE_TYPE_INVALID, "CKR_ATTRIBUTE_TYPE_INVALID" },
++		           { CKR_ATTRIBUTE_VALUE_INVALID, "CKR_ATTRIBUTE_VALUE_INVALID" },
++		           { CKR_DATA_INVALID, "CKR_DATA_INVALID" },
++		           { CKR_DATA_LEN_RANGE, "CKR_DATA_LEN_RANGE" },
++		           { CKR_DEVICE_ERROR, "CKR_DEVICE_ERROR" },
++		           { CKR_DEVICE_MEMORY, "CKR_DEVICE_MEMORY" },
++		           { CKR_DEVICE_REMOVED, "CKR_DEVICE_REMOVED" },
++		           { CKR_ENCRYPTED_DATA_INVALID, "CKR_ENCRYPTED_DATA_INVALID" },
++		           { CKR_ENCRYPTED_DATA_LEN_RANGE, "CKR_ENCRYPTED_DATA_LEN_RANGE" },
++		           { CKR_FUNCTION_CANCELED, "CKR_FUNCTION_CANCELED" },
++		           { CKR_FUNCTION_NOT_PARALLEL, "CKR_FUNCTION_NOT_PARALLEL" },
++		           { CKR_FUNCTION_NOT_SUPPORTED, "CKR_FUNCTION_NOT_SUPPORTED" },
++		           { CKR_KEY_HANDLE_INVALID, "CKR_KEY_HANDLE_INVALID" },
++		           { CKR_KEY_SIZE_RANGE, "CKR_KEY_SIZE_RANGE" },
++		           { CKR_KEY_TYPE_INCONSISTENT, "CKR_KEY_TYPE_INCONSISTENT" },
++		           { CKR_KEY_NOT_NEEDED, "CKR_KEY_NOT_NEEDED" },
++		           { CKR_KEY_CHANGED, "CKR_KEY_CHANGED" },
++		           { CKR_KEY_NEEDED, "CKR_KEY_NEEDED" },
++		           { CKR_KEY_INDIGESTIBLE, "CKR_KEY_INDIGESTIBLE" },
++		           { CKR_KEY_FUNCTION_NOT_PERMITTED, "CKR_KEY_FUNCTION_NOT_PERMITTED" },
++		           { CKR_KEY_NOT_WRAPPABLE, "CKR_KEY_NOT_WRAPPABLE" },
++		           { CKR_KEY_UNEXTRACTABLE, "CKR_KEY_UNEXTRACTABLE" },
++		           { CKR_MECHANISM_INVALID, "CKR_MECHANISM_INVALID" },
++		           { CKR_MECHANISM_PARAM_INVALID, "CKR_MECHANISM_PARAM_INVALID" },
++		           { CKR_OBJECT_HANDLE_INVALID, "CKR_OBJECT_HANDLE_INVALID" },
++		           { CKR_OPERATION_ACTIVE, "CKR_OPERATION_ACTIVE" },
++		           { CKR_OPERATION_NOT_INITIALIZED, "CKR_OPERATION_NOT_INITIALIZED" },
++		           { CKR_PIN_INCORRECT, "CKR_PIN_INCORRECT" },
++		           { CKR_PIN_INVALID, "CKR_PIN_INVALID" },
++		           { CKR_PIN_LEN_RANGE, "CKR_PIN_LEN_RANGE" },
++		           { CKR_PIN_EXPIRED, "CKR_PIN_EXPIRED" },
++		           { CKR_PIN_LOCKED, "CKR_PIN_LOCKED" },
++		           { CKR_SESSION_CLOSED, "CKR_SESSION_CLOSED" },
++		           { CKR_SESSION_COUNT, "CKR_SESSION_COUNT" },
++		           { CKR_SESSION_HANDLE_INVALID, "CKR_SESSION_HANDLE_INVALID" },
++		           { CKR_SESSION_PARALLEL_NOT_SUPPORTED, "CKR_SESSION_PARALLEL_NOT_SUPPORTED" },
++		           { CKR_SESSION_READ_ONLY, "CKR_SESSION_READ_ONLY" },
++		           { CKR_SESSION_EXISTS, "CKR_SESSION_EXISTS" },
++		           { CKR_SESSION_READ_ONLY_EXISTS, "CKR_SESSION_READ_ONLY_EXISTS" },
++		           { CKR_SESSION_READ_WRITE_SO_EXISTS, "CKR_SESSION_READ_WRITE_SO_EXISTS" },
++		           { CKR_SIGNATURE_INVALID, "CKR_SIGNATURE_INVALID" },
++		           { CKR_SIGNATURE_LEN_RANGE, "CKR_SIGNATURE_LEN_RANGE" },
++		           { CKR_TEMPLATE_INCOMPLETE, "CKR_TEMPLATE_INCOMPLETE" },
++		           { CKR_TEMPLATE_INCONSISTENT, "CKR_TEMPLATE_INCONSISTENT" },
++		           { CKR_TOKEN_NOT_PRESENT, "CKR_TOKEN_NOT_PRESENT" },
++		           { CKR_TOKEN_NOT_RECOGNIZED, "CKR_TOKEN_NOT_RECOGNIZED" },
++		           { CKR_TOKEN_WRITE_PROTECTED, "CKR_TOKEN_WRITE_PROTECTED" },
++		           { CKR_UNWRAPPING_KEY_HANDLE_INVALID, "CKR_UNWRAPPING_KEY_HANDLE_INVALID" },
++		           { CKR_UNWRAPPING_KEY_SIZE_RANGE, "CKR_UNWRAPPING_KEY_SIZE_RANGE" },
++		           { CKR_UNWRAPPING_KEY_TYPE_INCONSISTENT, "CKR_UNWRAPPING_KEY_TYPE_INCONSISTENT" },
++		           { CKR_USER_ALREADY_LOGGED_IN, "CKR_USER_ALREADY_LOGGED_IN" },
++		           { CKR_USER_NOT_LOGGED_IN, "CKR_USER_NOT_LOGGED_IN" },
++		           { CKR_USER_PIN_NOT_INITIALIZED, "CKR_USER_PIN_NOT_INITIALIZED" },
++		           { CKR_USER_TYPE_INVALID, "CKR_USER_TYPE_INVALID" },
++		           { CKR_USER_ANOTHER_ALREADY_LOGGED_IN, "CKR_USER_ANOTHER_ALREADY_LOGGED_IN" },
++		           { CKR_USER_TOO_MANY_TYPES, "CKR_USER_TOO_MANY_TYPES" },
++		           { CKR_WRAPPED_KEY_INVALID, "CKR_WRAPPED_KEY_INVALID" },
++		           { CKR_WRAPPED_KEY_LEN_RANGE, "CKR_WRAPPED_KEY_LEN_RANGE" },
++		           { CKR_WRAPPING_KEY_HANDLE_INVALID, "CKR_WRAPPING_KEY_HANDLE_INVALID" },
++		           { CKR_WRAPPING_KEY_SIZE_RANGE, "CKR_WRAPPING_KEY_SIZE_RANGE" },
++		           { CKR_WRAPPING_KEY_TYPE_INCONSISTENT, "CKR_WRAPPING_KEY_TYPE_INCONSISTENT" },
++		           { CKR_RANDOM_SEED_NOT_SUPPORTED, "CKR_RANDOM_SEED_NOT_SUPPORTED" },
++		           { CKR_RANDOM_NO_RNG, "CKR_RANDOM_NO_RNG" },
++		           { CKR_DOMAIN_PARAMS_INVALID, "CKR_DOMAIN_PARAMS_INVALID" },
++		           { CKR_BUFFER_TOO_SMALL, "CKR_BUFFER_TOO_SMALL" },
++		           { CKR_SAVED_STATE_INVALID, "CKR_SAVED_STATE_INVALID" },
++		           { CKR_INFORMATION_SENSITIVE, "CKR_INFORMATION_SENSITIVE" },
++		           { CKR_STATE_UNSAVEABLE, "CKR_STATE_UNSAVEABLE" },
++		           { CKR_CRYPTOKI_NOT_INITIALIZED, "CKR_CRYPTOKI_NOT_INITIALIZED" },
++		           { CKR_CRYPTOKI_ALREADY_INITIALIZED, "CKR_CRYPTOKI_ALREADY_INITIALIZED" },
++		           { CKR_MUTEX_BAD, "CKR_MUTEX_BAD" },
++		           { CKR_MUTEX_NOT_LOCKED, "CKR_MUTEX_NOT_LOCKED" },
++		           { CKR_FUNCTION_REJECTED, "CKR_FUNCTION_REJECTED" },
++		           { 0, 0 } };
++	int i = 0;
++
++	while (labels[i].label)
++	{
++		if (rv == labels[i].rv)
++		{
++			return labels[i].label;
++		}
++
++		i++;
++	}
++
++	static char buffer[80];
++	sprintf(buffer, "Unknown CR_RV value: %lu (0x%lx)", rv, rv);
++	return buffer;
++}
+--- libfreerdp/scquery/pkcs11errors.h	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/pkcs11errors.h	2019-07-25 20:11:29.299989286 +0300
+@@ -0,0 +1,8 @@
++#ifndef LIBFREERDP_SCQUERY_PKCS11ERRORS_H
++#define LIBFREERDP_SCQUERY_PKCS11ERRORS_H
++
++#include <pkcs11-helper-1.0/pkcs11.h>
++
++const char* pkcs11_return_value_label(CK_RV rv);
++
++#endif
+--- libfreerdp/scquery/pkcs11module.c	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/pkcs11module.c	2019-07-25 20:11:29.303989306 +0300
+@@ -0,0 +1,366 @@
++#include <dlfcn.h>
++#include <stdlib.h>
++#include <string.h>
++#include <stdio.h>
++
++#include "pkcs11module.h"
++#include "pkcs11errors.h"
++#include "scquery_error.h"
++
++/*
++C_LoadModule
++Allocate the pkcs11_module and load the library.
++*/
++pkcs11_module* C_LoadModule(const char* library_path)
++{
++	pkcs11_module* module;
++	CK_RV rv, (*c_get_function_list)(CK_FUNCTION_LIST_PTR_PTR);
++
++	if (library_path == NULL)
++	{
++		ERROR(ENODATA, "dlopen failed: %s", dlerror());
++		goto failed;
++	}
++
++	if (!(module = checked_calloc(1, sizeof(*module))))
++	{
++		goto failed;
++	}
++
++	if (!(module->library = dlopen(library_path, RTLD_LAZY)))
++	{
++		ERROR(-1, "dlopen failed: %s", dlerror());
++		free(module);
++		goto failed;
++	}
++
++	/* Get the list of function pointers */
++	c_get_function_list =
++	    (CK_RV(*)(CK_FUNCTION_LIST_PTR_PTR))dlsym(module->library, "C_GetFunctionList");
++
++	if (!c_get_function_list)
++	{
++		goto unload_and_failed;
++	}
++
++	rv = c_get_function_list(&module->p11);
++
++	if (rv == CKR_OK)
++	{
++		return (void*)module;
++	}
++
++	ERROR(rv, "C_GetFunctionList() failed with %s.", pkcs11_return_value_label(rv));
++unload_and_failed:
++	C_UnloadModule(module);
++failed:
++	ERROR(-1, "Failed to load PKCS#11 module %s", library_path ? library_path : "NULL");
++	return NULL;
++}
++
++/*
++C_UnloadModule
++Unload the library and free the pkcs11_module
++*/
++CK_RV C_UnloadModule(pkcs11_module* module)
++{
++	if (!module)
++	{
++		return CKR_ARGUMENTS_BAD;
++	}
++
++	if (module->library != NULL && dlclose(module->library) < 0)
++	{
++		return CKR_FUNCTION_FAILED;
++	}
++
++	memset(module, 0, sizeof(*module));
++	free(module);
++	return CKR_OK;
++}
++
++CK_BBOOL check_rv(CK_RV rv, const char* file, unsigned long line, const char* caller,
++                  const char* function)
++{
++	if (rv == CKR_OK)
++	{
++		return CK_TRUE;
++	}
++
++	handle_error(file, line, caller, EX_OSERR, "PKCS#11 function %s returned error: %s", function,
++	             pkcs11_return_value_label(rv));
++	return CK_FALSE;
++}
++
++CK_SESSION_HANDLE pkcs11module_open_session(pkcs11_module* module, CK_ULONG slot_id, CK_FLAGS flags,
++                                            void* application_reference, CK_NOTIFY notify_function)
++{
++	CK_SESSION_HANDLE session = CK_INVALID_HANDLE;
++
++	if (CHECK_RV(module->p11->C_OpenSession(slot_id, flags, application_reference, notify_function,
++	                                        &session),
++	             "C_OpenSession"))
++	{
++		return session;
++	}
++	else
++	{
++		return CK_INVALID_HANDLE;
++	}
++}
++
++void get_list_of_slots_with_token(pkcs11_module* module, slot_id_list* list)
++{
++	list->count = sizeof(list->slot_id) / sizeof(list->slot_id[0]);
++
++	if (!CHECK_RV(module->p11->C_GetSlotList(CK_TRUE, &(list->slot_id[0]), &(list->count)),
++	              "C_GetSlotList"))
++	{
++		list->count = 0;
++	}
++}
++
++void attribute_free_buffer(CK_ATTRIBUTE* attribute)
++{
++	if (attribute)
++	{
++		if (attribute->pValue != NULL)
++		{
++			free(attribute->pValue);
++		}
++
++		attribute->pValue = NULL;
++		attribute->ulValueLen = 0;
++	}
++}
++
++void attribute_copy(CK_ATTRIBUTE* destination, CK_ATTRIBUTE* source)
++{
++	destination->type = source->type;
++	destination->pValue = source->pValue;
++	destination->ulValueLen = source->ulValueLen;
++}
++
++void attribute_allocate_attribute_array(CK_ATTRIBUTE* attribute)
++{
++	attribute->pValue = checked_calloc(attribute->ulValueLen, sizeof(void*));
++}
++void attribute_allocate_ulong_array(CK_ATTRIBUTE* attribute)
++{
++	attribute->pValue = checked_calloc(attribute->ulValueLen, sizeof(CK_ULONG));
++}
++void attribute_allocate_buffer(CK_ATTRIBUTE* attribute)
++{
++	attribute->pValue = checked_calloc(attribute->ulValueLen, 1);
++}
++
++void template_free_buffers(template* template)
++{
++	CK_ULONG i;
++
++	for (i = 0; i < template->count; i++)
++	{
++		attribute_free_buffer(&template->attributes[i]);
++	}
++}
++
++void template_allocate_buffers(template* template)
++{
++	CK_ULONG i;
++
++	for (i = 0; i < template->count; i++)
++	{
++		CK_ATTRIBUTE* attribute = &template->attributes[i];
++
++		if ((attribute->pValue == NULL) && (attribute->ulValueLen != CK_UNAVAILABLE_INFORMATION))
++		{
++			switch (attribute->type)
++			{
++			case CKA_WRAP_TEMPLATE:
++			case CKA_UNWRAP_TEMPLATE:
++				attribute_allocate_attribute_array(attribute);
++				break;
++
++			case CKA_ALLOWED_MECHANISMS:
++				attribute_allocate_ulong_array(attribute);
++				break;
++
++			default:
++				attribute_allocate_buffer(attribute);
++				break;
++			}
++		}
++	}
++}
++
++CK_BBOOL template_has_unallocated_buffers(template* template)
++{
++	CK_ULONG i;
++
++	for (i = 0; i < template->count; i++)
++	{
++		CK_ATTRIBUTE* attribute = &template->attributes[i];
++
++		if ((attribute->pValue == NULL) && (attribute->ulValueLen != CK_UNAVAILABLE_INFORMATION))
++		{
++			return CK_TRUE;
++		}
++	}
++
++	return CK_FALSE;
++}
++
++void template_pack(template* template)
++{
++	CK_ULONG i;
++	CK_ULONG j = 0;
++
++	for (i = 0; i < template->count; i++)
++	{
++		if (!((template->attributes[i].type == CK_UNAVAILABLE_INFORMATION) ||
++		      (template->attributes[i].ulValueLen == CK_UNAVAILABLE_INFORMATION)))
++		{
++			if (j < i)
++			{
++				attribute_copy(&template->attributes[j], &template->attributes[i]);
++			}
++
++			j++;
++		}
++	}
++
++	template->count = j;
++}
++
++CK_OBJECT_HANDLE object_handle_first(object_handle_list list)
++{
++	return list->object_handle;
++}
++object_handle_list object_handle_rest(object_handle_list list)
++{
++	return list->rest;
++}
++object_handle_list object_handle_cons(CK_OBJECT_HANDLE object_handle, object_handle_list rest)
++{
++	object_handle_list list = checked_malloc(sizeof(*list));
++
++	if (list)
++	{
++		list->object_handle = object_handle;
++		list->rest = rest;
++	}
++
++	return list;
++}
++void object_handle_list_free(object_handle_list list)
++{
++	while (list != NULL)
++	{
++		object_handle_list current = list;
++		list = object_handle_rest(list);
++		free(current);
++	}
++}
++
++CK_ULONG object_handle_list_length(object_handle_list list)
++{
++	CK_ULONG length = 0;
++
++	while (list)
++	{
++		length++;
++		list = object_handle_rest(list);
++	}
++
++	return length;
++}
++
++object_handle_list find_all_object(pkcs11_module* module, CK_SESSION_HANDLE session,
++                                   template* template)
++{
++	if (CHECK_RV(module->p11->C_FindObjectsInit(session, &template->attributes[0], template->count),
++	             "C_FindObjectsInit"))
++	{
++		object_handle_list list = NULL;
++		CK_BBOOL got_some_objects = CK_FALSE;
++		object_handle_buffer buffer;
++		const CK_ULONG max_count = sizeof(buffer.object_handles) / sizeof(buffer.object_handles[0]);
++
++		do
++		{
++			got_some_objects = CK_FALSE;
++			buffer.count = 0;
++
++			if (CHECK_RV(module->p11->C_FindObjects(session, &buffer.object_handles[0], max_count,
++			                                        &buffer.count),
++			             "C_FindObjets"))
++			{
++				if (buffer.count > 0)
++				{
++					CK_ULONG i;
++					got_some_objects = CK_TRUE;
++
++					for (i = 0; i < buffer.count; i++)
++					{
++						list = object_handle_cons(buffer.object_handles[i], list);
++					}
++				}
++			}
++		} while (got_some_objects);
++
++		CHECK_RV(module->p11->C_FindObjectsFinal(session), "C_FindObjectsFinal");
++		return list;
++	}
++	else
++	{
++		return NULL;
++	}
++}
++
++CK_RV object_get_attributes(pkcs11_module* module, CK_SESSION_HANDLE session,
++                            CK_OBJECT_HANDLE object, template* template)
++{
++	CK_RV rv = module->p11->C_GetAttributeValue(session, object, &template->attributes[0],
++	                                            template->count);
++	VERBOSE(module->verbose, "C_GetAttributeValue returned %s for %lu attributes",
++	        pkcs11_return_value_label(rv), template->count);
++
++	switch (rv)
++	{
++	case CKR_OK:
++		if (!template_has_unallocated_buffers(template))
++		{
++			return rv;
++		}
++
++	case CKR_ATTRIBUTE_SENSITIVE:
++	case CKR_ATTRIBUTE_TYPE_INVALID:
++	case CKR_BUFFER_TOO_SMALL:
++		template_pack(template);
++		template_allocate_buffers(template);
++		rv = module->p11->C_GetAttributeValue(session, object, &template->attributes[0],
++		                                      template->count);
++		VERBOSE(module->verbose,
++		        "C_GetAttributeValue returned %s after buffer allocation for %lu attributes",
++		        pkcs11_return_value_label(rv), template->count);
++
++		switch (rv)
++		{
++		case CKR_OK:
++		case CKR_ATTRIBUTE_SENSITIVE:
++		case CKR_ATTRIBUTE_TYPE_INVALID:
++		case CKR_BUFFER_TOO_SMALL:
++			return rv;
++
++		default:
++			CHECK_RV(rv, "C_GetAttributeValue");
++			return rv;
++		}
++
++		break;
++
++	default:
++		CHECK_RV(rv, "C_GetAttributeValue");
++		return rv;
++	}
++}
+--- libfreerdp/scquery/pkcs11module.h	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/pkcs11module.h	2019-07-25 20:11:29.307989326 +0300
+@@ -0,0 +1,104 @@
++#ifndef LIBFREERDP_SCQUERY_PKCS11MODULE_H
++#define LIBFREERDP_SCQUERY_PKCS11MODULE_H
++
++#include <pkcs11-helper-1.0/pkcs11.h>
++
++CK_BBOOL check_rv(CK_RV rv, const char* file, unsigned long line, const char* caller,
++                  const char* function);
++#define CHECK_RV(rv, function) (check_rv((rv), __FILE__, __LINE__, __FUNCTION__, (function)))
++
++typedef struct
++{
++	void* library;
++	CK_FUNCTION_LIST_PTR p11;
++	CK_RV rv;
++	CK_BBOOL verbose;
++} pkcs11_module;
++
++pkcs11_module* C_LoadModule(const char* mspec);
++CK_RV C_UnloadModule(pkcs11_module* module);
++
++#define WITH_PKCS11_MODULE(module, name)                                                       \
++	for (((module = C_LoadModule(name)) ? (module->rv = module->p11->C_Initialize(NULL)) : 0); \
++	     ((module != NULL) &&                                                                  \
++	      ((module->rv == CKR_OK) || (module->rv == CKR_CRYPTOKI_ALREADY_INITIALIZED)));       \
++	     (((module != NULL) ? (module->p11->C_Finalize(NULL), C_UnloadModule(module)) : 0),    \
++	      module = NULL))
++
++CK_SESSION_HANDLE pkcs11module_open_session(pkcs11_module* module, CK_ULONG slot_id, CK_FLAGS flags,
++                                            void* application_reference, CK_NOTIFY notify_function);
++
++#define WITH_PKCS11_OPEN_SESSION(session, module, slot_id, flags, application_reference,    \
++                                 notify_function)                                           \
++	for (session = pkcs11module_open_session(module, slot_id, flags, application_reference, \
++	                                         notify_function);                              \
++	     session != CK_INVALID_HANDLE;                                                      \
++	     session = ((session != CK_INVALID_HANDLE)                                          \
++	                    ? (module->p11->C_CloseSession(session), CK_INVALID_HANDLE)         \
++	                    : CK_INVALID_HANDLE))
++
++#define MAX_SLOT_ID_LIST_SIZE (64)
++typedef struct
++{
++	CK_ULONG count;
++	CK_ULONG slot_id[MAX_SLOT_ID_LIST_SIZE];
++} slot_id_list;
++
++void get_list_of_slots_with_token(pkcs11_module* module, slot_id_list* list);
++
++#define MAX_ATTRIBUTE_TYPE_LIST_SIZE (64)
++typedef struct
++{
++	CK_ULONG count;
++	CK_ATTRIBUTE_TYPE attribute_types[MAX_ATTRIBUTE_TYPE_LIST_SIZE];
++} attribute_type_list;
++
++#define MAX_TEMPLATE_SIZE (64)
++typedef struct
++{
++	CK_ULONG count;
++	CK_ATTRIBUTE attributes[MAX_TEMPLATE_SIZE];
++} template;
++
++void attribute_free_buffer(CK_ATTRIBUTE* attribute);
++void attribute_copy(CK_ATTRIBUTE* destination, CK_ATTRIBUTE* source);
++void attribute_allocate_attribute_array(CK_ATTRIBUTE* attribute);
++void attribute_allocate_ulong_array(CK_ATTRIBUTE* attribute);
++void attribute_allocate_buffer(CK_ATTRIBUTE* attribute);
++
++void template_free_buffers(template* template);
++void template_pack(template* template);
++void template_allocate_buffers(template* template);
++
++#define MAX_OBJECT_HANDLE_BUFFER_SIZE (128)
++typedef struct
++{
++	CK_ULONG count;
++	CK_OBJECT_HANDLE object_handles[MAX_OBJECT_HANDLE_BUFFER_SIZE];
++} object_handle_buffer;
++
++typedef struct object_handle_list
++{
++	CK_OBJECT_HANDLE object_handle;
++	struct object_handle_list* rest;
++} object_handle_list_t, *object_handle_list;
++
++CK_OBJECT_HANDLE object_handle_first(object_handle_list list);
++object_handle_list object_handle_rest(object_handle_list list);
++object_handle_list object_handle_cons(CK_OBJECT_HANDLE object_handle, object_handle_list rest);
++void object_handle_list_free(object_handle_list list);
++CK_ULONG object_handle_list_length(object_handle_list list);
++
++#define DO_OBJECT_HANDLE_LIST(object_handle, current, list)                                      \
++	for ((current = list,                                                                        \
++	    object_handle = ((current != NULL) ? object_handle_first(current) : CK_INVALID_HANDLE)); \
++	     (current != NULL);                                                                      \
++	     (current = object_handle_rest(current),                                                 \
++	     object_handle = ((current != NULL) ? object_handle_first(current) : CK_INVALID_HANDLE)))
++
++object_handle_list find_all_object(pkcs11_module* module, CK_SESSION_HANDLE session,
++                                   template* template);
++CK_RV object_get_attributes(pkcs11_module* module, CK_SESSION_HANDLE session,
++                            CK_OBJECT_HANDLE object, template* template);
++
++#endif
+--- libfreerdp/scquery/scquery.c	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/scquery.c	2019-07-25 20:11:29.311989346 +0300
+@@ -0,0 +1,180 @@
++#include <ctype.h>
++#include <dlfcn.h>
++#include <errno.h>
++#include <stdarg.h>
++#include <stdio.h>
++#include <stddef.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sysexits.h>
++#include <unistd.h>
++
++#include <freerdp/log.h>
++
++#include "scquery.h"
++#include "certificate.h"
++#include "smartcard_certificate.h"
++#include "scquery_error.h"
++#include "scquery_string.h"
++#include "x509_alt_names.h"
++
++static const char* scquery_upn_oid = "1.3.6.1.4.1.311.20.2.3";
++/* static const char* scquery_kpn_oid = "1.3.6.1.5.2.2"; */
++
++#define TAG CLIENT_TAG("scquery")
++
++void* error_out_of_memory(size_t size)
++{
++	ERROR(EX_OSERR, "Out of memory, could not allocate %u bytes", size);
++	return NULL;
++}
++
++static void report_level(DWORD level, const char* file, unsigned long line, const char* function,
++                         int status, const char* format, va_list ap)
++{
++	wLog* log = WLog_Get(TAG);
++
++	if ((log != NULL) && (level >= WLog_GetLogLevel(log)))
++	{
++		WLog_PrintMessageVA(log, WLOG_MESSAGE_TEXT, level, line, file, function, format, ap);
++	}
++}
++
++void report_error(const char* file, unsigned long line, const char* function, int status,
++                  const char* format, ...)
++{
++	va_list ap;
++	va_start(ap, format);
++	report_level(WLOG_ERROR, file, line, function, status, format, ap);
++	va_end(ap);
++}
++
++void report_warning(const char* file, unsigned long line, const char* function, int status,
++                    const char* format, ...)
++{
++	va_list ap;
++	va_start(ap, format);
++	report_level(WLOG_WARN, file, line, function, status, format, ap);
++	va_end(ap);
++}
++
++const char* next_arg(va_list ap)
++{
++	return va_arg(ap, const char*);
++}
++
++void report_verbose(const char* file, unsigned long line, const char* function, const char* format,
++                    ...)
++{
++	va_list ap;
++	va_start(ap, format);
++	report_level(WLOG_INFO, file, line, function, 0, format, ap);
++	va_end(ap);
++}
++
++void initialize_error_handling(void)
++{
++	handle_out_of_memory = error_out_of_memory;
++	handle_error = report_error;
++	handle_warning = report_warning;
++	handle_verbose = report_verbose;
++}
++
++scquery_result query_X509_user_identities(const char* module, const char* reader_name,
++                                          const char* card_name, int verbose)
++{
++	scquery_result result = NULL;
++	certificate_list current;
++	certificate_list clist = find_x509_certificates_with_signing_rsa_private_key(
++	    module, reader_name, card_name, verbose);
++	smartcard_certificate entry = NULL;
++	char* X509_user_identity = NULL;
++	char* upn = NULL;
++	DO_CERTIFICATE_LIST(entry, current, clist)
++	{
++		alt_name name;
++		alt_name_list current;
++		alt_name_list alist = certificate_extract_subject_alt_names(entry->value);
++		DO_ALT_NAME_LIST(name, current, alist)
++		{
++			if ((0 != strcasecmp("OTHERNAME", name->type)) || (name->count < 2) ||
++			    (0 != strcmp(scquery_upn_oid, name->components[0])))
++			{
++				continue;
++			}
++
++			upn = check_memory(strdup(name->components[1]), 1 + strlen(name->components[1]));
++			break;
++		}
++		alt_name_list_deepfree(alist);
++
++		if (upn != NULL)
++		{
++			break;
++		}
++	}
++
++	if ((entry != NULL) && (upn != NULL))
++	{
++		X509_user_identity = string_format("PKCS11:module_name=%s:slotid=%lu:token=%s:certid=%s",
++		                                   module, entry->slot_id, entry->token_label, entry->id);
++
++		if (X509_user_identity != NULL)
++		{
++			result = scquery_result_new(entry, X509_user_identity, upn);
++			/* Remove entry from clist,  since we keep entry in the result,  and we'll free clist.
++			 */
++			clist = certificate_list_delete(entry, clist);
++		}
++	}
++	else
++	{
++		entry = NULL;
++	}
++
++	certificate_list_deepfree(clist);
++
++	if (result == NULL)
++	{
++		scquery_certificate_deepfree(entry);
++		free(X509_user_identity);
++		free(upn);
++	}
++
++	return result;
++}
++
++scquery_result scquery_X509_user_identities(const char* module, const char* reader_name,
++                                            const char* card_name, int verbose)
++{
++	initialize_error_handling();
++	return query_X509_user_identities(module, reader_name, card_name, verbose);
++}
++
++scquery_result scquery_result_new(smartcard_certificate certificate, char* X509_user_identity,
++                                  char* upn)
++{
++	scquery_result result = checked_malloc(sizeof(*result));
++
++	if (result)
++	{
++		result->certificate = certificate;
++		result->X509_user_identity = X509_user_identity;
++		result->upn = upn;
++	}
++
++	return result;
++}
++
++void scquery_result_free(scquery_result that)
++{
++	if (that)
++	{
++		scquery_certificate_deepfree(that->certificate);
++		free(that->X509_user_identity);
++		free(that->upn);
++		free(that);
++	}
++}
++
++/**** THE END ****/
+--- libfreerdp/scquery/scquery.h	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/scquery.h	2019-07-25 20:11:29.315989365 +0300
+@@ -0,0 +1,32 @@
++#ifndef LIBFREERDP_SCQUERY_H
++#define LIBFREERDP_SCQUERY_H
++
++#include "certificate.h"
++
++typedef struct
++{
++	smartcard_certificate certificate;
++	char* X509_user_identity; /* kinit -X X509_user_identity value */
++	char* upn;
++} scquery_result_t, *scquery_result;
++
++/**
++ * Find a user identity and UPN on a smartcard.
++ *
++ * @param module path to a pkcs11 shared library (eg. "/usr/lib/opensc-pkcs11.so" or
++ * "/usr/lib/libiaspkcs11.so")
++ * @param reader_name NULL or a smartcard reader name.
++ * @param card_name NULL or a smartcard name.
++ * @param verbose non-0 to add some logs.
++ * @return A structure containign the X509_user_identity parameter for kinit, and the upn from the
++ * selected certificate from the smartcard. The result shall be freed with  scquery_result_free().
++ */
++scquery_result scquery_X509_user_identities(const char* module, const char* reader_name,
++                                            const char* card_name, int verbose);
++
++scquery_result scquery_result_new(smartcard_certificate certificate, char* X509_user_identity,
++                                  char* upn);
++
++void scquery_result_free(scquery_result that);
++
++#endif
+--- libfreerdp/scquery/scquery_error.c	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/scquery_error.c	2019-07-25 20:11:29.315989365 +0300
+@@ -0,0 +1,21 @@
++#include <stdlib.h>
++
++#include "scquery_error.h"
++
++/* ========================================================================== */
++/* Error Handling */
++
++void* check_memory(void* memory, size_t size)
++{
++	return memory ? memory : handle_out_of_memory(size);
++}
++
++void* checked_malloc(size_t size)
++{
++	return check_memory(malloc(size), size);
++}
++
++void* checked_calloc(size_t nmemb, size_t size)
++{
++	return check_memory(calloc(nmemb, size), nmemb * size);
++}
+--- libfreerdp/scquery/scquery_error.h	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/scquery_error.h	2019-07-25 20:11:29.315989365 +0300
+@@ -0,0 +1,69 @@
++#ifndef LIBFREERDP_SCQUERY_ERROR_H
++#define LIBFREERDP_SCQUERY_ERROR_H
++#include <stddef.h>
++#include <errno.h>
++#include <sysexits.h>
++
++/* out_of_memory
++handles the out of memory error (when malloc returns NULL).
++It may not return, or it should return a pointer returned
++untouched by the caller.
++*/
++typedef void* (*out_of_memory_handler)(size_t size);
++out_of_memory_handler handle_out_of_memory;
++
++/* check_memory
++checks the memory pointer is not null, and returns it.
++If it's null, then call out_of_memory and return its results.
++*/
++void* check_memory(void* memory, size_t size);
++
++/* checked_malloc
++allocates size bytes of memory, or if it can't, calls out_of_memory and return its results.
++*/
++void* checked_malloc(size_t size);
++
++/* checked_calloc
++allocates nmemb * size bytes of memory and clears it,
++or if it can't, calls out_of_memory and return its results.
++*/
++void* checked_calloc(size_t nmemb, size_t size);
++
++/* error
++handles other errors, displaying the formated error message.
++It may return or not.
++*/
++typedef void (*error_handler)(const char* file, unsigned long line, const char* function,
++                              int status, const char* format, ...);
++error_handler handle_error;
++#define ERROR(status, format, ...) \
++	(handle_error(__FILE__, __LINE__, __FUNCTION__, status, format, ##__VA_ARGS__))
++
++/* warn
++handles the warning, displaying the formated error message, and returning.
++*/
++typedef void (*warning_handler)(const char* file, unsigned long line, const char* function,
++                                int status, const char* format, ...);
++warning_handler handle_warning;
++#define WARN(status, format, ...) \
++	(handle_warning(__FILE__, __LINE__, __FUNCTION__, status, format, ##__VA_ARGS__))
++
++typedef void (*verbose_handler)(const char* file, unsigned long line, const char* function,
++                                const char* format, ...);
++verbose_handler handle_verbose;
++#define VERBOSE(verbose, format, ...) \
++	((verbose) ? handle_verbose(__FILE__, __LINE__, __FUNCTION__, format, ##__VA_ARGS__) : (void)0)
++
++#ifdef assert
++#	undef assert
++#endif
++#define assert(condition)                                           \
++	do                                                              \
++	{                                                               \
++		if (!(condition))                                           \
++		{                                                           \
++			ERROR(EX_SOFTWARE, "Assertion failed: %s", #condition); \
++		}                                                           \
++	} while (0)
++
++#endif
+--- libfreerdp/scquery/scquery_string.c	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/scquery_string.c	2019-07-25 20:11:29.319989386 +0300
+@@ -0,0 +1,186 @@
++#include <stdarg.h>
++#include <stdio.h>
++
++#include "scquery_string.h"
++#include "scquery_error.h"
++
++#if _POSIX_C_SOURCE >= 200809L || defined(_GNU_SOURCE)
++/* strndup and strnlen are defined in string.h */
++void string_dummy(void)
++{
++} /* some compilers complain on empty sources. */
++#else
++
++size_t strnlen(const char* string, size_t length)
++{
++	size_t i = 0;
++
++	if (string == NULL)
++	{
++		return i;
++	}
++
++	while ((i < length) && (string[i] != '\0'))
++	{
++		i++;
++	}
++
++	return i;
++}
++
++char* strndup(const char* string, size_t length)
++{
++	if (string == NULL)
++	{
++		return NULL;
++	}
++	else
++	{
++		size_t i;
++		size_t size = 1 + strnlen(string, length);
++		char* result = checked_malloc(size);
++
++		if (result == NULL)
++		{
++			errno = ENOMEM;
++			return NULL;
++		}
++
++		for (i = 0; i < size - 1; i++)
++		{
++			result[i] = string[i];
++		}
++
++		result[size - 1] = '\0';
++		return result;
++	}
++}
++
++#endif
++
++#if (_XOPEN_SOURCE >= 500) || (_POSIX_C_SOURCE >= 200809L) || _BSD_SOURCE || _SVID_SOURCE
++/* strdup is defined in string.h */
++#else
++
++char* strdup(const char* string)
++{
++	if (string == NULL)
++	{
++		return NULL;
++	}
++	else
++	{
++		char* result = checked_malloc(1 + strlen(string));
++
++		if (result == NULL)
++		{
++			errno = ENOMEM;
++			return NULL;
++		}
++
++		strcpy(result, string);
++		return result;
++	}
++}
++
++#endif
++
++/* typedef char* (* string_preprocess_pr)(const char *); */
++/* typedef void (* string_postprocess_pr)(char *); */
++
++char* string_mapconcat(string_preprocess_pr preprocess, string_postprocess_pr postprocess,
++                       unsigned count, const char** strings, const char* separator)
++{
++	if ((count == 0) || (strings == 0))
++	{
++		goto failure;
++	}
++
++	char* item;
++	char* current;
++	size_t seplen = strlen(separator);
++	size_t size = 1 + seplen * (count - 1);
++	unsigned i;
++
++	for (i = 0; i < count; i++)
++	{
++		size += strlen(strings[i]);
++	}
++
++	char* result = checked_malloc(size);
++
++	if (result == NULL)
++	{
++		goto failure;
++	}
++
++	current = result;
++	item = preprocess(strings[0]);
++	strcpy(current, item);
++	current = strchr(current, '\0');
++	postprocess(item);
++
++	for (i = 1; i < count; i++)
++	{
++		item = preprocess(strings[i]);
++		strcat(current, separator);
++		current = strchr(current, '\0');
++		strcat(current, item);
++		current = strchr(current, '\0');
++		postprocess(item);
++	}
++
++	return result;
++failure:
++	return check_memory(strdup(""), 1);
++}
++
++size_t string_count(const char* string, char character)
++{
++	size_t count = 0;
++
++	while ((string = strchr(string, character)) != NULL)
++	{
++		count++;
++	}
++
++	return count;
++}
++
++size_t padded_string_length(const char* padded_string, size_t max_size, char pad)
++{
++	size_t len = strnlen(padded_string, max_size);
++
++	while ((len > 0) && (padded_string[len - 1] == pad))
++	{
++		len--;
++	}
++
++	return len;
++}
++
++char* string_from_padded_string(const char* padded_string, size_t max_size, char pad)
++{
++	size_t length = padded_string_length(padded_string, max_size, pad);
++	return check_memory(strndup(padded_string, length), length);
++}
++
++char* string_format(const char* format_string, ...)
++{
++	char* result = NULL;
++	va_list args;
++	int length;
++	va_start(args, format_string);
++	length = vsnprintf(NULL, 0, format_string, args);
++	va_end(args);
++	result = checked_malloc(1 + length);
++
++	if (result != NULL)
++	{
++		va_start(args, format_string);
++		vsnprintf(result, 1 + length, format_string, args);
++		va_end(args);
++	}
++
++	return result;
++}
+--- libfreerdp/scquery/scquery_string.h	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/scquery_string.h	2019-07-25 20:11:29.323989405 +0300
+@@ -0,0 +1,41 @@
++#ifndef LIBFREERDP_SCQUERY_STRING_H
++#define LIBFREERDP_SCQUERY_STRING_H
++
++#include <string.h>
++
++#if (_POSIX_C_SOURCE >= 200809L) || defined(_GNU_SOURCE)
++/* strndup and strnlen are defined in string.h */
++#else
++
++size_t strnlen(const char* string, size_t length);
++char* strndup(const char* string, size_t length);
++
++#endif
++
++#if (_XOPEN_SOURCE >= 500) || (_POSIX_C_SOURCE >= 200809L) || _BSD_SOURCE || _SVID_SOURCE
++/* strdup is defined in string.h */
++#else
++
++char* strdup(const char* string);
++
++#endif
++
++typedef char* (*string_preprocess_pr)(const char*);
++typedef void (*string_postprocess_pr)(char*);
++char* string_mapconcat(string_preprocess_pr preprocess, string_postprocess_pr postprocess,
++                       unsigned count, const char** strings, const char* separator);
++
++size_t string_count(const char* string, char character);
++
++size_t padded_string_length(const char* padded_string, size_t max_size, char pad);
++char* string_from_padded_string(const char* padded_string, size_t max_size, char pad);
++
++/*
++string_format
++format a string as with sprintf,  but first computing the output size
++and allocating buffer of that size (plus terminating nul).
++@result returns the new string,  or NULL if it couldn't be allocated.
++ */
++char* string_format(const char* format_string, ...);
++
++#endif
+--- libfreerdp/scquery/smartcard_certificate.c	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/smartcard_certificate.c	2019-07-25 20:11:29.331989445 +0300
+@@ -0,0 +1,345 @@
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <stdbool.h>
++#include <pkcs11-helper-1.0/pkcs11.h>
++#include "smartcard_certificate.h"
++#include "pkcs11module.h"
++#include "pkcs11errors.h"
++#include "scquery_error.h"
++#include "scquery_string.h"
++
++/* ========================================================================== */
++/* Searching certificates on a IAS-ECC smartcard. */
++
++static char* bytes_to_hexadecimal(CK_BYTE* bytes, CK_ULONG count)
++{
++	char* buffer = checked_malloc(2 * count + 1);
++	char* current = buffer;
++
++	if (buffer == NULL)
++	{
++		return buffer;
++	}
++
++	while (count > 0)
++	{
++		sprintf(current, "%02x", *bytes);
++		bytes++;
++		current += 2;
++		count--;
++	}
++
++	*current = '\0';
++	return buffer;
++}
++
++CK_OBJECT_HANDLE object_handle_ensure_one(object_handle_list list, char* what)
++{
++	if ((list == NULL) || (object_handle_rest(list) != NULL))
++	{
++		WARN(0, "Something strange: there is %s %s when exactly one was expected.",
++		     (list == NULL) ? "zero" : "more than one", what);
++	}
++
++	CK_OBJECT_HANDLE result = ((list == NULL) ? CK_INVALID_HANDLE : object_handle_first(list));
++	object_handle_list_free(list);
++	return result;
++}
++
++CK_ULONG position_of_attribute(CK_ULONG attribute_type, template* template)
++{
++	CK_ULONG i;
++
++	for (i = 0; i < template->count; i++)
++	{
++		if (template->attributes[i].type == attribute_type)
++		{
++			return i;
++		}
++	}
++
++	return CK_UNAVAILABLE_INFORMATION;
++}
++
++char* string_attribute(CK_ULONG attribute, template* template)
++{
++	CK_ULONG index = position_of_attribute(attribute, template);
++
++	if (index == CK_UNAVAILABLE_INFORMATION)
++	{
++		const char* text = "unavailable";
++		return check_memory(strdup(text), 1 + strlen(text));
++	}
++	else
++	{
++		return check_memory(
++		    strndup(template->attributes[index].pValue, template->attributes[index].ulValueLen),
++		    template->attributes[index].ulValueLen + 1);
++	}
++}
++
++buffer buffer_attribute(CK_ULONG attribute, template* template)
++{
++	CK_ULONG index = position_of_attribute(attribute, template);
++
++	if (index == CK_UNAVAILABLE_INFORMATION)
++	{
++		return NULL;
++	}
++	else
++	{
++		return buffer_new_copy(template->attributes[index].ulValueLen,
++		                       template->attributes[index].pValue);
++	}
++}
++
++certificate_list find_x509_certificates_with_signing_rsa_private_key_in_slot(
++    pkcs11_module* module, CK_ULONG slot_id, const char* slot_description, const char* token_label,
++    const char* token_serial, int protected_authentication_path, CK_SESSION_HANDLE session,
++    certificate_list result)
++{
++	CK_OBJECT_CLASS oclass = CKO_PRIVATE_KEY;
++	CK_BBOOL sign = CK_TRUE;
++	CK_KEY_TYPE ktype = CKK_RSA;
++	template privkey_template = { 3,
++		                          { { CKA_CLASS, &oclass, sizeof(oclass) },
++		                            { CKA_SIGN, &sign, sizeof(sign) },
++		                            { CKA_KEY_TYPE, &ktype, sizeof(ktype) } } };
++	object_handle_list privkey_list = find_all_object(module, session, &privkey_template);
++	object_handle_list current;
++	CK_OBJECT_HANDLE privkey_handle;
++	VERBOSE(module->verbose, "Found %lu private keys", object_handle_list_length(privkey_list));
++	DO_OBJECT_HANDLE_LIST(privkey_handle, current, privkey_list)
++	{
++		template privkey_attributes = { 2, { { CKA_CLASS, NULL, 0 }, { CKA_ID, NULL, 0 } } };
++		CK_BYTE* id;
++		CK_ULONG id_size;
++		object_get_attributes(module, session, privkey_handle, &privkey_attributes);
++		id = privkey_attributes.attributes[1].pValue;
++		id_size = privkey_attributes.attributes[1].ulValueLen;
++
++		if (id && (id_size != CK_UNAVAILABLE_INFORMATION))
++		{
++			CK_OBJECT_CLASS oclass = CKO_CERTIFICATE;
++			CK_CERTIFICATE_TYPE ctype = CKC_X_509;
++			template certificate_template = { 3,
++				                              { { CKA_CLASS, &oclass, sizeof(oclass) },
++				                                { CKA_CERTIFICATE_TYPE, &ctype, sizeof(ctype) },
++				                                { CKA_ID, id, id_size } } };
++			CK_OBJECT_HANDLE certificate_handle;
++			char* idstring = bytes_to_hexadecimal(id, id_size);
++			VERBOSE(module->verbose, "Private key ID %s", idstring);
++			certificate_handle = object_handle_ensure_one(
++			    find_all_object(module, session, &certificate_template), "certificate handle");
++
++			if (certificate_handle == CK_INVALID_HANDLE)
++			{
++				VERBOSE(module->verbose, "Found no certificate for private key ID %s", idstring);
++				free(idstring);
++				continue;
++			}
++
++			free(idstring);
++			template certificate_attributes = { 10,
++				                                { { CKA_CLASS, NULL, 0 },
++				                                  { CKA_ID, NULL, 0 },
++				                                  { CKA_OBJECT_ID, NULL, 0 },
++				                                  { CKA_LABEL, NULL, 0 },
++				                                  { CKA_CERTIFICATE_TYPE, NULL, 0 },
++				                                  { CKA_CERTIFICATE_CATEGORY, NULL, 0 },
++				                                  { CKA_ISSUER, NULL, 0 },
++				                                  { CKA_SUBJECT, NULL, 0 },
++				                                  { CKA_VALUE, NULL, 0 },
++				                                  { CKA_KEY_TYPE, NULL, 0 } } };
++			object_get_attributes(module, session, certificate_handle, &certificate_attributes);
++			smartcard_certificate certificate;
++			CK_ULONG id_index = position_of_attribute(CKA_ID, &certificate_attributes);
++			CK_ULONG certype_index =
++			    position_of_attribute(CKA_CERTIFICATE_TYPE, &certificate_attributes);
++			CK_ULONG keytype_index = position_of_attribute(CKA_KEY_TYPE, &certificate_attributes);
++			certificate = scquery_certificate_new(
++			    slot_id, check_memory(strdup(slot_description), strlen(slot_description)),
++			    check_memory(strdup(token_label), strlen(token_label)),
++			    check_memory(strdup(token_serial), strlen(token_serial)),
++			    ((id_index != CK_UNAVAILABLE_INFORMATION)
++			         ? (bytes_to_hexadecimal(
++			               certificate_attributes.attributes[id_index].pValue,
++			               certificate_attributes.attributes[id_index].ulValueLen))
++			         : string_attribute(CKA_ID, &certificate_attributes)),
++			    string_attribute(CKA_LABEL, &certificate_attributes),
++			    ((certype_index != CK_UNAVAILABLE_INFORMATION)
++			         ? (*(CK_CERTIFICATE_TYPE*)certificate_attributes.attributes[certype_index]
++			                 .pValue)
++			         : 0),
++			    buffer_attribute(CKA_ISSUER, &certificate_attributes),
++			    buffer_attribute(CKA_SUBJECT, &certificate_attributes),
++			    buffer_attribute(CKA_VALUE, &certificate_attributes),
++			    ((keytype_index != CK_UNAVAILABLE_INFORMATION)
++			         ? (*(CK_KEY_TYPE*)certificate_attributes.attributes[keytype_index].pValue)
++			         : 0),
++			    protected_authentication_path);
++			VERBOSE(
++			    module->verbose,
++			    "Certificate slot_id=%lu token_label=%s id=%s label=%s type=%lu issuer=(%d bytes) "
++			    "subject=(%d bytes) value=(%d bytes) key_type=%lu",
++			    certificate->slot_id, certificate->token_label, certificate->id, certificate->label,
++			    certificate->type, (certificate->issuer ? buffer_size(certificate->issuer) : 0),
++			    (certificate->subject ? buffer_size(certificate->subject) : 0),
++			    (certificate->value ? buffer_size(certificate->value) : 0), certificate->key_type);
++			result = certificate_list_cons(certificate, result);
++			template_free_buffers(&certificate_attributes);
++			template_free_buffers(&privkey_attributes);
++		}
++		else
++		{
++			VERBOSE(module->verbose, "Private key has no ID!");
++		}
++	}
++	object_handle_list_free(privkey_list);
++	return result;
++}
++
++char* get_slot_description(pkcs11_module* module, CK_ULONG slot_id)
++{
++	CK_SLOT_INFO info;
++	char* result = NULL;
++
++	if (CHECK_RV(module->p11->C_GetSlotInfo(slot_id, &info), "C_GetSlotInfo"))
++	{
++		result = check_memory(string_from_padded_string((const char*)info.slotDescription,
++		                                                sizeof(info.slotDescription), ' '),
++		                      sizeof(info.slotDescription) + 1);
++	}
++
++	return result;
++}
++
++char* get_token_label(pkcs11_module* module, CK_ULONG slot_id, char** token_serial,
++                      int* protected_authentication_path)
++{
++	CK_TOKEN_INFO info;
++
++	if (CHECK_RV(module->p11->C_GetTokenInfo(slot_id, &info), "C_GetTokenInfo"))
++	{
++		char* label = check_memory(
++		    string_from_padded_string((const char*)info.label, sizeof(info.label), ' '),
++		    sizeof(info.label) + 1);
++		char* serial = check_memory(string_from_padded_string((const char*)info.serialNumber,
++		                                                      sizeof(info.serialNumber), ' '),
++		                            sizeof(info.serialNumber) + 1);
++		(*token_serial) = serial;
++		(*protected_authentication_path) = ((info.flags & CKF_PROTECTED_AUTHENTICATION_PATH) != 0);
++		return label;
++	}
++
++	(*token_serial) = NULL;
++	return NULL;
++}
++
++CK_BBOOL selected_slot(pkcs11_module* module, CK_ULONG slot_id, const char* slot_description,
++                       const char* reader_name)
++{
++	CK_BBOOL selected = TRUE;
++
++	if (reader_name != NULL)
++	{
++		selected = ((slot_description != NULL) && (0 == strcmp(slot_description, reader_name)));
++	}
++
++	if (selected)
++	{
++		VERBOSE(module->verbose, "Processing slot id %lu", slot_id);
++	}
++	else
++	{
++		VERBOSE(module->verbose, "Rejected slot id %lu (reader named \"%s\",  not \"%s\")", slot_id,
++		        reader_name);
++	}
++
++	return selected;
++}
++
++CK_BBOOL selected_token(pkcs11_module* module, CK_ULONG slot_id, const char* label,
++                        const char* serial, const char* card_name)
++{
++	CK_BBOOL selected = TRUE;
++
++	if (card_name != NULL)
++	{
++		selected = ((label != NULL) && (0 == strcmp(label, card_name))) ||
++		           ((serial != NULL) && (0 == strcmp(serial, card_name)));
++	}
++
++	if (selected)
++	{
++		VERBOSE(module->verbose, "Processing token label %s (serial %s)", label, serial);
++	}
++	else
++	{
++		VERBOSE(module->verbose, "Rejected token label %s (serial %s), not named %s", label, serial,
++		        card_name);
++	}
++
++	return selected;
++}
++
++certificate_list find_x509_certificates_with_signing_rsa_private_key(
++    const char* pkcs11_library_path, const char* reader_name, const char* card_name, int verbose)
++{
++	/* Find PRIVATE-KEYs of KEY-TYPE = RSA, that can SIGN, and that have a X-509 certificate with
++	 * same ID. */
++	certificate_list result = NULL;
++	pkcs11_module* module = NULL;
++	slot_id_list slots;
++	WITH_PKCS11_MODULE(module, pkcs11_library_path)
++	{
++		module->verbose = verbose;
++		get_list_of_slots_with_token(module, &slots);
++		VERBOSE(module->verbose, "Found %d slots", slots.count);
++
++		if (slots.count == 0)
++		{
++			ERROR(1, "No smartcard!");
++		}
++		else
++		{
++			CK_ULONG i;
++
++			for (i = 0; i < slots.count; i++)
++			{
++				CK_ULONG slot_id = slots.slot_id[i];
++				char* slot_description = get_slot_description(module, slot_id);
++
++				if (selected_slot(module, slot_id, slot_description, reader_name))
++				{
++					int protected_authentication_path = 0;
++					char* serial = NULL;
++					char* label =
++					    get_token_label(module, slot_id, &serial, &protected_authentication_path);
++
++					if (selected_token(module, slot_id, label, serial, card_name))
++					{
++						CK_SESSION_HANDLE session;
++						WITH_PKCS11_OPEN_SESSION(session, module, slot_id, CKF_SERIAL_SESSION, NULL,
++						                         NULL)
++						{
++							VERBOSE(module->verbose, "Opened PKCS#11 session %lu", session);
++							result = find_x509_certificates_with_signing_rsa_private_key_in_slot(
++							    module, slot_id, slot_description, label, serial,
++							    protected_authentication_path, session, result);
++						}
++					}
++
++					free(label);
++					free(serial);
++				}
++
++				free(slot_description);
++			}
++		}
++	}
++	return result;
++}
++
++/**** THE END ****/
+--- libfreerdp/scquery/smartcard_certificate.h	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/smartcard_certificate.h	2019-07-25 20:11:29.335989465 +0300
+@@ -0,0 +1,20 @@
++#ifndef LIBFREERDP_SCQUERY_SMARTCARD_CERTIFICATE_H
++#define LIBFREERDP_SCQUERY_SMARTCARD_CERTIFICATE_H
++#include "certificate_list.h"
++
++/* find_x509_certificates_with_signing_rsa_private_key
++
++When given, reader_name and / or card_name select secific slots (reader) or token (card).
++
++@result a list of certificates that can be used with PKINIT.
++This list shall be freed with  certificate_list_deepfree
++@param verbose when non-0 will print logs on stderr.
++@param reader_name NULL, or a nul-terminated string matching the slot_info.slot_description (with
++the padding removed).
++@param card_name NULL, or a nul-terminated string matching the token_info.label or
++token_info.serial_number (with the padding removed).
++*/
++certificate_list find_x509_certificates_with_signing_rsa_private_key(
++    const char* pkcs11_library_path, const char* reader_name, const char* card_name, int verbose);
++
++#endif
+--- libfreerdp/scquery/x509_alt_names.c	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/x509_alt_names.c	2019-07-25 20:11:29.343989504 +0300
+@@ -0,0 +1,631 @@
++#include <string.h>
++#include <openssl/bn.h>
++#include <openssl/err.h>
++#include <openssl/safestack.h>
++#include <openssl/ssl.h>
++#include <openssl/stack.h>
++#include <openssl/x509v3.h>
++#include "x509_alt_names.h"
++#include "scquery_error.h"
++#include "scquery_string.h"
++
++static void string_list_free(unsigned count, char** components)
++{
++	unsigned i;
++
++	for (i = 0; i < count; i++)
++	{
++		free(components[i]);
++	}
++
++	free(components);
++}
++
++alt_name alt_name_new_with_components(char* type, unsigned count, char** components)
++{
++	alt_name name = alt_name_new(type, count);
++
++	if (name == NULL)
++	{
++		return NULL;
++	}
++
++	name->count = count;
++	name->allocated = count;
++	name->components = components;
++	return name;
++}
++
++alt_name alt_name_new(char* type, unsigned allocated)
++{
++	alt_name result = checked_malloc(sizeof(*result));
++
++	if (result == NULL)
++	{
++		return NULL;
++	}
++
++	result->type = check_memory(strdup(type), 1 + strlen(type));
++	result->count = 0;
++	result->allocated = allocated;
++	result->components =
++	    ((allocated == 0) ? NULL
++	                      : checked_calloc(result->allocated, sizeof(result->components[0])));
++
++	if ((result->type == NULL) || ((result->allocated > 0) && (result->components == NULL)))
++	{
++		free(result->type);
++		string_list_free(result->allocated, result->components);
++		free(result);
++		return NULL;
++	}
++
++	return result;
++}
++
++void alt_name_add_component(alt_name name, char* component)
++{
++	if ((name == NULL) || (component == NULL))
++	{
++		return;
++	}
++
++	if (name->count >= name->allocated)
++	{
++		unsigned new_allocated = ((name->allocated == 0) ? 8 : 2 * name->allocated);
++		char** new_components =
++		    realloc(name->components, new_allocated * sizeof(name->components[0]));
++
++		if (new_components == NULL)
++		{
++			ERROR(EX_OSERR, "Cannot add component '%s'", component);
++			return;
++		}
++
++		name->components = new_components;
++		name->allocated = new_allocated;
++	}
++
++	unsigned index = name->count++;
++	name->components[index] = check_memory(strdup(component), 1 + strlen(component));
++	return;
++}
++
++void alt_name_free(alt_name name)
++{
++	if (name == NULL)
++	{
++		return;
++	}
++
++	free(name->type);
++	string_list_free(name->count, name->components);
++	free(name);
++}
++
++alt_name_list alt_name_list_cons(alt_name name, alt_name_list rest)
++{
++	alt_name_list list = checked_malloc(sizeof(*list));
++
++	if (list == NULL)
++	{
++		return NULL;
++	}
++
++	list->name = name;
++	list->rest = rest;
++	return list;
++}
++
++alt_name alt_name_list_first(alt_name_list list)
++{
++	return ((list == NULL) ? NULL : list->name);
++}
++
++alt_name_list alt_name_list_rest(alt_name_list list)
++{
++	return ((list == NULL) ? NULL : list->rest);
++}
++
++void alt_name_list_free(alt_name_list list)
++{
++	free(list);
++}
++
++void alt_name_list_deepfree(alt_name_list list)
++{
++	while (list != NULL)
++	{
++		alt_name_list rest = list->rest;
++		alt_name_free(list->name);
++		alt_name_list_free(list);
++		list = rest;
++	}
++}
++
++char* general_name_type_label(int general_name_type)
++{
++	static const char* labels[] = { "OTHERNAME", "EMAIL", "DNS",   "X400", "DIRNAME",
++		                            "EDIPARTY",  "URI",   "IPADD", "RID" };
++
++	if ((general_name_type < 0) || (general_name_type >= (int)(sizeof(labels) / sizeof(labels[0]))))
++	{
++		char* result = checked_malloc(64);
++
++		if (result == NULL)
++		{
++			return NULL;
++		}
++
++		sprintf(result, "Unknown GENERAL_NAME type %d", general_name_type);
++		return result;
++	}
++
++	return strdup(labels[general_name_type]);
++}
++
++void extract_asn1_string(GENERAL_NAME* name, alt_name alt_name)
++{
++	unsigned char* string = NULL;
++
++	switch (name->type)
++	{
++	case GEN_URI:
++	case GEN_DNS:
++	case GEN_EMAIL:
++		if (ASN1_STRING_to_UTF8(&string, name->d.ia5) < 0)
++		{
++			char* type = general_name_type_label(name->type);
++			ERROR(EX_OSERR, "Error converting with ASN1_STRING_to_UTF8 a %s general name", type);
++			free(type);
++			return;
++		}
++
++		/* alt_name_add_component makes a copy of the component: */
++		alt_name_add_component(alt_name, (char*)string);
++		OPENSSL_free(string);
++	}
++}
++
++char* type_id_to_oid_string(ASN1_OBJECT* type_id)
++{
++	char small_buffer[1];
++	int buffer_size = 1 + OBJ_obj2txt(small_buffer, 1, type_id, /*no_name=*/1);
++	char* buffer = checked_malloc(buffer_size);
++
++	if (buffer == NULL)
++	{
++		return NULL;
++	}
++
++	OBJ_obj2txt(buffer, buffer_size, type_id, /*no_name=*/1);
++	return buffer;
++}
++
++char* asn1_string_to_string(ASN1_TYPE* value)
++{
++	unsigned char* utf8string = NULL;
++	int result = ASN1_STRING_to_UTF8(&utf8string, value->value.asn1_string);
++
++	if (result < 0)
++	{
++		return check_memory(strdup(""), 1);
++	}
++
++	char* string = check_memory(strdup((char*)utf8string), 1 + result);
++	OPENSSL_free(utf8string);
++	return string;
++}
++
++char* asn1_boolean_to_string(ASN1_TYPE* value)
++{
++	return check_memory(strdup(value->value.boolean ? "true" : "false"), 6);
++}
++
++typedef void (*collector_pr)(unsigned class, unsigned primitive, unsigned tag, unsigned char* data,
++                             unsigned length, void* collect_data);
++
++void collect_alt_name_component(unsigned class, unsigned primitive, unsigned tag,
++                                unsigned char* data, unsigned length, void* collect_data)
++{
++	(void)class;
++	(void)primitive;
++	(void)tag;
++	alt_name name = collect_data;
++	/* Use an auto buffer if length is small enough, or else a dynamic buffer. */
++	char buffer[4096];
++
++	if (1 + length <= sizeof(buffer))
++	{
++		strncpy(buffer, (char*)data, length);
++		buffer[length] = '\0';
++		alt_name_add_component(name, buffer);
++	}
++	else
++	{
++		char* buffer = checked_malloc(1 + length);
++
++		if (!buffer)
++		{
++			return;
++		}
++
++		strncpy(buffer, (char*)data, length);
++		buffer[length] = '\0';
++		alt_name_add_component(name, buffer);
++		free(buffer);
++	}
++}
++
++enum
++{
++	asn1_eoc = 0,
++	asn1_boolean = 1,
++	asn1_integer = 2,
++	asn1_bit_string = 3,
++	asn1_octet_string = 4,
++	asn1_null = 5,
++	asn1_object = 6,
++	asn1_object_descriptor = 7,
++	asn1_external = 8,
++	asn1_real = 9,
++	asn1_enumerated = 10,
++	asn1_utf8string = 12,
++	asn1_sequence = 16,
++	asn1_set = 17,
++	asn1_numericstring = 18,
++	asn1_printablestring = 19,
++	asn1_t61string = 20,
++	asn1_teletexstring = asn1_t61string,
++	asn1_videotexstring = 21,
++	asn1_ia5string = 22,
++	asn1_utctime = 23,
++	asn1_generalizedtime = 24,
++	asn1_graphicstring = 25,
++	asn1_iso64string = 26,
++	asn1_visiblestring = asn1_iso64string,
++	asn1_generalstring = 27,
++	asn1_universalstring = 28,
++	asn1_bmpstring = 30,
++};
++
++unsigned decode_der_length(unsigned char* data, unsigned i, unsigned* length)
++{
++	unsigned len = 0;
++	unsigned char b = data[i++];
++
++	if (b < 128)
++	{
++		len = b;
++	}
++	else
++	{
++		unsigned char c = b & 0x7f;
++
++		while (0 < c--)
++		{
++			len = (len << 8) | data[i++];
++		}
++	}
++
++	(*length) = len;
++	return i;
++}
++
++char* decode_integer(unsigned char* data, unsigned i, unsigned length)
++{
++	unsigned long long value = 0;
++
++	if (length <= sizeof(value))
++	{
++		unsigned j;
++
++		for (j = 0; 0 < length--; j += 8)
++		{
++			value |= (data[i++] << j);
++		}
++	}
++	else
++	{
++		value = (~0);
++	}
++
++	char* buffer = checked_malloc(64);
++
++	if (buffer)
++	{
++		snprintf(buffer, sizeof(buffer) - 1, "%llu", value);
++	}
++
++	return buffer;
++}
++
++unsigned decode_der_item_collect(unsigned char* data, unsigned i, unsigned length,
++                                 collector_pr collect, void* collect_data)
++{
++	/* We decode a sequence item.
++	   It can be a context-specific indexed element, or a plain element.
++	   When given a context-specific index, we just collect it, and then go on collecting the
++	   element itself. */
++	/* decode tag */
++	unsigned char tag = data[i] & 31;
++	unsigned char class = (data[i] >> 6) & 0b11;
++	unsigned char primitive = ((data[i] & 32) == 0);
++	i++;
++	/* decode length */
++	unsigned len = 0;
++	i = decode_der_length(data, i, &len);
++	assert(1 + len <= length);
++
++	/* decode elements */
++	switch (class)
++	{
++	case 2: /*context specific*/
++	{
++		char index[3];
++		sprintf(index, "%d", tag);
++		collect(class, primitive, tag, (unsigned char*)index, strlen(index), collect_data);
++		i = decode_der_item_collect(data, i, len, collect, collect_data);
++		break;
++	}
++
++	default:
++		switch (tag)
++		{
++		case asn1_eoc:
++		{
++			/* not processed yet */
++			collect(class, primitive, tag, (unsigned char*)&"", 0, collect_data);
++			i += len;
++			break;
++		}
++
++		case asn1_boolean:
++		{
++			char buffer[8];
++			strcpy(buffer, (data[i] ? "true" : "false"));
++			collect(class, primitive, tag, (unsigned char*)buffer, strlen(buffer), collect_data);
++			i += len;
++			break;
++		}
++
++		case asn1_integer:
++		{
++			char* value = decode_integer(data, i, len);
++			collect(class, primitive, tag, (unsigned char*)value, strlen(value), collect_data);
++			free(value);
++			i += len;
++			break;
++		}
++
++		case asn1_bit_string:
++		case asn1_octet_string:
++		{
++			/* not processed yet */
++			collect(class, primitive, tag, (unsigned char*)&"", 0, collect_data);
++			i += len;
++			break;
++		}
++
++		case asn1_null:
++		{
++			char buffer[8];
++			strcpy(buffer, "null");
++			collect(class, primitive, tag, (unsigned char*)buffer, strlen(buffer), collect_data);
++			i += len;
++			break;
++		}
++
++		case asn1_set:
++		case asn1_sequence:
++		{
++			unsigned e = i + len;
++
++			while (i < e)
++			{
++				i = decode_der_item_collect(data, i, len, collect, collect_data);
++			}
++
++			break;
++		}
++
++		case asn1_utf8string:
++		case asn1_numericstring:
++		case asn1_printablestring:
++		case asn1_t61string:
++		case asn1_videotexstring:
++		case asn1_ia5string:
++		case asn1_graphicstring:
++		case asn1_iso64string:
++		case asn1_generalstring:
++		case asn1_universalstring:
++		case asn1_bmpstring:
++		{
++			collect(class, primitive, tag, data + i, len, collect_data);
++			i += len;
++			break;
++		}
++
++		case asn1_object:
++		case asn1_object_descriptor:
++		case asn1_external:
++		case asn1_real:
++		case asn1_enumerated:
++		case asn1_utctime:
++		case asn1_generalizedtime:
++		{
++			/* not processed yet */
++			collect(class, primitive, tag, (unsigned char*)&"", 0, collect_data);
++			i += len;
++			break;
++		}
++		}
++	}
++
++	return i;
++}
++
++void extract_othername_object(GENERAL_NAME* name, alt_name alt_name)
++{
++	switch (name->type)
++	{
++		char* type;
++
++	case GEN_OTHERNAME:
++		alt_name_add_component(alt_name, type = type_id_to_oid_string(name->d.otherName->type_id));
++		unsigned char* der = NULL;
++		int length = i2d_ASN1_TYPE(name->d.otherName->value, &der);
++		decode_der_item_collect(der, 0, (unsigned)length, collect_alt_name_component, alt_name);
++		free(der);
++		free(type);
++	}
++}
++
++typedef alt_name (*extract_alt_name_pr)(GENERAL_NAME* name, unsigned i);
++
++alt_name extract_alt_name(GENERAL_NAME* name, unsigned i)
++{
++	(void)i;
++	alt_name alt_name;
++	char* type;
++
++	switch (name->type)
++	{
++	case GEN_URI:
++	case GEN_DNS:
++	case GEN_EMAIL:
++		alt_name = alt_name_new(type = general_name_type_label(name->type), 1);
++		extract_asn1_string(name, alt_name);
++		free(type);
++		return alt_name;
++
++	case GEN_OTHERNAME:
++		alt_name = alt_name_new(type = general_name_type_label(name->type), 1);
++		extract_othername_object(name, alt_name);
++		free(type);
++		return alt_name;
++
++	default:
++		return NULL;
++	}
++}
++
++void cert_info_kpn(X509* x509, alt_name alt_name)
++{
++	int i;
++	int j = 0;
++	STACK_OF(GENERAL_NAME) * gens;
++	GENERAL_NAME* name;
++	ASN1_OBJECT* krb5PrincipalName;
++	gens = X509_get_ext_d2i(x509, NID_subject_alt_name, NULL, NULL);
++	krb5PrincipalName = OBJ_txt2obj("1.3.6.1.5.2.2", 1);
++
++	if (!gens)
++	{
++		return; /* no alternate names */
++	}
++
++	if (!krb5PrincipalName)
++	{
++		ERROR(0, "Cannot map KPN object");
++		return;
++	}
++
++	for (i = 0; (i < sk_GENERAL_NAME_num(gens)); i++)
++	{
++		name = sk_GENERAL_NAME_value(gens, i);
++
++		if (name && name->type == GEN_OTHERNAME)
++		{
++			if (OBJ_cmp(name->d.otherName->type_id, krb5PrincipalName))
++			{
++				continue; /* object is not a UPN */
++			}
++			else
++			{
++				/* NOTE:
++				from PKINIT RFC, I deduce that stored format for kerberos
++				Principal Name is ASN1_STRING, but not sure at 100%
++				Any help will be granted
++				*/
++				unsigned char* txt;
++				ASN1_TYPE* val = name->d.otherName->value;
++				ASN1_STRING* str = val->value.asn1_string;
++
++				if ((ASN1_STRING_to_UTF8(&txt, str)) < 0)
++				{
++					ERROR(0, "ASN1_STRING_to_UTF8() failed: %s",
++					      ERR_error_string(ERR_get_error(), NULL));
++				}
++				else
++				{
++					alt_name_add_component(alt_name, check_memory(strdup((const char*)txt),
++					                                              1 + strlen((const char*)txt)));
++					j++;
++				}
++			}
++		}
++	}
++
++	sk_GENERAL_NAME_pop_free(gens, GENERAL_NAME_free);
++	ASN1_OBJECT_free(krb5PrincipalName);
++
++	if (j == 0)
++	{
++		ERROR(0, "Certificate does not contain a KPN entry");
++	}
++}
++
++alt_name_list map_subject_alt_names(X509* certificate, extract_alt_name_pr extract_alt_name)
++{
++	STACK_OF(GENERAL_NAME)* gens = X509_get_ext_d2i(certificate, NID_subject_alt_name, NULL, NULL);
++	alt_name_list results = NULL;
++
++	if (gens == NULL)
++	{
++		return NULL;
++	}
++
++	int count = sk_GENERAL_NAME_num(gens);
++	int i;
++
++	for (i = 0; i < count; i++)
++	{
++		GENERAL_NAME* name = sk_GENERAL_NAME_value(gens, i);
++		alt_name alt_name = extract_alt_name(name, i);
++
++		if (alt_name != NULL)
++		{
++			results = alt_name_list_cons(alt_name, results);
++		}
++	}
++
++	/* It looks like it's not possible to free the general_name themselves
++	   (they may be taken directly from the certificate data?).
++	   sk_GENERAL_NAME_pop_free(gens, GENERAL_NAME_free) crashes. */
++	sk_GENERAL_NAME_pop_free(gens, GENERAL_NAME_free);
++	/* sk_GENERAL_NAME_free(gens); */
++	return results;
++}
++
++alt_name_list certificate_extract_subject_alt_names(buffer certificate_data)
++{
++	if (certificate_data == NULL)
++	{
++		return NULL;
++	}
++	else
++	{
++		/* d2i_X509 increments the input point by the length read */
++		const unsigned char* next = buffer_data(certificate_data);
++		X509* certificate = d2i_X509(NULL, &next, buffer_size(certificate_data));
++		alt_name_list result = map_subject_alt_names(certificate, extract_alt_name);
++		/* alt_name alt_name = alt_name_new("1.3.6.1.5.2.2",1); */
++		/* cert_info_kpn(certificate, alt_name); */
++		/* result = alt_name_list_cons(alt_name, result); */
++		X509_free(certificate);
++		return result;
++	}
++}
++
++/**** THE END ****/
+--- libfreerdp/scquery/x509_alt_names.h	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/libfreerdp/scquery/x509_alt_names.h	2019-07-25 20:11:29.343989504 +0300
+@@ -0,0 +1,36 @@
++#ifndef LIBFREERDP_SCQUERY_X509_ALT_NAMES_H
++#define LIBFREERDP_SCQUERY_X509_ALT_NAMES_H
++#include "buffer.h"
++
++typedef struct
++{
++	char* type;
++	unsigned count;
++	unsigned allocated;
++	char** components;
++} alt_name_t, *alt_name;
++
++alt_name alt_name_new_with_components(char* type, unsigned count, char** components);
++alt_name alt_name_new(char* type, unsigned allocated);
++void alt_name_add_component(alt_name name, char* component);
++void alt_name_free(alt_name name);
++
++typedef struct alt_name_node
++{
++	alt_name name;
++	struct alt_name_node* rest;
++} alt_name_list_t, *alt_name_list;
++
++alt_name_list alt_name_list_cons(alt_name name, alt_name_list rest);
++alt_name alt_name_list_first(alt_name_list list);
++alt_name_list alt_name_list_rest(alt_name_list list);
++void alt_name_list_free(alt_name_list list);
++void alt_name_list_deepfree(alt_name_list list);
++
++#define DO_ALT_NAME_LIST(alt_name, current, list)                                      \
++	for ((current = list, alt_name = alt_name_list_first(current)); (current != NULL); \
++	     (current = alt_name_list_rest(current), alt_name = alt_name_list_first(current)))
++
++alt_name_list certificate_extract_subject_alt_names(buffer certificate_data);
++
++#endif
