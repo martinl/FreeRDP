@@ -6,9 +6,11 @@ export WLOG_FILEAPPENDER_OUTPUT_FILE_NAME=freerdp-x11-smartcard-redirect-no-nla.
 export WLOG_LEVEL=DEBUG
 
 mkdir -p log
+echo "---------------" >> log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME}
 
 # smartcard redirect without NLA
-./client/X11/xfreerdp /v:${RDP_SERVER} /u:${RDP_USER} /d:${RDP_DOMAIN} /smartcard -sec-nla
+./client/X11/xfreerdp /v:${RDP_SERVER} /u:${RDP_USER} /d:${RDP_DOMAIN} /smartcard -sec-nla /sec:tls
 
 # check logs
-grep -e 'PCSC_SCardStatus_Internal\|smartcard_trace_status_return' log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME} | tail -15
+#grep -e 'PCSC_SCardStatus_Internal\|smartcard_trace_status_return' log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME} | tail -15
+tail -50 log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME}

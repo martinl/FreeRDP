@@ -9,4 +9,5 @@ echo "---------------" >> log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME}
 ./client/Mac/cli/MacFreeRDP.app/Contents/MacOS/MacFreeRDP /v:${RDP_SERVER} /u:${RDP_USER} /d:${RDP_DOMAIN} /smartcard /sec:nla
 
 # check logs
-grep -e 'PCSC_SCardStatus_Internal\|smartcard_trace_status_return' log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME} | tail -50
+#grep -e 'PCSC_SCardStatus_Internal\|smartcard_trace_status_return' log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME} | tail -50
+tail -50 log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME}

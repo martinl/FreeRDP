@@ -5,8 +5,10 @@ export WLOG_FILEAPPENDER_OUTPUT_FILE_PATH=log
 export WLOG_FILEAPPENDER_OUTPUT_FILE_NAME=freerdp-macos-smartcard-logon-no-nla.log
 export WLOG_LEVEL=DEBUG
 
+mkdir -p log
 echo "---------------" >> log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME}
-./client/Mac/cli/MacFreeRDP.app/Contents/MacOS/MacFreeRDP /v:${RDP_SERVER} /u:${RDP_USER} /d:${RDP_DOMAIN} /smartcard -sec-nla
+./client/Mac/cli/MacFreeRDP.app/Contents/MacOS/MacFreeRDP /v:${RDP_SERVER} /u:${RDP_USER} /d:${RDP_DOMAIN} /smartcard -sec-nla /sec:tls
 
 # check logs
-grep -e 'PCSC_SCardStatus_Internal\|smartcard_trace_status_return' log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME} | tail -50
+#grep -e 'PCSC_SCardStatus_Internal\|smartcard_trace_status_return' log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME} | tail -50
+tail -50 log/${WLOG_FILEAPPENDER_OUTPUT_FILE_NAME}

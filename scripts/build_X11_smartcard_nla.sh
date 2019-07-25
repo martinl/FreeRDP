@@ -174,6 +174,7 @@ function compile_and_test(){
 	    -DWITH_DEBUG_NEGO=ON  \
 	    -DWITH_DEBUG_NLA=ON    \
 	    -DWITH_DEBUG_SCARD=ON   \
+	    -DWITH_SMARTCARD_INSPECT=ON   \
 	    . \
 	    && make \
 	    && make CTEST_OUTPUT_ON_FAILURE=1 test

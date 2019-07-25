@@ -1,6 +1,6 @@
 Test report for FreeRDP smartcard authentication support
 
-Last update: 2019-07-24
+Last update: 2019-07-25
 
 EstEID: opensc, ECC384
 Yubikey4: opensc, piv, RSA2048
@@ -27,18 +27,23 @@ Branch                                       Yubikey4        EstEID           Yu
 
 informatimago/cssp-smartcard                   
 
-Debian 10 no-nla
-----------------
-Branch                                       Yubikey4        EstEID           Yubikey4      EstEID
-
-informatimago/cssp-smartcard                   
-
-Debian 10 nla
+Debian no-nla
 -------------
 Branch                                       Yubikey4        EstEID           Yubikey4      EstEID
 
+freerdp/master                                 
+martinl/smartcard-logon-no-nla               segfault       segfault
+bmiklautz/smartcard-fixes                      OK           segfault            OK
+akallabeth/smartcard_cleanup_and_fixes         OK           segfault            OK          
+informatimago/cssp-smartcard                   OK           segfault            OK          segfault
+
+Debian nla
+----------
+Branch                                       Yubikey4        EstEID           Yubikey4      EstEID
+
 informatimago/cssp-smartcard                   
 
+Note: nla testing will require developing scquery or similar implementation
 
 Debug logs
 
@@ -50,4 +55,10 @@ macOS
 - informatimago/cssp-smartcard yubikey4 redirect certs not found
 
 Debian 10
+
+
+Note
+----
+macOS = macOS Mojave
+Debian = Debian 10
 
