@@ -1,0 +1,53 @@
+Test report for FreeRDP smartcard authentication support
+
+Last update: 2019-07-24
+
+EstEID: opensc, ECC384
+Yubikey4: opensc, piv, RSA2048
+
+macOS no-nla                                          Auth                          Redirect
+------------
+Branch                                       Yubikey4        EstEID           Yubikey4      EstEID
+
+freerdp/master                               segfault        segfault
+martinl/smartcard-logon-no-nla               segfault        segfault
+bmiklautz/smartcard-fixes                      OK*              OK              OK            OK
+akallabeth/smartcard_cleanup_and_fixes         OK*              OK              OK            OK
+informatimago/cssp-smartcard              certs not found       OK        certs not found     OK
+
+* by default windows logon screen shows no certificates found on smartcard message
+  Yubikey4 certificates are sometimes detected and smartcard logon starts working after plugging in the 
+  yubikey during active rdp session and running certutil.exe -scinfo
+
+Note: smartcard redirect is tested by running either certutil.exe -scinfo (Yubikey4, RSA) or DigiDoc4 (EstEID, ECC) in RDP session
+
+macOS nla
+---------
+Branch                                       Yubikey4        EstEID           Yubikey4      EstEID
+
+informatimago/cssp-smartcard                   
+
+Debian 10 no-nla
+----------------
+Branch                                       Yubikey4        EstEID           Yubikey4      EstEID
+
+informatimago/cssp-smartcard                   
+
+Debian 10 nla
+-------------
+Branch                                       Yubikey4        EstEID           Yubikey4      EstEID
+
+informatimago/cssp-smartcard                   
+
+
+Debug logs
+
+macOS
+- freerdp/master yubikey4 auth segfault - saved
+- freerdp/master esteid auth segfault - saved
+- bmiklautz/smartcard-fixes yubikey auth segfault - saved
+- informatimago/cssp-smartcard yubikey4 auth certs not found
+- informatimago/cssp-smartcard yubikey4 redirect certs not found
+
+Debian 10
+
