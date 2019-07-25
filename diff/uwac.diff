@@ -1,0 +1,3967 @@
+diff -urN uwac/include/uwac/uwac.h ../../informatimago/FreeRDP/uwac/include/uwac/uwac.h
+--- uwac/include/uwac/uwac.h	2019-07-25 19:51:06.825926994 +0300
++++ ../../informatimago/FreeRDP/uwac/include/uwac/uwac.h	2019-07-25 20:11:30.795996704 +0300
+@@ -92,10 +92,6 @@
+ 	UWAC_EVENT_TOUCH_FRAME_END,
+ 	UWAC_EVENT_FRAME_DONE,
+ 	UWAC_EVENT_CLOSE,
+-	UWAC_EVENT_CLIPBOARD_AVAILABLE,
+-	UWAC_EVENT_CLIPBOARD_SELECT,
+-	UWAC_EVENT_CLIPBOARD_OFFER,
+-	UWAC_EVENT_OUTPUT_GEOMETRY,
+ };
+ 
+ /** @brief window states */
+@@ -233,34 +229,10 @@
+ };
+ typedef struct uwac_close_event UwacCloseEvent;
+ 
+-struct uwac_clipboard_event
+-{
+-	int type;
+-	UwacSeat* seat;
+-	char mime[64];
+-};
+-typedef struct uwac_clipboard_event UwacClipboardEvent;
+-
+-struct uwac_output_geometry_event
+-{
+-	int type;
+-	UwacOutput* output;
+-	int x;
+-	int y;
+-	int physical_width;
+-	int physical_height;
+-	int subpixel;
+-	const char* make;
+-	const char* model;
+-	int transform;
+-};
+-typedef struct uwac_output_geometry_event UwacOutputGeometryEvent;
+-
+ /** @brief */
+ union uwac_event {
+ 	int type;
+ 	UwacOutputNewEvent output_new;
+-	UwacOutputGeometryEvent output_geometry;
+ 	UwacSeatNewEvent seat_new;
+ 	UwacSeatRemovedEvent seat_removed;
+ 	UwacPointerEnterLeaveEvent mouse_enter_leave;
+@@ -268,7 +240,6 @@
+ 	UwacPointerButtonEvent mouse_button;
+ 	UwacPointerAxisEvent mouse_axis;
+ 	UwacKeyboardEnterLeaveEvent keyboard_enter_leave;
+-	UwacClipboardEvent clipboard;
+ 	UwacKeyEvent key;
+ 	UwacTouchFrameBegin touchFrameBegin;
+ 	UwacTouchUp touchUp;
+@@ -283,8 +254,6 @@
+ typedef union uwac_event UwacEvent;
+ 
+ typedef bool (*UwacErrorHandler)(UwacDisplay* d, UwacReturnCode code, const char* msg, ...);
+-typedef void (*UwacDataTransferHandler)(UwacSeat* seat, void* context, const char* mime, int fd);
+-typedef void (*UwacCancelDataTransferHandler)(UwacSeat* seat, void* context);
+ 
+ #ifdef __cplusplus
+ extern "C"
+@@ -470,17 +439,6 @@
+ 	                                            uint32_t width, uint32_t height);
+ 
+ 	/**
+-	 *	returns the geometry of the given UwacWindow buffer
+-	 *
+-	 * @param window   the UwacWindow
+-	 * @param geometry the geometry to fill
+-	 * @param stride   the length of a buffer line in bytes
+-	 * @return UWAC_SUCCESS on success, an Uwac error otherwise
+-	 */
+-	UWAC_API UwacReturnCode UwacWindowGetDrawingBufferGeometry(UwacWindow* window,
+-	                                                           UwacSize* geometry, size_t* stride);
+-
+-	/**
+ 	 *	Sends a frame to the compositor with the content of the drawing buffer
+ 	 *
+ 	 * @param window the UwacWindow to refresh
+@@ -562,46 +520,6 @@
+ 	 */
+ 	UWAC_API UwacSeatId UwacSeatGetId(const UwacSeat* seat);
+ 
+-	/**
+-	 *
+-	 */
+-	UWAC_API UwacReturnCode UwacClipboardOfferDestroy(UwacSeat* seat);
+-	UWAC_API UwacReturnCode UwacClipboardOfferCreate(UwacSeat* seat, const char* mime);
+-	UWAC_API UwacReturnCode UwacClipboardOfferAnnounce(UwacSeat* seat, void* context,
+-	                                                   UwacDataTransferHandler transfer,
+-	                                                   UwacCancelDataTransferHandler cancel);
+-	UWAC_API void* UwacClipboardDataGet(UwacSeat* seat, const char* mime, size_t* size);
+-
+-	/**
+-	 * Inhibits or restores keyboard shortcuts.
+-	 *
+-	 * @param seat    The UwacSeat to inhibit the shortcuts for
+-	 * @param inhibit Inhibit or restore keyboard shortcuts
+-	 *
+-	 * @return UWAC_SUCCESS or an appropriate error code.
+-	 */
+-	UWAC_API UwacReturnCode UwacSeatInhibitShortcuts(UwacSeat* seat, bool inhibit);
+-
+-	/**
+-	 * @brief UwacSeatSetMouseCursor Sets the specified image as the new mouse cursor.
+-	 *                               Special values: If data == NULL && lenght == 0
+-	 *                               the cursor is hidden, if data == NULL && length != 0
+-	 *                               the default system cursor is used.
+-	 *
+-	 * @param seat   The UwacSeat to apply the cursor image to
+-	 * @param data   A pointer to the image data
+-	 * @param length The size of the image data
+-	 * @param width  The image width in pixel
+-	 * @param height The image height in pixel
+-	 * @param hot_x  The hotspot horizontal offset in pixel
+-	 * @param hot_y  The hotspot vertical offset in pixel
+-	 *
+-	 * @return UWAC_SUCCESS if successful, an appropriate error otherwise.
+-	 */
+-	UWAC_API UwacReturnCode UwacSeatSetMouseCursor(UwacSeat* seat, const void* data, size_t length,
+-	                                               size_t width, size_t height, size_t hot_x,
+-	                                               size_t hot_y);
+-
+ #ifdef __cplusplus
+ }
+ #endif
+diff -urN uwac/libuwac/CMakeLists.txt ../../informatimago/FreeRDP/uwac/libuwac/CMakeLists.txt
+--- uwac/libuwac/CMakeLists.txt	2019-07-24 06:11:52.522197829 +0300
++++ ../../informatimago/FreeRDP/uwac/libuwac/CMakeLists.txt	2019-07-19 20:00:34.137156343 +0300
+@@ -31,17 +31,14 @@
+         COMMAND ${WAYLAND_SCANNER} client-header < ${CMAKE_SOURCE_DIR}/uwac/protocols/${PROTO}.xml > ${CMAKE_CURRENT_BINARY_DIR}/${PROTO}-client-protocol.h
+         DEPENDS ${CMAKE_SOURCE_DIR}/uwac/protocols/${PROTO}.xml
+     )
+-
++    
+     list(APPEND GENERATED_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${PROTO}-client-protocol.h)
+     list(APPEND GENERATED_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${PROTO}-protocol.c)
+ endmacro()
+ 
+ generate_protocol_file(xdg-shell)
+-generate_protocol_file(xdg-decoration-unstable-v1)
+-generate_protocol_file(server-decoration)
+ generate_protocol_file(ivi-application)
+-generate_protocol_file(fullscreen-shell-unstable-v1)
+-generate_protocol_file(keyboard-shortcuts-inhibit-unstable-v1)
++generate_protocol_file(fullscreen-shell)
+ 
+ if(FREEBSD)
+ 	include_directories(${EPOLLSHIM_INCLUDE_DIR})
+@@ -58,14 +55,13 @@
+     ${GENERATED_SOURCES}
+     uwac-display.c
+     uwac-input.c
+-    uwac-clipboard.c
+     uwac-os.c
+     uwac-os.h
+     uwac-output.c
+     uwac-priv.h
+     uwac-tools.c
+     uwac-utils.c
+-    uwac-window.c)
++	uwac-window.c)
+ 
+ 
+ add_library(${MODULE_NAME} ${${MODULE_PREFIX}_SRCS})
+diff -urN uwac/libuwac/uwac-clipboard.c ../../informatimago/FreeRDP/uwac/libuwac/uwac-clipboard.c
+--- uwac/libuwac/uwac-clipboard.c	2019-07-25 19:51:06.829927013 +0300
++++ ../../informatimago/FreeRDP/uwac/libuwac/uwac-clipboard.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,278 +0,0 @@
+-/*
+- * Copyright © 2018 Armin Novak <armin.novak@thincast.com>
+- * Copyright © 2018 Thincast Technologies GmbH
+- *
+- * Permission to use, copy, modify, distribute, and sell this software and its
+- * documentation for any purpose is hereby granted without fee, provided that
+- * the above copyright notice appear in all copies and that both that copyright
+- * notice and this permission notice appear in supporting documentation, and
+- * that the name of the copyright holders not be used in advertising or
+- * publicity pertaining to distribution of the software without specific,
+- * written prior permission.  The copyright holders make no representations
+- * about the suitability of this software for any purpose.  It is provided "as
+- * is" without express or implied warranty.
+- *
+- * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO
+- * EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+- * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+- * DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+- * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
+- * OF THIS SOFTWARE.
+- */
+-#include "uwac-priv.h"
+-#include "uwac-utils.h"
+-
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <assert.h>
+-#include <time.h>
+-#include <fcntl.h>
+-#include <unistd.h>
+-#include <sys/mman.h>
+-#include <sys/timerfd.h>
+-#include <sys/epoll.h>
+-
+-/* paste */
+-static void data_offer_offer(void* data, struct wl_data_offer* data_offer,
+-                             const char* offered_mime_type)
+-{
+-	UwacSeat* seat = (UwacSeat*)data;
+-	assert(seat);
+-
+-	if (!seat->ignore_announcement)
+-	{
+-		UwacClipboardEvent* event =
+-		    (UwacClipboardEvent*)UwacDisplayNewEvent(seat->display, UWAC_EVENT_CLIPBOARD_OFFER);
+-
+-		if (!event)
+-		{
+-			assert(uwacErrorHandler(seat->display, UWAC_ERROR_INTERNAL,
+-			                        "failed to allocate a clipboard event\n"));
+-		}
+-		else
+-		{
+-			event->seat = seat;
+-			sprintf_s(event->mime, sizeof(event->mime), "%s", offered_mime_type);
+-		}
+-	}
+-}
+-
+-static const struct wl_data_offer_listener data_offer_listener = { .offer = data_offer_offer };
+-
+-static void data_device_data_offer(void* data, struct wl_data_device* data_device,
+-                                   struct wl_data_offer* data_offer)
+-{
+-	UwacSeat* seat = (UwacSeat*)data;
+-	assert(seat);
+-
+-	if (!seat->ignore_announcement)
+-	{
+-		UwacClipboardEvent* event =
+-		    (UwacClipboardEvent*)UwacDisplayNewEvent(seat->display, UWAC_EVENT_CLIPBOARD_SELECT);
+-
+-		if (!event)
+-		{
+-			assert(uwacErrorHandler(seat->display, UWAC_ERROR_INTERNAL,
+-			                        "failed to allocate a close event\n"));
+-		}
+-		else
+-			event->seat = seat;
+-
+-		wl_data_offer_add_listener(data_offer, &data_offer_listener, data);
+-		seat->offer = data_offer;
+-	}
+-	else
+-		seat->offer = NULL;
+-}
+-
+-static void data_device_selection(void* data, struct wl_data_device* data_device,
+-                                  struct wl_data_offer* data_offer)
+-{
+-}
+-
+-static const struct wl_data_device_listener data_device_listener = {
+-	.data_offer = data_device_data_offer, .selection = data_device_selection
+-};
+-
+-/* copy */
+-static void data_source_target_handler(void* data, struct wl_data_source* data_source,
+-                                       const char* mime_type)
+-{
+-}
+-
+-static void data_source_send_handler(void* data, struct wl_data_source* data_source,
+-                                     const char* mime_type, int fd)
+-{
+-	UwacSeat* seat = (UwacSeat*)data;
+-	seat->transfer_data(seat, seat->data_context, mime_type, fd);
+-}
+-
+-static void data_source_cancelled_handler(void* data, struct wl_data_source* data_source)
+-{
+-	UwacSeat* seat = (UwacSeat*)data;
+-	seat->cancel_data(seat, seat->data_context);
+-}
+-
+-static const struct wl_data_source_listener data_source_listener = {
+-	.target = data_source_target_handler,
+-	.send = data_source_send_handler,
+-	.cancelled = data_source_cancelled_handler
+-};
+-
+-static void UwacRegisterDeviceListener(UwacSeat* s)
+-{
+-	wl_data_device_add_listener(s->data_device, &data_device_listener, s);
+-}
+-
+-UwacReturnCode UwacCreateDataSource(UwacSeat* s)
+-{
+-	if (!s)
+-		return UWAC_ERROR_INTERNAL;
+-
+-	s->data_source = wl_data_device_manager_create_data_source(s->display->data_device_manager);
+-	wl_data_source_add_listener(s->data_source, &data_source_listener, s);
+-	return UWAC_SUCCESS;
+-}
+-
+-UwacReturnCode UwacSeatRegisterClipboard(UwacSeat* s)
+-{
+-	UwacReturnCode rc;
+-	UwacClipboardEvent* event;
+-
+-	if (!s)
+-		return UWAC_ERROR_INTERNAL;
+-
+-	if (!s->display->data_device_manager || !s->data_device)
+-		return UWAC_NOT_ENOUGH_RESOURCES;
+-
+-	UwacRegisterDeviceListener(s);
+-	rc = UwacCreateDataSource(s);
+-
+-	if (rc != UWAC_SUCCESS)
+-		return rc;
+-
+-	event = (UwacClipboardEvent*)UwacDisplayNewEvent(s->display, UWAC_EVENT_CLIPBOARD_AVAILABLE);
+-
+-	if (!event)
+-	{
+-		assert(uwacErrorHandler(s->display, UWAC_ERROR_INTERNAL,
+-		                        "failed to allocate a clipboard event\n"));
+-		return UWAC_ERROR_INTERNAL;
+-	}
+-
+-	event->seat = s;
+-	return UWAC_SUCCESS;
+-}
+-
+-UwacReturnCode UwacClipboardOfferDestroy(UwacSeat* seat)
+-{
+-	if (!seat)
+-		return UWAC_ERROR_INTERNAL;
+-
+-	if (seat->data_source)
+-		wl_data_source_destroy(seat->data_source);
+-
+-	return UwacCreateDataSource(seat);
+-}
+-
+-UwacReturnCode UwacClipboardOfferCreate(UwacSeat* seat, const char* mime)
+-{
+-	if (!seat || !mime)
+-		return UWAC_ERROR_INTERNAL;
+-
+-	wl_data_source_offer(seat->data_source, mime);
+-	return UWAC_SUCCESS;
+-}
+-
+-static void callback_done(void* data, struct wl_callback* callback, uint32_t serial)
+-{
+-	*(uint32_t*)data = serial;
+-}
+-
+-static const struct wl_callback_listener callback_listener = { .done = callback_done };
+-
+-uint32_t get_serial(UwacSeat* s)
+-{
+-	struct wl_callback* callback;
+-	uint32_t serial = 0;
+-	callback = wl_display_sync(s->display->display);
+-	wl_callback_add_listener(callback, &callback_listener, &serial);
+-
+-	while (serial == 0)
+-	{
+-		wl_display_dispatch(s->display->display);
+-	}
+-
+-	return serial;
+-}
+-
+-UwacReturnCode UwacClipboardOfferAnnounce(UwacSeat* seat, void* context,
+-                                          UwacDataTransferHandler transfer,
+-                                          UwacCancelDataTransferHandler cancel)
+-{
+-	if (!seat)
+-		return UWAC_ERROR_INTERNAL;
+-
+-	seat->data_context = context;
+-	seat->transfer_data = transfer;
+-	seat->cancel_data = cancel;
+-	seat->ignore_announcement = true;
+-	wl_data_device_set_selection(seat->data_device, seat->data_source, get_serial(seat));
+-	wl_display_roundtrip(seat->display->display);
+-	seat->ignore_announcement = false;
+-	return UWAC_SUCCESS;
+-}
+-
+-void* UwacClipboardDataGet(UwacSeat* seat, const char* mime, size_t* size)
+-{
+-	ssize_t r = 0;
+-	size_t alloc = 0;
+-	size_t pos = 0;
+-	char* data = NULL;
+-	int pipefd[2];
+-
+-	if (!seat || !mime || !size || !seat->offer)
+-		return NULL;
+-
+-	if (pipe(pipefd) != 0)
+-		return NULL;
+-
+-	wl_data_offer_receive(seat->offer, mime, pipefd[1]);
+-	close(pipefd[1]);
+-	wl_display_roundtrip(seat->display->display);
+-	wl_display_flush(seat->display->display);
+-
+-	do
+-	{
+-		void* tmp;
+-		alloc += 1024;
+-		tmp = xrealloc(data, alloc);
+-
+-		if (!tmp)
+-		{
+-			free(data);
+-			close(pipefd[0]);
+-			return NULL;
+-		}
+-
+-		data = tmp;
+-		r = read(pipefd[0], &data[pos], alloc - pos);
+-
+-		if (r > 0)
+-			pos += r;
+-
+-		if (r < 0)
+-		{
+-			free(data);
+-			close(pipefd[0]);
+-			return NULL;
+-		}
+-	} while (r > 0);
+-
+-	close(pipefd[0]);
+-	close(pipefd[1]);
+-	*size = pos + 1;
+-	return data;
+-}
+diff -urN uwac/libuwac/uwac-display.c ../../informatimago/FreeRDP/uwac/libuwac/uwac-display.c
+--- uwac/libuwac/uwac-display.c	2019-07-25 19:51:06.841927073 +0300
++++ ../../informatimago/FreeRDP/uwac/libuwac/uwac-display.c	2019-07-25 20:11:30.807996764 +0300
+@@ -33,14 +33,13 @@
+ #include <sys/epoll.h>
+ 
+ #include "uwac-os.h"
+-#include "wayland-cursor.h"
+ 
+-#define TARGET_COMPOSITOR_INTERFACE 3U
+-#define TARGET_SHM_INTERFACE 1U
+-#define TARGET_SHELL_INTERFACE 1U
+-#define TARGET_DDM_INTERFACE 1U
+-#define TARGET_SEAT_INTERFACE 5U
+-#define TARGET_XDG_VERSION 5U /* The version of xdg-shell that we implement */
++#define TARGET_COMPOSITOR_INTERFACE 3
++#define TARGET_SHM_INTERFACE 1
++#define TARGET_SHELL_INTERFACE 1
++#define TARGET_DDM_INTERFACE 1
++#define TARGET_SEAT_INTERFACE 5
++#define TARGET_XDG_VERSION 5 /* The version of xdg-shell that we implement */
+ 
+ static const char* event_names[] = {
+ 	"new seat",      "removed seat",      "new output",      "configure",    "pointer enter",
+@@ -83,31 +82,30 @@
+ 
+ struct wl_shm_listener shm_listener = { cb_shm_format };
+ 
+-static void xdg_shell_ping(void* data, struct xdg_wm_base* xdg_wm_base, uint32_t serial)
++static void xdg_shell_ping(void* data, struct xdg_shell* shell, uint32_t serial)
+ {
+-	xdg_wm_base_pong(xdg_wm_base, serial);
++	xdg_shell_pong(shell, serial);
+ }
+ 
+-static const struct xdg_wm_base_listener xdg_wm_base_listener = {
++static const struct xdg_shell_listener xdg_shell_listener = {
+ 	xdg_shell_ping,
+ };
+ 
+ #ifdef BUILD_FULLSCREEN_SHELL
+-static void fullscreen_capability(void* data,
+-                                  struct zwp_fullscreen_shell_v1* zwp_fullscreen_shell_v1,
+-                                  uint32_t capability)
++static void fullscreen_capability(void* data, struct _wl_fullscreen_shell* _wl_fullscreen_shell,
++                                  uint32_t capabilty)
+ {
+ }
+ 
+-static const struct zwp_fullscreen_shell_v1_listener fullscreen_shell_listener = {
++static const struct _wl_fullscreen_shell_listener fullscreen_shell_listener = {
+ 	fullscreen_capability,
+ };
+ #endif
+ 
+ static void display_destroy_seat(UwacDisplay* d, uint32_t name)
+ {
+-	UwacSeat *seat, *tmp;
+-	wl_list_for_each_safe(seat, tmp, &d->seats, link)
++	UwacSeat* seat;
++	wl_list_for_each(seat, &d->seats, link)
+ 	{
+ 		if (seat->seat_id == name)
+ 		{
+@@ -116,32 +114,12 @@
+ 	}
+ }
+ 
+-static void UwacSeatRegisterDDM(UwacSeat* seat)
+-{
+-	UwacDisplay* d = seat->display;
+-
+-	if (!d->data_device_manager)
+-		return;
+-
+-	if (!seat->data_device)
+-		seat->data_device =
+-		    wl_data_device_manager_get_data_device(d->data_device_manager, seat->seat);
+-}
+-
+-static void UwacRegisterCursor(UwacSeat* seat)
+-{
+-	if (!seat || !seat->display || !seat->display->compositor)
+-		return;
+-
+-	seat->pointer_surface = wl_compositor_create_surface(seat->display->compositor);
+-}
+-
+ static void registry_handle_global(void* data, struct wl_registry* registry, uint32_t id,
+                                    const char* interface, uint32_t version)
+ {
+ 	UwacDisplay* d = data;
+ 	UwacGlobal* global;
+-	global = xzalloc(sizeof *global);
++	global = xmalloc(sizeof *global);
+ 	global->name = id;
+ 	global->interface = xstrdup(interface);
+ 	global->version = version;
+@@ -187,9 +165,6 @@
+ 			return;
+ 		}
+ 
+-		UwacSeatRegisterDDM(seat);
+-		UwacSeatRegisterClipboard(seat);
+-		UwacRegisterCursor(seat);
+ 		ev = (UwacSeatNewEvent*)UwacDisplayNewEvent(d, UWAC_EVENT_NEW_SEAT);
+ 
+ 		if (!ev)
+@@ -202,57 +177,34 @@
+ 	}
+ 	else if (strcmp(interface, "wl_data_device_manager") == 0)
+ 	{
+-		UwacSeat *seat, *tmp;
+ 		d->data_device_manager = wl_registry_bind(registry, id, &wl_data_device_manager_interface,
+ 		                                          min(TARGET_DDM_INTERFACE, version));
+-		wl_list_for_each_safe(seat, tmp, &d->seats, link)
+-		{
+-			UwacSeatRegisterDDM(seat);
+-			UwacSeatRegisterClipboard(seat);
+-			UwacRegisterCursor(seat);
+-		}
+ 	}
+ 	else if (strcmp(interface, "wl_shell") == 0)
+ 	{
+ 		d->shell = wl_registry_bind(registry, id, &wl_shell_interface,
+ 		                            min(TARGET_SHELL_INTERFACE, version));
+ 	}
+-	else if (strcmp(interface, "xdg_wm_base") == 0)
+-	{
+-		d->xdg_base = wl_registry_bind(registry, id, &xdg_wm_base_interface, 1);
+-		xdg_wm_base_add_listener(d->xdg_base, &xdg_wm_base_listener, d);
+-	}
+-	else if (strcmp(interface, "zwp_keyboard_shortcuts_inhibit_manager_v1") == 0)
++	else if (strcmp(interface, "xdg_shell") == 0)
+ 	{
+-		d->keyboard_inhibit_manager =
+-		    wl_registry_bind(registry, id, &zwp_keyboard_shortcuts_inhibit_manager_v1_interface, 1);
+-	}
+-	else if (strcmp(interface, "zxdg_decoration_manager_v1") == 0)
+-	{
+-		d->deco_manager = wl_registry_bind(registry, id, &zxdg_decoration_manager_v1_interface, 1);
+-	}
+-	else if (strcmp(interface, "org_kde_kwin_server_decoration_manager") == 0)
+-	{
+-		d->kde_deco_manager =
+-		    wl_registry_bind(registry, id, &org_kde_kwin_server_decoration_manager_interface, 1);
+-	}
+-
++		d->xdg_shell = wl_registry_bind(registry, id, &xdg_shell_interface, 1);
++		xdg_shell_use_unstable_version(d->xdg_shell, TARGET_XDG_VERSION);
++		xdg_shell_add_listener(d->xdg_shell, &xdg_shell_listener, d);
+ #if BUILD_IVI
++	}
+ 	else if (strcmp(interface, "ivi_application") == 0)
+ 	{
+ 		d->ivi_application = wl_registry_bind(registry, id, &ivi_application_interface, 1);
+-	}
+-
+ #endif
+ #if BUILD_FULLSCREEN_SHELL
+-	else if (strcmp(interface, "zwp_fullscreen_shell_v1") == 0)
+-	{
+-		d->fullscreen_shell = wl_registry_bind(registry, id, &zwp_fullscreen_shell_v1_interface, 1);
+-		zwp_fullscreen_shell_v1_add_listener(d->fullscreen_shell, &fullscreen_shell_listener, d);
+ 	}
+-
++	else if (strcmp(interface, "_wl_fullscreen_shell") == 0)
++	{
++		d->fullscreen_shell = wl_registry_bind(registry, id, &_wl_fullscreen_shell_interface, 1);
++		_wl_fullscreen_shell_add_listener(d->fullscreen_shell, &fullscreen_shell_listener, d);
+ #endif
+ #if 0
++	}
+ 	else if (strcmp(interface, "text_cursor_position") == 0)
+ 	{
+ 		d->text_cursor_position = wl_registry_bind(registry, id, &text_cursor_position_interface, 1);
+@@ -265,6 +217,7 @@
+ 	{
+ 		d->subcompositor = wl_registry_bind(registry, id, &wl_subcompositor_interface, 1);
+ #endif
++	}
+ }
+ 
+ static void registry_handle_global_remove(void* data, struct wl_registry* registry, uint32_t name)
+@@ -279,8 +232,8 @@
+ 
+ #if 0
+ 
+-			if (strcmp(global->interface, "wl_output") == 0)
+-				display_destroy_output(d, name);
++		if (strcmp(global->interface, "wl_output") == 0)
++			display_destroy_output(d, name);
+ 
+ #endif
+ 
+@@ -299,19 +252,23 @@
+ 		free(global);
+ 	}
+ }
++
+ void UwacDestroyGlobal(UwacGlobal* global)
+ {
+ 	free(global->interface);
+ 	wl_list_remove(&global->link);
+ 	free(global);
+ }
++
+ void* display_bind(UwacDisplay* display, uint32_t name, const struct wl_interface* interface,
+                    uint32_t version)
+ {
+ 	return wl_registry_bind(display->registry, name, interface, version);
+ }
++
+ static const struct wl_registry_listener registry_listener = { registry_handle_global,
+ 	                                                           registry_handle_global_remove };
++
+ int UwacDisplayWatchFd(UwacDisplay* display, int fd, uint32_t events, UwacTask* task)
+ {
+ 	struct epoll_event ep;
+@@ -319,14 +276,17 @@
+ 	ep.data.ptr = task;
+ 	return epoll_ctl(display->epoll_fd, EPOLL_CTL_ADD, fd, &ep);
+ }
++
+ void UwacDisplayUnwatchFd(UwacDisplay* display, int fd)
+ {
+ 	epoll_ctl(display->epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+ }
++
+ static void display_exit(UwacDisplay* display)
+ {
+ 	display->running = false;
+ }
++
+ static void display_dispatch_events(UwacTask* task, uint32_t events)
+ {
+ 	UwacDisplay* display = container_of(task, UwacDisplay, dispatch_fd_task);
+@@ -368,10 +328,11 @@
+ 		}
+ 	}
+ }
++
+ UwacDisplay* UwacOpenDisplay(const char* name, UwacReturnCode* err)
+ {
+ 	UwacDisplay* ret;
+-	ret = (UwacDisplay*)xzalloc(sizeof(*ret));
++	ret = (UwacDisplay*)calloc(1, sizeof(*ret));
+ 
+ 	if (!ret)
+ 	{
+@@ -442,6 +403,7 @@
+ 	free(ret);
+ 	return NULL;
+ }
++
+ int UwacDisplayDispatch(UwacDisplay* display, int timeout)
+ {
+ 	int ret, count, i;
+@@ -475,10 +437,12 @@
+ 
+ 	return 1;
+ }
++
+ UwacReturnCode UwacDisplayGetLastError(const UwacDisplay* display)
+ {
+ 	return display->last_error;
+ }
++
+ UwacReturnCode UwacCloseDisplay(UwacDisplay** pdisplay)
+ {
+ 	UwacDisplay* display;
+@@ -516,19 +480,10 @@
+ 	if (display->compositor)
+ 		wl_compositor_destroy(display->compositor);
+ 
+-	if (display->keyboard_inhibit_manager)
+-		zwp_keyboard_shortcuts_inhibit_manager_v1_destroy(display->keyboard_inhibit_manager);
+-
+-	if (display->deco_manager)
+-		zxdg_decoration_manager_v1_destroy(display->deco_manager);
+-
+-	if (display->kde_deco_manager)
+-		org_kde_kwin_server_decoration_manager_destroy(display->kde_deco_manager);
+-
+ #ifdef BUILD_FULLSCREEN_SHELL
+ 
+ 	if (display->fullscreen_shell)
+-		zwp_fullscreen_shell_v1_destroy(display->fullscreen_shell);
++		_wl_fullscreen_shell_destroy(display->fullscreen_shell);
+ 
+ #endif
+ #ifdef BUILD_IVI
+@@ -538,11 +493,8 @@
+ 
+ #endif
+ 
+-	if (display->xdg_toplevel)
+-		xdg_toplevel_destroy(display->xdg_toplevel);
+-
+-	if (display->xdg_base)
+-		xdg_wm_base_destroy(display->xdg_base);
++	if (display->xdg_shell)
++		xdg_shell_destroy(display->xdg_shell);
+ 
+ 	if (display->shell)
+ 		wl_shell_destroy(display->shell);
+@@ -573,10 +525,12 @@
+ 	*pdisplay = NULL;
+ 	return UWAC_SUCCESS;
+ }
++
+ int UwacDisplayGetFd(UwacDisplay* display)
+ {
+ 	return display->epoll_fd;
+ }
++
+ static const char* errorStrings[] = {
+ 	"success",
+ 	"out of memory error",
+@@ -589,6 +543,7 @@
+ 
+ 	"internal error",
+ };
++
+ const char* UwacErrorString(UwacReturnCode error)
+ {
+ 	if (error < UWAC_SUCCESS || error >= UWAC_ERROR_LAST)
+@@ -596,15 +551,16 @@
+ 
+ 	return errorStrings[error];
+ }
++
+ UwacReturnCode UwacDisplayQueryInterfaceVersion(const UwacDisplay* display, const char* name,
+                                                 uint32_t* version)
+ {
+-	const UwacGlobal *global, *tmp;
++	const UwacGlobal* global;
+ 
+ 	if (!display)
+ 		return UWAC_ERROR_INVALID_DISPLAY;
+ 
+-	wl_list_for_each_safe(global, tmp, &display->globals, link)
++	wl_list_for_each(global, &display->globals, link)
+ 	{
+ 		if (strcmp(global->interface, name) == 0)
+ 		{
+@@ -616,6 +572,7 @@
+ 	}
+ 	return UWAC_NOT_FOUND;
+ }
++
+ uint32_t UwacDisplayQueryGetNbShmFormats(UwacDisplay* display)
+ {
+ 	if (!display)
+@@ -632,20 +589,23 @@
+ 	display->last_error = UWAC_SUCCESS;
+ 	return display->shm_formats_nb;
+ }
++
+ UwacReturnCode UwacDisplayQueryShmFormats(const UwacDisplay* display, enum wl_shm_format* formats,
+                                           int formats_size, int* filled)
+ {
+ 	if (!display)
+ 		return UWAC_ERROR_INVALID_DISPLAY;
+ 
+-	*filled = min((int64_t)display->shm_formats_nb, formats_size);
++	*filled = min(display->shm_formats_nb, formats_size);
+ 	memcpy(formats, (const void*)display->shm_formats, *filled * sizeof(enum wl_shm_format));
+ 	return UWAC_SUCCESS;
+ }
++
+ uint32_t UwacDisplayGetNbOutputs(UwacDisplay* display)
+ {
+ 	return wl_list_length(&display->outputs);
+ }
++
+ UwacOutput* UwacDisplayGetOutput(UwacDisplay* display, int index)
+ {
+ 	struct wl_list* l;
+@@ -666,11 +626,13 @@
+ 	display->last_error = UWAC_SUCCESS;
+ 	return container_of(l, UwacOutput, link);
+ }
++
+ UwacReturnCode UwacOutputGetResolution(UwacOutput* output, UwacSize* resolution)
+ {
+ 	*resolution = output->resolution;
+ 	return UWAC_SUCCESS;
+ }
++
+ UwacEvent* UwacDisplayNewEvent(UwacDisplay* display, int type)
+ {
+ 	UwacEventListItem* ret;
+@@ -680,7 +642,7 @@
+ 		return 0;
+ 	}
+ 
+-	ret = xzalloc(sizeof(UwacEventListItem));
++	ret = zalloc(sizeof(UwacEventListItem));
+ 
+ 	if (!ret)
+ 	{
+@@ -701,10 +663,12 @@
+ 	display->push_queue = ret;
+ 	return &ret->event;
+ }
++
+ bool UwacHasEvent(UwacDisplay* display)
+ {
+ 	return display->pop_queue != NULL;
+ }
++
+ UwacReturnCode UwacNextEvent(UwacDisplay* display, UwacEvent* event)
+ {
+ 	UwacEventListItem* prevItem;
+@@ -734,4 +698,4 @@
+ 		display->push_queue = NULL;
+ 
+ 	return UWAC_SUCCESS;
+-}
+\ No newline at end of file
++}
+diff -urN uwac/libuwac/uwac-input.c ../../informatimago/FreeRDP/uwac/libuwac/uwac-input.c
+--- uwac/libuwac/uwac-input.c	2019-07-25 19:51:06.857927153 +0300
++++ ../../informatimago/FreeRDP/uwac/libuwac/uwac-input.c	2019-07-25 20:11:30.819996823 +0300
+@@ -32,118 +32,6 @@
+ #include <sys/timerfd.h>
+ #include <sys/epoll.h>
+ 
+-#include "uwac-os.h"
+-#include "wayland-cursor.h"
+-#include "wayland-client-protocol.h"
+-
+-static struct wl_buffer* create_pointer_buffer(UwacSeat* seat, const void* src, size_t size)
+-{
+-	struct wl_buffer* buffer = NULL;
+-	int fd;
+-	void* data;
+-	struct wl_shm_pool* pool;
+-	fd = uwac_create_anonymous_file(size);
+-
+-	if (fd < 0)
+-		return buffer;
+-
+-	data = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+-
+-	if (data == MAP_FAILED)
+-	{
+-		goto error_mmap;
+-	}
+-
+-	memcpy(data, src, size);
+-	pool = wl_shm_create_pool(seat->display->shm, fd, size);
+-
+-	if (!pool)
+-	{
+-		munmap(data, size);
+-		goto error_mmap;
+-	}
+-
+-	buffer =
+-	    wl_shm_pool_create_buffer(pool, 0, seat->pointer_image->width, seat->pointer_image->height,
+-	                              seat->pointer_image->width * 4, WL_SHM_FORMAT_ARGB8888);
+-	wl_shm_pool_destroy(pool);
+-error_mmap:
+-	close(fd);
+-	return buffer;
+-}
+-
+-static void on_buffer_release(void* data, struct wl_buffer* wl_buffer)
+-{
+-	(void)data;
+-	wl_buffer_destroy(wl_buffer);
+-}
+-
+-const struct wl_buffer_listener buffer_release_listener = { on_buffer_release };
+-
+-static UwacReturnCode set_cursor_image(UwacSeat* seat, uint32_t serial)
+-{
+-	struct wl_buffer* buffer = NULL;
+-	struct wl_cursor* cursor;
+-	struct wl_cursor_image* image;
+-	struct wl_surface* surface = NULL;
+-	int32_t x = 0, y = 0;
+-
+-	if (!seat || !seat->display || !seat->default_cursor || !seat->default_cursor->images)
+-		return UWAC_ERROR_INTERNAL;
+-
+-	switch (seat->pointer_type)
+-	{
+-	case 2: /* Custom poiner */
+-		image = seat->pointer_image;
+-		buffer = create_pointer_buffer(seat, seat->pointer_data, seat->pointer_size);
+-
+-		if (!buffer)
+-			return UWAC_ERROR_INTERNAL;
+-
+-		surface = seat->pointer_surface;
+-		x = image->hotspot_x;
+-		y = image->hotspot_y;
+-		break;
+-
+-	case 1: /* NULL pointer */
+-		break;
+-
+-	default: /* Default system pointer */
+-		cursor = seat->default_cursor;
+-
+-		if (!cursor)
+-			return UWAC_ERROR_INTERNAL;
+-
+-		image = cursor->images[0];
+-
+-		if (!image)
+-			return UWAC_ERROR_INTERNAL;
+-
+-		x = image->hotspot_x;
+-		y = image->hotspot_y;
+-		buffer = wl_cursor_image_get_buffer(image);
+-
+-		if (!buffer)
+-			return UWAC_ERROR_INTERNAL;
+-
+-		surface = seat->pointer_surface;
+-		break;
+-	}
+-
+-	if (buffer)
+-		wl_buffer_add_listener(buffer, &buffer_release_listener, seat);
+-
+-	if (surface)
+-	{
+-		wl_surface_attach(surface, buffer, -x, -y);
+-		wl_surface_damage(surface, 0, 0, image->width, image->height);
+-		wl_surface_commit(surface);
+-	}
+-
+-	wl_pointer_set_cursor(seat->pointer, serial, surface, x, y);
+-	return UWAC_SUCCESS;
+-}
+-
+ static void keyboard_repeat_func(UwacTask* task, uint32_t events)
+ {
+ 	UwacSeat* input = container_of(task, UwacSeat, repeat_task);
+@@ -239,7 +127,7 @@
+ {
+ 	uint32_t *key, *pressedKey;
+ 	UwacSeat* input = (UwacSeat*)data;
+-	size_t i, found;
++	int i, found;
+ 	UwacKeyboardEnterLeaveEvent* event;
+ 	event = (UwacKeyboardEnterLeaveEvent*)UwacDisplayNewEvent(input->display,
+ 	                                                          UWAC_EVENT_KEYBOARD_ENTER);
+@@ -248,7 +136,6 @@
+ 		return;
+ 
+ 	event->window = input->keyboard_focus = (UwacWindow*)wl_surface_get_user_data(surface);
+-	event->seat = input;
+ 	/* look for keys that have been released */
+ 	found = false;
+ 
+@@ -324,7 +211,7 @@
+ static int update_key_released(UwacSeat* seat, uint32_t key)
+ {
+ 	uint32_t* keyPtr;
+-	size_t i, toMove;
++	int i, toMove;
+ 	bool found = false;
+ 
+ 	for (i = 0, keyPtr = seat->pressed_keys.data; i < seat->pressed_keys.size; i++, keyPtr++)
+@@ -692,13 +579,10 @@
+ #endif
+ }
+ 
+-static const struct wl_touch_listener touch_listener = { touch_handle_down,
+-	                                                     touch_handle_up,
+-	                                                     touch_handle_motion,
+-	                                                     touch_handle_frame,
+-	                                                     touch_handle_cancel,
+-	                                                     NULL,
+-	                                                     NULL };
++static const struct wl_touch_listener touch_listener = {
++	touch_handle_down,  touch_handle_up,     touch_handle_motion,
++	touch_handle_frame, touch_handle_cancel,
++};
+ 
+ static void pointer_handle_enter(void* data, struct wl_pointer* pointer, uint32_t serial,
+                                  struct wl_surface* surface, wl_fixed_t sx_w, wl_fixed_t sy_w)
+@@ -734,8 +618,6 @@
+ 	event->window = window;
+ 	event->x = sx;
+ 	event->y = sy;
+-	/* Apply cursor theme */
+-	set_cursor_image(input, serial);
+ }
+ 
+ static void pointer_handle_leave(void* data, struct wl_pointer* pointer, uint32_t serial,
+@@ -862,23 +744,6 @@
+ 		input->pointer = wl_seat_get_pointer(seat);
+ 		wl_pointer_set_user_data(input->pointer, input);
+ 		wl_pointer_add_listener(input->pointer, &pointer_listener, input);
+-		input->cursor_theme = wl_cursor_theme_load(NULL, 32, input->display->shm);
+-
+-		if (!input->cursor_theme)
+-		{
+-			assert(uwacErrorHandler(input->display, UWAC_ERROR_NOMEMORY,
+-			                        "unable to get wayland cursor theme\n"));
+-			return;
+-		}
+-
+-		input->default_cursor = wl_cursor_theme_get_cursor(input->cursor_theme, "left_ptr");
+-
+-		if (!input->default_cursor)
+-		{
+-			assert(uwacErrorHandler(input->display, UWAC_ERROR_NOMEMORY,
+-			                        "unable to get wayland cursor left_ptr\n"));
+-			return;
+-		}
+ 	}
+ 	else if (!(caps & WL_SEAT_CAPABILITY_POINTER) && input->pointer)
+ 	{
+@@ -890,11 +755,6 @@
+ #endif
+ 			wl_pointer_destroy(input->pointer);
+ 
+-		if (input->cursor_theme)
+-			wl_cursor_theme_destroy(input->cursor_theme);
+-
+-		input->default_cursor = NULL;
+-		input->cursor_theme = NULL;
+ 		input->pointer = NULL;
+ 	}
+ 
+@@ -959,7 +819,7 @@
+ UwacSeat* UwacSeatNew(UwacDisplay* d, uint32_t id, uint32_t version)
+ {
+ 	UwacSeat* ret;
+-	ret = xzalloc(sizeof(UwacSeat));
++	ret = zalloc(sizeof(UwacSeat));
+ 	ret->display = d;
+ 	ret->seat_id = id;
+ 	ret->seat_version = version;
+@@ -1004,8 +864,6 @@
+ 
+ void UwacSeatDestroy(UwacSeat* s)
+ {
+-	UwacSeatInhibitShortcuts(s, false);
+-
+ 	if (s->seat)
+ 	{
+ #ifdef WL_SEAT_RELEASE_SINCE_VERSION
+@@ -1056,17 +914,6 @@
+ 			wl_keyboard_destroy(s->keyboard);
+ 	}
+ 
+-	if (s->data_device)
+-		wl_data_device_destroy(s->data_device);
+-
+-	if (s->data_source)
+-		wl_data_source_destroy(s->data_source);
+-
+-	if (s->pointer_surface)
+-		wl_surface_destroy(s->pointer_surface);
+-
+-	free(s->pointer_image);
+-	free(s->pointer_data);
+ 	wl_list_remove(&s->link);
+ 	free(s);
+ }
+@@ -1080,65 +927,3 @@
+ {
+ 	return seat->seat_id;
+ }
+-
+-UwacReturnCode UwacSeatInhibitShortcuts(UwacSeat* s, bool inhibit)
+-{
+-	if (!s)
+-		return UWAC_ERROR_CLOSED;
+-
+-	if (s->keyboard_inhibitor)
+-		zwp_keyboard_shortcuts_inhibitor_v1_destroy(s->keyboard_inhibitor);
+-
+-	if (inhibit && s->display && s->display->keyboard_inhibit_manager)
+-		s->keyboard_inhibitor = zwp_keyboard_shortcuts_inhibit_manager_v1_inhibit_shortcuts(
+-		    s->display->keyboard_inhibit_manager, s->keyboard_focus->surface, s->seat);
+-
+-	if (!s->keyboard_inhibitor)
+-		return UWAC_ERROR_INTERNAL;
+-
+-	return UWAC_SUCCESS;
+-}
+-
+-UwacReturnCode UwacSeatSetMouseCursor(UwacSeat* seat, const void* data, size_t length, size_t width,
+-                                      size_t height, size_t hot_x, size_t hot_y)
+-{
+-	if (!seat)
+-		return UWAC_ERROR_CLOSED;
+-
+-	free(seat->pointer_image);
+-	seat->pointer_image = NULL;
+-	free(seat->pointer_data);
+-	seat->pointer_data = NULL;
+-	seat->pointer_size = 0;
+-
+-	/* There is a cursor provided */
+-	if ((data != NULL) && (length != 0))
+-	{
+-		seat->pointer_image = xzalloc(sizeof(struct wl_cursor_image));
+-
+-		if (!seat->pointer_image)
+-			return UWAC_ERROR_NOMEMORY;
+-
+-		seat->pointer_image->width = width;
+-		seat->pointer_image->height = height;
+-		seat->pointer_image->hotspot_x = hot_x;
+-		seat->pointer_image->hotspot_y = hot_y;
+-		free(seat->pointer_data);
+-		seat->pointer_data = xmalloc(length);
+-		memcpy(seat->pointer_data, data, length);
+-		seat->pointer_size = length;
+-		seat->pointer_type = 2;
+-	}
+-	/* We want to use the system cursor */
+-	else if (length != 0)
+-	{
+-		seat->pointer_type = 0;
+-	}
+-	/* Hide the cursor */
+-	else
+-	{
+-		seat->pointer_type = 1;
+-	}
+-
+-	return set_cursor_image(seat, seat->display->serial);
+-}
+diff -urN uwac/libuwac/uwac-os.c ../../informatimago/FreeRDP/uwac/libuwac/uwac-os.c
+--- uwac/libuwac/uwac-os.c	2019-07-25 19:51:06.861927172 +0300
++++ ../../informatimago/FreeRDP/uwac/libuwac/uwac-os.c	2019-07-25 20:11:30.823996843 +0300
+@@ -48,7 +48,6 @@
+ 
+ #include "../config.h"
+ #include "uwac-os.h"
+-#include "uwac-utils.h"
+ 
+ static int set_cloexec_or_close(int fd)
+ {
+@@ -212,11 +211,11 @@
+ int uwac_create_anonymous_file(off_t size)
+ {
+ 	static const char template[] = "/weston-shared-XXXXXX";
+-	size_t length;
+-	char* name;
+ 	const char* path;
++	char* name;
+ 	int fd;
+ 	int ret;
++	size_t length;
+ 	path = getenv("XDG_RUNTIME_DIR");
+ 
+ 	if (!path)
+@@ -225,20 +224,15 @@
+ 		return -1;
+ 	}
+ 
+-	fd = open(path, O_TMPFILE | O_RDWR | O_EXCL, 0600);
++	length = strlen(path) + sizeof(template);
++	name = malloc(length);
+ 
+-	if (fd < 0)
+-	{
+-		length = strlen(path) + sizeof(template);
+-		name = xmalloc(length);
+-
+-		if (!name)
+-			return -1;
++	if (!name)
++		return -1;
+ 
+-		snprintf(name, length, "%s%s", path, template);
+-		fd = create_tmpfile_cloexec(name);
+-		free(name);
+-	}
++	snprintf(name, length, "%s%s", path, template);
++	fd = create_tmpfile_cloexec(name);
++	free(name);
+ 
+ 	if (fd < 0)
+ 		return -1;
+diff -urN uwac/libuwac/uwac-output.c ../../informatimago/FreeRDP/uwac/libuwac/uwac-output.c
+--- uwac/libuwac/uwac-output.c	2019-07-25 19:51:06.865927193 +0300
++++ ../../informatimago/FreeRDP/uwac/libuwac/uwac-output.c	2019-07-25 20:11:30.827996863 +0300
+@@ -27,7 +27,7 @@
+ #include <string.h>
+ #include <assert.h>
+ 
+-#define TARGET_OUTPUT_INTERFACE 2U
++#define TARGET_OUTPUT_INTERFACE 2
+ 
+ static void output_handle_geometry(void* data, struct wl_output* wl_output, int x, int y,
+                                    int physical_width, int physical_height, int subpixel,
+@@ -59,17 +59,6 @@
+ 		assert(uwacErrorHandler(output->display, UWAC_ERROR_NOMEMORY,
+ 		                        "%s: unable to strdup model\n", __FUNCTION__));
+ 	}
+-
+-	UwacEvent* event = UwacDisplayNewEvent(output->display, UWAC_EVENT_OUTPUT_GEOMETRY);
+-	event->output_geometry.output = output;
+-	event->output_geometry.x = x;
+-	event->output_geometry.y = y;
+-	event->output_geometry.physical_width = physical_width;
+-	event->output_geometry.physical_height = physical_height;
+-	event->output_geometry.subpixel = subpixel;
+-	event->output_geometry.make = output->make;
+-	event->output_geometry.model = output->model;
+-	event->output_geometry.transform = transform;
+ }
+ 
+ static void output_handle_done(void* data, struct wl_output* wl_output)
+@@ -114,7 +103,7 @@
+ UwacOutput* UwacCreateOutput(UwacDisplay* d, uint32_t id, uint32_t version)
+ {
+ 	UwacOutput* o;
+-	o = xzalloc(sizeof *o);
++	o = zalloc(sizeof *o);
+ 
+ 	if (!o)
+ 		return NULL;
+diff -urN uwac/libuwac/uwac-priv.h ../../informatimago/FreeRDP/uwac/libuwac/uwac-priv.h
+--- uwac/libuwac/uwac-priv.h	2019-07-25 19:51:06.869927212 +0300
++++ ../../informatimago/FreeRDP/uwac/libuwac/uwac-priv.h	2019-07-25 20:11:30.831996883 +0300
+@@ -28,15 +28,11 @@
+ #include <stdbool.h>
+ #include <wayland-client.h>
+ #include "xdg-shell-client-protocol.h"
+-#include "keyboard-shortcuts-inhibit-unstable-v1-client-protocol.h"
+-#include "xdg-decoration-unstable-v1-client-protocol.h"
+-#include "server-decoration-client-protocol.h"
+-
+ #ifdef BUILD_IVI
+ #	include "ivi-application-client-protocol.h"
+ #endif
+ #ifdef BUILD_FULLSCREEN_SHELL
+-#	include "fullscreen-shell-unstable-v1-client-protocol.h"
++#	include "fullscreen-shell-client-protocol.h"
+ #endif
+ 
+ #ifdef HAVE_PIXMAN_REGION
+@@ -90,17 +86,12 @@
+ 	struct wl_compositor* compositor;
+ 	struct wl_subcompositor* subcompositor;
+ 	struct wl_shell* shell;
+-	struct xdg_toplevel* xdg_toplevel;
+-	struct xdg_wm_base* xdg_base;
+-	struct wl_data_device_manager* devicemanager;
+-	struct zwp_keyboard_shortcuts_inhibit_manager_v1* keyboard_inhibit_manager;
+-	struct zxdg_decoration_manager_v1* deco_manager;
+-	struct org_kde_kwin_server_decoration_manager* kde_deco_manager;
++	struct xdg_shell* xdg_shell;
+ #ifdef BUILD_IVI
+ 	struct ivi_application* ivi_application;
+ #endif
+ #ifdef BUILD_FULLSCREEN_SHELL
+-	struct zwp_fullscreen_shell_v1* fullscreen_shell;
++	struct _wl_fullscreen_shell* fullscreen_shell;
+ #endif
+ 
+ 	struct wl_shm* shm;
+@@ -122,6 +113,9 @@
+ 	UwacTask dispatch_fd_task;
+ 	uint32_t serial;
+ 
++	struct wl_cursor_theme* cursor_theme;
++	struct wl_cursor** cursors;
++
+ 	struct wl_list windows;
+ 
+ 	struct wl_list outputs;
+@@ -156,21 +150,10 @@
+ 	struct wl_seat* seat;
+ 	uint32_t seat_id;
+ 	uint32_t seat_version;
+-	struct wl_data_device* data_device;
+-	struct wl_data_source* data_source;
+ 	struct wl_pointer* pointer;
+-	struct wl_surface* pointer_surface;
+-	struct wl_cursor_image* pointer_image;
+-	struct wl_cursor_theme* cursor_theme;
+-	struct wl_cursor* default_cursor;
+-	void* pointer_data;
+-	size_t pointer_size;
+-	int pointer_type;
+ 	struct wl_keyboard* keyboard;
+ 	struct wl_touch* touch;
+-	struct wl_data_offer* offer;
+ 	struct xkb_context* xkb_context;
+-	struct zwp_keyboard_shortcuts_inhibitor_v1* keyboard_inhibitor;
+ 
+ 	struct
+ 	{
+@@ -198,11 +181,6 @@
+ 	UwacTask repeat_task;
+ 	float sx, sy;
+ 	struct wl_list link;
+-
+-	void* data_context;
+-	UwacDataTransferHandler transfer_data;
+-	UwacCancelDataTransferHandler cancel_data;
+-	bool ignore_announcement;
+ };
+ 
+ /** @brief a buffer used for drawing a surface frame */
+@@ -232,13 +210,11 @@
+ 
+ 	struct wl_region* opaque_region;
+ 	struct wl_region* input_region;
++	struct wl_callback* frame_callback;
+ 	UwacBuffer *drawingBuffer, *pendingBuffer;
+ 	struct wl_surface* surface;
+ 	struct wl_shell_surface* shell_surface;
+ 	struct xdg_surface* xdg_surface;
+-	struct xdg_toplevel* xdg_toplevel;
+-	struct zxdg_toplevel_decoration_v1* deco;
+-	struct org_kde_kwin_server_decoration* kde_deco;
+ #ifdef BUILD_IVI
+ 	struct ivi_surface* ivi_surface;
+ #endif
+@@ -261,6 +237,4 @@
+ UwacOutput* UwacCreateOutput(UwacDisplay* d, uint32_t id, uint32_t version);
+ int UwacDestroyOutput(UwacOutput* output);
+ 
+-UwacReturnCode UwacSeatRegisterClipboard(UwacSeat* s);
+-
+ #endif /* UWAC_PRIV_H_ */
+diff -urN uwac/libuwac/uwac-tools.c ../../informatimago/FreeRDP/uwac/libuwac/uwac-tools.c
+--- uwac/libuwac/uwac-tools.c	2019-07-25 19:51:06.873927232 +0300
++++ ../../informatimago/FreeRDP/uwac/libuwac/uwac-tools.c	2019-07-25 20:11:30.831996883 +0300
+@@ -52,10 +52,10 @@
+ 	case UWAC_EVENT_TOUCH_UP:
+ 	{
+ 		UwacTouchUp* touchUp = &event->touchUp;
+-		size_t toMove = automata->tp.size - sizeof(UwacTouchPoint);
++		int toMove = automata->tp.size - sizeof(UwacTouchPoint);
+ 		wl_array_for_each(tp, &automata->tp)
+ 		{
+-			if ((int64_t)tp->id == touchUp->id)
++			if (tp->id == touchUp->id)
+ 			{
+ 				if (toMove)
+ 					memmove(tp, tp + 1, toMove);
+@@ -73,7 +73,7 @@
+ 		UwacTouchDown* touchDown = &event->touchDown;
+ 		wl_array_for_each(tp, &automata->tp)
+ 		{
+-			if ((int64_t)tp->id == touchDown->id)
++			if (tp->id == touchDown->id)
+ 			{
+ 				tp->x = touchDown->x;
+ 				tp->y = touchDown->y;
+@@ -85,10 +85,7 @@
+ 		if (!tp)
+ 			return false;
+ 
+-		if (touchDown->id < 0)
+-			return false;
+-
+-		tp->id = (uint32_t)touchDown->id;
++		tp->id = touchDown->id;
+ 		tp->x = touchDown->x;
+ 		tp->y = touchDown->y;
+ 		break;
+diff -urN uwac/libuwac/uwac-utils.c ../../informatimago/FreeRDP/uwac/libuwac/uwac-utils.c
+--- uwac/libuwac/uwac-utils.c	2019-07-25 19:51:06.873927232 +0300
++++ ../../informatimago/FreeRDP/uwac/libuwac/uwac-utils.c	2019-07-25 20:11:30.835996902 +0300
+@@ -61,7 +61,7 @@
+ 	return fail_on_null(strdup(s));
+ }
+ 
+-void* xrealloc(void* p, size_t s)
++void* xrealloc(char* p, size_t s)
+ {
+ 	return fail_on_null(realloc(p, s));
+ }
+diff -urN uwac/libuwac/uwac-utils.h ../../informatimago/FreeRDP/uwac/libuwac/uwac-utils.h
+--- uwac/libuwac/uwac-utils.h	2019-07-25 19:51:06.877927251 +0300
++++ ../../informatimago/FreeRDP/uwac/libuwac/uwac-utils.h	2019-07-25 20:11:30.835996902 +0300
+@@ -51,6 +51,6 @@
+ 
+ char* xstrdup(const char* s);
+ 
+-void* xrealloc(void* p, size_t s);
++void* xrealloc(char* p, size_t s);
+ 
+ #endif /* UWAC_UTILS_H_ */
+diff -urN uwac/libuwac/uwac-window.c ../../informatimago/FreeRDP/uwac/libuwac/uwac-window.c
+--- uwac/libuwac/uwac-window.c	2019-07-25 19:51:06.897927351 +0300
++++ ../../informatimago/FreeRDP/uwac/libuwac/uwac-window.c	2019-07-25 20:11:30.851996982 +0300
+@@ -75,31 +75,31 @@
+ int UwacWindowShmAllocBuffers(UwacWindow* w, int nbuffers, int allocSize, uint32_t width,
+                               uint32_t height, enum wl_shm_format format);
+ 
+-static void xdg_handle_configure(void* data, struct xdg_toplevel* xdg_toplevel, int32_t width,
+-                                 int32_t height, struct wl_array* states)
++static void xdg_handle_configure(void* data, struct xdg_surface* surface, int32_t width,
++                                 int32_t height, struct wl_array* states, uint32_t serial)
+ {
+ 	UwacWindow* window = (UwacWindow*)data;
+ 	UwacConfigureEvent* event;
+ 	int ret, surfaceState;
+-	enum xdg_toplevel_state* state;
++	enum xdg_surface_state* state;
+ 	surfaceState = 0;
+ 	wl_array_for_each(state, states)
+ 	{
+ 		switch (*state)
+ 		{
+-		case XDG_TOPLEVEL_STATE_MAXIMIZED:
++		case XDG_SURFACE_STATE_MAXIMIZED:
+ 			surfaceState |= UWAC_WINDOW_MAXIMIZED;
+ 			break;
+ 
+-		case XDG_TOPLEVEL_STATE_FULLSCREEN:
++		case XDG_SURFACE_STATE_FULLSCREEN:
+ 			surfaceState |= UWAC_WINDOW_FULLSCREEN;
+ 			break;
+ 
+-		case XDG_TOPLEVEL_STATE_ACTIVATED:
++		case XDG_SURFACE_STATE_ACTIVATED:
+ 			surfaceState |= UWAC_WINDOW_ACTIVATED;
+ 			break;
+ 
+-		case XDG_TOPLEVEL_STATE_RESIZING:
++		case XDG_SURFACE_STATE_RESIZING:
+ 			surfaceState |= UWAC_WINDOW_RESIZING;
+ 			break;
+ 
+@@ -114,7 +114,7 @@
+ 	{
+ 		assert(uwacErrorHandler(window->display, UWAC_ERROR_NOMEMORY,
+ 		                        "failed to allocate a configure event\n"));
+-		return;
++		goto ack;
+ 	}
+ 
+ 	event->window = window;
+@@ -136,7 +136,7 @@
+ 			assert(
+ 			    uwacErrorHandler(window->display, ret, "failed to reallocate a wayland buffers\n"));
+ 			window->drawingBuffer = window->pendingBuffer = NULL;
+-			return;
++			goto ack;
+ 		}
+ 
+ 		window->drawingBuffer = window->pendingBuffer = &window->buffers[0];
+@@ -146,9 +146,12 @@
+ 		event->width = window->width;
+ 		event->height = window->height;
+ 	}
++
++ack:
++	xdg_surface_ack_configure(surface, serial);
+ }
+ 
+-static void xdg_handle_close(void* data, struct xdg_toplevel* xdg_toplevel)
++static void xdg_handle_close(void* data, struct xdg_surface* xdg_surface)
+ {
+ 	UwacCloseEvent* event;
+ 	UwacWindow* window = (UwacWindow*)data;
+@@ -164,10 +167,11 @@
+ 	event->window = window;
+ }
+ 
+-static const struct xdg_toplevel_listener xdg_toplevel_listener = {
++static const struct xdg_surface_listener xdg_surface_listener = {
+ 	xdg_handle_configure,
+ 	xdg_handle_close,
+ };
++
+ #if BUILD_IVI
+ 
+ static void ivi_handle_configure(void* data, struct ivi_surface* surface, int32_t width,
+@@ -287,7 +291,7 @@
+ 	int i, fd;
+ 	void* data;
+ 	struct wl_shm_pool* pool;
+-	newBuffers = xrealloc(w->buffers, (w->nbuffers + nbuffers) * sizeof(UwacBuffer));
++	newBuffers = realloc(w->buffers, (w->nbuffers + nbuffers) * sizeof(UwacBuffer));
+ 
+ 	if (!newBuffers)
+ 		return UWAC_ERROR_NOMEMORY;
+@@ -364,43 +368,6 @@
+ 	return &w->buffers[i];
+ }
+ 
+-static UwacReturnCode UwacWindowSetDecorations(UwacWindow* w)
+-{
+-	if (!w || !w->display)
+-		return UWAC_ERROR_INTERNAL;
+-
+-	if (w->display->deco_manager)
+-	{
+-		w->deco = zxdg_decoration_manager_v1_get_toplevel_decoration(w->display->deco_manager,
+-		                                                             w->xdg_toplevel);
+-
+-		if (!w->deco)
+-		{
+-			uwacErrorHandler(w->display, UWAC_NOT_FOUND,
+-			                 "Current window manager does not allow decorating with SSD");
+-		}
+-		else
+-			zxdg_toplevel_decoration_v1_set_mode(w->deco,
+-			                                     ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
+-	}
+-	else if (w->display->kde_deco_manager)
+-	{
+-		w->kde_deco =
+-		    org_kde_kwin_server_decoration_manager_create(w->display->kde_deco_manager, w->surface);
+-
+-		if (!w->kde_deco)
+-		{
+-			uwacErrorHandler(w->display, UWAC_NOT_FOUND,
+-			                 "Current window manager does not allow decorating with SSD");
+-		}
+-		else
+-			org_kde_kwin_server_decoration_request_mode(w->kde_deco,
+-			                                            ORG_KDE_KWIN_SERVER_DECORATION_MODE_SERVER);
+-	}
+-
+-	return UWAC_SUCCESS;
+-}
+-
+ UwacWindow* UwacCreateWindowShm(UwacDisplay* display, uint32_t width, uint32_t height,
+                                 enum wl_shm_format format)
+ {
+@@ -412,7 +379,7 @@
+ 		return NULL;
+ 	}
+ 
+-	w = xzalloc(sizeof(*w));
++	w = zalloc(sizeof(*w));
+ 
+ 	if (!w)
+ 	{
+@@ -446,9 +413,9 @@
+ 
+ 	wl_surface_set_user_data(w->surface, w);
+ 
+-	if (display->xdg_base)
++	if (display->xdg_shell)
+ 	{
+-		w->xdg_surface = xdg_wm_base_get_xdg_surface(display->xdg_base, w->surface);
++		w->xdg_surface = xdg_shell_get_xdg_surface(display->xdg_shell, w->surface);
+ 
+ 		if (!w->xdg_surface)
+ 		{
+@@ -456,36 +423,24 @@
+ 			goto out_error_shell;
+ 		}
+ 
+-		w->xdg_toplevel = xdg_surface_get_toplevel(w->xdg_surface);
+-
+-		if (!w->xdg_toplevel)
+-		{
+-			display->last_error = UWAC_ERROR_NOMEMORY;
+-			goto out_error_shell;
+-		}
+-
+ 		assert(w->xdg_surface);
+-		xdg_toplevel_add_listener(w->xdg_toplevel, &xdg_toplevel_listener, w);
+-	}
+-
++		xdg_surface_add_listener(w->xdg_surface, &xdg_surface_listener, w);
+ #if BUILD_IVI
++	}
+ 	else if (display->ivi_application)
+ 	{
+ 		w->ivi_surface = ivi_application_surface_create(display->ivi_application, 1, w->surface);
+ 		assert(w->ivi_surface);
+ 		ivi_surface_add_listener(w->ivi_surface, &ivi_surface_listener, w);
+-	}
+-
+ #endif
+ #if BUILD_FULLSCREEN_SHELL
++	}
+ 	else if (display->fullscreen_shell)
+ 	{
+-		zwp_fullscreen_shell_v1_present_surface(display->fullscreen_shell, w->surface,
+-		                                        ZWP_FULLSCREEN_SHELL_V1_PRESENT_METHOD_CENTER,
+-		                                        NULL);
+-	}
+-
++		_wl_fullscreen_shell_present_surface(display->fullscreen_shell, w->surface,
++		                                     _WL_FULLSCREEN_SHELL_PRESENT_METHOD_CENTER, NULL);
+ #endif
++	}
+ 	else
+ 	{
+ 		w->shell_surface = wl_shell_get_shell_surface(display->shell, w->surface);
+@@ -496,7 +451,6 @@
+ 
+ 	wl_list_insert(display->windows.prev, &w->link);
+ 	display->last_error = UWAC_SUCCESS;
+-	UwacWindowSetDecorations(w);
+ 	return w;
+ out_error_shell:
+ 	wl_surface_destroy(w->surface);
+@@ -514,11 +468,8 @@
+ 	w = *pwindow;
+ 	UwacWindowDestroyBuffers(w);
+ 
+-	if (w->deco)
+-		zxdg_toplevel_decoration_v1_destroy(w->deco);
+-
+-	if (w->kde_deco)
+-		org_kde_kwin_server_decoration_destroy(w->kde_deco);
++	if (w->frame_callback)
++		wl_callback_destroy(w->frame_callback);
+ 
+ 	if (w->xdg_surface)
+ 		xdg_surface_destroy(w->xdg_surface);
+@@ -590,35 +541,34 @@
+ 
+ static void UwacSubmitBufferPtr(UwacWindow* window, UwacBuffer* buffer)
+ {
+-#if 0
+ 	UINT32 nrects, i;
+-#	ifdef HAVE_PIXMAN_REGION
++#ifdef HAVE_PIXMAN_REGION
+ 	const pixman_box32_t* box;
+-#	else
++#else
+ 	const RECTANGLE_16* box;
+-#	endif
+ #endif
+ 	wl_surface_attach(window->surface, buffer->wayland_buffer, 0, 0);
+-#if 0
+-#	ifdef HAVE_PIXMAN_REGION
++#ifdef HAVE_PIXMAN_REGION
+ 	box = pixman_region32_rectangles(&buffer->damage, &nrects);
+ 
+ 	for (i = 0; i < nrects; i++, box++)
+-		wl_surface_damage(window->surface, box->x1, box->y1, (box->x2 - box->x1), (box->y2 - box->y1));
++		wl_surface_damage(window->surface, box->x1, box->y1, (box->x2 - box->x1),
++		                  (box->y2 - box->y1));
+ 
+-#	else
++#else
+ 	box = region16_rects(&buffer->damage, &nrects);
+ 
+ 	for (i = 0; i < nrects; i++, box++)
+ 		wl_surface_damage(window->surface, box->left, box->top, (box->right - box->left),
+ 		                  (box->bottom - box->top));
+ 
+-#	endif
+-#else
+-	wl_surface_damage(window->surface, 0, 0, window->width, window->height);
+ #endif
+-	struct wl_callback* frame_callback = wl_surface_frame(window->surface);
+-	wl_callback_add_listener(frame_callback, &frame_listener, window);
++
++	if (window->frame_callback)
++		wl_callback_destroy(window->frame_callback);
++
++	window->frame_callback = wl_surface_frame(window->surface);
++	wl_callback_add_listener(window->frame_callback, &frame_listener, window);
+ 	wl_surface_commit(window->surface);
+ #ifdef HAVE_PIXMAN_REGION
+ 	pixman_region32_clear(&buffer->damage);
+@@ -631,7 +581,6 @@
+ {
+ 	UwacWindow* window = (UwacWindow*)data;
+ 	UwacFrameDoneEvent* event;
+-	wl_callback_destroy(callback);
+ 	window->pendingBuffer = NULL;
+ 	event = (UwacFrameDoneEvent*)UwacDisplayNewEvent(window->display, UWAC_EVENT_FRAME_DONE);
+ 
+@@ -661,31 +610,17 @@
+ 	return UWAC_SUCCESS;
+ }
+ 
+-UwacReturnCode UwacWindowGetDrawingBufferGeometry(UwacWindow* window, UwacSize* geometry,
+-                                                  size_t* stride)
+-{
+-	if (!window || !window->drawingBuffer)
+-		return UWAC_ERROR_INTERNAL;
+-
+-	if (geometry)
+-	{
+-		geometry->width = window->width;
+-		geometry->height = window->height;
+-	}
+-
+-	if (stride)
+-		*stride = window->stride;
+-
+-	return UWAC_SUCCESS;
+-}
+-
+ UwacReturnCode UwacWindowSubmitBuffer(UwacWindow* window, bool copyContentForNextFrame)
+ {
+ 	UwacBuffer* drawingBuffer = window->drawingBuffer;
+ 
+ 	if (window->pendingBuffer)
++	{
++		/* we already have a pending frame, don't do anything*/
+ 		return UWAC_SUCCESS;
++	}
+ 
++	UwacSubmitBufferPtr(window, drawingBuffer);
+ 	window->pendingBuffer = window->drawingBuffer;
+ 	window->drawingBuffer = UwacWindowFindFreeBuffer(window);
+ 
+@@ -693,10 +628,11 @@
+ 		return UWAC_ERROR_NOMEMORY;
+ 
+ 	if (copyContentForNextFrame)
++	{
+ 		memcpy(window->drawingBuffer->data, window->pendingBuffer->data,
+ 		       window->stride * window->height);
++	}
+ 
+-	UwacSubmitBufferPtr(window, drawingBuffer);
+ 	return UWAC_SUCCESS;
+ }
+ 
+@@ -712,15 +648,15 @@
+ UwacReturnCode UwacWindowSetFullscreenState(UwacWindow* window, UwacOutput* output,
+                                             bool isFullscreen)
+ {
+-	if (window->xdg_toplevel)
++	if (window->xdg_surface)
+ 	{
+ 		if (isFullscreen)
+ 		{
+-			xdg_toplevel_set_fullscreen(window->xdg_toplevel, output ? output->output : NULL);
++			xdg_surface_set_fullscreen(window->xdg_surface, output ? output->output : NULL);
+ 		}
+ 		else
+ 		{
+-			xdg_toplevel_unset_fullscreen(window->xdg_toplevel);
++			xdg_surface_unset_fullscreen(window->xdg_surface);
+ 		}
+ 	}
+ 	else if (window->shell_surface)
+@@ -742,8 +678,8 @@
+ 
+ void UwacWindowSetTitle(UwacWindow* window, const char* name)
+ {
+-	if (window->xdg_toplevel)
+-		xdg_toplevel_set_title(window->xdg_toplevel, name);
++	if (window->xdg_surface)
++		xdg_surface_set_title(window->xdg_surface, name);
+ 	else if (window->shell_surface)
+ 		wl_shell_surface_set_title(window->shell_surface, name);
+ }
+diff -urN uwac/protocols/fullscreen-shell-unstable-v1.xml ../../informatimago/FreeRDP/uwac/protocols/fullscreen-shell-unstable-v1.xml
+--- uwac/protocols/fullscreen-shell-unstable-v1.xml	2019-07-24 06:11:52.522197829 +0300
++++ ../../informatimago/FreeRDP/uwac/protocols/fullscreen-shell-unstable-v1.xml	1970-01-01 03:00:00.000000000 +0300
+@@ -1,220 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<protocol name="fullscreen_shell_unstable_v1">
+-
+-  <interface name="zwp_fullscreen_shell_v1" version="1">
+-    <description summary="displays a single surface per output">
+-      Displays a single surface per output.
+-
+-      This interface provides a mechanism for a single client to display
+-      simple full-screen surfaces.  While there technically may be multiple
+-      clients bound to this interface, only one of those clients should be
+-      shown at a time.
+-
+-      To present a surface, the client uses either the present_surface or
+-      present_surface_for_mode requests.  Presenting a surface takes effect
+-      on the next wl_surface.commit.  See the individual requests for
+-      details about scaling and mode switches.
+-
+-      The client can have at most one surface per output at any time.
+-      Requesting a surface to be presented on an output that already has a
+-      surface replaces the previously presented surface.  Presenting a null
+-      surface removes its content and effectively disables the output.
+-      Exactly what happens when an output is "disabled" is
+-      compositor-specific.  The same surface may be presented on multiple
+-      outputs simultaneously.
+-
+-      Once a surface is presented on an output, it stays on that output
+-      until either the client removes it or the compositor destroys the
+-      output.  This way, the client can update the output's contents by
+-      simply attaching a new buffer.
+-
+-      Warning! The protocol described in this file is experimental and
+-      backward incompatible changes may be made. Backward compatible changes
+-      may be added together with the corresponding interface version bump.
+-      Backward incompatible changes are done by bumping the version number in
+-      the protocol and interface names and resetting the interface version.
+-      Once the protocol is to be declared stable, the 'z' prefix and the
+-      version number in the protocol and interface names are removed and the
+-      interface version number is reset.
+-    </description>
+-
+-    <request name="release" type="destructor">
+-      <description summary="release the wl_fullscreen_shell interface">
+-	Release the binding from the wl_fullscreen_shell interface.
+-
+-	This destroys the server-side object and frees this binding.  If
+-	the client binds to wl_fullscreen_shell multiple times, it may wish
+-	to free some of those bindings.
+-      </description>
+-    </request>
+-
+-    <enum name="capability">
+-      <description summary="capabilities advertised by the compositor">
+-	Various capabilities that can be advertised by the compositor.  They
+-	are advertised one-at-a-time when the wl_fullscreen_shell interface is
+-	bound.  See the wl_fullscreen_shell.capability event for more details.
+-
+-	ARBITRARY_MODES:
+-	This is a hint to the client that indicates that the compositor is
+-	capable of setting practically any mode on its outputs.  If this
+-	capability is provided, wl_fullscreen_shell.present_surface_for_mode
+-	will almost never fail and clients should feel free to set whatever
+-	mode they like.  If the compositor does not advertise this, it may
+-	still support some modes that are not advertised through wl_global.mode
+-	but it is less likely.
+-
+-	CURSOR_PLANE:
+-	This is a hint to the client that indicates that the compositor can
+-	handle a cursor surface from the client without actually compositing.
+-	This may be because of a hardware cursor plane or some other mechanism.
+-	If the compositor does not advertise this capability then setting
+-	wl_pointer.cursor may degrade performance or be ignored entirely.  If
+-	CURSOR_PLANE is not advertised, it is recommended that the client draw
+-	its own cursor and set wl_pointer.cursor(NULL).
+-      </description>
+-      <entry name="arbitrary_modes" value="1" summary="compositor is capable of almost any output mode"/>
+-      <entry name="cursor_plane" value="2" summary="compositor has a separate cursor plane"/>
+-    </enum>
+-
+-    <event name="capability">
+-      <description summary="advertises a capability of the compositor">
+-	Advertises a single capability of the compositor.
+-
+-	When the wl_fullscreen_shell interface is bound, this event is emitted
+-	once for each capability advertised.  Valid capabilities are given by
+-	the wl_fullscreen_shell.capability enum.  If clients want to take
+-	advantage of any of these capabilities, they should use a
+-	wl_display.sync request immediately after binding to ensure that they
+-	receive all the capability events.
+-      </description>
+-      <arg name="capability" type="uint"/>
+-    </event>
+-
+-    <enum name="present_method">
+-      <description summary="different method to set the surface fullscreen">
+-	Hints to indicate to the compositor how to deal with a conflict
+-	between the dimensions of the surface and the dimensions of the
+-	output. The compositor is free to ignore this parameter.
+-      </description>
+-      <entry name="default" value="0" summary="no preference, apply default policy"/>
+-      <entry name="center" value="1" summary="center the surface on the output"/>
+-      <entry name="zoom" value="2" summary="scale the surface, preserving aspect ratio, to the largest size that will fit on the output" />
+-      <entry name="zoom_crop" value="3" summary="scale the surface, preserving aspect ratio, to fully fill the output cropping if needed" />
+-      <entry name="stretch" value="4" summary="scale the surface to the size of the output ignoring aspect ratio" />
+-    </enum>
+-
+-    <request name="present_surface">
+-      <description summary="present surface for display">
+-	Present a surface on the given output.
+-
+-	If the output is null, the compositor will present the surface on
+-	whatever display (or displays) it thinks best.  In particular, this
+-	may replace any or all surfaces currently presented so it should
+-	not be used in combination with placing surfaces on specific
+-	outputs.
+-
+-	The method parameter is a hint to the compositor for how the surface
+-	is to be presented.  In particular, it tells the compositor how to
+-	handle a size mismatch between the presented surface and the
+-	output.  The compositor is free to ignore this parameter.
+-
+-	The "zoom", "zoom_crop", and "stretch" methods imply a scaling
+-	operation on the surface.  This will override any kind of output
+-	scaling, so the buffer_scale property of the surface is effectively
+-	ignored.
+-      </description>
+-      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+-      <arg name="method" type="uint"/>
+-      <arg name="output" type="object" interface="wl_output" allow-null="true"/>
+-    </request>
+-
+-    <request name="present_surface_for_mode">
+-      <description summary="present surface for display at a particular mode">
+-	Presents a surface on the given output for a particular mode.
+-
+-	If the current size of the output differs from that of the surface,
+-	the compositor will attempt to change the size of the output to
+-	match the surface.  The result of the mode-switch operation will be
+-	returned via the provided wl_fullscreen_shell_mode_feedback object.
+-
+-	If the current output mode matches the one requested or if the
+-	compositor successfully switches the mode to match the surface,
+-	then the mode_successful event will be sent and the output will
+-	contain the contents of the given surface.  If the compositor
+-	cannot match the output size to the surface size, the mode_failed
+-	will be sent and the output will contain the contents of the
+-	previously presented surface (if any).  If another surface is
+-	presented on the given output before either of these has a chance
+-	to happen, the present_cancelled event will be sent.
+-
+-	Due to race conditions and other issues unknown to the client, no
+-	mode-switch operation is guaranteed to succeed.  However, if the
+-	mode is one advertised by wl_output.mode or if the compositor
+-	advertises the ARBITRARY_MODES capability, then the client should
+-	expect that the mode-switch operation will usually succeed.
+-
+-	If the size of the presented surface changes, the resulting output
+-	is undefined.  The compositor may attempt to change the output mode
+-	to compensate.  However, there is no guarantee that a suitable mode
+-	will be found and the client has no way to be notified of success
+-	or failure.
+-
+-	The framerate parameter specifies the desired framerate for the
+-	output in mHz.  The compositor is free to ignore this parameter.  A
+-	value of 0 indicates that the client has no preference.
+-
+-	If the value of wl_output.scale differs from wl_surface.buffer_scale,
+-	then the compositor may choose a mode that matches either the buffer
+-	size or the surface size.  In either case, the surface will fill the
+-	output.
+-      </description>
+-      <arg name="surface" type="object" interface="wl_surface"/>
+-      <arg name="output" type="object" interface="wl_output"/>
+-      <arg name="framerate" type="int"/>
+-      <arg name="feedback" type="new_id" interface="zwp_fullscreen_shell_mode_feedback_v1"/>
+-    </request>
+-
+-    <enum name="error">
+-      <description summary="wl_fullscreen_shell error values">
+-	These errors can be emitted in response to wl_fullscreen_shell requests.
+-      </description>
+-      <entry name="invalid_method" value="0" summary="present_method is not known"/>
+-    </enum>
+-  </interface>
+-
+-  <interface name="zwp_fullscreen_shell_mode_feedback_v1" version="1">
+-    <event name="mode_successful">
+-      <description summary="mode switch succeeded">
+-	This event indicates that the attempted mode switch operation was
+-	successful.  A surface of the size requested in the mode switch
+-	will fill the output without scaling.
+-
+-	Upon receiving this event, the client should destroy the
+-	wl_fullscreen_shell_mode_feedback object.
+-      </description>
+-    </event>
+-
+-    <event name="mode_failed">
+-      <description summary="mode switch failed">
+-	This event indicates that the attempted mode switch operation
+-	failed.  This may be because the requested output mode is not
+-	possible or it may mean that the compositor does not want to allow it.
+-
+-	Upon receiving this event, the client should destroy the
+-	wl_fullscreen_shell_mode_feedback object.
+-      </description>
+-    </event>
+-
+-    <event name="present_cancelled">
+-      <description summary="mode switch cancelled">
+-	This event indicates that the attempted mode switch operation was
+-	cancelled.  Most likely this is because the client requested a
+-	second mode switch before the first one completed.
+-
+-	Upon receiving this event, the client should destroy the
+-	wl_fullscreen_shell_mode_feedback object.
+-      </description>
+-    </event>
+-  </interface>
+-
+-</protocol>
+diff -urN uwac/protocols/fullscreen-shell.xml ../../informatimago/FreeRDP/uwac/protocols/fullscreen-shell.xml
+--- uwac/protocols/fullscreen-shell.xml	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/uwac/protocols/fullscreen-shell.xml	2019-07-19 20:00:34.137156343 +0300
+@@ -0,0 +1,206 @@
++<protocol name="fullscreen_shell">
++  <interface name="_wl_fullscreen_shell" version="1">
++    <description summary="Displays a single surface per output">
++      Displays a single surface per output.
++
++      This interface provides a mechanism for a single client to display
++      simple full-screen surfaces.  While there technically may be multiple
++      clients bound to this interface, only one of those clients should be
++      shown at a time.
++
++      To present a surface, the client uses either the present_surface or
++      present_surface_for_mode requests.  Presenting a surface takes effect
++      on the next wl_surface.commit.  See the individual requests for
++      details about scaling and mode switches.
++
++      The client can have at most one surface per output at any time.
++      Requesting a surface be presented on an output that already has a
++      surface replaces the previously presented surface.  Presenting a null
++      surface removes its content and effectively disables the output.
++      Exactly what happens when an output is "disabled" is
++      compositor-specific.  The same surface may be presented on multiple
++      outputs simultaneously.
++
++      Once a surface is presented on an output, it stays on that output
++      until either the client removes it or the compositor destroys the
++      output.  This way, the client can update the output's contents by
++      simply attaching a new buffer.
++    </description>
++
++    <request name="release" type="destructor">
++      <description summary="release the wl_fullscreen_shell interface">
++	Release the binding from the wl_fullscreen_shell interface
++
++	This destroys the server-side object and frees this binding.  If
++	the client binds to wl_fullscreen_shell multiple times, it may wish
++	to free some of those bindings.
++      </description>
++    </request>
++
++    <enum name="capability">
++      <description summary="capabilities advertised by the compositor">
++	Various capabilities that can be advertised by the compositor.  They
++	are advertised one-at-a-time when the wl_fullscreen_shell interface is
++	bound.  See the wl_fullscreen_shell.capability event for more details.
++
++	ARBITRARY_MODE:
++	This is a hint to the client that indicates that the compositor is
++	capable of setting practically any mode on its outputs.  If this
++	capability is provided, wl_fullscreen_shell.present_surface_for_mode
++	will almost never fail and clients should feel free to set whatever
++	mode they like.  If the compositor does not advertise this, it may
++	still support some modes that are not advertised through wl_global.mode
++	but it is less likely.
++
++	CURSOR_PLANE:
++	This is a hint to the client that indicates that the compositor can
++	handle a cursor surface from the client without actually compositing.
++	This may be because of a hardware cursor plane or some other mechanism.
++	If the compositor does not advertise this capability then setting
++	wl_pointer.cursor may degrade performance or be ignored entirely.  If
++	CURSOR_PLANE is not advertised, it is recommended that the client draw
++	its own cursor and set wl_pointer.cursor(NULL).
++      </description>
++      <entry name="arbitrary_modes" value="1" summary="compositor is capable of almost any output mode"/>
++      <entry name="cursor_plane" value="2" summary="compositor has a separate cursor plane"/>
++    </enum>
++
++    <event name="capability">
++      <description summary="advertises a capability of the compositor">
++	Advertises a single capability of the compositor.
++
++	When the wl_fullscreen_shell interface is bound, this event is emitted
++	once for each capability advertised.  Valid capabilities are given by
++	the wl_fullscreen_shell.capability enum.  If clients want to take
++	advantage of any of these capabilities, they should use a
++	wl_display.sync request immediately after binding to ensure that they
++	receive all the capability events.
++      </description>
++      <arg name="capabilty" type="uint"/>
++    </event>
++
++    <enum name="present_method">
++      <description summary="different method to set the surface fullscreen">
++	Hints to indicate to the compositor how to deal with a conflict
++	between the dimensions of the surface and the dimensions of the
++	output. The compositor is free to ignore this parameter.
++      </description>
++      <entry name="default" value="0" summary="no preference, apply default policy"/>
++      <entry name="center" value="1" summary="center the surface on the output"/>
++      <entry name="zoom" value="2" summary="scale the surface, preserving aspect ratio, to the largest size that will fit on the output" />
++      <entry name="zoom_crop" value="3" summary="scale the surface, preserving aspect ratio, to fully fill the output cropping if needed" />
++      <entry name="stretch" value="4" summary="scale the surface to the size of the output ignoring aspect ratio" />
++    </enum>
++
++    <request name="present_surface">
++      <description summary="present surface for display">
++	Present a surface on the given output.
++
++	If the output is null, the compositor will present the surface on
++	whatever display (or displays) it thinks best.  In particular, this
++	may replace any or all surfaces currently presented so it should
++	not be used in combination with placing surfaces on specific
++	outputs.
++
++	The method parameter is a hint to the compositor for how the surface
++	is to be presented.  In particular, it tells the compositor how to
++	handle a size mismatch between the presented surface and the
++	output.  The compositor is free to ignore this parameter.
++
++	The "zoom", "zoom_crop", and "stretch" methods imply a scaling
++	operation on the surface.  This will override any kind of output
++	scaling, so the buffer_scale property of the surface is effectively
++	ignored.
++      </description>
++      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
++      <arg name="method" type="uint"/>
++      <arg name="output" type="object" interface="wl_output" allow-null="true"/>
++    </request>
++
++    <request name="present_surface_for_mode">
++      <description summary="present surface for display at a particular mode">
++	Presents a surface on the given output for a particular mode.
++
++	If the current size of the output differs from that of the surface,
++	the compositor will attempt to change the size of the output to
++	match the surface.  The result of the mode-switch operation will be
++	returned via the provided wl_fullscreen_shell_mode_feedback object.
++
++	If the current output mode matches the one requested or if the
++	compositor successfully switches the mode to match the surface,
++	then the mode_successful event will be sent and the output will
++	contain the contents of the given surface.  If the compositor
++	cannot match the output size to the surface size, the mode_failed
++	will be sent and the output will contain the contents of the
++	previously presented surface (if any).  If another surface is
++	presented on the given output before either of these has a chance
++	to happen, the present_cancelled event will be sent.
++
++	Due to race conditions and other issues unknown to the client, no
++	mode-switch operation is guaranteed to succeed.  However, if the
++	mode is one advertised by wl_output.mode or if the compositor
++	advertises the ARBITRARY_MODES capability, then the client should
++	expect that the mode-switch operation will usually succeed.
++
++	If the size of the presented surface changes, the resulting output
++	is undefined.  The compositor may attempt to change the output mode
++	to compensate.  However, there is no guarantee that a suitable mode
++	will be found and the client has no way to be notified of success
++	or failure.
++
++	The framerate parameter specifies the desired framerate for the
++	output in mHz.  The compositor is free to ignore this parameter.  A
++	value of 0 indicates that the client has no preference.
++
++	If the value of wl_output.scale differs from wl_surface.buffer_scale,
++	then the compositor may choose a mode that matches either the buffer
++	size or the surface size.  In either case, the surface will fill the
++	output.
++      </description>
++      <arg name="surface" type="object" interface="wl_surface"/>
++      <arg name="output" type="object" interface="wl_output"/>
++      <arg name="framerate" type="int"/>
++      <arg name="feedback" type="new_id" interface="_wl_fullscreen_shell_mode_feedback"/>
++    </request>
++
++    <enum name="error">
++      <description summary="wl_fullscreen_shell error values">
++	These errors can be emitted in response to wl_fullscreen_shell requests
++      </description>
++      <entry name="invalid_method" value="0" summary="present_method is not known"/>
++    </enum>
++  </interface>
++
++  <interface name="_wl_fullscreen_shell_mode_feedback" version="1">
++    <event name="mode_successful">
++      <description summary="mode switch succeeded">
++	This event indicates that the attempted mode switch operation was
++	successful.  A surface of the size requested in the mode switch
++	will fill the output without scaling.
++
++	Upon receiving this event, the client should destroy the
++	wl_fullscreen_shell_mode_feedback object.
++      </description>
++    </event>
++    <event name="mode_failed">
++      <description summary="mode switch failed">
++	This event indicates that the attempted mode switch operation
++	failed. This may be because the requested output mode is not
++	possible or it may mean that the compositor does not want to allow it.
++
++	Upon receiving this event, the client should destroy the
++	wl_fullscreen_shell_mode_feedback object.
++      </description>
++    </event>
++    <event name="present_cancelled">
++      <description summary="mode switch cancelled">
++	This event indicates that the attempted mode switch operation was
++	cancelled.  Most likely this is because the client requested a
++	second mode switch before the first one completed.
++
++	Upon receiving this event, the client should destroy the
++	wl_fullscreen_shell_mode_feedback object.
++      </description>
++    </event>
++  </interface>
++</protocol>
+diff -urN uwac/protocols/keyboard-shortcuts-inhibit-unstable-v1.xml ../../informatimago/FreeRDP/uwac/protocols/keyboard-shortcuts-inhibit-unstable-v1.xml
+--- uwac/protocols/keyboard-shortcuts-inhibit-unstable-v1.xml	2019-07-24 06:11:52.522197829 +0300
++++ ../../informatimago/FreeRDP/uwac/protocols/keyboard-shortcuts-inhibit-unstable-v1.xml	1970-01-01 03:00:00.000000000 +0300
+@@ -1,143 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<protocol name="keyboard_shortcuts_inhibit_unstable_v1">
+-
+-  <copyright>
+-    Copyright © 2017 Red Hat Inc.
+-
+-    Permission is hereby granted, free of charge, to any person obtaining a
+-    copy of this software and associated documentation files (the "Software"),
+-    to deal in the Software without restriction, including without limitation
+-    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+-    and/or sell copies of the Software, and to permit persons to whom the
+-    Software is furnished to do so, subject to the following conditions:
+-
+-    The above copyright notice and this permission notice (including the next
+-    paragraph) shall be included in all copies or substantial portions of the
+-    Software.
+-
+-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+-    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+-    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+-    DEALINGS IN THE SOFTWARE.
+-  </copyright>
+-
+-  <description summary="Protocol for inhibiting the compositor keyboard shortcuts">
+-    This protocol specifies a way for a client to request the compositor
+-    to ignore its own keyboard shortcuts for a given seat, so that all
+-    key events from that seat get forwarded to a surface.
+-
+-    Warning! The protocol described in this file is experimental and
+-    backward incompatible changes may be made. Backward compatible
+-    changes may be added together with the corresponding interface
+-    version bump.
+-    Backward incompatible changes are done by bumping the version
+-    number in the protocol and interface names and resetting the
+-    interface version. Once the protocol is to be declared stable,
+-    the 'z' prefix and the version number in the protocol and
+-    interface names are removed and the interface version number is
+-    reset.
+-  </description>
+-
+-  <interface name="zwp_keyboard_shortcuts_inhibit_manager_v1" version="1">
+-    <description summary="context object for keyboard grab_manager">
+-      A global interface used for inhibiting the compositor keyboard shortcuts.
+-    </description>
+-
+-    <request name="destroy" type="destructor">
+-      <description summary="destroy the keyboard shortcuts inhibitor object">
+-	Destroy the keyboard shortcuts inhibitor manager.
+-      </description>
+-    </request>
+-
+-    <request name="inhibit_shortcuts">
+-      <description summary="create a new keyboard shortcuts inhibitor object">
+-	Create a new keyboard shortcuts inhibitor object associated with
+-	the given surface for the given seat.
+-
+-	If shortcuts are already inhibited for the specified seat and surface,
+-	a protocol error "already_inhibited" is raised by the compositor.
+-      </description>
+-      <arg name="id" type="new_id" interface="zwp_keyboard_shortcuts_inhibitor_v1"/>
+-      <arg name="surface" type="object" interface="wl_surface"
+-	   summary="the surface that inhibits the keyboard shortcuts behavior"/>
+-      <arg name="seat" type="object" interface="wl_seat"
+-	   summary="the wl_seat for which keyboard shortcuts should be disabled"/>
+-    </request>
+-
+-    <enum name="error">
+-      <entry name="already_inhibited"
+-	     value="0"
+-	     summary="the shortcuts are already inhibited for this surface"/>
+-    </enum>
+-  </interface>
+-
+-  <interface name="zwp_keyboard_shortcuts_inhibitor_v1" version="1">
+-    <description summary="context object for keyboard shortcuts inhibitor">
+-      A keyboard shortcuts inhibitor instructs the compositor to ignore
+-      its own keyboard shortcuts when the associated surface has keyboard
+-      focus. As a result, when the surface has keyboard focus on the given
+-      seat, it will receive all key events originating from the specified
+-      seat, even those which would normally be caught by the compositor for
+-      its own shortcuts.
+-
+-      The Wayland compositor is however under no obligation to disable
+-      all of its shortcuts, and may keep some special key combo for its own
+-      use, including but not limited to one allowing the user to forcibly
+-      restore normal keyboard events routing in the case of an unwilling
+-      client. The compositor may also use the same key combo to reactivate
+-      an existing shortcut inhibitor that was previously deactivated on
+-      user request.
+-
+-      When the compositor restores its own keyboard shortcuts, an
+-      "inactive" event is emitted to notify the client that the keyboard
+-      shortcuts inhibitor is not effectively active for the surface and
+-      seat any more, and the client should not expect to receive all
+-      keyboard events.
+-
+-      When the keyboard shortcuts inhibitor is inactive, the client has
+-      no way to forcibly reactivate the keyboard shortcuts inhibitor.
+-
+-      The user can chose to re-enable a previously deactivated keyboard
+-      shortcuts inhibitor using any mechanism the compositor may offer,
+-      in which case the compositor will send an "active" event to notify
+-      the client.
+-
+-      If the surface is destroyed, unmapped, or loses the seat's keyboard
+-      focus, the keyboard shortcuts inhibitor becomes irrelevant and the
+-      compositor will restore its own keyboard shortcuts but no "inactive"
+-      event is emitted in this case.
+-    </description>
+-
+-    <request name="destroy" type="destructor">
+-      <description summary="destroy the keyboard shortcuts inhibitor object">
+-	Remove the keyboard shortcuts inhibitor from the associated wl_surface.
+-      </description>
+-    </request>
+-
+-    <event name="active">
+-      <description summary="shortcuts are inhibited">
+-	This event indicates that the shortcut inhibitor is active.
+-
+-	The compositor sends this event every time compositor shortcuts
+-	are inhibited on behalf of the surface. When active, the client
+-	may receive input events normally reserved by the compositor
+-	(see zwp_keyboard_shortcuts_inhibitor_v1).
+-
+-	This occurs typically when the initial request "inhibit_shortcuts"
+-	first becomes active or when the user instructs the compositor to
+-	re-enable and existing shortcuts inhibitor using any mechanism
+-	offered by the compositor.
+-      </description>
+-    </event>
+-
+-    <event name="inactive">
+-      <description summary="shortcuts are restored">
+-	This event indicates that the shortcuts inhibitor is inactive,
+-	normal shortcuts processing is restored by the compositor.
+-       </description>
+-    </event>
+-  </interface>
+-</protocol>
+diff -urN uwac/protocols/server-decoration.xml ../../informatimago/FreeRDP/uwac/protocols/server-decoration.xml
+--- uwac/protocols/server-decoration.xml	2019-07-24 06:11:52.522197829 +0300
++++ ../../informatimago/FreeRDP/uwac/protocols/server-decoration.xml	1970-01-01 03:00:00.000000000 +0300
+@@ -1,96 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<protocol name="server_decoration">
+-  <copyright><![CDATA[
+-    Copyright (C) 2015 Martin Gräßlin
+-
+-    This program is free software: you can redistribute it and/or modify
+-    it under the terms of the GNU Lesser General Public License as published by
+-    the Free Software Foundation, either version 2.1 of the License, or
+-    (at your option) any later version.
+-
+-    This program is distributed in the hope that it will be useful,
+-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-    GNU Lesser General Public License for more details.
+-
+-    You should have received a copy of the GNU Lesser General Public License
+-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-  ]]></copyright>
+-  <interface  name="org_kde_kwin_server_decoration_manager" version="1">
+-      <description summary="Server side window decoration manager">
+-        This interface allows to coordinate whether the server should create
+-        a server-side window decoration around a wl_surface representing a
+-        shell surface (wl_shell_surface or similar). By announcing support
+-        for this interface the server indicates that it supports server
+-        side decorations.
+-
+-        Use in conjunction with zxdg_decoration_manager_v1 is undefined.
+-      </description>
+-      <request name="create">
+-        <description summary="Create a server-side decoration object for a given surface">
+-            When a client creates a server-side decoration object it indicates
+-            that it supports the protocol. The client is supposed to tell the
+-            server whether it wants server-side decorations or will provide
+-            client-side decorations.
+-
+-            If the client does not create a server-side decoration object for
+-            a surface the server interprets this as lack of support for this
+-            protocol and considers it as client-side decorated. Nevertheless a
+-            client-side decorated surface should use this protocol to indicate
+-            to the server that it does not want a server-side deco.
+-        </description>
+-        <arg name="id" type="new_id" interface="org_kde_kwin_server_decoration"/>
+-        <arg name="surface" type="object" interface="wl_surface"/>
+-      </request>
+-      <enum name="mode">
+-            <description summary="Possible values to use in request_mode and the event mode."/>
+-            <entry name="None" value="0" summary="Undecorated: The surface is not decorated at all, neither server nor client-side. An example is a popup surface which should not be decorated."/>
+-            <entry name="Client" value="1" summary="Client-side decoration: The decoration is part of the surface and the client."/>
+-            <entry name="Server" value="2" summary="Server-side decoration: The server embeds the surface into a decoration frame."/>
+-      </enum>
+-      <event name="default_mode">
+-          <description summary="The default mode used on the server">
+-              This event is emitted directly after binding the interface. It contains
+-              the default mode for the decoration. When a new server decoration object
+-              is created this new object will be in the default mode until the first
+-              request_mode is requested.
+-
+-              The server may change the default mode at any time.
+-          </description>
+-          <arg name="mode" type="uint" summary="The default decoration mode applied to newly created server decorations."/>
+-      </event>
+-  </interface>
+-  <interface name="org_kde_kwin_server_decoration" version="1">
+-      <request name="release" type="destructor">
+-        <description summary="release the server decoration object"/>
+-      </request>
+-      <enum name="mode">
+-            <description summary="Possible values to use in request_mode and the event mode."/>
+-            <entry name="None" value="0" summary="Undecorated: The surface is not decorated at all, neither server nor client-side. An example is a popup surface which should not be decorated."/>
+-            <entry name="Client" value="1" summary="Client-side decoration: The decoration is part of the surface and the client."/>
+-            <entry name="Server" value="2" summary="Server-side decoration: The server embeds the surface into a decoration frame."/>
+-      </enum>
+-      <request name="request_mode">
+-          <description summary="The decoration mode the surface wants to use."/>
+-          <arg name="mode" type="uint" summary="The mode this surface wants to use."/>
+-      </request>
+-      <event name="mode">
+-          <description summary="The new decoration mode applied by the server">
+-              This event is emitted directly after the decoration is created and
+-              represents the base decoration policy by the server. E.g. a server
+-              which wants all surfaces to be client-side decorated will send Client,
+-              a server which wants server-side decoration will send Server.
+-
+-              The client can request a different mode through the decoration request.
+-              The server will acknowledge this by another event with the same mode. So
+-              even if a server prefers server-side decoration it's possible to force a
+-              client-side decoration.
+-
+-              The server may emit this event at any time. In this case the client can
+-              again request a different mode. It's the responsibility of the server to
+-              prevent a feedback loop.
+-          </description>
+-          <arg name="mode" type="uint" summary="The decoration mode applied to the surface by the server."/>
+-      </event>
+-  </interface>
+-</protocol>
+diff -urN uwac/protocols/xdg-decoration-unstable-v1.xml ../../informatimago/FreeRDP/uwac/protocols/xdg-decoration-unstable-v1.xml
+--- uwac/protocols/xdg-decoration-unstable-v1.xml	2019-07-24 06:11:52.522197829 +0300
++++ ../../informatimago/FreeRDP/uwac/protocols/xdg-decoration-unstable-v1.xml	1970-01-01 03:00:00.000000000 +0300
+@@ -1,156 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<protocol name="xdg_decoration_unstable_v1">
+-  <copyright>
+-    Copyright © 2018 Simon Ser
+-
+-    Permission is hereby granted, free of charge, to any person obtaining a
+-    copy of this software and associated documentation files (the "Software"),
+-    to deal in the Software without restriction, including without limitation
+-    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+-    and/or sell copies of the Software, and to permit persons to whom the
+-    Software is furnished to do so, subject to the following conditions:
+-
+-    The above copyright notice and this permission notice (including the next
+-    paragraph) shall be included in all copies or substantial portions of the
+-    Software.
+-
+-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+-    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+-    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+-    DEALINGS IN THE SOFTWARE.
+-  </copyright>
+-
+-  <interface name="zxdg_decoration_manager_v1" version="1">
+-    <description summary="window decoration manager">
+-      This interface allows a compositor to announce support for server-side
+-      decorations.
+-
+-      A window decoration is a set of window controls as deemed appropriate by
+-      the party managing them, such as user interface components used to move,
+-      resize and change a window's state.
+-
+-      A client can use this protocol to request being decorated by a supporting
+-      compositor.
+-
+-      If compositor and client do not negotiate the use of a server-side
+-      decoration using this protocol, clients continue to self-decorate as they
+-      see fit.
+-
+-      Warning! The protocol described in this file is experimental and
+-      backward incompatible changes may be made. Backward compatible changes
+-      may be added together with the corresponding interface version bump.
+-      Backward incompatible changes are done by bumping the version number in
+-      the protocol and interface names and resetting the interface version.
+-      Once the protocol is to be declared stable, the 'z' prefix and the
+-      version number in the protocol and interface names are removed and the
+-      interface version number is reset.
+-    </description>
+-
+-    <request name="destroy" type="destructor">
+-      <description summary="destroy the decoration manager object">
+-        Destroy the decoration manager. This doesn't destroy objects created
+-        with the manager.
+-      </description>
+-    </request>
+-
+-    <request name="get_toplevel_decoration">
+-      <description summary="create a new toplevel decoration object">
+-        Create a new decoration object associated with the given toplevel.
+-
+-        Creating an xdg_toplevel_decoration from an xdg_toplevel which has a
+-        buffer attached or committed is a client error, and any attempts by a
+-        client to attach or manipulate a buffer prior to the first
+-        xdg_toplevel_decoration.configure event must also be treated as
+-        errors.
+-      </description>
+-      <arg name="id" type="new_id" interface="zxdg_toplevel_decoration_v1"/>
+-      <arg name="toplevel" type="object" interface="xdg_toplevel"/>
+-    </request>
+-  </interface>
+-
+-  <interface name="zxdg_toplevel_decoration_v1" version="1">
+-    <description summary="decoration object for a toplevel surface">
+-      The decoration object allows the compositor to toggle server-side window
+-      decorations for a toplevel surface. The client can request to switch to
+-      another mode.
+-
+-      The xdg_toplevel_decoration object must be destroyed before its
+-      xdg_toplevel.
+-    </description>
+-
+-    <enum name="error">
+-      <entry name="unconfigured_buffer" value="0"
+-        summary="xdg_toplevel has a buffer attached before configure"/>
+-      <entry name="already_constructed" value="1"
+-        summary="xdg_toplevel already has a decoration object"/>
+-      <entry name="orphaned" value="2"
+-        summary="xdg_toplevel destroyed before the decoration object"/>
+-    </enum>
+-
+-    <request name="destroy" type="destructor">
+-      <description summary="destroy the decoration object">
+-        Switch back to a mode without any server-side decorations at the next
+-        commit.
+-      </description>
+-    </request>
+-
+-    <enum name="mode">
+-      <description summary="window decoration modes">
+-        These values describe window decoration modes.
+-      </description>
+-      <entry name="client_side" value="1"
+-        summary="no server-side window decoration"/>
+-      <entry name="server_side" value="2"
+-        summary="server-side window decoration"/>
+-    </enum>
+-
+-    <request name="set_mode">
+-      <description summary="set the decoration mode">
+-        Set the toplevel surface decoration mode. This informs the compositor
+-        that the client prefers the provided decoration mode.
+-
+-        After requesting a decoration mode, the compositor will respond by
+-        emitting a xdg_surface.configure event. The client should then update
+-        its content, drawing it without decorations if the received mode is
+-        server-side decorations. The client must also acknowledge the configure
+-        when committing the new content (see xdg_surface.ack_configure).
+-
+-        The compositor can decide not to use the client's mode and enforce a
+-        different mode instead.
+-
+-        Clients whose decoration mode depend on the xdg_toplevel state may send
+-        a set_mode request in response to a xdg_surface.configure event and wait
+-        for the next xdg_surface.configure event to prevent unwanted state.
+-        Such clients are responsible for preventing configure loops and must
+-        make sure not to send multiple successive set_mode requests with the
+-        same decoration mode.
+-      </description>
+-      <arg name="mode" type="uint" enum="mode" summary="the decoration mode"/>
+-    </request>
+-
+-    <request name="unset_mode">
+-      <description summary="unset the decoration mode">
+-        Unset the toplevel surface decoration mode. This informs the compositor
+-        that the client doesn't prefer a particular decoration mode.
+-
+-        This request has the same semantics as set_mode.
+-      </description>
+-    </request>
+-
+-    <event name="configure">
+-      <description summary="suggest a surface change">
+-        The configure event asks the client to change its decoration mode. The
+-        configured state should not be applied immediately. Clients must send an
+-        ack_configure in response to this event. See xdg_surface.configure and
+-        xdg_surface.ack_configure for details.
+-
+-        A configure event can be sent at any time. The specified mode must be
+-        obeyed by the client.
+-      </description>
+-      <arg name="mode" type="uint" enum="mode" summary="the decoration mode"/>
+-    </event>
+-  </interface>
+-</protocol>
+diff -urN uwac/protocols/xdg-shell.xml ../../informatimago/FreeRDP/uwac/protocols/xdg-shell.xml
+--- uwac/protocols/xdg-shell.xml	2019-07-24 06:11:52.522197829 +0300
++++ ../../informatimago/FreeRDP/uwac/protocols/xdg-shell.xml	2019-07-19 20:00:34.137156343 +0300
+@@ -6,8 +6,6 @@
+     Copyright © 2013      Rafael Antognolli
+     Copyright © 2013      Jasper St. Pierre
+     Copyright © 2010-2013 Intel Corporation
+-    Copyright © 2015-2017 Samsung Electronics Co., Ltd
+-    Copyright © 2015-2017 Red Hat Inc.
+ 
+     Permission is hereby granted, free of charge, to any person obtaining a
+     copy of this software and associated documentation files (the "Software"),
+@@ -29,58 +27,59 @@
+     DEALINGS IN THE SOFTWARE.
+   </copyright>
+ 
+-  <interface name="xdg_wm_base" version="2">
++  <interface name="xdg_shell" version="1">
+     <description summary="create desktop-style surfaces">
+-      The xdg_wm_base interface is exposed as a global object enabling clients
+-      to turn their wl_surfaces into windows in a desktop environment. It
+-      defines the basic functionality needed for clients and the compositor to
+-      create windows that can be dragged, resized, maximized, etc, as well as
+-      creating transient windows such as popup menus.
++      xdg_shell allows clients to turn a wl_surface into a "real window"
++      which can be dragged, resized, stacked, and moved around by the
++      user. Everything about this interface is suited towards traditional
++      desktop environments.
+     </description>
+ 
++    <enum name="version">
++      <description summary="latest protocol version">
++	The 'current' member of this enum gives the version of the
++	protocol.  Implementations can compare this to the version
++	they implement using static_assert to ensure the protocol and
++	implementation versions match.
++      </description>
++      <entry name="current" value="5" summary="Always the latest version"/>
++    </enum>
++
+     <enum name="error">
+       <entry name="role" value="0" summary="given wl_surface has another role"/>
+-      <entry name="defunct_surfaces" value="1"
+-	     summary="xdg_wm_base was destroyed before children"/>
+-      <entry name="not_the_topmost_popup" value="2"
+-	     summary="the client tried to map or destroy a non-topmost popup"/>
+-      <entry name="invalid_popup_parent" value="3"
+-	     summary="the client specified an invalid popup parent surface"/>
+-      <entry name="invalid_surface_state" value="4"
+-	     summary="the client provided an invalid surface state"/>
+-      <entry name="invalid_positioner" value="5"
+-	     summary="the client provided an invalid positioner"/>
++      <entry name="defunct_surfaces" value="1" summary="xdg_shell was destroyed before children"/>
++      <entry name="not_the_topmost_popup" value="2" summary="the client tried to map or destroy a non-topmost popup"/>
++      <entry name="invalid_popup_parent" value="3" summary="the client specified an invalid popup parent surface"/>
+     </enum>
+ 
+     <request name="destroy" type="destructor">
+-      <description summary="destroy xdg_wm_base">
+-	Destroy this xdg_wm_base object.
++      <description summary="destroy xdg_shell">
++        Destroy this xdg_shell object.
+ 
+-	Destroying a bound xdg_wm_base object while there are surfaces
+-	still alive created by this xdg_wm_base object instance is illegal
+-	and will result in a protocol error.
++        Destroying a bound xdg_shell object while there are surfaces
++        still alive created by this xdg_shell object instance is illegal
++        and will result in a protocol error.
+       </description>
+     </request>
+ 
+-    <request name="create_positioner">
+-      <description summary="create a positioner object">
+-	Create a positioner object. A positioner object is used to position
+-	surfaces relative to some parent surface. See the interface description
+-	and xdg_surface.get_popup for details.
++    <request name="use_unstable_version">
++      <description summary="enable use of this unstable version">
++	Negotiate the unstable version of the interface.  This
++	mechanism is in place to ensure client and server agree on the
++	unstable versions of the protocol that they speak or exit
++	cleanly if they don't agree.  This request will go away once
++	the xdg-shell protocol is stable.
+       </description>
+-      <arg name="id" type="new_id" interface="xdg_positioner"/>
++      <arg name="version" type="int"/>
+     </request>
+ 
+     <request name="get_xdg_surface">
+       <description summary="create a shell surface from a surface">
+-	This creates an xdg_surface for the given surface. While xdg_surface
+-	itself is not a role, the corresponding surface may only be assigned
+-	a role extending xdg_surface, such as xdg_toplevel or xdg_popup.
+-
+-	This creates an xdg_surface for the given surface. An xdg_surface is
+-	used as basis to define a role to a given surface, such as xdg_toplevel
+-	or xdg_popup. It also manages functionality shared between xdg_surface
+-	based surface roles.
++	This creates an xdg_surface for the given surface and gives it the
++	xdg_surface role. A wl_surface can only be given an xdg_surface role
++	once. If get_xdg_surface is called with a wl_surface that already has
++	an active xdg_surface associated with it, or if it had any other role,
++	an error is raised.
+ 
+ 	See the documentation of xdg_surface for more details about what an
+ 	xdg_surface is and how it is used.
+@@ -89,489 +88,97 @@
+       <arg name="surface" type="object" interface="wl_surface"/>
+     </request>
+ 
+-    <request name="pong">
+-      <description summary="respond to a ping event">
+-	A client must respond to a ping event with a pong request or
+-	the client may be deemed unresponsive. See xdg_wm_base.ping.
++    <request name="get_xdg_popup">
++      <description summary="create a popup for a surface">
++	This creates an xdg_popup for the given surface and gives it the
++	xdg_popup role. A wl_surface can only be given an xdg_popup role
++	once. If get_xdg_popup is called with a wl_surface that already has
++	an active xdg_popup associated with it, or if it had any other role,
++	an error is raised.
++
++	This request must be used in response to some sort of user action
++	like a button press, key press, or touch down event.
++
++	See the documentation of xdg_popup for more details about what an
++	xdg_popup is and how it is used.
+       </description>
+-      <arg name="serial" type="uint" summary="serial of the ping event"/>
++      <arg name="id" type="new_id" interface="xdg_popup"/>
++      <arg name="surface" type="object" interface="wl_surface"/>
++      <arg name="parent" type="object" interface="wl_surface"/>
++      <arg name="seat" type="object" interface="wl_seat" summary="the wl_seat of the user event"/>
++      <arg name="serial" type="uint" summary="the serial of the user event"/>
++      <arg name="x" type="int"/>
++      <arg name="y" type="int"/>
+     </request>
+ 
+     <event name="ping">
+       <description summary="check if the client is alive">
+-	The ping event asks the client if it's still alive. Pass the
+-	serial specified in the event back to the compositor by sending
+-	a "pong" request back with the specified serial. See xdg_wm_base.ping.
+-
+-	Compositors can use this to determine if the client is still
+-	alive. It's unspecified what will happen if the client doesn't
+-	respond to the ping request, or in what timeframe. Clients should
+-	try to respond in a reasonable amount of time.
++        The ping event asks the client if it's still alive. Pass the
++        serial specified in the event back to the compositor by sending
++        a "pong" request back with the specified serial.
++
++        Compositors can use this to determine if the client is still
++        alive. It's unspecified what will happen if the client doesn't
++        respond to the ping request, or in what timeframe. Clients should
++        try to respond in a reasonable amount of time.
+ 
+-	A compositor is free to ping in any way it wants, but a client must
+-	always respond to any xdg_wm_base object it created.
++        A compositor is free to ping in any way it wants, but a client must
++        always respond to any xdg_shell object it created.
+       </description>
+       <arg name="serial" type="uint" summary="pass this to the pong request"/>
+     </event>
+-  </interface>
+-
+-  <interface name="xdg_positioner" version="2">
+-    <description summary="child surface positioner">
+-      The xdg_positioner provides a collection of rules for the placement of a
+-      child surface relative to a parent surface. Rules can be defined to ensure
+-      the child surface remains within the visible area's borders, and to
+-      specify how the child surface changes its position, such as sliding along
+-      an axis, or flipping around a rectangle. These positioner-created rules are
+-      constrained by the requirement that a child surface must intersect with or
+-      be at least partially adjacent to its parent surface.
+-
+-      See the various requests for details about possible rules.
+-
+-      At the time of the request, the compositor makes a copy of the rules
+-      specified by the xdg_positioner. Thus, after the request is complete the
+-      xdg_positioner object can be destroyed or reused; further changes to the
+-      object will have no effect on previous usages.
+-
+-      For an xdg_positioner object to be considered complete, it must have a
+-      non-zero size set by set_size, and a non-zero anchor rectangle set by
+-      set_anchor_rect. Passing an incomplete xdg_positioner object when
+-      positioning a surface raises an error.
+-    </description>
+-
+-    <enum name="error">
+-      <entry name="invalid_input" value="0" summary="invalid input provided"/>
+-    </enum>
+-
+-    <request name="destroy" type="destructor">
+-      <description summary="destroy the xdg_positioner object">
+-	Notify the compositor that the xdg_positioner will no longer be used.
+-      </description>
+-    </request>
+-
+-    <request name="set_size">
+-      <description summary="set the size of the to-be positioned rectangle">
+-	Set the size of the surface that is to be positioned with the positioner
+-	object. The size is in surface-local coordinates and corresponds to the
+-	window geometry. See xdg_surface.set_window_geometry.
+-
+-	If a zero or negative size is set the invalid_input error is raised.
+-      </description>
+-      <arg name="width" type="int" summary="width of positioned rectangle"/>
+-      <arg name="height" type="int" summary="height of positioned rectangle"/>
+-    </request>
+-
+-    <request name="set_anchor_rect">
+-      <description summary="set the anchor rectangle within the parent surface">
+-	Specify the anchor rectangle within the parent surface that the child
+-	surface will be placed relative to. The rectangle is relative to the
+-	window geometry as defined by xdg_surface.set_window_geometry of the
+-	parent surface.
+-
+-	When the xdg_positioner object is used to position a child surface, the
+-	anchor rectangle may not extend outside the window geometry of the
+-	positioned child's parent surface.
+-
+-	If a negative size is set the invalid_input error is raised.
+-      </description>
+-      <arg name="x" type="int" summary="x position of anchor rectangle"/>
+-      <arg name="y" type="int" summary="y position of anchor rectangle"/>
+-      <arg name="width" type="int" summary="width of anchor rectangle"/>
+-      <arg name="height" type="int" summary="height of anchor rectangle"/>
+-    </request>
+-
+-    <enum name="anchor">
+-      <entry name="none" value="0"/>
+-      <entry name="top" value="1"/>
+-      <entry name="bottom" value="2"/>
+-      <entry name="left" value="3"/>
+-      <entry name="right" value="4"/>
+-      <entry name="top_left" value="5"/>
+-      <entry name="bottom_left" value="6"/>
+-      <entry name="top_right" value="7"/>
+-      <entry name="bottom_right" value="8"/>
+-    </enum>
+-
+-    <request name="set_anchor">
+-      <description summary="set anchor rectangle anchor">
+-	Defines the anchor point for the anchor rectangle. The specified anchor
+-	is used derive an anchor point that the child surface will be
+-	positioned relative to. If a corner anchor is set (e.g. 'top_left' or
+-	'bottom_right'), the anchor point will be at the specified corner;
+-	otherwise, the derived anchor point will be centered on the specified
+-	edge, or in the center of the anchor rectangle if no edge is specified.
+-      </description>
+-      <arg name="anchor" type="uint" enum="anchor"
+-	   summary="anchor"/>
+-    </request>
+-
+-    <enum name="gravity">
+-      <entry name="none" value="0"/>
+-      <entry name="top" value="1"/>
+-      <entry name="bottom" value="2"/>
+-      <entry name="left" value="3"/>
+-      <entry name="right" value="4"/>
+-      <entry name="top_left" value="5"/>
+-      <entry name="bottom_left" value="6"/>
+-      <entry name="top_right" value="7"/>
+-      <entry name="bottom_right" value="8"/>
+-    </enum>
+ 
+-    <request name="set_gravity">
+-      <description summary="set child surface gravity">
+-	Defines in what direction a surface should be positioned, relative to
+-	the anchor point of the parent surface. If a corner gravity is
+-	specified (e.g. 'bottom_right' or 'top_left'), then the child surface
+-	will be placed towards the specified gravity; otherwise, the child
+-	surface will be centered over the anchor point on any axis that had no
+-	gravity specified.
+-      </description>
+-      <arg name="gravity" type="uint" enum="gravity"
+-	   summary="gravity direction"/>
+-    </request>
+-
+-    <enum name="constraint_adjustment" bitfield="true">
+-      <description summary="constraint adjustments">
+-	The constraint adjustment value define ways the compositor will adjust
+-	the position of the surface, if the unadjusted position would result
+-	in the surface being partly constrained.
+-
+-	Whether a surface is considered 'constrained' is left to the compositor
+-	to determine. For example, the surface may be partly outside the
+-	compositor's defined 'work area', thus necessitating the child surface's
+-	position be adjusted until it is entirely inside the work area.
+-
+-	The adjustments can be combined, according to a defined precedence: 1)
+-	Flip, 2) Slide, 3) Resize.
+-      </description>
+-      <entry name="none" value="0">
+-	<description summary="don't move the child surface when constrained">
+-	  Don't alter the surface position even if it is constrained on some
+-	  axis, for example partially outside the edge of an output.
+-	</description>
+-      </entry>
+-      <entry name="slide_x" value="1">
+-	<description summary="move along the x axis until unconstrained">
+-	  Slide the surface along the x axis until it is no longer constrained.
+-
+-	  First try to slide towards the direction of the gravity on the x axis
+-	  until either the edge in the opposite direction of the gravity is
+-	  unconstrained or the edge in the direction of the gravity is
+-	  constrained.
+-
+-	  Then try to slide towards the opposite direction of the gravity on the
+-	  x axis until either the edge in the direction of the gravity is
+-	  unconstrained or the edge in the opposite direction of the gravity is
+-	  constrained.
+-	</description>
+-      </entry>
+-      <entry name="slide_y" value="2">
+-	<description summary="move along the y axis until unconstrained">
+-	  Slide the surface along the y axis until it is no longer constrained.
+-
+-	  First try to slide towards the direction of the gravity on the y axis
+-	  until either the edge in the opposite direction of the gravity is
+-	  unconstrained or the edge in the direction of the gravity is
+-	  constrained.
+-
+-	  Then try to slide towards the opposite direction of the gravity on the
+-	  y axis until either the edge in the direction of the gravity is
+-	  unconstrained or the edge in the opposite direction of the gravity is
+-	  constrained.
+-	</description>
+-      </entry>
+-      <entry name="flip_x" value="4">
+-	<description summary="invert the anchor and gravity on the x axis">
+-	  Invert the anchor and gravity on the x axis if the surface is
+-	  constrained on the x axis. For example, if the left edge of the
+-	  surface is constrained, the gravity is 'left' and the anchor is
+-	  'left', change the gravity to 'right' and the anchor to 'right'.
+-
+-	  If the adjusted position also ends up being constrained, the resulting
+-	  position of the flip_x adjustment will be the one before the
+-	  adjustment.
+-	</description>
+-      </entry>
+-      <entry name="flip_y" value="8">
+-	<description summary="invert the anchor and gravity on the y axis">
+-	  Invert the anchor and gravity on the y axis if the surface is
+-	  constrained on the y axis. For example, if the bottom edge of the
+-	  surface is constrained, the gravity is 'bottom' and the anchor is
+-	  'bottom', change the gravity to 'top' and the anchor to 'top'.
+-
+-	  The adjusted position is calculated given the original anchor
+-	  rectangle and offset, but with the new flipped anchor and gravity
+-	  values.
+-
+-	  If the adjusted position also ends up being constrained, the resulting
+-	  position of the flip_y adjustment will be the one before the
+-	  adjustment.
+-	</description>
+-      </entry>
+-      <entry name="resize_x" value="16">
+-	<description summary="horizontally resize the surface">
+-	  Resize the surface horizontally so that it is completely
+-	  unconstrained.
+-	</description>
+-      </entry>
+-      <entry name="resize_y" value="32">
+-	<description summary="vertically resize the surface">
+-	  Resize the surface vertically so that it is completely unconstrained.
+-	</description>
+-      </entry>
+-    </enum>
+-
+-    <request name="set_constraint_adjustment">
+-      <description summary="set the adjustment to be done when constrained">
+-	Specify how the window should be positioned if the originally intended
+-	position caused the surface to be constrained, meaning at least
+-	partially outside positioning boundaries set by the compositor. The
+-	adjustment is set by constructing a bitmask describing the adjustment to
+-	be made when the surface is constrained on that axis.
+-
+-	If no bit for one axis is set, the compositor will assume that the child
+-	surface should not change its position on that axis when constrained.
+-
+-	If more than one bit for one axis is set, the order of how adjustments
+-	are applied is specified in the corresponding adjustment descriptions.
+-
+-	The default adjustment is none.
+-      </description>
+-      <arg name="constraint_adjustment" type="uint"
+-	   summary="bit mask of constraint adjustments"/>
+-    </request>
+-
+-    <request name="set_offset">
+-      <description summary="set surface position offset">
+-	Specify the surface position offset relative to the position of the
+-	anchor on the anchor rectangle and the anchor on the surface. For
+-	example if the anchor of the anchor rectangle is at (x, y), the surface
+-	has the gravity bottom|right, and the offset is (ox, oy), the calculated
+-	surface position will be (x + ox, y + oy). The offset position of the
+-	surface is the one used for constraint testing. See
+-	set_constraint_adjustment.
+-
+-	An example use case is placing a popup menu on top of a user interface
+-	element, while aligning the user interface element of the parent surface
+-	with some user interface element placed somewhere in the popup surface.
++    <request name="pong">
++      <description summary="respond to a ping event">
++	A client must respond to a ping event with a pong request or
++	the client may be deemed unresponsive.
+       </description>
+-      <arg name="x" type="int" summary="surface position x offset"/>
+-      <arg name="y" type="int" summary="surface position y offset"/>
++      <arg name="serial" type="uint" summary="serial of the ping event"/>
+     </request>
+   </interface>
+ 
+-  <interface name="xdg_surface" version="2">
+-    <description summary="desktop user interface surface base interface">
++  <interface name="xdg_surface" version="1">
++    <description summary="A desktop window">
+       An interface that may be implemented by a wl_surface, for
+       implementations that provide a desktop-style user interface.
+ 
+-      It provides a base set of functionality required to construct user
+-      interface elements requiring management by the compositor, such as
+-      toplevel windows, menus, etc. The types of functionality are split into
+-      xdg_surface roles.
+-
+-      Creating an xdg_surface does not set the role for a wl_surface. In order
+-      to map an xdg_surface, the client must create a role-specific object
+-      using, e.g., get_toplevel, get_popup. The wl_surface for any given
+-      xdg_surface can have at most one role, and may not be assigned any role
+-      not based on xdg_surface.
+-
+-      A role must be assigned before any other requests are made to the
+-      xdg_surface object.
++      It provides requests to treat surfaces like windows, allowing to set
++      properties like maximized, fullscreen, minimized, and to move and resize
++      them, and associate metadata like title and app id.
+ 
+       The client must call wl_surface.commit on the corresponding wl_surface
+-      for the xdg_surface state to take effect.
++      for the xdg_surface state to take effect. Prior to committing the new
++      state, it can set up initial configuration, such as maximizing or setting
++      a window geometry.
++
++      Even without attaching a buffer the compositor must respond to initial
++      committed configuration, for instance sending a configure event with
++      expected window geometry if the client maximized its surface during
++      initialization.
+ 
+-      Creating an xdg_surface from a wl_surface which has a buffer attached or
+-      committed is a client error, and any attempts by a client to attach or
+-      manipulate a buffer prior to the first xdg_surface.configure call must
+-      also be treated as errors.
+-
+-      Mapping an xdg_surface-based role surface is defined as making it
+-      possible for the surface to be shown by the compositor. Note that
+-      a mapped surface is not guaranteed to be visible once it is mapped.
+-
+-      For an xdg_surface to be mapped by the compositor, the following
+-      conditions must be met:
+-      (1) the client has assigned an xdg_surface-based role to the surface
+-      (2) the client has set and committed the xdg_surface state and the
+-	  role-dependent state to the surface
+-      (3) the client has committed a buffer to the surface
+-
+-      A newly-unmapped surface is considered to have met condition (1) out
+-      of the 3 required conditions for mapping a surface if its role surface
+-      has not been destroyed.
++      For a surface to be mapped by the compositor the client must have
++      committed both an xdg_surface state and a buffer.
+     </description>
+ 
+-    <enum name="error">
+-      <entry name="not_constructed" value="1"/>
+-      <entry name="already_constructed" value="2"/>
+-      <entry name="unconfigured_buffer" value="3"/>
+-    </enum>
+-
+     <request name="destroy" type="destructor">
+-      <description summary="destroy the xdg_surface">
+-	Destroy the xdg_surface object. An xdg_surface must only be destroyed
+-	after its role object has been destroyed.
+-      </description>
+-    </request>
+-
+-    <request name="get_toplevel">
+-      <description summary="assign the xdg_toplevel surface role">
+-	This creates an xdg_toplevel object for the given xdg_surface and gives
+-	the associated wl_surface the xdg_toplevel role.
+-
+-	See the documentation of xdg_toplevel for more details about what an
+-	xdg_toplevel is and how it is used.
+-      </description>
+-      <arg name="id" type="new_id" interface="xdg_toplevel"/>
+-    </request>
+-
+-    <request name="get_popup">
+-      <description summary="assign the xdg_popup surface role">
+-	This creates an xdg_popup object for the given xdg_surface and gives
+-	the associated wl_surface the xdg_popup role.
+-
+-	If null is passed as a parent, a parent surface must be specified using
+-	some other protocol, before committing the initial state.
+-
+-	See the documentation of xdg_popup for more details about what an
+-	xdg_popup is and how it is used.
+-      </description>
+-      <arg name="id" type="new_id" interface="xdg_popup"/>
+-      <arg name="parent" type="object" interface="xdg_surface" allow-null="true"/>
+-      <arg name="positioner" type="object" interface="xdg_positioner"/>
+-    </request>
+-
+-    <request name="set_window_geometry">
+-      <description summary="set the new window geometry">
+-	The window geometry of a surface is its "visible bounds" from the
+-	user's perspective. Client-side decorations often have invisible
+-	portions like drop-shadows which should be ignored for the
+-	purposes of aligning, placing and constraining windows.
+-
+-	The window geometry is double buffered, and will be applied at the
+-	time wl_surface.commit of the corresponding wl_surface is called.
+-
+-	When maintaining a position, the compositor should treat the (x, y)
+-	coordinate of the window geometry as the top left corner of the window.
+-	A client changing the (x, y) window geometry coordinate should in
+-	general not alter the position of the window.
+-
+-	Once the window geometry of the surface is set, it is not possible to
+-	unset it, and it will remain the same until set_window_geometry is
+-	called again, even if a new subsurface or buffer is attached.
+-
+-	If never set, the value is the full bounds of the surface,
+-	including any subsurfaces. This updates dynamically on every
+-	commit. This unset is meant for extremely simple clients.
+-
+-	The arguments are given in the surface-local coordinate space of
+-	the wl_surface associated with this xdg_surface.
+-
+-	The width and height must be greater than zero. Setting an invalid size
+-	will raise an error. When applied, the effective window geometry will be
+-	the set window geometry clamped to the bounding rectangle of the
+-	combined geometry of the surface of the xdg_surface and the associated
+-	subsurfaces.
+-      </description>
+-      <arg name="x" type="int"/>
+-      <arg name="y" type="int"/>
+-      <arg name="width" type="int"/>
+-      <arg name="height" type="int"/>
+-    </request>
+-
+-    <request name="ack_configure">
+-      <description summary="ack a configure event">
+-	When a configure event is received, if a client commits the
+-	surface in response to the configure event, then the client
+-	must make an ack_configure request sometime before the commit
+-	request, passing along the serial of the configure event.
+-
+-	For instance, for toplevel surfaces the compositor might use this
+-	information to move a surface to the top left only when the client has
+-	drawn itself for the maximized or fullscreen state.
+-
+-	If the client receives multiple configure events before it
+-	can respond to one, it only has to ack the last configure event.
+-
+-	A client is not required to commit immediately after sending
+-	an ack_configure request - it may even ack_configure several times
+-	before its next surface commit.
+-
+-	A client may send multiple ack_configure requests before committing, but
+-	only the last request sent before a commit indicates which configure
+-	event the client really is responding to.
+-      </description>
+-      <arg name="serial" type="uint" summary="the serial from the configure event"/>
+-    </request>
+-
+-    <event name="configure">
+-      <description summary="suggest a surface change">
+-	The configure event marks the end of a configure sequence. A configure
+-	sequence is a set of one or more events configuring the state of the
+-	xdg_surface, including the final xdg_surface.configure event.
+-
+-	Where applicable, xdg_surface surface roles will during a configure
+-	sequence extend this event as a latched state sent as events before the
+-	xdg_surface.configure event. Such events should be considered to make up
+-	a set of atomically applied configuration states, where the
+-	xdg_surface.configure commits the accumulated state.
+-
+-	Clients should arrange their surface for the new states, and then send
+-	an ack_configure request with the serial sent in this configure event at
+-	some point before committing the new surface.
+-
+-	If the client receives multiple configure events before it can respond
+-	to one, it is free to discard all but the last event it received.
+-      </description>
+-      <arg name="serial" type="uint" summary="serial of the configure event"/>
+-    </event>
+-  </interface>
+-
+-  <interface name="xdg_toplevel" version="2">
+-    <description summary="toplevel surface">
+-      This interface defines an xdg_surface role which allows a surface to,
+-      among other things, set window-like properties such as maximize,
+-      fullscreen, and minimize, set application-specific metadata like title and
+-      id, and well as trigger user interactive operations such as interactive
+-      resize and move.
+-
+-      Unmapping an xdg_toplevel means that the surface cannot be shown
+-      by the compositor until it is explicitly mapped again.
+-      All active operations (e.g., move, resize) are canceled and all
+-      attributes (e.g. title, state, stacking, ...) are discarded for
+-      an xdg_toplevel surface when it is unmapped.
+-
+-      Attaching a null buffer to a toplevel unmaps the surface.
+-    </description>
+-
+-    <request name="destroy" type="destructor">
+-      <description summary="destroy the xdg_toplevel">
+-	This request destroys the role surface and unmaps the surface;
+-	see "Unmapping" behavior in interface section for details.
++      <description summary="Destroy the xdg_surface">
++	Unmap and destroy the window. The window will be effectively
++	hidden from the user's point of view, and all state like
++	maximization, fullscreen, and so on, will be lost.
+       </description>
+     </request>
+ 
+     <request name="set_parent">
+       <description summary="set the parent of this surface">
+-	Set the "parent" of this surface. This surface should be stacked
+-	above the parent surface and all other ancestor surfaces.
++	Set the "parent" of this surface. This window should be stacked
++	above a parent. The parent surface must be mapped as long as this
++	surface is mapped.
+ 
+ 	Parent windows should be set on dialogs, toolboxes, or other
+ 	"auxiliary" surfaces, so that the parent is raised when the dialog
+ 	is raised.
+-
+-	Setting a null parent for a child window removes any parent-child
+-	relationship for the child. Setting a null parent for a window which
+-	currently has no parent is a no-op.
+-
+-	If the parent is unmapped then its children are managed as
+-	though the parent of the now-unmapped parent has become the
+-	parent of this surface. If no parent exists for the now-unmapped
+-	parent then the children are managed as though they have no
+-	parent surface.
+       </description>
+-      <arg name="parent" type="object" interface="xdg_toplevel" allow-null="true"/>
++      <arg name="parent" type="object" interface="xdg_surface" allow-null="true"/>
+     </request>
+ 
+     <request name="set_title">
+@@ -599,7 +206,7 @@
+ 	service name.
+ 
+ 	The compositor shell will try to group application surfaces together
+-	by their app ID. As a best practice, it is suggested to select app
++	by their app ID.  As a best practice, it is suggested to select app
+ 	ID's that match the basename of the application's .desktop file.
+ 	For example, "org.freedesktop.FooViewer" where the .desktop file is
+ 	"org.freedesktop.FooViewer.desktop".
+@@ -615,18 +222,19 @@
+ 
+     <request name="show_window_menu">
+       <description summary="show the window menu">
+-	Clients implementing client-side decorations might want to show
+-	a context menu when right-clicking on the decorations, giving the
+-	user a menu that they can use to maximize or minimize the window.
+-
+-	This request asks the compositor to pop up such a window menu at
+-	the given position, relative to the local surface coordinates of
+-	the parent surface. There are no guarantees as to what menu items
+-	the window menu contains.
++        Clients implementing client-side decorations might want to show
++        a context menu when right-clicking on the decorations, giving the
++        user a menu that they can use to maximize or minimize the window.
++
++        This request asks the compositor to pop up such a window menu at
++        the given position, relative to the local surface coordinates of
++        the parent surface. There are no guarantees as to what menu items
++        the window menu contains.
+ 
+-	This request must be used in response to some sort of user action
+-	like a button press, key press, or touch down event.
++        This request must be used in response to some sort of user action
++        like a button press, key press, or touch down event.
+       </description>
++
+       <arg name="seat" type="object" interface="wl_seat" summary="the wl_seat of the user event"/>
+       <arg name="serial" type="uint" summary="the serial of the user event"/>
+       <arg name="x" type="int" summary="the x position to pop up the window menu at"/>
+@@ -712,255 +320,197 @@
+ 
+     <enum name="state">
+       <description summary="types of state on the surface">
+-	The different state values used on the surface. This is designed for
+-	state values like maximized, fullscreen. It is paired with the
+-	configure event to ensure that both the client and the compositor
+-	setting the state can be synchronized.
+-
+-	States set in this way are double-buffered. They will get applied on
+-	the next commit.
+-      </description>
+-      <entry name="maximized" value="1" summary="the surface is maximized">
+-	<description summary="the surface is maximized">
+-	  The surface is maximized. The window geometry specified in the configure
+-	  event must be obeyed by the client.
+-
+-	  The client should draw without shadow or other
+-	  decoration outside of the window geometry.
+-	</description>
+-      </entry>
+-      <entry name="fullscreen" value="2" summary="the surface is fullscreen">
+-	<description summary="the surface is fullscreen">
+-	  The surface is fullscreen. The window geometry specified in the
+-	  configure event is a maximum; the client cannot resize beyond it. For
+-	  a surface to cover the whole fullscreened area, the geometry
+-	  dimensions must be obeyed by the client. For more details, see
+-	  xdg_toplevel.set_fullscreen.
+-	</description>
+-      </entry>
+-      <entry name="resizing" value="3" summary="the surface is being resized">
+-	<description summary="the surface is being resized">
+-	  The surface is being resized. The window geometry specified in the
+-	  configure event is a maximum; the client cannot resize beyond it.
+-	  Clients that have aspect ratio or cell sizing configuration can use
+-	  a smaller size, however.
+-	</description>
+-      </entry>
+-      <entry name="activated" value="4" summary="the surface is now activated">
+-	<description summary="the surface is now activated">
+-	  Client window decorations should be painted as if the window is
+-	  active. Do not assume this means that the window actually has
+-	  keyboard or pointer focus.
+-	</description>
+-      </entry>
+-      <entry name="tiled_left" value="5" since="2">
+-	<description summary="the surface is tiled">
+-	  The window is currently in a tiled layout and the left edge is
+-	  considered to be adjacent to another part of the tiling grid.
+-	</description>
+-      </entry>
+-      <entry name="tiled_right" value="6" since="2">
+-	<description summary="the surface is tiled">
+-	  The window is currently in a tiled layout and the right edge is
+-	  considered to be adjacent to another part of the tiling grid.
+-	</description>
+-      </entry>
+-      <entry name="tiled_top" value="7" since="2">
+-	<description summary="the surface is tiled">
+-	  The window is currently in a tiled layout and the top edge is
+-	  considered to be adjacent to another part of the tiling grid.
+-	</description>
+-      </entry>
+-      <entry name="tiled_bottom" value="8" since="2">
+-	<description summary="the surface is tiled">
+-	  The window is currently in a tiled layout and the bottom edge is
+-	  considered to be adjacent to another part of the tiling grid.
+-	</description>
++        The different state values used on the surface. This is designed for
++        state values like maximized, fullscreen. It is paired with the
++        configure event to ensure that both the client and the compositor
++        setting the state can be synchronized.
++
++        States set in this way are double-buffered. They will get applied on
++        the next commit.
++
++        Desktop environments may extend this enum by taking up a range of
++        values and documenting the range they chose in this description.
++        They are not required to document the values for the range that they
++        chose. Ideally, any good extensions from a desktop environment should
++        make its way into standardization into this enum.
++
++        The current reserved ranges are:
++
++        0x0000 - 0x0FFF: xdg-shell core values, documented below.
++        0x1000 - 0x1FFF: GNOME
++      </description>
++      <entry name="maximized" value="1" >
++      <description summary="the surface is maximized">
++        The surface is maximized. The window geometry specified in the configure
++        event must be obeyed by the client.
++      </description>
++      </entry>
++      <entry name="fullscreen" value="2" >
++      <description summary="the surface is fullscreen">
++        The surface is fullscreen. The window geometry specified in the configure
++        event must be obeyed by the client.
++      </description>
++      </entry>
++      <entry name="resizing" value="3">
++      <description summary="surface is being resized">
++        The surface is being resized. The window geometry specified in the
++        configure event is a maximum; the client cannot resize beyond it.
++        Clients that have aspect ratio or cell sizing configuration can use
++        a smaller size, however.
++      </description>
++      </entry>
++      <entry name="activated" value="4">
++      <description summary="the surface is activeed">
++        Client window decorations should be painted as if the window is
++        active. Do not assume this means that the window actually has
++        keyboard or pointer focus.
++      </description>
+       </entry>
+     </enum>
+ 
+-    <request name="set_max_size">
+-      <description summary="set the maximum size">
+-	Set a maximum size for the window.
+-
+-	The client can specify a maximum size so that the compositor does
+-	not try to configure the window beyond this size.
+-
+-	The width and height arguments are in window geometry coordinates.
+-	See xdg_surface.set_window_geometry.
+-
+-	Values set in this way are double-buffered. They will get applied
+-	on the next commit.
+-
+-	The compositor can use this information to allow or disallow
+-	different states like maximize or fullscreen and draw accurate
+-	animations.
+-
+-	Similarly, a tiling window manager may use this information to
+-	place and resize client windows in a more effective way.
+-
+-	The client should not rely on the compositor to obey the maximum
+-	size. The compositor may decide to ignore the values set by the
+-	client and request a larger size.
+-
+-	If never set, or a value of zero in the request, means that the
+-	client has no expected maximum size in the given dimension.
+-	As a result, a client wishing to reset the maximum size
+-	to an unspecified state can use zero for width and height in the
+-	request.
+-
+-	Requesting a maximum size to be smaller than the minimum size of
+-	a surface is illegal and will result in a protocol error.
+-
+-	The width and height must be greater than or equal to zero. Using
+-	strictly negative values for width and height will result in a
+-	protocol error.
++    <event name="configure">
++      <description summary="suggest a surface change">
++	The configure event asks the client to resize its surface or to
++	change its state.
++
++	The width and height arguments specify a hint to the window
++	about how its surface should be resized in window geometry
++	coordinates. See set_window_geometry.
++
++	If the width or height arguments are zero, it means the client
++	should decide its own window dimension. This may happen when the
++	compositor need to configure the state of the surface but doesn't
++	have any information about any previous or expected dimension.
++
++	The states listed in the event specify how the width/height
++	arguments should be interpreted, and possibly how it should be
++	drawn.
++
++	Clients should arrange their surface for the new size and
++	states, and then send a ack_configure request with the serial
++	sent in this configure event at some point before committing
++	the new surface.
++
++	If the client receives multiple configure events before it
++        can respond to one, it is free to discard all but the last
++        event it received.
+       </description>
++
+       <arg name="width" type="int"/>
+       <arg name="height" type="int"/>
++      <arg name="states" type="array"/>
++      <arg name="serial" type="uint"/>
++    </event>
++
++    <request name="ack_configure">
++      <description summary="ack a configure event">
++        When a configure event is received, if a client commits the
++        surface in response to the configure event, then the client
++        must make a ack_configure request before the commit request,
++        passing along the serial of the configure event.
++
++        For instance, the compositor might use this information to move
++        a surface to the top left only when the client has drawn itself
++        for the maximized or fullscreen state.
++
++        If the client receives multiple configure events before it
++        can respond to one, it only has to ack the last configure event.
++      </description>
++      <arg name="serial" type="uint" summary="the serial from the configure event"/>
+     </request>
+ 
+-    <request name="set_min_size">
+-      <description summary="set the minimum size">
+-	Set a minimum size for the window.
+-
+-	The client can specify a minimum size so that the compositor does
+-	not try to configure the window below this size.
+-
+-	The width and height arguments are in window geometry coordinates.
+-	See xdg_surface.set_window_geometry.
+-
+-	Values set in this way are double-buffered. They will get applied
+-	on the next commit.
+-
+-	The compositor can use this information to allow or disallow
+-	different states like maximize or fullscreen and draw accurate
+-	animations.
+-
+-	Similarly, a tiling window manager may use this information to
+-	place and resize client windows in a more effective way.
+-
+-	The client should not rely on the compositor to obey the minimum
+-	size. The compositor may decide to ignore the values set by the
+-	client and request a smaller size.
+-
+-	If never set, or a value of zero in the request, means that the
+-	client has no expected minimum size in the given dimension.
+-	As a result, a client wishing to reset the minimum size
+-	to an unspecified state can use zero for width and height in the
+-	request.
+-
+-	Requesting a minimum size to be larger than the maximum size of
+-	a surface is illegal and will result in a protocol error.
+-
+-	The width and height must be greater than or equal to zero. Using
+-	strictly negative values for width and height will result in a
+-	protocol error.
++    <request name="set_window_geometry">
++      <description summary="set the new window geometry">
++        The window geometry of a window is its "visible bounds" from the
++        user's perspective. Client-side decorations often have invisible
++        portions like drop-shadows which should be ignored for the
++        purposes of aligning, placing and constraining windows.
++
++        The window geometry is double buffered, and will be applied at the
++        time wl_surface.commit of the corresponding wl_surface is called.
++
++        Once the window geometry of the surface is set once, it is not
++        possible to unset it, and it will remain the same until
++        set_window_geometry is called again, even if a new subsurface or
++        buffer is attached.
++
++        If never set, the value is the full bounds of the surface,
++        including any subsurfaces. This updates dynamically on every
++        commit. This unset mode is meant for extremely simple clients.
++
++        If responding to a configure event, the window geometry in here
++        must respect the sizing negotiations specified by the states in
++        the configure event.
++
++        The arguments are given in the surface local coordinate space of
++        the wl_surface associated with this xdg_surface.
++
++        The width and height must be greater than zero.
+       </description>
++      <arg name="x" type="int"/>
++      <arg name="y" type="int"/>
+       <arg name="width" type="int"/>
+       <arg name="height" type="int"/>
+     </request>
+ 
+     <request name="set_maximized">
+       <description summary="maximize the window">
+-	Maximize the surface.
++        Maximize the surface.
++
++        After requesting that the surface should be maximized, the compositor
++        will respond by emitting a configure event with the "maximized" state
++        and the required window geometry. The client should then update its
++        content, drawing it in a maximized state, i.e. without shadow or other
++        decoration outside of the window geometry. The client must also
++        acknowledge the configure when committing the new content (see
++        ack_configure).
++
++        It is up to the compositor to decide how and where to maximize the
++        surface, for example which output and what region of the screen should
++        be used.
+ 
+-	After requesting that the surface should be maximized, the compositor
+-	will respond by emitting a configure event. Whether this configure
+-	actually sets the window maximized is subject to compositor policies.
+-	The client must then update its content, drawing in the configured
+-	state. The client must also acknowledge the configure when committing
+-	the new content (see ack_configure).
+-
+-	It is up to the compositor to decide how and where to maximize the
+-	surface, for example which output and what region of the screen should
+-	be used.
+-
+-	If the surface was already maximized, the compositor will still emit
+-	a configure event with the "maximized" state.
+-
+-	If the surface is in a fullscreen state, this request has no direct
+-	effect. It may alter the state the surface is returned to when
+-	unmaximized unless overridden by the compositor.
++        If the surface was already maximized, the compositor will still emit
++        a configure event with the "maximized" state.
+       </description>
+     </request>
+ 
+     <request name="unset_maximized">
+       <description summary="unmaximize the window">
+-	Unmaximize the surface.
++        Unmaximize the surface.
++
++        After requesting that the surface should be unmaximized, the compositor
++        will respond by emitting a configure event without the "maximized"
++        state. If available, the compositor will include the window geometry
++        dimensions the window had prior to being maximized in the configure
++        request. The client must then update its content, drawing it in a
++        regular state, i.e. potentially with shadow, etc. The client must also
++        acknowledge the configure when committing the new content (see
++        ack_configure).
++
++        It is up to the compositor to position the surface after it was
++        unmaximized; usually the position the surface had before maximizing, if
++        applicable.
+ 
+-	After requesting that the surface should be unmaximized, the compositor
+-	will respond by emitting a configure event. Whether this actually
+-	un-maximizes the window is subject to compositor policies.
+-	If available and applicable, the compositor will include the window
+-	geometry dimensions the window had prior to being maximized in the
+-	configure event. The client must then update its content, drawing it in
+-	the configured state. The client must also acknowledge the configure
+-	when committing the new content (see ack_configure).
+-
+-	It is up to the compositor to position the surface after it was
+-	unmaximized; usually the position the surface had before maximizing, if
+-	applicable.
+-
+-	If the surface was already not maximized, the compositor will still
+-	emit a configure event without the "maximized" state.
+-
+-	If the surface is in a fullscreen state, this request has no direct
+-	effect. It may alter the state the surface is returned to when
+-	unmaximized unless overridden by the compositor.
++        If the surface was already not maximized, the compositor will still
++        emit a configure event without the "maximized" state.
+       </description>
+     </request>
+ 
+     <request name="set_fullscreen">
+-      <description summary="set the window as fullscreen on an output">
++      <description summary="set the window as fullscreen on a monitor">
+ 	Make the surface fullscreen.
+ 
+-	After requesting that the surface should be fullscreened, the
+-	compositor will respond by emitting a configure event. Whether the
+-	client is actually put into a fullscreen state is subject to compositor
+-	policies. The client must also acknowledge the configure when
+-	committing the new content (see ack_configure).
+-
+-	The output passed by the request indicates the client's preference as
+-	to which display it should be set fullscreen on. If this value is NULL,
+-	it's up to the compositor to choose which display will be used to map
+-	this surface.
+-
+-	If the surface doesn't cover the whole output, the compositor will
+-	position the surface in the center of the output and compensate with
+-	with border fill covering the rest of the output. The content of the
+-	border fill is undefined, but should be assumed to be in some way that
+-	attempts to blend into the surrounding area (e.g. solid black).
+-
+-	If the fullscreened surface is not opaque, the compositor must make
+-	sure that other screen content not part of the same surface tree (made
+-	up of subsurfaces, popups or similarly coupled surfaces) are not
+-	visible below the fullscreened surface.
++        You can specify an output that you would prefer to be fullscreen.
++	If this value is NULL, it's up to the compositor to choose which
++        display will be used to map this surface.
++
++        If the surface doesn't cover the whole output, the compositor will
++        position the surface in the center of the output and compensate with
++        black borders filling the rest of the output.
+       </description>
+       <arg name="output" type="object" interface="wl_output" allow-null="true"/>
+     </request>
+-
+-    <request name="unset_fullscreen">
+-      <description summary="unset the window as fullscreen">
+-	Make the surface no longer fullscreen.
+-
+-	After requesting that the surface should be unfullscreened, the
+-	compositor will respond by emitting a configure event.
+-	Whether this actually removes the fullscreen state of the client is
+-	subject to compositor policies.
+-
+-	Making a surface unfullscreen sets states for the surface based on the following:
+-	* the state(s) it may have had before becoming fullscreen
+-	* any state(s) decided by the compositor
+-	* any state(s) requested by the client while the surface was fullscreen
+-
+-	The compositor may include the previous window geometry dimensions in
+-	the configure event, if applicable.
+-
+-	The client must also acknowledge the configure when committing the new
+-	content (see ack_configure).
+-      </description>
+-    </request>
++    <request name="unset_fullscreen" />
+ 
+     <request name="set_minimized">
+       <description summary="set the window as minimized">
+@@ -975,85 +525,74 @@
+       </description>
+     </request>
+ 
+-    <event name="configure">
+-      <description summary="suggest a surface change">
+-	This configure event asks the client to resize its toplevel surface or
+-	to change its state. The configured state should not be applied
+-	immediately. See xdg_surface.configure for details.
+-
+-	The width and height arguments specify a hint to the window
+-	about how its surface should be resized in window geometry
+-	coordinates. See set_window_geometry.
+-
+-	If the width or height arguments are zero, it means the client
+-	should decide its own window dimension. This may happen when the
+-	compositor needs to configure the state of the surface but doesn't
+-	have any information about any previous or expected dimension.
+-
+-	The states listed in the event specify how the width/height
+-	arguments should be interpreted, and possibly how it should be
+-	drawn.
+-
+-	Clients must send an ack_configure in response to this event. See
+-	xdg_surface.configure and xdg_surface.ack_configure for details.
+-      </description>
+-      <arg name="width" type="int"/>
+-      <arg name="height" type="int"/>
+-      <arg name="states" type="array"/>
+-    </event>
+-
+     <event name="close">
+       <description summary="surface wants to be closed">
+-	The close event is sent by the compositor when the user
+-	wants the surface to be closed. This should be equivalent to
+-	the user clicking the close button in client-side decorations,
+-	if your application has any.
+-
+-	This is only a request that the user intends to close the
+-	window. The client may choose to ignore this request, or show
+-	a dialog to ask the user to save their data, etc.
++        The close event is sent by the compositor when the user
++        wants the surface to be closed. This should be equivalent to
++        the user clicking the close button in client-side decorations,
++        if your application has any...
++
++        This is only a request that the user intends to close your
++        window. The client may choose to ignore this request, or show
++        a dialog to ask the user to save their data...
+       </description>
+     </event>
+   </interface>
+ 
+-  <interface name="xdg_popup" version="2">
++  <interface name="xdg_popup" version="1">
+     <description summary="short-lived, popup surfaces for menus">
+-      A popup surface is a short-lived, temporary surface. It can be used to
+-      implement for example menus, popovers, tooltips and other similar user
+-      interface concepts.
+-
+-      A popup can be made to take an explicit grab. See xdg_popup.grab for
+-      details.
+-
+-      When the popup is dismissed, a popup_done event will be sent out, and at
+-      the same time the surface will be unmapped. See the xdg_popup.popup_done
+-      event for details.
+-
+-      Explicitly destroying the xdg_popup object will also dismiss the popup and
+-      unmap the surface. Clients that want to dismiss the popup when another
+-      surface of their own is clicked should dismiss the popup using the destroy
++      A popup surface is a short-lived, temporary surface that can be
++      used to implement menus. It takes an explicit grab on the surface
++      that will be dismissed when the user dismisses the popup. This can
++      be done by the user clicking outside the surface, using the keyboard,
++      or even locking the screen through closing the lid or a timeout.
++
++      When the popup is dismissed, a popup_done event will be sent out,
++      and at the same time the surface will be unmapped. The xdg_popup
++      object is now inert and cannot be reactivated, so clients should
++      destroy it. Explicitly destroying the xdg_popup object will also
++      dismiss the popup and unmap the surface.
++
++      Clients will receive events for all their surfaces during this
++      grab (which is an "owner-events" grab in X11 parlance). This is
++      done so that users can navigate through submenus and other
++      "nested" popup windows without having to dismiss the topmost
++      popup.
++
++      Clients that want to dismiss the popup when another surface of
++      their own is clicked should dismiss the popup using the destroy
+       request.
+ 
+-      A newly created xdg_popup will be stacked on top of all previously created
+-      xdg_popup surfaces associated with the same xdg_toplevel.
++      The parent surface must have either an xdg_surface or xdg_popup
++      role.
+ 
+-      The parent of an xdg_popup must be mapped (see the xdg_surface
+-      description) before the xdg_popup itself.
++      Specifying an xdg_popup for the parent means that the popups are
++      nested, with this popup now being the topmost popup. Nested
++      popups must be destroyed in the reverse order they were created
++      in, e.g. the only popup you are allowed to destroy at all times
++      is the topmost one.
++
++      If there is an existing popup when creating a new popup, the
++      parent must be the current topmost popup.
++
++      A parent surface must be mapped before the new popup is mapped.
++
++      When compositors choose to dismiss a popup, they will likely
++      dismiss every nested popup as well. When a compositor dismisses
++      popups, it will follow the same dismissing order as required
++      from the client.
+ 
+       The x and y arguments passed when creating the popup object specify
+       where the top left of the popup should be placed, relative to the
+       local surface coordinates of the parent surface. See
+-      xdg_surface.get_popup. An xdg_popup must intersect with or be at least
+-      partially adjacent to its parent surface.
++      xdg_shell.get_xdg_popup.
+ 
+       The client must call wl_surface.commit on the corresponding wl_surface
+       for the xdg_popup state to take effect.
+-    </description>
+ 
+-    <enum name="error">
+-      <entry name="invalid_grab" value="0"
+-	     summary="tried to grab after being mapped"/>
+-    </enum>
++      For a surface to be mapped by the compositor the client must have
++      committed both the xdg_popup state and a buffer.
++    </description>
+ 
+     <request name="destroy" type="destructor">
+       <description summary="remove xdg_popup interface">
+@@ -1065,73 +604,6 @@
+       </description>
+     </request>
+ 
+-    <request name="grab">
+-      <description summary="make the popup take an explicit grab">
+-	This request makes the created popup take an explicit grab. An explicit
+-	grab will be dismissed when the user dismisses the popup, or when the
+-	client destroys the xdg_popup. This can be done by the user clicking
+-	outside the surface, using the keyboard, or even locking the screen
+-	through closing the lid or a timeout.
+-
+-	If the compositor denies the grab, the popup will be immediately
+-	dismissed.
+-
+-	This request must be used in response to some sort of user action like a
+-	button press, key press, or touch down event. The serial number of the
+-	event should be passed as 'serial'.
+-
+-	The parent of a grabbing popup must either be an xdg_toplevel surface or
+-	another xdg_popup with an explicit grab. If the parent is another
+-	xdg_popup it means that the popups are nested, with this popup now being
+-	the topmost popup.
+-
+-	Nested popups must be destroyed in the reverse order they were created
+-	in, e.g. the only popup you are allowed to destroy at all times is the
+-	topmost one.
+-
+-	When compositors choose to dismiss a popup, they may dismiss every
+-	nested grabbing popup as well. When a compositor dismisses popups, it
+-	will follow the same dismissing order as required from the client.
+-
+-	The parent of a grabbing popup must either be another xdg_popup with an
+-	active explicit grab, or an xdg_popup or xdg_toplevel, if there are no
+-	explicit grabs already taken.
+-
+-	If the topmost grabbing popup is destroyed, the grab will be returned to
+-	the parent of the popup, if that parent previously had an explicit grab.
+-
+-	If the parent is a grabbing popup which has already been dismissed, this
+-	popup will be immediately dismissed. If the parent is a popup that did
+-	not take an explicit grab, an error will be raised.
+-
+-	During a popup grab, the client owning the grab will receive pointer
+-	and touch events for all their surfaces as normal (similar to an
+-	"owner-events" grab in X11 parlance), while the top most grabbing popup
+-	will always have keyboard focus.
+-      </description>
+-      <arg name="seat" type="object" interface="wl_seat"
+-	   summary="the wl_seat of the user event"/>
+-      <arg name="serial" type="uint" summary="the serial of the user event"/>
+-    </request>
+-
+-    <event name="configure">
+-      <description summary="configure the popup surface">
+-	This event asks the popup surface to configure itself given the
+-	configuration. The configured state should not be applied immediately.
+-	See xdg_surface.configure for details.
+-
+-	The x and y arguments represent the position the popup was placed at
+-	given the xdg_positioner rule, relative to the upper left corner of the
+-	window geometry of the parent surface.
+-      </description>
+-      <arg name="x" type="int"
+-	   summary="x position relative to parent surface window geometry"/>
+-      <arg name="y" type="int"
+-	   summary="y position relative to parent surface window geometry"/>
+-      <arg name="width" type="int" summary="window geometry width"/>
+-      <arg name="height" type="int" summary="window geometry height"/>
+-    </event>
+-
+     <event name="popup_done">
+       <description summary="popup interaction is done">
+ 	The popup_done event is sent out when a popup is dismissed by the

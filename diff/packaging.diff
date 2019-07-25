@@ -1,0 +1,260 @@
+diff -urN packaging/deb/freerdp-nightly/control ../../informatimago/FreeRDP/packaging/deb/freerdp-nightly/control
+--- packaging/deb/freerdp-nightly/control	2019-07-24 06:11:52.498197714 +0300
++++ ../../informatimago/FreeRDP/packaging/deb/freerdp-nightly/control	2019-07-19 20:00:34.133156354 +0300
+@@ -27,7 +27,6 @@
+  libxdamage-dev,
+  libxtst-dev,
+  libcups2-dev,
+- libcairo2-dev,
+  libpcsclite-dev,
+  libasound2-dev,
+  libpulse-dev, 
+diff -urN packaging/deb/freerdp-nightly/rules ../../informatimago/FreeRDP/packaging/deb/freerdp-nightly/rules
+--- packaging/deb/freerdp-nightly/rules	2019-07-24 06:11:52.498197714 +0300
++++ ../../informatimago/FreeRDP/packaging/deb/freerdp-nightly/rules	2019-07-19 20:00:17.457205554 +0300
+@@ -19,7 +19,6 @@
+                           -DCHANNEL_URBDRC=ON \
+                           -DCHANNEL_URBDRC_CLIENT=ON \
+                           -DWITH_SERVER=ON \
+-                          -DWITH_CAIRO=ON \
+                           -DBUILD_TESTING=OFF \
+                           -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+                           -DCMAKE_INSTALL_PREFIX=/opt/freerdp-nightly/ \
+diff -urN packaging/flatpak/com.freerdp.FreeRDP.json ../../informatimago/FreeRDP/packaging/flatpak/com.freerdp.FreeRDP.json
+--- packaging/flatpak/com.freerdp.FreeRDP.json	2019-07-24 06:11:52.498197714 +0300
++++ ../../informatimago/FreeRDP/packaging/flatpak/com.freerdp.FreeRDP.json	1970-01-01 03:00:00.000000000 +0300
+@@ -1,117 +0,0 @@
+-{
+-    "app-id": "com.freerdp.FreeRDP",
+-    "runtime": "org.freedesktop.Platform",
+-    "runtime-version": "18.08",
+-    "sdk": "org.freedesktop.Sdk",
+-    "build-options" : {
+-        "cflags": "-O2 -g",
+-        "cxxflags": "-O2 -g"
+-    },
+-    "command": "freerdp.sh",
+-    "cleanup": [
+-    ],
+-    "finish-args": [
+-        /* X11 + XShm access */
+-        "--share=ipc",
+-				"--socket=x11",
+-				"--socket=fallback-x11",
+-        /* Needs to talk to the network */
+-        "--share=network",
+-        /* Play sounds redirected from guests */
+-        "--socket=pulseaudio",
+-        /* Wayland access */
+-        "--socket=wayland",
+-				/* Allow rw access to download folder */
+-				"--filesystem=xdg-download"
+-    ],
+-    "modules": [
+-    {
+-        /**
+-         * libfreerdp use xprop to try to detect keyboard layout
+-         */
+-        "name": "xprop",
+-        "sources": [
+-        {
+-            "type": "archive",
+-            "url": "https://xorg.freedesktop.org/releases/individual/app/xprop-1.2.3.tar.bz2",
+-            "sha256": "d22afb28c86d85fff10a50156a7d0fa930c80ae865d70b26d805fd28a17a521b"
+-        }
+-        ]
+-    },
+-    "shared-modules/udev/udev-175.json",
+-    "shared-modules/dbus-glib/dbus-glib-0.110.json",
+-    {
+-        "name": "libusb",
+-        "config-opts": ["--disable-static"],
+-        "sources": [
+-            {
+-                "type": "git",
+-                "url": "https://github.com/libusb/libusb.git",
+-                "tag": "v1.0.22",
+-                "commit": "0034b2afdcdb1614e78edaa2a9e22d5936aeae5d"
+-            }
+-        ]
+-    },
+-    {
+-        "name": "pcsc",
+-        "config-opts": [
+-            "--disable-libsystemd",
+-            "--enable-pic",
+-            "--disable-libusb",
+-            "--enable-shared",
+-            "--with-systemdsystemunitdir=/app/lib/systemd/"
+-        ],
+-        "sources": [
+-            {
+-                "type": "git",
+-                "url": "https://salsa.debian.org/rousseau/PCSC.git",
+-                "tag": "pcsc-1.8.24",
+-                "commit": "73d95ada3221c060cbd7b6aa2375453f9d0e359b"
+-            }
+-        ]
+-    },
+-    {
+-        "name": "wrapper",
+-        "buildsystem": "simple",
+-        "build-commands": [
+-                "install -D freerdp.sh /app/bin/freerdp.sh"
+-            ],
+-        "sources": [
+-                {
+-                     "type": "file",
+-                     "path": "freerdp.sh"
+-                }
+-            ]
+-    },
+-    {
+-        "name": "freerdp",
+-        "buildsystem": "cmake-ninja",
+-        "cleanup": [
+-        ],
+-        "config-opts": [
+-        "-DCMAKE_BUILD_TYPE:STRING=Release",
+-        "-DCMAKE_INSTALL_LIBDIR:PATH=lib",
+-        "-DCHANNEL_TSMF:BOOL=ON",
+-        "-DCHANNEL_URBDRC:BOOL=ON",
+-        "-DBUILD_TESTING:BOOL=OFF",
+-        "-DWITH_MANPAGES:BOOL=OFF",
+-        "-DWITH_GSSAPI:BOOL=OFF",
+-        "-DWITH_PCSC:BOOL=ON",
+-        "-DWITH_SERVER:BOOL=ON",
+-        "-DWITH_SAMPLE:BOOL=ON",
+-        "-DWITH_CUPS:BOOL=ON",
+-        "-DWITH_FFMPEG:BOOL=ON",
+-        "-DWITH_DSP_FFMPEG:BOOL=ON",
+-        "-DWITH_OSS:BOOL=OFF",
+-        "-DWITH_PULSE:BOOL=ON"
+-        ],
+-        "sources": [
+-        {
+-            "type": "git",
+-            "url": "https://github.com/FreeRDP/FreeRDP.git",
+-            "branch": "master"
+-        }
+-        ]
+-    }
+-    ]
+-}
+diff -urN packaging/flatpak/freerdp.sh ../../informatimago/FreeRDP/packaging/flatpak/freerdp.sh
+--- packaging/flatpak/freerdp.sh	2019-07-24 06:11:52.498197714 +0300
++++ ../../informatimago/FreeRDP/packaging/flatpak/freerdp.sh	1970-01-01 03:00:00.000000000 +0300
+@@ -1,18 +0,0 @@
+-#!/bin/sh
+-if [ -z $XDG_SESSION_TYPE ];
+-then
+-	echo "XDG_SESSION_TYPE undefined"
+-	exit -1
+-elif [ "$XDG_SESSION_TYPE" = "wayland" ];
+-then
+-	echo "wayland $(which wlfreerdp)"
+-	wlfreerdp $@
+-elif [ "$XDG_SESSION_TYPE" = "x11" ];
+-then
+-	echo "X11 $(which xfreerdp)"
+-	xfreerdp $@
+-	exit $rc
+-else
+-	echo "XDG_SESSION_TYPE $XDG_SESSION_TYPE not handled"
+-	exit -1
+-fi
+diff -urN packaging/flatpak/shared-modules/dbus-glib/dbus-glib-0.110.json ../../informatimago/FreeRDP/packaging/flatpak/shared-modules/dbus-glib/dbus-glib-0.110.json
+--- packaging/flatpak/shared-modules/dbus-glib/dbus-glib-0.110.json	2019-07-24 06:11:52.498197714 +0300
++++ ../../informatimago/FreeRDP/packaging/flatpak/shared-modules/dbus-glib/dbus-glib-0.110.json	1970-01-01 03:00:00.000000000 +0300
+@@ -1,23 +0,0 @@
+-{
+-    "name": "dbus-glib",
+-    "cleanup": [
+-        "*.la",
+-        "/bin",
+-        "/etc",
+-        "/include",
+-        "/libexec",
+-        "/share/gtk-doc",
+-        "/share/man"
+-    ],
+-    "config-opts": [
+-        "--disable-static",
+-        "--disable-gtk-doc"
+-    ],
+-    "sources": [
+-        {
+-            "type": "archive",
+-            "url": "https://dbus.freedesktop.org/releases/dbus-glib/dbus-glib-0.110.tar.gz",
+-            "sha256": "7ce4760cf66c69148f6bd6c92feaabb8812dee30846b24cd0f7395c436d7e825"
+-        }
+-    ]
+-}
+diff -urN packaging/flatpak/shared-modules/udev/udev-175.json ../../informatimago/FreeRDP/packaging/flatpak/shared-modules/udev/udev-175.json
+--- packaging/flatpak/shared-modules/udev/udev-175.json	2019-07-24 06:11:52.498197714 +0300
++++ ../../informatimago/FreeRDP/packaging/flatpak/shared-modules/udev/udev-175.json	1970-01-01 03:00:00.000000000 +0300
+@@ -1,45 +0,0 @@
+-{
+-  "name": "udev",
+-  "rm-configure": true,
+-  "config-opts": [
+-    "--disable-hwdb",
+-    "--disable-logging",
+-    "--disable-introspection",
+-    "--disable-keymap",
+-    "--disable-mtd_probe",
+-    "--with-systemdsystemunitdir=/app/lib/systemd/"
+-  ],
+-  "cleanup": [
+-    "/include",
+-    "/etc",
+-    "/libexec",
+-    "/sbin",
+-    "/lib/pkgconfig",
+-    "/lib/systemd",
+-    "/man",
+-    "/share/aclocal",
+-    "/share/doc",
+-    "/share/gtk-doc",
+-    "/share/man",
+-    "/share/pkgconfig",
+-    "*.la",
+-    "*.a"
+-  ],
+-  "sources": [
+-    {
+-      "type": "archive",
+-      "url": "http://kernel.org/pub/linux/utils/kernel/hotplug/udev-175.tar.bz2",
+-      "sha256": "4c7937fe5a1521316ea571188745b9a00a9fdf314228cffc53a7ba9e5968b7ab"
+-    },
+-    {
+-      "type": "script",
+-      "dest-filename": "autogen.sh",
+-      "commands": [
+-        "autoreconf -vfi"
+-      ]
+-    }
+-  ],
+-  "post-install": [
+-    "sed -i 's|${exec_prefix}|/app|g' /app/share/pkgconfig/udev.pc"
+-  ]
+-}
+diff -urN packaging/rpm/freerdp-nightly.spec ../../informatimago/FreeRDP/packaging/rpm/freerdp-nightly.spec
+--- packaging/rpm/freerdp-nightly.spec	2019-07-24 06:11:52.498197714 +0300
++++ ../../informatimago/FreeRDP/packaging/rpm/freerdp-nightly.spec	2019-07-19 20:00:34.133156354 +0300
+@@ -40,7 +40,6 @@
+ BuildRequires: libXdamage-devel
+ BuildRequires: libXtst-devel
+ BuildRequires: cups-devel
+-BuildRequires: cairo-devel
+ BuildRequires: pcsc-lite-devel
+ BuildRequires: uuid-devel
+ BuildRequires: libxml2-devel
+@@ -127,7 +126,6 @@
+         -DCHANNEL_URBDRC=ON \
+         -DCHANNEL_URBDRC_CLIENT=ON \
+         -DWITH_SERVER=ON \
+-        -DWITH_CAIRO=ON \
+         -DBUILD_TESTING=OFF \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+         -DCMAKE_INSTALL_PREFIX=%{INSTALL_PREFIX} \

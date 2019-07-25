@@ -1,0 +1,128 @@
+diff -urN cmake/ConfigOptions.cmake ../../informatimago/FreeRDP/cmake/ConfigOptions.cmake
+--- cmake/ConfigOptions.cmake	2019-07-24 06:11:52.442197443 +0300
++++ ../../informatimago/FreeRDP/cmake/ConfigOptions.cmake	2019-07-25 20:05:40.158257926 +0300
+@@ -105,7 +105,6 @@
+ option(WITH_DEBUG_CAPABILITIES "Print capability negotiation debug messages." ${DEFAULT_DEBUG_OPTION})
+ option(WITH_DEBUG_CHANNELS "Print channel manager debug messages." ${DEFAULT_DEBUG_OPTION})
+ option(WITH_DEBUG_CLIPRDR "Print clipboard redirection debug messages" ${DEFAULT_DEBUG_OPTION})
+-option(WITH_DEBUG_RDPGFX "Print RDPGFX debug messages" ${DEFAULT_DEBUG_OPTION})
+ option(WITH_DEBUG_DVC "Print dynamic virtual channel debug messages." ${DEFAULT_DEBUG_OPTION})
+ option(WITH_DEBUG_TSMF "Print TSMF virtual channel debug messages." ${DEFAULT_DEBUG_OPTION})
+ option(WITH_DEBUG_KBD "Print keyboard related debug messages." ${DEFAULT_DEBUG_OPTION})
+@@ -147,14 +146,11 @@
+ 
+ option(USE_VERSION_FROM_GIT_TAG "Extract FreeRDP version from git tag." OFF)
+ 
+-option(WITH_CAIRO    "Use CAIRO image library for screen resizing" OFF)
+-option(WITH_SWSCALE  "Use SWScale image library for screen resizing" OFF)
+-
+-if (ANDROID)
+-	include(ConfigOptionsAndroid)
++if(ANDROID)
++include(ConfigOptionsAndroid)
+ endif(ANDROID)
+ 
+-if (IOS)
+-	include(ConfigOptionsiOS)
++if(IOS)
++include(ConfigOptionsiOS)
+ endif(IOS)
+ 
+diff -urN cmake/FindCairo.cmake ../../informatimago/FreeRDP/cmake/FindCairo.cmake
+--- cmake/FindCairo.cmake	2019-07-24 06:11:52.442197443 +0300
++++ ../../informatimago/FreeRDP/cmake/FindCairo.cmake	1970-01-01 03:00:00.000000000 +0300
+@@ -1,24 +0,0 @@
+-find_package(PkgConfig QUIET)
+-pkg_check_modules(CAIRO QUIET libcairo)
+-
+-find_path(CAIRO_INCLUDE_DIR
+-		  NAMES cairo.h
+-			PATHS ${CAIRO_INCLUDE_DIRS}
+-		  PATH_SUFFIXES cairo
+-		 )
+-
+-# Finally the library itself
+-find_library(CAIRO_LIBRARY
+-			 NAMES cairo
+-			 PATHS ${CAIRO_LIBRARY_DIRS}
+-			)
+-mark_as_advanced(CAIRO_INCLUDE_DIR)
+-mark_as_advanced(CAIRO_LIBRARY)
+-
+-include(FindPackageHandleStandardArgs)
+-find_package_handle_standard_args(CAIRO
+-	REQUIRED_VARS
+-		CAIRO_LIBRARY CAIRO_INCLUDE_DIR
+-	VERSION_VAR
+-		CAIRO_VERSION_STRING
+-	HANDLE_COMPONENTS)
+diff -urN cmake/FindOpenSSL.cmake ../../informatimago/FreeRDP/cmake/FindOpenSSL.cmake
+--- cmake/FindOpenSSL.cmake	2019-07-24 06:11:52.442197443 +0300
++++ ../../informatimago/FreeRDP/cmake/FindOpenSSL.cmake	2019-07-19 20:00:34.113156408 +0300
+@@ -63,13 +63,13 @@
+     include
+ )
+ 
+-IF(MSVC)
++IF(WIN32)
+   if(${MSVC_RUNTIME} STREQUAL "static")
+     set(MSVC_RUNTIME_SUFFIX "MT")
+   else()
+     set(MSVC_RUNTIME_SUFFIX "MD")
+   endif()
+-ENDIF(MSVC)
++ENDIF(WIN32)
+ 
+ IF(ANDROID)
+     FIND_LIBRARY(OPENSSL_LIBRARIES
+diff -urN cmake/FindSWScale.cmake ../../informatimago/FreeRDP/cmake/FindSWScale.cmake
+--- cmake/FindSWScale.cmake	2019-07-24 06:11:52.442197443 +0300
++++ ../../informatimago/FreeRDP/cmake/FindSWScale.cmake	1970-01-01 03:00:00.000000000 +0300
+@@ -1,14 +0,0 @@
+-
+-include(FindPkgConfig)
+-
+-if (PKG_CONFIG_FOUND)
+-	pkg_check_modules(SWScale swscale)
+-endif()
+-
+-find_path(SWScale_INCLUDE_DIR libswscale / swscale.h PATHS $ {SWScale_INCLUDE_DIRS})
+-find_library(SWScale_LIBRARY swscale PATHS $ {SWScale_LIBRARY_DIRS})
+-
+-FIND_PACKAGE_HANDLE_STANDARD_ARGS(SWScale DEFAULT_MSG SWScale_INCLUDE_DIR SWScale_LIBRARY)
+-
+-mark_as_advanced(SWScale_INCLUDE_DIR SWScale_LIBRARY)
+-
+diff -urN cmake/FindWayland.cmake ../../informatimago/FreeRDP/cmake/FindWayland.cmake
+--- cmake/FindWayland.cmake	2019-07-24 06:11:52.442197443 +0300
++++ ../../informatimago/FreeRDP/cmake/FindWayland.cmake	2019-07-19 20:00:34.113156408 +0300
+@@ -30,7 +30,6 @@
+ if(PKG_CONFIG_FOUND)
+     pkg_check_modules(WAYLAND_SCANNER_PC wayland-scanner)
+     pkg_check_modules(WAYLAND_CLIENT_PC wayland-client)
+-		pkg_check_modules(WAYLAND_CURSOR_PC wayland-cursor)
+     pkg_check_modules(XKBCOMMON_PC xkbcommon)
+ endif()
+ 
+@@ -42,20 +41,11 @@
+     HINTS ${WAYLAND_CLIENT_PC_INCLUDE_DIRS}
+ )
+ 
+-find_library(WAYLAND_CLIENT_LIB
++find_library(WAYLAND_LIBS
+     NAMES "wayland-client"
+     HINTS "${WAYLAND_CLIENT_PC_LIBRARY_DIRS}"
+ )
+ 
+-find_library(WAYLAND_CURSOR_LIB
+-    NAMES "wayland-cursor"
+-		HINTS "${WAYLAND_CURSOR_PC_LIBRARY_DIRS}"
+-)
+-
+-if (WAYLAND_CLIENT_LIB AND WAYLAND_CURSOR_LIB)
+-	list(APPEND WAYLAND_LIBS ${WAYLAND_CLIENT_LIB} ${WAYLAND_CURSOR_LIB})
+-endif (WAYLAND_CLIENT_LIB AND WAYLAND_CURSOR_LIB)
+-
+ find_path(XKBCOMMON_INCLUDE_DIR xkbcommon/xkbcommon.h
+     HINTS ${XKBCOMMON_PC_INCLUDE_DIRS}
+ )

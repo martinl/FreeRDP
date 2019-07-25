@@ -1,0 +1,306 @@
+diff -urN scripts/autoformat.sh ../../informatimago/FreeRDP/scripts/autoformat.sh
+--- scripts/autoformat.sh	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/scripts/autoformat.sh	2019-07-19 20:00:34.133156354 +0300
+@@ -0,0 +1,11 @@
++#!/bin/bash
++MY_PATH="`dirname \"$0\"`"              # relative
++MY_PATH="`( cd \"$MY_PATH\" && pwd )`"  # absolutized and normalized
++# get filenames from git status; only .c or .h (skip .cmake).
++CHANGESET=`git status | cut -d ':' -f 2 | grep -vE "#|no" | grep -E "*\.[hc]$"`
++
++for f in $CHANGESET; do
++	if [ -e $f ]; then
++		sh $MY_PATH/format_code.sh $f
++	fi
++done
+diff -urN scripts/clone_and_build_debug.sh ../../informatimago/FreeRDP/scripts/clone_and_build_debug.sh
+--- scripts/clone_and_build_debug.sh	2019-07-24 09:39:02.513066313 +0300
++++ ../../informatimago/FreeRDP/scripts/clone_and_build_debug.sh	1970-01-01 03:00:00.000000000 +0300
+@@ -1,6 +0,0 @@
+-cd /tmp
+-git clone https://github.com/martinl/FreeRDP.git freerdp-smartcard-logon-nla
+-cd freerdp-smartcard-logon-nla/
+-git checkout smartcard-logon-nla
+-cmake -DWITH_SSE2=ON -DWITH_GSSAPI=ON -DWITH_PKCS11H=ON -DWITH_KERBEROS=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DWITH_CUNIT=ON -DWITH_DEBUG_NTLM=ON -DWITH_DEBUG_NEGO=ON -DWITH_DEBUG_NLA=ON -DWITH_DEBUG_SCARD=ON . && make && make CTEST_OUTPUT_ON_FAILURE=1 test
+-
+diff -urN scripts/format_code.sh ../../informatimago/FreeRDP/scripts/format_code.sh
+--- scripts/format_code.sh	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/scripts/format_code.sh	2019-07-19 20:00:17.465205529 +0300
+@@ -0,0 +1,42 @@
++#!/bin/bash
++
++ASTYLE=$(which astyle)
++
++if [ ! -x $ASTYLE ]; then
++  echo "No astyle found in path, please install."
++  exit 1
++fi
++
++# Need at least astyle 2.03 due to bugs in older versions
++# indenting headers with extern "C"
++STR_VERSION=$($ASTYLE --version 2>&1)
++VERSION=$(echo $STR_VERSION | cut -d ' ' -f4)
++MAJOR_VERSION=$(echo $VERSION | cut -d'.' -f1)
++MINOR_VERSION=$(echo $VERSION | cut -d'.' -f2)
++
++if [ "$MAJOR_VERSION" -lt "2" ];
++then
++  echo "Your version of astyle($VERSION) is too old, need at least 2.03"
++  exit 1
++elif [ "$MAJOR_VERSION" -eq "2" ];
++then
++  if [ "$MINOR_VERSION" -lt "3" ];
++  then
++    echo "Your version of astyle($VERSION) is too old, need at least 2.03"
++    exit 1
++  fi
++fi
++
++if [ $# -le 0 ]; then
++  echo "Usage:"
++  echo -e "\t$0 <file1> [<file2> ...]"
++  exit 2
++fi
++
++$ASTYLE --lineend=linux --mode=c --indent=tab=4 --pad-header --pad-oper --style=allman --min-conditional-indent=0 \
++        --indent-switches --indent-cases --indent-preprocessor -k1 --max-code-length=100 \
++        --indent-col1-comments --delete-empty-lines --break-closing-brackets \
++        --align-pointer=type --indent-labels -xe --break-after-logical \
++        --unpad-paren --break-blocks $@
++
++exit $?
+diff -urN scripts/install-pre-commit-hook ../../informatimago/FreeRDP/scripts/install-pre-commit-hook
+--- scripts/install-pre-commit-hook	1970-01-01 03:00:00.000000000 +0300
++++ ../../informatimago/FreeRDP/scripts/install-pre-commit-hook	2019-07-19 20:00:34.133156354 +0300
+@@ -0,0 +1,34 @@
++#!/bin/bash
++
++root=$(cd $(dirname "$0")/.. && pwd)
++
++cat > .git/hooks/pre-commit <<'EOF'
++#!/bin/bash -e
++root=$(cd $(dirname "$0")/../.. && pwd)
++"${root}"/scripts/autoformat.sh # TODO: scripts MUST NOT be named with file extensions!
++#
++# Unix scripts should not have any file extension.
++# 
++# They unnecessarily expose implementation detail (breaking encapsulation).
++# They uselessly and incompletely mimic detail from the #! line.
++# They capture insufficient detail to be useful at the system level (and aren't used).
++# They clash with recommended Unix (and Linux) practice.
++# They add noise to the command-level API.
++# They are very commonly technically incorrect for the script.
++# They give incorrect impressions about the use of the files they adorn.
++# They aren't validated even for what little info is present in them.
++# They interfere with switching scripting languages.
++# They interfere with changing scripting language versions.
++# They interfere with changing to presumably-faster compiled forms.
++# They encourage naively running scripts with the extension-implied interpreter.
++# They infect novice scripters with misinformation about Unix scripting.
++# They ironically are only a problem when interpreted by humans.
++# 
++# See more at:
++# 
++# http://www.talisman.org/~erlkonig/documents/commandname-extensions-considered-harmful
++#
++EOF
++
++chmod 755 .git/hooks/pre-commit
++
+diff -urN scripts/save_brew_list.sh ../../informatimago/FreeRDP/scripts/save_brew_list.sh
+--- scripts/save_brew_list.sh	2019-07-24 23:25:17.610080471 +0300
++++ ../../informatimago/FreeRDP/scripts/save_brew_list.sh	1970-01-01 03:00:00.000000000 +0300
+@@ -1,2 +0,0 @@
+-# save brew list (potential macos build dependencies)
+-brew list > brew_list.txt
+diff -urN scripts/update-settings-tests ../../informatimago/FreeRDP/scripts/update-settings-tests
+--- scripts/update-settings-tests	2019-07-24 06:11:52.506197752 +0300
++++ ../../informatimago/FreeRDP/scripts/update-settings-tests	1970-01-01 03:00:00.000000000 +0300
+@@ -1,187 +0,0 @@
+-#!/usr/bin/env python
+-import os
+-import sys
+-
+-def get_values(entry_dict, entry_type):
+-    values = []
+-    if '*' == entry_type:
+-        for key in entry_dict.keys():
+-            if entry_type in key:
+-                values += entry_dict[key]
+-                entry_dict.pop(key, None)
+-    elif entry_type in entry_dict:
+-        values = entry_dict[entry_type]
+-        entry_dict.pop(entry_type, None)
+-    return values
+-
+-def write_entry(f, entry_dict, entry_type, entry_name):
+-    values = get_values(entry_dict, entry_type)
+-    if not values:
+-        return
+-
+-    f.write('#define have_' + entry_name.lower() + '_list_indices\n')
+-    f.write('static const size_t ' + entry_name.lower() + '_list_indices[] =\n')
+-    f.write('{\n')
+-
+-    for val in values:
+-        f.write('\tFreeRDP_' + val + ',\n')
+-
+-    f.write('};\n\n')
+-
+-def write_getter_case(f, val):
+-    f.write('\t\tcase FreeRDP_' + val + ':\n')
+-    f.write('\t\t\treturn settings->' + val + ';\n\n')
+-
+-def write_getter(f, entry_dict, entry_type, entry_name):
+-    isString = 'string' in entry_name
+-    isPointer = 'pointer' in entry_name
+-    values = get_values(entry_dict, entry_type)
+-
+-    if isPointer:
+-        f.write('const void*')
+-    elif isString:
+-        f.write('const ' + entry_type)
+-    else:
+-        f.write(entry_type)
+-    f.write(' freerdp_settings_get_' + entry_name.lower() + '(rdpSettings* settings, size_t id)\n')
+-    f.write('{\n')
+-    f.write('\tif (!settings)\n')
+-    f.write('\t\treturn FALSE;\n\n')
+-    f.write('\tswitch (id)\n')
+-    f.write('\t{\n')
+-    if values:
+-        for val in values:
+-            write_getter_case(f, val)
+-    f.write('\t\tdefault:\n')
+-    f.write('\t\t\tWLog_ERR(TAG, "[%s] Invalid key index %"PRIuz, __FUNCTION__,  id);\n')
+-    f.write('\t\t\treturn FALSE;\n')
+-    f.write('\t}\n')
+-    f.write('}\n\n')
+-
+-def write_setter_case(f, val, isString, isPointer):
+-    f.write('\t\tcase FreeRDP_' + val + ':\n')
+-    if not isString:
+-        f.write('\t\t\tsettings->' + val + ' = val;\n')
+-        f.write('\t\t\tbreak;\n\n')
+-    else:
+-        f.write('\t\t\tfree(settings->' + val + ');\n')
+-        f.write('\t\t\tsettings->' + val + ' = _strdup(val);\n')
+-        f.write('\t\t\treturn settings->' + val + ' != NULL;\n\n')
+-
+-def write_setter(f, entry_dict, entry_type, entry_name):
+-    isString = 'string' in entry_name
+-    isPointer = 'pointer' in entry_name
+-    values = get_values(entry_dict, entry_type)
+-
+-    f.write('BOOL freerdp_settings_set_' + entry_name.lower() + '(rdpSettings* settings, size_t id, ')
+-    if isString or isPointer:
+-        f.write('const ')
+-    if not isPointer:
+-        f.write(entry_type + ' val)\n')
+-    else:
+-        f.write('void* val)\n')
+-    f.write('{\n')
+-    f.write('\tif (!settings)\n')
+-    f.write('\t\treturn FALSE;\n\n')
+-    f.write('\tswitch (id)\n')
+-    f.write('\t{\n')
+-    if values:
+-        for val in values:
+-            write_setter_case(f, val, isString, isPointer)
+-    f.write('\t\tdefault:\n')
+-    f.write('\t\t\tWLog_ERR(TAG, "[%s] Invalid key index %"PRIuz, __FUNCTION__,  id);\n')
+-    f.write('\t\t\treturn FALSE;\n')
+-    f.write('\t}\n')
+-    f.write('\treturn TRUE;\n')
+-    f.write('}\n\n')
+-
+-name = os.path.dirname(os.path.realpath(__file__))
+-begin = "WARNING: this data structure is carefully padded for ABI stability!"
+-end = "WARNING: End of ABI stable zone!"
+-
+-print('begin parsing settings header')
+-try:
+-    type_list = dict()
+-
+-    with open(name + "/../include/freerdp/settings.h", "rb") as f:
+-        lines = f.readlines()
+-        started = False
+-        for line in lines:
+-            if not started:
+-                if begin in line:
+-                    started = True
+-                continue
+-
+-            if end in line:
+-                break
+-
+-            sline = line.strip()
+-            if not sline:
+-                continue
+-            if sline.startswith('/'):
+-                continue
+-            if sline.startswith('*'):
+-                continue
+-            if 'padding' in sline:
+-                continue
+-
+-            if sline.startswith('ALIGN64'):
+-                sline = sline[7:].strip()
+-
+-            sline = sline[:sline.find(';')]
+-            pair = sline.split()
+-            if pair[0] in type_list:
+-                type_list[pair[0]].append(pair[1])
+-            else:
+-                type_list[pair[0]] = [pair[1]]
+-
+-    with open(name + '/../libfreerdp/common/settings_getters.c', 'w+') as f:
+-        f.write('/* Generated by ' + ''  + ' */\n\n')
+-        f.write('#include <freerdp/settings.h>\n')
+-        f.write('#include <freerdp/log.h>\n\n')
+-        f.write('#define TAG FREERDP_TAG("common.settings")\n\n')
+-
+-        getter_list = dict(type_list)
+-        setter_list = dict(type_list)
+-        write_getter(f, getter_list, 'BOOL', 'bool')
+-        write_setter(f, setter_list, 'BOOL', 'bool')
+-        write_getter(f, getter_list, 'UINT16', 'uint16')
+-        write_setter(f, setter_list, 'UINT16', 'uint16')
+-        write_getter(f, getter_list, 'INT16', 'int16')
+-        write_setter(f, setter_list, 'INT16', 'int16')
+-        write_getter(f, getter_list, 'UINT32', 'uint32')
+-        write_setter(f, setter_list, 'UINT32', 'uint32')
+-        write_getter(f, getter_list, 'INT32', 'int32')
+-        write_setter(f, setter_list, 'INT32', 'int32')
+-        write_getter(f, getter_list, 'UINT64', 'uint64')
+-        write_setter(f, setter_list, 'UINT64', 'uint64')
+-        write_getter(f, getter_list, 'INT64', 'int64')
+-        write_setter(f, setter_list, 'INT64', 'int64')
+-        write_getter(f, getter_list, 'char*', 'string')
+-        write_setter(f, setter_list, 'char*', 'string')
+-        write_getter(f, getter_list, '*', 'pointer')
+-#        write_setter(f, setter_list, '*', 'pointer')
+-
+-        f.write('\n')
+-
+-    with open(name + '/../libfreerdp/core/test/settings_property_lists.h', 'w+') as f:
+-        f.write('#ifndef TEST_SETTINGS_PROPERTY_LISTS\n')
+-        f.write('#define TEST_SETTINGS_PROPERTY_LISTS\n\n')
+-
+-        write_entry(f, type_list, 'BOOL', 'bool')
+-        write_entry(f, type_list, 'UINT16', 'uint16')
+-        write_entry(f, type_list, 'INT16', 'int16')
+-        write_entry(f, type_list, 'UINT32', 'uint32')
+-        write_entry(f, type_list, 'INT32', 'int32')
+-        write_entry(f, type_list, 'UINT64', 'uint64')
+-        write_entry(f, type_list, 'INT64', 'int64')
+-        write_entry(f, type_list, 'char*', 'string')
+-        write_entry(f, type_list, '*', 'pointer')
+-
+-        f.write('#endif /* TEST_SETTINGS_PROPERTY_LISTS */\n\n')
+-
+-        print('remaining:\n' + str(type_list))
+-except IOError as e:
+-    print('failed to parse settings header ' + str(e))
+-    sys.exit(-1)
+-print('ended parsing settings header')

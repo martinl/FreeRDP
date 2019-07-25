@@ -1,0 +1,4450 @@
+diff -urN server/CMakeLists.txt ../../informatimago/FreeRDP/server/CMakeLists.txt
+--- server/CMakeLists.txt	2019-07-24 06:11:52.506197752 +0300
++++ ../../informatimago/FreeRDP/server/CMakeLists.txt	2019-07-19 20:00:17.465205529 +0300
+@@ -19,7 +19,6 @@
+ 
+ add_subdirectory(common)
+ add_subdirectory(shadow)
+-add_subdirectory(proxy)
+ 
+ if(FREERDP_VENDOR)
+ 	if(WITH_SAMPLE)
+diff -urN server/.gitignore ../../informatimago/FreeRDP/server/.gitignore
+--- server/.gitignore	2019-07-24 06:11:52.506197752 +0300
++++ ../../informatimago/FreeRDP/server/.gitignore	2019-07-19 20:00:17.465205529 +0300
+@@ -1,5 +1,4 @@
+ /*
+-!/proxy
+ !/common
+ !/Mac
+ !/Sample
+diff -urN server/Mac/mf_rdpsnd.c ../../informatimago/FreeRDP/server/Mac/mf_rdpsnd.c
+--- server/Mac/mf_rdpsnd.c	2019-07-25 19:51:06.401924892 +0300
++++ ../../informatimago/FreeRDP/server/Mac/mf_rdpsnd.c	2019-07-25 20:11:30.435994920 +0300
+@@ -93,6 +93,7 @@
+ 	recorderState.dataFormat.mSampleRate = agreedFormat->nSamplesPerSec;
+ 	recorderState.dataFormat.mFormatFlags =
+ 	    kAudioFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
++	;
+ 	recorderState.dataFormat.mBytesPerPacket = 4;
+ 	recorderState.dataFormat.mFramesPerPacket = 1;
+ 	recorderState.dataFormat.mBytesPerFrame = 4;
+diff -urN server/proxy/CMakeLists.txt ../../informatimago/FreeRDP/server/proxy/CMakeLists.txt
+--- server/proxy/CMakeLists.txt	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/CMakeLists.txt	1970-01-01 03:00:00.000000000 +0300
+@@ -1,82 +0,0 @@
+-# FreeRDP: A Remote Desktop Protocol Implementation
+-# FreeRDP Proxy Server
+-#
+-# Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+-# Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+-#
+-# Licensed under the Apache License, Version 2.0 (the "License");
+-# you may not use this file except in compliance with the License.
+-# You may obtain a copy of the License at
+-#
+-#     http://www.apache.org/licenses/LICENSE-2.0
+-#
+-# Unless required by applicable law or agreed to in writing, software
+-# distributed under the License is distributed on an "AS IS" BASIS,
+-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-# See the License for the specific language governing permissions and
+-# limitations under the License.
+-
+-set(MODULE_NAME "freerdp-proxy")
+-set(MODULE_PREFIX "FREERDP_SERVER_PROXY")
+-
+-set(${MODULE_PREFIX}_SRCS
+-  freerdp_proxy.c
+-  pf_context.c
+-  pf_context.h
+-  pf_channels.c
+-  pf_channels.h
+-  pf_client.c
+-  pf_client.h
+-  pf_input.c
+-  pf_input.h
+-  pf_update.c
+-  pf_update.h
+-  pf_rdpgfx.c
+-  pf_rdpgfx.h
+-  pf_disp.c
+-  pf_disp.h
+-  pf_server.c
+-  pf_server.h
+-  pf_common.c
+-  pf_common.h
+-  pf_gdi.c
+-  pf_gdi.h
+-  pf_config.c
+-  pf_config.h
+-  pf_graphics.c
+-  pf_graphics.h
+-  pf_filters.c
+-  pf_filters.h
+-  pf_log.h)
+-
+-# On windows create dll version information.
+-# Vendor, product and year are already set in top level CMakeLists.txt
+-if (WIN32)
+-  set (RC_VERSION_MAJOR ${FREERDP_VERSION_MAJOR})
+-  set (RC_VERSION_MINOR ${FREERDP_VERSION_MINOR})
+-  set (RC_VERSION_BUILD ${FREERDP_VERSION_REVISION})
+-  set (RC_VERSION_FILE "${MODULE_NAME}${CMAKE_EXECUTABLE_SUFFIX}" )
+-
+-  configure_file(
+-    ${CMAKE_SOURCE_DIR}/cmake/WindowsDLLVersion.rc.in
+-    ${CMAKE_CURRENT_BINARY_DIR}/version.rc
+-    @ONLY)
+-
+-  set ( ${MODULE_PREFIX}_SRCS ${${MODULE_PREFIX}_SRCS} ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+-endif()
+-
+-add_executable(${MODULE_NAME} ${${MODULE_PREFIX}_SRCS})
+-
+-set(${MODULE_PREFIX}_LIBS ${${MODULE_PREFIX}_LIBS} freerdp-server)
+-set(${MODULE_PREFIX}_LIBS ${${MODULE_PREFIX}_LIBS} freerdp-client)
+-set(${MODULE_PREFIX}_LIBS ${${MODULE_PREFIX}_LIBS} winpr freerdp)
+-
+-target_link_libraries(${MODULE_NAME} ${${MODULE_PREFIX}_LIBS})
+-install(TARGETS ${MODULE_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT server)
+-if (WITH_DEBUG_SYMBOLS AND MSVC)
+-    install(FILES ${CMAKE_PDB_BINARY_DIR}/${MODULE_NAME}.pdb DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT symbols)
+-endif()
+-
+-set_property(TARGET ${MODULE_NAME} PROPERTY FOLDER "Server/proxy")
+-
+-add_subdirectory("filters")
+diff -urN server/proxy/config.ini ../../informatimago/FreeRDP/server/proxy/config.ini
+--- server/proxy/config.ini	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/config.ini	1970-01-01 03:00:00.000000000 +0300
+@@ -1,37 +0,0 @@
+-[Server]
+-Host = "0.0.0.0"
+-Port = 3389
+-LocalOnly = 0
+-
+-[Target]
+-; If this value is set to TRUE, the target server info will be parsed using the 
+-; load balance info setting at runtime. The format is
+-; "Cookie: msts=<target server>", and can be set in an rdp file for windows/mac,
+-; and the /load-balance-info: CLI option for xfreerdp. Otherwise, the server
+-; will always connect to the same target, using the configured values of `Host`
+-; and `Port`.
+-UseLoadBalanceInfo = 1
+-Host = "Target server"
+-Port = 3389
+-
+-[Input]
+-Mouse = 1
+-Keyboard = 1
+-
+-[Graphics]
+-GFX = 1
+-BitmapUpdate = 1
+-
+-[Security]
+-NlaSecurity = 0
+-TlsSecurity = 1
+-RdpSecurity = 1
+-
+-[Channels]
+-WhitelistMode = 0
+-AllowedChannels = "cliprdr,Microsoft::Windows::RDS::Video::Control"
+-DeniedChannels = "Microsoft::Windows::RDS::Geometry"
+-
+-[Filters]
+-; FilterName = FilterPath
+-DemoFilter = "server/proxy/filters/libdemo_filter.so"
+diff -urN server/proxy/filters/CMakeLists.txt ../../informatimago/FreeRDP/server/proxy/filters/CMakeLists.txt
+--- server/proxy/filters/CMakeLists.txt	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/filters/CMakeLists.txt	1970-01-01 03:00:00.000000000 +0300
+@@ -1,3 +0,0 @@
+-add_library(demo_filter SHARED
+-    filter_demo.c
+-)
+diff -urN server/proxy/filters/filter_demo.c ../../informatimago/FreeRDP/server/proxy/filters/filter_demo.c
+--- server/proxy/filters/filter_demo.c	2019-07-25 19:51:06.537925566 +0300
++++ ../../informatimago/FreeRDP/server/proxy/filters/filter_demo.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,46 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#include "filters_api.h"
+-
+-static PF_FILTER_RESULT demo_filter_keyboard_event(connectionInfo* info, void* param)
+-{
+-	proxyKeyboardEventInfo* event_data = (proxyKeyboardEventInfo*)param;
+-	WINPR_UNUSED(event_data);
+-	return FILTER_PASS;
+-}
+-
+-static PF_FILTER_RESULT demo_filter_mouse_event(connectionInfo* info, void* param)
+-{
+-	proxyMouseEventInfo* event_data = (proxyMouseEventInfo*)param;
+-
+-	if (event_data->x % 100 == 0)
+-	{
+-		return FILTER_DROP;
+-	}
+-
+-	return FILTER_PASS;
+-}
+-
+-BOOL filter_init(proxyEvents* events)
+-{
+-	events->KeyboardEvent = demo_filter_keyboard_event;
+-	events->MouseEvent = demo_filter_mouse_event;
+-	return TRUE;
+-}
+diff -urN server/proxy/filters/filters_api.h ../../informatimago/FreeRDP/server/proxy/filters/filters_api.h
+--- server/proxy/filters/filters_api.h	2019-07-25 19:51:06.537925566 +0300
++++ ../../informatimago/FreeRDP/server/proxy/filters/filters_api.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,74 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_FILTERS_API_H
+-#define FREERDP_SERVER_PROXY_FILTERS_API_H
+-
+-#include <winpr/winpr.h>
+-
+-enum pf_filter_result
+-{
+-	FILTER_PASS = 0,
+-	FILTER_DROP,
+-	FILTER_IGNORE
+-};
+-
+-typedef enum pf_filter_result PF_FILTER_RESULT;
+-typedef struct connection_info connectionInfo;
+-typedef struct proxy_events proxyEvents;
+-typedef struct proxy_keyboard_event_info proxyKeyboardEventInfo;
+-typedef struct proxy_mouse_event_info proxyMouseEventInfo;
+-typedef PF_FILTER_RESULT (*proxyEvent)(connectionInfo* info, void* param);
+-
+-struct connection_info
+-{
+-	char* TargetHostname;
+-	char* ClientHostname;
+-	char* Username;
+-};
+-
+-struct proxy_events
+-{
+-	proxyEvent KeyboardEvent;
+-	proxyEvent MouseEvent;
+-};
+-
+-#pragma pack(push, 1)
+-struct proxy_keyboard_event_info
+-{
+-	UINT16 flags;
+-	UINT16 rdp_scan_code;
+-};
+-
+-struct proxy_mouse_event_info
+-{
+-	UINT16 flags;
+-	UINT16 x;
+-	UINT16 y;
+-};
+-#pragma pack(pop)
+-
+-/* implement this method and register callbacks for proxy events
+- * return TRUE if initialization succeeded, otherwise FALSE.
+- **/
+-BOOL filter_init(proxyEvents* events);
+-
+-#endif /* FREERDP_SERVER_PROXY_FILTERS_API_H */
+diff -urN server/proxy/filters/README.md ../../informatimago/FreeRDP/server/proxy/filters/README.md
+--- server/proxy/filters/README.md	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/filters/README.md	1970-01-01 03:00:00.000000000 +0300
+@@ -1,27 +0,0 @@
+-# Proxy filter API
+-
+-`freerdp-proxy` has an API for filtering certain messages. A filter can register callbacks to events, allowing to record the data and control whether to pass/ignore the message, or right out drop the connection. 
+-
+-During startup, the proxy loads its filters from the configuration:
+-```ini
+-[Filters]
+-; FilterName = FilterPath
+-DemoFilter = "server/proxy/demo.so"
+-```
+-
+-## Currently supported events
+-* Mouse event
+-* Keyboard event
+-
+-## Developing a new filter
+-* Create a new file that includes `filters_api.h`.
+-* Implement the `filter_init` function and register the callbacks you are interested in.
+-* Each callback receives two parameters:
+-    * `connectionInfo* info` holds connection info of the raised event.
+-    * `void* param` holds the actual event data. It should be casted by the filter to the suitable struct from `filters_api.h`.
+-* Each callback must return a `PF_FILTER_RESULT`:
+-    * `FILTER_IGNORE`: The event will not be proxied.
+-    * `FILTER_PASS`: The event will be proxied.
+-    * `FILTER_DROP`: The entire connection will be dropped.
+-
+-A demo can be found in `filter_demo.c`.
+\ No newline at end of file
+diff -urN server/proxy/freerdp_proxy.c ../../informatimago/FreeRDP/server/proxy/freerdp_proxy.c
+--- server/proxy/freerdp_proxy.c	2019-07-25 19:51:06.541925586 +0300
++++ ../../informatimago/FreeRDP/server/proxy/freerdp_proxy.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,83 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#include "pf_server.h"
+-#include "pf_config.h"
+-#include "pf_log.h"
+-#include "pf_filters.h"
+-
+-#include <winpr/collections.h>
+-
+-#define TAG PROXY_TAG("server")
+-
+-int main(int argc, char* argv[])
+-{
+-	const char* cfg = "config.ini";
+-	int status = 0;
+-	DWORD ld;
+-	UINT32 i;
+-	UINT32 count;
+-	proxyConfig* config = calloc(1, sizeof(proxyConfig));
+-
+-	if (!config)
+-		return -1;
+-
+-	if (argc > 1)
+-		cfg = argv[1];
+-
+-	ld = pf_server_load_config(cfg, config);
+-
+-	switch (ld)
+-	{
+-	case CONFIG_PARSE_SUCCESS:
+-		WLog_DBG(TAG, "Configuration parsed successfully");
+-		break;
+-
+-	case CONFIG_PARSE_ERROR:
+-		WLog_ERR(TAG, "An error occured while parsing configuration file, exiting...");
+-		goto fail;
+-
+-	case CONFIG_INVALID:
+-		goto fail;
+-	}
+-
+-	if (config->WhitelistMode)
+-	{
+-		WLog_INFO(TAG, "Channels mode: WHITELIST");
+-		count = ArrayList_Count(config->AllowedChannels);
+-
+-		for (i = 0; i < count; i++)
+-			WLog_INFO(TAG, "Allowing %s", (char*)ArrayList_GetItem(config->AllowedChannels, i));
+-	}
+-	else
+-	{
+-		WLog_INFO(TAG, "Channels mode: BLACKLIST");
+-		count = ArrayList_Count(config->BlockedChannels);
+-
+-		for (i = 0; i < count; i++)
+-			WLog_INFO(TAG, "Blocking %s", (char*)ArrayList_GetItem(config->BlockedChannels, i));
+-	}
+-
+-	status = pf_server_start(config);
+-fail:
+-	pf_server_config_free(config);
+-	return status;
+-}
+diff -urN server/proxy/pf_channels.c ../../informatimago/FreeRDP/server/proxy/pf_channels.c
+--- server/proxy/pf_channels.c	2019-07-25 19:51:06.541925586 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_channels.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,105 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#	include "config.h"
+-#endif
+-
+-#include <freerdp/gdi/gfx.h>
+-
+-#include <freerdp/client/rdpei.h>
+-#include <freerdp/client/tsmf.h>
+-#include <freerdp/client/rail.h>
+-#include <freerdp/client/cliprdr.h>
+-#include <freerdp/client/rdpgfx.h>
+-#include <freerdp/client/disp.h>
+-
+-#include "pf_channels.h"
+-#include "pf_client.h"
+-#include "pf_context.h"
+-#include "pf_rdpgfx.h"
+-#include "pf_log.h"
+-#include "pf_disp.h"
+-
+-#define TAG PROXY_TAG("channels")
+-
+-void pf_OnChannelConnectedEventHandler(void* context, ChannelConnectedEventArgs* e)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	pServerContext* ps = pc->pdata->ps;
+-	RdpgfxClientContext* gfx;
+-	RdpgfxServerContext* server;
+-	WLog_DBG(TAG, "Channel connected: %s", e->name);
+-
+-	if (strcmp(e->name, RDPEI_DVC_CHANNEL_NAME) == 0)
+-	{
+-		pc->rdpei = (RdpeiClientContext*)e->pInterface;
+-	}
+-	else if (strcmp(e->name, RDPGFX_DVC_CHANNEL_NAME) == 0)
+-	{
+-		gfx = (RdpgfxClientContext*)e->pInterface;
+-		pc->gfx = gfx;
+-		server = ps->gfx;
+-		pf_rdpgfx_pipeline_init(gfx, server, pc->pdata);
+-	}
+-	else if (strcmp(e->name, DISP_DVC_CHANNEL_NAME) == 0)
+-	{
+-		UINT error;
+-		pc->disp = (DispClientContext*)e->pInterface;
+-		ps->dispOpened = FALSE;
+-
+-		if ((error = ps->disp->Open(ps->disp)) != CHANNEL_RC_OK)
+-		{
+-			if (error == ERROR_NOT_FOUND)
+-			{
+-				/* disp is not opened by client, ignore */
+-				return;
+-			}
+-
+-			WLog_WARN(TAG, "Failed to open disp channel");
+-			return;
+-		}
+-
+-		ps->dispOpened = TRUE;
+-		pf_disp_register_callbacks(pc->disp, ps->disp, pc->pdata);
+-	}
+-}
+-
+-void pf_OnChannelDisconnectedEventHandler(void* context, ChannelDisconnectedEventArgs* e)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	rdpSettings* settings;
+-	settings = ((rdpContext*)pc)->settings;
+-
+-	if (strcmp(e->name, RDPEI_DVC_CHANNEL_NAME) == 0)
+-	{
+-		pc->rdpei = NULL;
+-	}
+-	else if (strcmp(e->name, RDPGFX_DVC_CHANNEL_NAME) == 0)
+-	{
+-		gdi_graphics_pipeline_uninit(((rdpContext*)context)->gdi,
+-		                             (RdpgfxClientContext*)e->pInterface);
+-	}
+-	else if (strcmp(e->name, DISP_DVC_CHANNEL_NAME) == 0)
+-	{
+-		pc->disp = NULL;
+-	}
+-}
+diff -urN server/proxy/pf_channels.h ../../informatimago/FreeRDP/server/proxy/pf_channels.h
+--- server/proxy/pf_channels.h	2019-07-25 19:51:06.541925586 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_channels.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,31 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_PFCHANNELS_H
+-#define FREERDP_SERVER_PROXY_PFCHANNELS_H
+-
+-#include <freerdp/freerdp.h>
+-#include <freerdp/client/channels.h>
+-
+-void pf_OnChannelConnectedEventHandler(void* context, ChannelConnectedEventArgs* e);
+-void pf_OnChannelDisconnectedEventHandler(void* context, ChannelDisconnectedEventArgs* e);
+-
+-#endif /* FREERDP_SERVER_PROXY_PFCHANNELS_H */
+diff -urN server/proxy/pf_client.c ../../informatimago/FreeRDP/server/proxy/pf_client.c
+--- server/proxy/pf_client.c	2019-07-25 19:51:06.549925625 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_client.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,427 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#	include "config.h"
+-#endif
+-
+-#include <errno.h>
+-#include <stdio.h>
+-#include <string.h>
+-
+-#include <freerdp/freerdp.h>
+-#include <freerdp/constants.h>
+-#include <freerdp/gdi/gdi.h>
+-#include <freerdp/utils/signal.h>
+-
+-#include <freerdp/client/file.h>
+-#include <freerdp/client/cmdline.h>
+-#include <freerdp/client/cliprdr.h>
+-#include <freerdp/client/channels.h>
+-#include <freerdp/channels/channels.h>
+-#include <freerdp/log.h>
+-
+-#include <winpr/crt.h>
+-#include <winpr/synch.h>
+-
+-#include "pf_channels.h"
+-#include "pf_gdi.h"
+-#include "pf_graphics.h"
+-#include "pf_common.h"
+-#include "pf_client.h"
+-#include "pf_context.h"
+-#include "pf_update.h"
+-#include "pf_log.h"
+-
+-#define TAG PROXY_TAG("client")
+-
+-/**
+- * Re-negotiate with original client after negotiation between the proxy
+- * and the target has finished.
+- */
+-static void proxy_server_reactivate(rdpContext* ps, const rdpContext* target)
+-{
+-	pf_context_copy_settings(ps->settings, target->settings, TRUE);
+-	/* DesktopResize causes internal function rdp_server_reactivate to be called,
+-	 * which causes the reactivation.
+-	 */
+-	ps->update->DesktopResize(ps);
+-}
+-
+-static void pf_OnErrorInfo(void* ctx, ErrorInfoEventArgs* e)
+-{
+-	pClientContext* pc = (pClientContext*)ctx;
+-	proxyData* pdata = pc->pdata;
+-	rdpContext* ps = (rdpContext*)pdata->ps;
+-
+-	if (e->code != ERRINFO_NONE)
+-	{
+-		const char* errorMessage = freerdp_get_error_info_string(e->code);
+-		WLog_WARN(TAG, "Proxy's client received error info pdu from server: (0x%08" PRIu32 "): %s",
+-		          e->code, errorMessage);
+-		/* forward error back to client */
+-		freerdp_set_error_info(ps->rdp, e->code);
+-		freerdp_send_error_info(ps->rdp);
+-	}
+-}
+-
+-/**
+- * Called before a connection is established.
+- *
+- * TODO: Take client to proxy settings and use channel whitelist to filter out
+- * unwanted channels.
+- */
+-static BOOL pf_client_pre_connect(freerdp* instance)
+-{
+-	rdpSettings* settings = instance->settings;
+-	settings->OsMajorType = OSMAJORTYPE_UNIX;
+-	settings->OsMinorType = OSMINORTYPE_NATIVE_XSERVER;
+-	/**
+-	 * settings->OrderSupport is initialized at this point.
+-	 * Only override it if you plan to implement custom order
+-	 * callbacks or deactiveate certain features.
+-	 */
+-	/* currently not supporting GDI orders */
+-	ZeroMemory(instance->settings->OrderSupport, 32);
+-	/**
+-	 * Register the channel listeners.
+-	 * They are required to set up / tear down channels if they are loaded.
+-	 */
+-	PubSub_SubscribeChannelConnected(instance->context->pubSub, pf_OnChannelConnectedEventHandler);
+-	PubSub_SubscribeChannelDisconnected(instance->context->pubSub,
+-	                                    pf_OnChannelDisconnectedEventHandler);
+-	PubSub_SubscribeErrorInfo(instance->context->pubSub, pf_OnErrorInfo);
+-	/**
+-	 * Load all required plugins / channels / libraries specified by current
+-	 * settings.
+-	 */
+-	WLog_INFO(TAG, "Loading addins");
+-
+-	if (!freerdp_client_load_addins(instance->context->channels, instance->settings))
+-	{
+-		WLog_ERR(TAG, "Failed to load addins");
+-		return FALSE;
+-	}
+-
+-	return TRUE;
+-}
+-
+-/**
+- * Called after a RDP connection was successfully established.
+- * Settings might have changed during negotiation of client / server feature
+- * support.
+- *
+- * Set up local framebuffers and painting callbacks.
+- * If required, register pointer callbacks to change the local mouse cursor
+- * when hovering over the RDP window
+- */
+-static BOOL pf_client_post_connect(freerdp* instance)
+-{
+-	rdpContext* context;
+-	rdpSettings* settings;
+-	rdpUpdate* update;
+-	pClientContext* pc;
+-	rdpContext* ps;
+-	context = instance->context;
+-	settings = instance->settings;
+-	update = instance->update;
+-	pc = (pClientContext*)context;
+-	ps = (rdpContext*)pc->pdata->ps;
+-
+-	if (!proxy_data_set_connection_info(pc->pdata, ps->settings, settings))
+-	{
+-		WLog_ERR(TAG, "proxy_data_set_connection_info failed!");
+-		return FALSE;
+-	}
+-
+-	if (!gdi_init(instance, PIXEL_FORMAT_XRGB32))
+-		return FALSE;
+-
+-	if (!pf_register_pointer(context->graphics))
+-		return FALSE;
+-
+-	if (!settings->SoftwareGdi)
+-	{
+-		if (!pf_register_graphics(context->graphics))
+-		{
+-			WLog_ERR(TAG, "failed to register graphics");
+-			return FALSE;
+-		}
+-
+-		pf_gdi_register_update_callbacks(update);
+-		brush_cache_register_callbacks(update);
+-		glyph_cache_register_callbacks(update);
+-		bitmap_cache_register_callbacks(update);
+-		offscreen_cache_register_callbacks(update);
+-		palette_cache_register_callbacks(update);
+-	}
+-
+-	pf_client_register_update_callbacks(update);
+-	proxy_server_reactivate(ps, context);
+-	return TRUE;
+-}
+-
+-/* This function is called whether a session ends by failure or success.
+- * Clean up everything allocated by pre_connect and post_connect.
+- */
+-static void pf_client_post_disconnect(freerdp* instance)
+-{
+-	pClientContext* context;
+-	proxyData* pdata;
+-
+-	if (!instance)
+-		return;
+-
+-	if (!instance->context)
+-		return;
+-
+-	context = (pClientContext*)instance->context;
+-	pdata = context->pdata;
+-	PubSub_UnsubscribeChannelConnected(instance->context->pubSub,
+-	                                   pf_OnChannelConnectedEventHandler);
+-	PubSub_UnsubscribeChannelDisconnected(instance->context->pubSub,
+-	                                      pf_OnChannelDisconnectedEventHandler);
+-	PubSub_UnsubscribeErrorInfo(instance->context->pubSub, pf_OnErrorInfo);
+-	gdi_free(instance);
+-
+-	if (!context->during_connect_process)
+-	{
+-		/* proxy's client failed to connect, and now it's trying to connect without NLA, no need to
+-		 * shutdown the connection between proxy's server and the original client.
+-		 */
+-		SetEvent(pdata->connectionClosed);
+-	}
+-
+-	/* It's important to avoid calling `freerdp_peer_context_free` and `freerdp_peer_free` here,
+-	 * in order to avoid double-free. Those objects will be freed by the server when needed.
+-	 */
+-}
+-
+-/**
+- * RDP main loop.
+- * Connects RDP, loops while running and handles event and dispatch, cleans up
+- * after the connection ends.
+- */
+-static DWORD WINAPI pf_client_thread_proc(LPVOID arg)
+-{
+-	freerdp* instance = (freerdp*)arg;
+-	pClientContext* pc = (pClientContext*)instance->context;
+-	DWORD nCount;
+-	DWORD status;
+-	HANDLE handles[64];
+-	pc->during_connect_process = TRUE;
+-
+-	if (!freerdp_connect(instance))
+-	{
+-		if (instance->settings->NlaSecurity)
+-		{
+-			WLog_ERR(TAG, "freerdp_connect() failed, trying to connect without NLA");
+-			/* disable NLA, enable TLS */
+-			instance->settings->NlaSecurity = FALSE;
+-			instance->settings->RdpSecurity = TRUE;
+-			instance->settings->TlsSecurity = TRUE;
+-			pc->during_connect_process = FALSE;
+-
+-			if (!freerdp_connect(instance))
+-			{
+-				WLog_ERR(TAG, "connection failure");
+-				return 0;
+-			}
+-		}
+-		else
+-		{
+-			WLog_ERR(TAG, "connection failure");
+-			return 0;
+-		}
+-	}
+-
+-	pc->during_connect_process = FALSE;
+-
+-	while (!freerdp_shall_disconnect(instance))
+-	{
+-		nCount = freerdp_get_event_handles(instance->context, &handles[0], 64);
+-
+-		if (nCount == 0)
+-		{
+-			WLog_ERR(TAG, "%s: freerdp_get_event_handles failed", __FUNCTION__);
+-			break;
+-		}
+-
+-		status = WaitForMultipleObjects(nCount, handles, FALSE, 100);
+-
+-		if (status == WAIT_FAILED)
+-		{
+-			WLog_ERR(TAG, "%s: WaitForMultipleObjects failed with %" PRIu32 "", __FUNCTION__,
+-			         status);
+-			break;
+-		}
+-
+-		if (freerdp_shall_disconnect(instance))
+-			break;
+-
+-		if (!freerdp_check_event_handles(instance->context))
+-		{
+-			if (freerdp_get_last_error(instance->context) == FREERDP_ERROR_SUCCESS)
+-				WLog_ERR(TAG, "Failed to check FreeRDP event handles");
+-
+-			break;
+-		}
+-	}
+-
+-	freerdp_disconnect(instance);
+-	return 0;
+-}
+-
+-/**
+- * Optional global initializer.
+- * Here we just register a signal handler to print out stack traces
+- * if available.
+- * */
+-static BOOL pf_client_global_init(void)
+-{
+-	if (freerdp_handle_signals() != 0)
+-		return FALSE;
+-
+-	return TRUE;
+-}
+-
+-static int pf_logon_error_info(freerdp* instance, UINT32 data, UINT32 type)
+-{
+-	pClientContext* pc;
+-	const char* str_data = freerdp_get_logon_error_info_data(data);
+-	const char* str_type = freerdp_get_logon_error_info_type(type);
+-
+-	if (!instance || !instance->context)
+-		return -1;
+-
+-	pc = (pClientContext*)instance->context;
+-	WLog_INFO(TAG, "Logon Error Info %s [%s]", str_data, str_type);
+-	return 1;
+-}
+-
+-/**
+- * Callback set in the rdp_freerdp structure, and used to make a certificate validation
+- * when the connection requires it.
+- * This function will actually be called by tls_verify_certificate().
+- * @see rdp_client_connect() and tls_connect()
+- * @param instance     pointer to the rdp_freerdp structure that contains the connection settings
+- * @param host         The host currently connecting to
+- * @param port         The port currently connecting to
+- * @param common_name  The common name of the certificate, should match host or an alias of it
+- * @param subject      The subject of the certificate
+- * @param issuer       The certificate issuer name
+- * @param fingerprint  The fingerprint of the certificate
+- * @param flags        See VERIFY_CERT_FLAG_* for possible values.
+- *
+- * @return 1 if the certificate is trusted, 2 if temporary trusted, 0 otherwise.
+- */
+-static DWORD pf_client_verify_certificate_ex(freerdp* instance, const char* host, UINT16 port,
+-                                             const char* common_name, const char* subject,
+-                                             const char* issuer, const char* fingerprint,
+-                                             DWORD flags)
+-{
+-	/* TODO: Add trust level to proxy configurable settings */
+-	return 1;
+-}
+-
+-/**
+- * Callback set in the rdp_freerdp structure, and used to make a certificate validation
+- * when a stored certificate does not match the remote counterpart.
+- * This function will actually be called by tls_verify_certificate().
+- * @see rdp_client_connect() and tls_connect()
+- * @param instance        pointer to the rdp_freerdp structure that contains the connection settings
+- * @param host            The host currently connecting to
+- * @param port            The port currently connecting to
+- * @param common_name     The common name of the certificate, should match host or an alias of it
+- * @param subject         The subject of the certificate
+- * @param issuer          The certificate issuer name
+- * @param fingerprint     The fingerprint of the certificate
+- * @param old_subject     The subject of the previous certificate
+- * @param old_issuer      The previous certificate issuer name
+- * @param old_fingerprint The fingerprint of the previous certificate
+- * @param flags           See VERIFY_CERT_FLAG_* for possible values.
+- *
+- * @return 1 if the certificate is trusted, 2 if temporary trusted, 0 otherwise.
+- */
+-static DWORD pf_client_verify_changed_certificate_ex(
+-    freerdp* instance, const char* host, UINT16 port, const char* common_name, const char* subject,
+-    const char* issuer, const char* fingerprint, const char* old_subject, const char* old_issuer,
+-    const char* old_fingerprint, DWORD flags)
+-{
+-	/* TODO: Add trust level to proxy configurable settings */
+-	return 1;
+-}
+-
+-static BOOL pf_client_client_new(freerdp* instance, rdpContext* context)
+-{
+-	if (!instance || !context)
+-		return FALSE;
+-
+-	instance->PreConnect = pf_client_pre_connect;
+-	instance->PostConnect = pf_client_post_connect;
+-	instance->PostDisconnect = pf_client_post_disconnect;
+-	instance->VerifyCertificateEx = pf_client_verify_certificate_ex;
+-	instance->VerifyChangedCertificateEx = pf_client_verify_changed_certificate_ex;
+-	instance->LogonErrorInfo = pf_logon_error_info;
+-	return TRUE;
+-}
+-
+-static int pf_client_client_stop(rdpContext* context)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	pServerContext* ps = pc->pdata->ps;
+-	freerdp_abort_connect(context->instance);
+-
+-	if (ps->thread)
+-	{
+-		WaitForSingleObject(ps->thread, INFINITE);
+-		CloseHandle(ps->thread);
+-		ps->thread = NULL;
+-	}
+-
+-	return 0;
+-}
+-
+-int RdpClientEntry(RDP_CLIENT_ENTRY_POINTS* pEntryPoints)
+-{
+-	ZeroMemory(pEntryPoints, sizeof(RDP_CLIENT_ENTRY_POINTS));
+-	pEntryPoints->Version = RDP_CLIENT_INTERFACE_VERSION;
+-	pEntryPoints->Size = sizeof(RDP_CLIENT_ENTRY_POINTS_V1);
+-	pEntryPoints->GlobalInit = pf_client_global_init;
+-	pEntryPoints->ContextSize = sizeof(pClientContext);
+-	/* Client init and finish */
+-	pEntryPoints->ClientNew = pf_client_client_new;
+-	pEntryPoints->ClientStop = pf_client_client_stop;
+-	return 0;
+-}
+-
+-/**
+- * Starts running a client connection towards target server.
+- */
+-DWORD WINAPI pf_client_start(LPVOID arg)
+-{
+-	rdpContext* context = (rdpContext*)arg;
+-
+-	if (freerdp_client_start(context) != 0)
+-		return 1;
+-
+-	return pf_client_thread_proc(context->instance);
+-}
+diff -urN server/proxy/pf_client.h ../../informatimago/FreeRDP/server/proxy/pf_client.h
+--- server/proxy/pf_client.h	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_client.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,31 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_PFCLIENT_H
+-#define FREERDP_SERVER_PROXY_PFCLIENT_H
+-
+-#include <freerdp/freerdp.h>
+-#include <winpr/wtypes.h>
+-
+-int RdpClientEntry(RDP_CLIENT_ENTRY_POINTS* pEntryPoints);
+-DWORD WINAPI pf_client_start(LPVOID arg);
+-
+-#endif /* FREERDP_SERVER_PROXY_PFCLIENT_H */
+diff -urN server/proxy/pf_common.c ../../informatimago/FreeRDP/server/proxy/pf_common.c
+--- server/proxy/pf_common.c	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_common.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,112 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#include "pf_common.h"
+-
+-BOOL pf_common_connection_aborted_by_peer(proxyData* pdata)
+-{
+-	return WaitForSingleObject(pdata->connectionClosed, 0) == WAIT_OBJECT_0;
+-}
+-
+-void pf_common_copy_settings(rdpSettings* dst, rdpSettings* src)
+-{
+-	/* Client/server CORE options */
+-	dst->RdpVersion = src->RdpVersion;
+-	dst->DesktopWidth = src->DesktopWidth;
+-	dst->DesktopHeight = src->DesktopHeight;
+-	dst->ColorDepth = src->ColorDepth;
+-	dst->ConnectionType = src->ConnectionType;
+-	dst->ClientBuild = src->ClientBuild;
+-	dst->ClientHostname = _strdup(src->ClientHostname);
+-	dst->ClientProductId = _strdup(src->ClientProductId);
+-	dst->EarlyCapabilityFlags = src->EarlyCapabilityFlags;
+-	dst->NetworkAutoDetect = src->NetworkAutoDetect;
+-	dst->SupportAsymetricKeys = src->SupportAsymetricKeys;
+-	dst->SupportErrorInfoPdu = src->SupportErrorInfoPdu;
+-	dst->SupportStatusInfoPdu = src->SupportStatusInfoPdu;
+-	dst->SupportMonitorLayoutPdu = src->SupportMonitorLayoutPdu;
+-	dst->SupportGraphicsPipeline = src->SupportGraphicsPipeline;
+-	dst->SupportDynamicTimeZone = src->SupportDynamicTimeZone;
+-	dst->SupportHeartbeatPdu = src->SupportHeartbeatPdu;
+-	dst->DesktopPhysicalWidth = src->DesktopPhysicalWidth;
+-	dst->DesktopPhysicalHeight = src->DesktopPhysicalHeight;
+-	dst->DesktopOrientation = src->DesktopOrientation;
+-	dst->DesktopScaleFactor = src->DesktopScaleFactor;
+-	dst->DeviceScaleFactor = src->DeviceScaleFactor;
+-	dst->SupportMonitorLayoutPdu = src->SupportMonitorLayoutPdu;
+-	/* client info */
+-	dst->AutoLogonEnabled = src->AutoLogonEnabled;
+-	dst->CompressionEnabled = src->CompressionEnabled;
+-	dst->DisableCtrlAltDel = src->DisableCtrlAltDel;
+-	dst->EnableWindowsKey = src->EnableWindowsKey;
+-	dst->MaximizeShell = src->MaximizeShell;
+-	dst->LogonNotify = src->LogonNotify;
+-	dst->LogonErrors = src->LogonErrors;
+-	dst->MouseAttached = src->MouseAttached;
+-	dst->MouseHasWheel = src->MouseHasWheel;
+-	dst->RemoteConsoleAudio = src->RemoteConsoleAudio;
+-	dst->AudioPlayback = src->AudioPlayback;
+-	dst->AudioCapture = src->AudioCapture;
+-	dst->VideoDisable = src->VideoDisable;
+-	dst->PasswordIsSmartcardPin = src->PasswordIsSmartcardPin;
+-	dst->UsingSavedCredentials = src->UsingSavedCredentials;
+-	dst->ForceEncryptedCsPdu = src->ForceEncryptedCsPdu;
+-	dst->HiDefRemoteApp = src->HiDefRemoteApp;
+-	dst->CompressionLevel = src->CompressionLevel;
+-	dst->PerformanceFlags = src->PerformanceFlags;
+-	dst->AllowFontSmoothing = src->AllowFontSmoothing;
+-	dst->DisableWallpaper = src->DisableWallpaper;
+-	dst->DisableFullWindowDrag = src->DisableFullWindowDrag;
+-	dst->DisableMenuAnims = src->DisableMenuAnims;
+-	dst->DisableThemes = src->DisableThemes;
+-	dst->DisableCursorShadow = src->DisableCursorShadow;
+-	dst->DisableCursorBlinking = src->DisableCursorBlinking;
+-	dst->AllowDesktopComposition = src->AllowDesktopComposition;
+-	dst->DisableThemes = src->DisableThemes;
+-	/* Remote App */
+-	dst->RemoteApplicationMode = src->RemoteApplicationMode;
+-	dst->RemoteApplicationName = src->RemoteApplicationName;
+-	dst->RemoteApplicationIcon = src->RemoteApplicationIcon;
+-	dst->RemoteApplicationProgram = src->RemoteApplicationProgram;
+-	dst->RemoteApplicationFile = src->RemoteApplicationFile;
+-	dst->RemoteApplicationGuid = src->RemoteApplicationGuid;
+-	dst->RemoteApplicationCmdLine = src->RemoteApplicationCmdLine;
+-	dst->RemoteApplicationExpandCmdLine = src->RemoteApplicationExpandCmdLine;
+-	dst->RemoteApplicationExpandWorkingDir = src->RemoteApplicationExpandWorkingDir;
+-	dst->DisableRemoteAppCapsCheck = src->DisableRemoteAppCapsCheck;
+-	dst->RemoteAppNumIconCaches = src->RemoteAppNumIconCaches;
+-	dst->RemoteAppNumIconCacheEntries = src->RemoteAppNumIconCacheEntries;
+-	dst->RemoteAppLanguageBarSupported = src->RemoteAppLanguageBarSupported;
+-	dst->RemoteWndSupportLevel = src->RemoteWndSupportLevel;
+-	/* GFX */
+-	dst->GfxThinClient = src->GfxThinClient;
+-	dst->GfxSmallCache = src->GfxSmallCache;
+-	dst->GfxProgressive = src->GfxProgressive;
+-	dst->GfxProgressiveV2 = src->GfxProgressiveV2;
+-	dst->GfxH264 = src->GfxH264;
+-	dst->GfxAVC444 = src->GfxAVC444;
+-	dst->GfxSendQoeAck = src->GfxSendQoeAck;
+-	dst->GfxAVC444v2 = src->GfxAVC444v2;
+-	dst->SupportDisplayControl = src->SupportDisplayControl;
+-	dst->SupportMonitorLayoutPdu = src->SupportMonitorLayoutPdu;
+-	dst->DynamicResolutionUpdate = src->DynamicResolutionUpdate;
+-	dst->DesktopResize = src->DesktopResize;
+-}
+diff -urN server/proxy/pf_common.h ../../informatimago/FreeRDP/server/proxy/pf_common.h
+--- server/proxy/pf_common.h	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_common.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,31 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_PFCOMMON_H
+-#define FREERDP_SERVER_PROXY_PFCOMMON_H
+-
+-#include <freerdp/freerdp.h>
+-#include "pf_context.h"
+-
+-BOOL pf_common_connection_aborted_by_peer(proxyData* pdata);
+-void pf_common_copy_settings(rdpSettings* dst, rdpSettings* src);
+-
+-#endif /* FREERDP_SERVER_PROXY_PFCOMMON_H */
+diff -urN server/proxy/pf_config.c ../../informatimago/FreeRDP/server/proxy/pf_config.c
+--- server/proxy/pf_config.c	2019-07-25 19:51:06.557925665 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_config.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,226 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#include <stdio.h>
+-#include <string.h>
+-#include <winpr/crt.h>
+-#include <winpr/collections.h>
+-
+-#include "pf_log.h"
+-#include "pf_server.h"
+-#include "pf_config.h"
+-
+-#define TAG PROXY_TAG("config")
+-
+-#define CHANNELS_SEPERATOR ","
+-
+-wArrayList* parse_string_array_from_str(const char* str)
+-{
+-	wArrayList* list = ArrayList_New(FALSE);
+-	char* s;
+-	char* temp;
+-	char* token;
+-
+-	if (list == NULL)
+-	{
+-		WLog_ERR(TAG, "parse_string_array_from_str(): ArrayList_New failed!");
+-		return NULL;
+-	}
+-
+-	temp = s = _strdup(str);
+-
+-	if (!s)
+-	{
+-		WLog_ERR(TAG, "parse_string_array_from_str(): strdup failed!");
+-		return NULL;
+-	}
+-
+-	if (s == NULL)
+-	{
+-		WLog_ERR(TAG, "parse_string_array_from_str(): strdup failed!");
+-		goto error;
+-	}
+-
+-	while ((token = StrSep(&temp, CHANNELS_SEPERATOR)) != NULL)
+-	{
+-		char* current_token = _strdup(token);
+-
+-		if (current_token == NULL)
+-		{
+-			WLog_ERR(TAG, "parse_string_array_from_str(): strdup failed!");
+-			goto error;
+-		}
+-
+-		if (ArrayList_Add(list, current_token) < 0)
+-		{
+-			free(current_token);
+-			goto error;
+-		}
+-	}
+-
+-	free(s);
+-	return list;
+-error:
+-	free(s);
+-	ArrayList_Free(list);
+-	return NULL;
+-}
+-
+-static BOOL pf_server_is_config_valid(proxyConfig* config)
+-{
+-	if (config->Host == NULL)
+-	{
+-		WLog_ERR(TAG, "Configuration value for `Server.Host` is not valid");
+-		return FALSE;
+-	}
+-
+-	if (config->Port <= 0)
+-	{
+-		WLog_ERR(TAG, "Configuration value for `Server.Port` is not valid");
+-		return FALSE;
+-	}
+-
+-	if (!config->UseLoadBalanceInfo)
+-	{
+-		if (config->TargetHost == NULL)
+-		{
+-			WLog_ERR(TAG, "Configuration value for `Target.Host` is not valid");
+-			return FALSE;
+-		}
+-
+-		if (config->TargetPort <= 0)
+-		{
+-			WLog_ERR(TAG, "Configuration value for `Target.Port` is not valid");
+-			return FALSE;
+-		}
+-	}
+-
+-	return TRUE;
+-}
+-
+-DWORD pf_server_load_config(const char* path, proxyConfig* config)
+-{
+-	const char* input;
+-	char** filters_names;
+-	int rc;
+-	int filters_count = 0;
+-	UINT32 index;
+-	DWORD result = CONFIG_PARSE_ERROR;
+-	wIniFile* ini = IniFile_New();
+-
+-	if (!ini)
+-		return CONFIG_PARSE_ERROR;
+-
+-	if (IniFile_ReadFile(ini, path) < 0)
+-		goto out;
+-
+-	/* server */
+-	config->Host = _strdup(IniFile_GetKeyValueString(ini, "Server", "Host"));
+-	config->LocalOnly = IniFile_GetKeyValueInt(ini, "Server", "LocalOnly");
+-	rc = IniFile_GetKeyValueInt(ini, "Server", "Port");
+-
+-	if ((rc < 0) || (rc > UINT16_MAX))
+-		goto out;
+-
+-	config->Port = (UINT16)rc;
+-	/* target */
+-	config->UseLoadBalanceInfo = IniFile_GetKeyValueInt(ini, "Target", "UseLoadBalanceInfo");
+-	config->TargetHost = _strdup(IniFile_GetKeyValueString(ini, "Target", "Host"));
+-	rc = IniFile_GetKeyValueInt(ini, "Target", "Port");
+-
+-	if ((rc < 0) || (rc > UINT16_MAX))
+-		goto out;
+-
+-	config->TargetPort = (UINT16)rc;
+-	/* graphics */
+-	config->GFX = IniFile_GetKeyValueInt(ini, "Graphics", "GFX");
+-	config->BitmapUpdate = IniFile_GetKeyValueInt(ini, "Graphics", "BitmapUpdate");
+-	/* input */
+-	config->Keyboard = IniFile_GetKeyValueInt(ini, "Input", "Keyboard");
+-	config->Mouse = IniFile_GetKeyValueInt(ini, "Input", "Mouse");
+-	/* security */
+-	config->TlsSecurity = IniFile_GetKeyValueInt(ini, "Security", "TlsSecurity");
+-	config->NlaSecurity = IniFile_GetKeyValueInt(ini, "Security", "NlaSecurity");
+-	config->RdpSecurity = IniFile_GetKeyValueInt(ini, "Security", "RdpSecurity");
+-	/* channels filtering */
+-	config->WhitelistMode = IniFile_GetKeyValueInt(ini, "Channels", "WhitelistMode");
+-	input = IniFile_GetKeyValueString(ini, "Channels", "AllowedChannels");
+-	/* filters api */
+-
+-	if (input)
+-	{
+-		config->AllowedChannels = parse_string_array_from_str(input);
+-
+-		if (config->AllowedChannels == NULL)
+-			goto out;
+-	}
+-
+-	input = IniFile_GetKeyValueString(ini, "Channels", "DeniedChannels");
+-
+-	if (input)
+-	{
+-		config->BlockedChannels = parse_string_array_from_str(input);
+-
+-		if (config->BlockedChannels == NULL)
+-			goto out;
+-	}
+-
+-	result = CONFIG_PARSE_SUCCESS;
+-
+-	if (!pf_filters_init(&config->Filters))
+-		goto out;
+-
+-	filters_names = IniFile_GetSectionKeyNames(ini, "Filters", &filters_count);
+-
+-	for (index = 0; index < filters_count; index++)
+-	{
+-		char* filter_name = filters_names[index];
+-		const char* path = IniFile_GetKeyValueString(ini, "Filters", filter_name);
+-
+-		if (!pf_filters_register_new(config->Filters, path, filter_name))
+-		{
+-			WLog_DBG(TAG, "pf_server_load_config(): failed to register %s (%s)", filter_name, path);
+-		}
+-		else
+-		{
+-			WLog_DBG(TAG, "pf_server_load_config(): registered filter %s (%s) successfully",
+-			         filter_name, path);
+-		}
+-	}
+-
+-out:
+-	IniFile_Free(ini);
+-
+-	if (!pf_server_is_config_valid(config))
+-		return CONFIG_INVALID;
+-
+-	return result;
+-}
+-
+-void pf_server_config_free(proxyConfig* config)
+-{
+-	pf_filters_unregister_all(config->Filters);
+-	ArrayList_Free(config->AllowedChannels);
+-	ArrayList_Free(config->BlockedChannels);
+-	free(config->TargetHost);
+-	free(config->Host);
+-	free(config);
+-}
+diff -urN server/proxy/pf_config.h ../../informatimago/FreeRDP/server/proxy/pf_config.h
+--- server/proxy/pf_config.h	2019-07-25 19:51:06.557925665 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_config.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,73 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_PFCONFIG_H
+-#define FREERDP_SERVER_PROXY_PFCONFIG_H
+-
+-#define CONFIG_PARSE_SUCCESS 0
+-#define CONFIG_PARSE_ERROR 1
+-#define CONFIG_INVALID 2
+-
+-#include <winpr/ini.h>
+-
+-#include "pf_filters.h"
+-
+-struct proxy_config
+-{
+-	/* server */
+-	char* Host;
+-	UINT16 Port;
+-	BOOL LocalOnly;
+-
+-	/* target */
+-	BOOL UseLoadBalanceInfo;
+-	char* TargetHost;
+-	UINT16 TargetPort;
+-
+-	/* graphics */
+-	BOOL GFX;
+-	BOOL BitmapUpdate;
+-
+-	/* input */
+-	BOOL Keyboard;
+-	BOOL Mouse;
+-
+-	/* security */
+-	BOOL NlaSecurity;
+-	BOOL TlsSecurity;
+-	BOOL RdpSecurity;
+-
+-	/* channels */
+-	BOOL WhitelistMode;
+-
+-	wArrayList* AllowedChannels;
+-	wArrayList* BlockedChannels;
+-
+-	/* filters */
+-	filters_list* Filters;
+-};
+-
+-typedef struct proxy_config proxyConfig;
+-
+-DWORD pf_server_load_config(const char* path, proxyConfig* config);
+-void pf_server_config_free(proxyConfig* config);
+-
+-#endif /* FREERDP_SERVER_PROXY_PFCONFIG_H */
+diff -urN server/proxy/pf_context.c ../../informatimago/FreeRDP/server/proxy/pf_context.c
+--- server/proxy/pf_context.c	2019-07-25 19:51:06.561925685 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_context.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,200 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#include "pf_client.h"
+-#include "pf_context.h"
+-#include "pf_common.h"
+-
+-/* Proxy context initialization callback */
+-static BOOL client_to_proxy_context_new(freerdp_peer* client, pServerContext* context)
+-{
+-	context->vcm = WTSOpenServerA((LPSTR)client->context);
+-
+-	if (!context->vcm || context->vcm == INVALID_HANDLE_VALUE)
+-		goto fail_open_server;
+-
+-	return TRUE;
+-fail_open_server:
+-	context->vcm = NULL;
+-	return FALSE;
+-}
+-
+-/* Proxy context free callback */
+-static void client_to_proxy_context_free(freerdp_peer* client, pServerContext* context)
+-{
+-	WINPR_UNUSED(client);
+-
+-	if (!context)
+-		return;
+-
+-	WTSCloseServer((HANDLE)context->vcm);
+-
+-	if (context->dynvcReady)
+-	{
+-		CloseHandle(context->dynvcReady);
+-		context->dynvcReady = NULL;
+-	}
+-}
+-
+-BOOL init_p_server_context(freerdp_peer* client)
+-{
+-	client->ContextSize = sizeof(pServerContext);
+-	client->ContextNew = (psPeerContextNew)client_to_proxy_context_new;
+-	client->ContextFree = (psPeerContextFree)client_to_proxy_context_free;
+-	return freerdp_peer_context_new(client);
+-}
+-
+-void pf_context_copy_settings(rdpSettings* dst, const rdpSettings* src, BOOL is_server)
+-{
+-	rdpSettings* before_copy = freerdp_settings_clone(dst);
+-
+-	if (!before_copy)
+-		return;
+-
+-	if (!freerdp_settings_copy(dst, src))
+-	{
+-		freerdp_settings_free(before_copy);
+-		return;
+-	}
+-
+-	free(dst->ConfigPath);
+-	free(dst->PrivateKeyContent);
+-	free(dst->RdpKeyContent);
+-	free(dst->RdpKeyFile);
+-	free(dst->PrivateKeyFile);
+-	free(dst->CertificateFile);
+-	free(dst->CertificateName);
+-	free(dst->CertificateContent);
+-	free(dst->ClientRandom);
+-	/* adjust pointer to instance pointer */
+-	dst->ServerMode = is_server;
+-	dst->ConfigPath = _strdup(before_copy->ConfigPath);
+-	dst->PrivateKeyContent = _strdup(before_copy->PrivateKeyContent);
+-	dst->RdpKeyContent = _strdup(before_copy->RdpKeyContent);
+-	dst->RdpKeyFile = _strdup(before_copy->RdpKeyFile);
+-	dst->PrivateKeyFile = _strdup(before_copy->PrivateKeyFile);
+-	dst->CertificateFile = _strdup(before_copy->CertificateFile);
+-	dst->CertificateName = _strdup(before_copy->CertificateName);
+-	dst->CertificateContent = _strdup(before_copy->CertificateContent);
+-	dst->ClientRandomLength = before_copy->ClientRandomLength;
+-	CopyMemory(dst->ClientRandom, before_copy->ClientRandom, before_copy->ClientRandomLength);
+-
+-	if (is_server)
+-	{
+-		free(dst->ServerCertificate);
+-		dst->ServerCertificateLength = before_copy->ServerCertificateLength;
+-	}
+-	else
+-	{
+-		/* adjust instance pointer for client's context */
+-		dst->instance = before_copy->instance;
+-		/* RdpServerRsaKey must be set to NULL if `dst` is client's context */
+-		dst->RdpServerRsaKey = NULL;
+-	}
+-
+-	freerdp_settings_free(before_copy);
+-}
+-
+-rdpContext* p_client_context_create(rdpSettings* clientSettings)
+-{
+-	RDP_CLIENT_ENTRY_POINTS clientEntryPoints;
+-	rdpContext* context;
+-	RdpClientEntry(&clientEntryPoints);
+-	context = freerdp_client_context_new(&clientEntryPoints);
+-
+-	if (!context)
+-		return NULL;
+-
+-	pf_context_copy_settings(context->settings, clientSettings, FALSE);
+-
+-	if (!context->settings)
+-		goto error;
+-
+-	return context;
+-error:
+-	freerdp_client_context_free(context);
+-	return NULL;
+-}
+-
+-static void connection_info_free(connectionInfo* info)
+-{
+-	free(info->TargetHostname);
+-	free(info->ClientHostname);
+-	free(info->Username);
+-	free(info);
+-}
+-
+-proxyData* proxy_data_new()
+-{
+-	proxyData* pdata = calloc(1, sizeof(proxyData));
+-
+-	if (pdata == NULL)
+-	{
+-		return NULL;
+-	}
+-
+-	pdata->info = calloc(1, sizeof(connectionInfo));
+-
+-	if (pdata->info == NULL)
+-	{
+-		free(pdata);
+-		return NULL;
+-	}
+-
+-	if (!(pdata->connectionClosed = CreateEvent(NULL, TRUE, FALSE, NULL)))
+-	{
+-		proxy_data_free(pdata);
+-		return NULL;
+-	}
+-
+-	return pdata;
+-}
+-
+-/* sets connection info values using the settings of both server & client */
+-BOOL proxy_data_set_connection_info(proxyData* pdata, rdpSettings* ps, rdpSettings* pc)
+-{
+-	if (!(pdata->info->TargetHostname = _strdup(pc->ServerHostname)))
+-		goto out_fail;
+-
+-	if (!(pdata->info->Username = _strdup(pc->Username)))
+-		goto out_fail;
+-
+-	if (!(pdata->info->ClientHostname = _strdup(ps->ClientHostname)))
+-		goto out_fail;
+-
+-	return TRUE;
+-out_fail:
+-	proxy_data_free(pdata);
+-	return FALSE;
+-}
+-
+-void proxy_data_free(proxyData* pdata)
+-{
+-	connection_info_free(pdata->info);
+-
+-	if (pdata->connectionClosed)
+-	{
+-		CloseHandle(pdata->connectionClosed);
+-		pdata->connectionClosed = NULL;
+-	}
+-
+-	free(pdata);
+-}
+diff -urN server/proxy/pf_context.h ../../informatimago/FreeRDP/server/proxy/pf_context.h
+--- server/proxy/pf_context.h	2019-07-25 19:51:06.561925685 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_context.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,108 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_PFCONTEXT_H
+-#define FREERDP_SERVER_PROXY_PFCONTEXT_H
+-
+-#include <freerdp/freerdp.h>
+-#include <freerdp/channels/wtsvc.h>
+-#include <freerdp/client/rdpei.h>
+-#include <freerdp/client/rdpgfx.h>
+-#include <freerdp/server/rdpgfx.h>
+-#include <freerdp/client/disp.h>
+-#include <freerdp/server/disp.h>
+-
+-#include "pf_config.h"
+-#include "pf_server.h"
+-#include "pf_filters.h"
+-
+-typedef struct proxy_data proxyData;
+-
+-/**
+- * Wraps rdpContext and holds the state for the proxy's server.
+- */
+-struct p_server_context
+-{
+-	rdpContext _context;
+-
+-	proxyData* pdata;
+-
+-	HANDLE vcm;
+-	HANDLE thread;
+-	HANDLE dynvcReady;
+-
+-	RdpgfxServerContext* gfx;
+-	DispServerContext* disp;
+-
+-	BOOL dispOpened;
+-};
+-typedef struct p_server_context pServerContext;
+-
+-/**
+- * Wraps rdpContext and holds the state for the proxy's client.
+- */
+-struct p_client_context
+-{
+-	rdpContext _context;
+-
+-	proxyData* pdata;
+-
+-	RdpeiClientContext* rdpei;
+-	RdpgfxClientContext* gfx;
+-	DispClientContext* disp;
+-
+-	/*
+-	 * In a case when freerdp_connect fails,
+-	 * Used for NLA fallback feature, to check if the server should close the connection.
+-	 * When it is set to TRUE, proxy's client knows it shouldn't signal the server thread to closed
+-	 * the connection when pf_client_post_disconnect is called, because it is trying to connect
+-	 * reconnect without NLA. It must be set to TRUE before the first try, and to FALSE after the
+-	 * connection fully established, to ensure graceful shutdown of the connection when it will be
+-	 * closed.
+-	 */
+-	BOOL during_connect_process;
+-};
+-typedef struct p_client_context pClientContext;
+-
+-/**
+- * Holds data common to both sides of a proxy's session.
+- */
+-struct proxy_data
+-{
+-	proxyConfig* config;
+-
+-	pServerContext* ps;
+-	pClientContext* pc;
+-
+-	HANDLE connectionClosed;
+-
+-	connectionInfo* info;
+-	filters_list* filters;
+-};
+-
+-BOOL init_p_server_context(freerdp_peer* client);
+-rdpContext* p_client_context_create(rdpSettings* clientSettings);
+-proxyData* proxy_data_new();
+-BOOL proxy_data_set_connection_info(proxyData* pdata, rdpSettings* ps, rdpSettings* pc);
+-void proxy_data_free(proxyData* pdata);
+-void pf_context_copy_settings(rdpSettings* dst, const rdpSettings* src, BOOL is_server);
+-
+-#endif /* FREERDP_SERVER_PROXY_PFCONTEXT_H */
+diff -urN server/proxy/pf_disp.c ../../informatimago/FreeRDP/server/proxy/pf_disp.c
+--- server/proxy/pf_disp.c	2019-07-25 19:51:06.565925704 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_disp.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,54 +0,0 @@
+-#include <freerdp/server/disp.h>
+-
+-#include "pf_disp.h"
+-#include "pf_log.h"
+-
+-#define TAG PROXY_TAG("disp")
+-
+-BOOL pf_server_disp_init(pServerContext* ps)
+-{
+-	DispServerContext* disp;
+-	disp = ps->disp = disp_server_context_new(ps->vcm);
+-
+-	if (!disp)
+-	{
+-		return FALSE;
+-	}
+-
+-	disp->rdpcontext = (rdpContext*)ps;
+-	return TRUE;
+-}
+-
+-static UINT pf_disp_monitor_layout(DispServerContext* context,
+-                                   const DISPLAY_CONTROL_MONITOR_LAYOUT_PDU* pdu)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	DispClientContext* client = (DispClientContext*)pdata->pc->disp;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return client->SendMonitorLayout(client, pdu->NumMonitors, pdu->Monitors);
+-}
+-
+-static UINT pf_disp_on_caps_control(DispClientContext* context, UINT32 MaxNumMonitors,
+-                                    UINT32 MaxMonitorAreaFactorA, UINT32 MaxMonitorAreaFactorB)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	DispServerContext* server = (DispServerContext*)pdata->ps->disp;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	/* Update caps of proxy's disp server */
+-	server->MaxMonitorAreaFactorA = MaxMonitorAreaFactorA;
+-	server->MaxMonitorAreaFactorB = MaxMonitorAreaFactorB;
+-	server->MaxNumMonitors = MaxNumMonitors;
+-	/* Send CapsControl to client */
+-	return server->DisplayControlCaps(server);
+-}
+-
+-void pf_disp_register_callbacks(DispClientContext* client, DispServerContext* server,
+-                                proxyData* pdata)
+-{
+-	client->custom = (void*)pdata;
+-	server->custom = (void*)pdata;
+-	/* client receives from server, forward using disp server to original client */
+-	client->DisplayControlCaps = pf_disp_on_caps_control;
+-	/* server receives from client, forward to target server using disp client */
+-	server->DispMonitorLayout = pf_disp_monitor_layout;
+-}
+diff -urN server/proxy/pf_disp.h ../../informatimago/FreeRDP/server/proxy/pf_disp.h
+--- server/proxy/pf_disp.h	2019-07-25 18:08:44.791469413 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_disp.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,34 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_RDPEDISP_H
+-#define FREERDP_SERVER_PROXY_RDPEDISP_H
+-
+-#include <freerdp/client/disp.h>
+-#include <freerdp/server/disp.h>
+-
+-#include "pf_context.h"
+-
+-BOOL pf_server_disp_init(pServerContext* ps);
+-void pf_disp_register_callbacks(DispClientContext* client, DispServerContext* server,
+-                                proxyData* pdata);
+-
+-#endif /*FREERDP_SERVER_PROXY_RDPEDISP_H*/
+diff -urN server/proxy/pf_filters.c ../../informatimago/FreeRDP/server/proxy/pf_filters.c
+--- server/proxy/pf_filters.c	2019-07-25 19:51:06.569925725 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_filters.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,218 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#include <assert.h>
+-
+-#include <winpr/wlog.h>
+-#include <winpr/library.h>
+-#include <freerdp/api.h>
+-
+-#include "pf_log.h"
+-#include "pf_filters.h"
+-
+-#define TAG PROXY_TAG("filters")
+-#define FILTER_INIT_METHOD "filter_init"
+-
+-static const char* FILTER_RESULT_STRINGS[] = {
+-	"FILTER_PASS",
+-	"FILTER_DROP",
+-	"FILTER_IGNORE",
+-};
+-
+-static const char* EVENT_TYPE_STRINGS[] = {
+-	"KEYBOARD_EVENT",
+-	"MOUSE_EVENT",
+-};
+-
+-static const char* pf_filters_get_filter_result_string(PF_FILTER_RESULT result)
+-{
+-	if (result >= FILTER_PASS && result <= FILTER_IGNORE)
+-		return FILTER_RESULT_STRINGS[result];
+-	else
+-		return "FILTER_UNKNOWN";
+-}
+-
+-static const char* pf_filters_get_event_type_string(PF_FILTER_TYPE result)
+-{
+-	if (result >= FILTER_TYPE_KEYBOARD && result <= FILTER_TYPE_MOUSE)
+-		return EVENT_TYPE_STRINGS[result];
+-	else
+-		return "EVENT_UNKNOWN";
+-}
+-
+-BOOL pf_filters_init(filters_list** list)
+-{
+-	if (list == NULL)
+-	{
+-		WLog_ERR(TAG, "pf_filters_init(): list == NULL");
+-		return FALSE;
+-	}
+-
+-	*list = ArrayList_New(FALSE);
+-
+-	if (*list == NULL)
+-	{
+-		WLog_ERR(TAG, "pf_filters_init(): ArrayList_New failed!");
+-		return FALSE;
+-	}
+-
+-	return TRUE;
+-}
+-
+-PF_FILTER_RESULT pf_filters_run_by_type(filters_list* list, PF_FILTER_TYPE type,
+-                                        connectionInfo* info, void* param)
+-{
+-	proxyFilter* filter;
+-	proxyEvents* events;
+-	PF_FILTER_RESULT result = FILTER_PASS;
+-	const size_t count = (size_t)ArrayList_Count(list);
+-	size_t index;
+-
+-	for (index = 0; index < count; index++)
+-	{
+-		filter = (proxyFilter*)ArrayList_GetItem(list, index);
+-		events = filter->events;
+-		WLog_DBG(TAG, "pf_filters_run_by_type(): Running filter: %s", filter->name);
+-
+-		switch (type)
+-		{
+-		case FILTER_TYPE_KEYBOARD:
+-			IFCALLRET(events->KeyboardEvent, result, info, param);
+-			break;
+-
+-		case FILTER_TYPE_MOUSE:
+-			IFCALLRET(events->MouseEvent, result, info, param);
+-			break;
+-		}
+-
+-		if (result != FILTER_PASS)
+-		{
+-			/* Filter returned FILTER_DROP or FILTER_IGNORE. There's no need to call next filters.
+-			 */
+-			WLog_INFO(TAG, "Filter %s [%s] returned %s", filter->name,
+-			          pf_filters_get_event_type_string(type),
+-			          pf_filters_get_filter_result_string(result));
+-			return result;
+-		}
+-	}
+-
+-	/* all filters returned FILTER_PASS */
+-	return FILTER_PASS;
+-}
+-
+-static void pf_filters_filter_free(proxyFilter* filter)
+-{
+-	if (!filter)
+-		return;
+-
+-	if (filter->handle)
+-		FreeLibrary(filter->handle);
+-
+-	free(filter->name);
+-	free(filter->events);
+-	free(filter);
+-}
+-
+-void pf_filters_unregister_all(filters_list* list)
+-{
+-	size_t count;
+-	size_t index;
+-
+-	if (list == NULL)
+-		return;
+-
+-	count = (size_t)ArrayList_Count(list);
+-
+-	for (index = 0; index < count; index++)
+-	{
+-		proxyFilter* filter = (proxyFilter*)ArrayList_GetItem(list, index);
+-		WLog_DBG(TAG, "pf_filters_unregister_all(): freeing filter: %s", filter->name);
+-		pf_filters_filter_free(filter);
+-	}
+-
+-	ArrayList_Free(list);
+-}
+-
+-BOOL pf_filters_register_new(filters_list* list, const char* module_path, const char* filter_name)
+-{
+-	proxyEvents* events = NULL;
+-	proxyFilter* filter = NULL;
+-	HMODULE handle = NULL;
+-	filterInitFn fn;
+-	assert(list != NULL);
+-	handle = LoadLibraryA(module_path);
+-
+-	if (handle == NULL)
+-	{
+-		WLog_ERR(TAG, "pf_filters_register_new(): failed loading external module: %s", module_path);
+-		return FALSE;
+-	}
+-
+-	if (!(fn = (filterInitFn)GetProcAddress(handle, FILTER_INIT_METHOD)))
+-	{
+-		WLog_ERR(TAG, "pf_filters_register_new(): GetProcAddress failed while loading %s",
+-		         module_path);
+-		goto error;
+-	}
+-
+-	filter = (proxyFilter*)malloc(sizeof(proxyFilter));
+-
+-	if (filter == NULL)
+-	{
+-		WLog_ERR(TAG, "pf_filters_register_new(): malloc failed");
+-		goto error;
+-	}
+-
+-	events = calloc(1, sizeof(proxyEvents));
+-
+-	if (events == NULL)
+-	{
+-		WLog_ERR(TAG, "pf_filters_register_new(): calloc proxyEvents failed");
+-		goto error;
+-	}
+-
+-	if (!fn(events))
+-	{
+-		WLog_ERR(TAG, "pf_filters_register_new(): failed calling external filter_init: %s",
+-		         module_path);
+-		goto error;
+-	}
+-
+-	filter->handle = handle;
+-	filter->name = _strdup(filter_name);
+-	filter->events = events;
+-	filter->enabled = TRUE;
+-
+-	if (ArrayList_Add(list, filter) < 0)
+-	{
+-		WLog_ERR(TAG, "pf_filters_register_new(): failed adding filter to list: %s", module_path);
+-		goto error;
+-	}
+-
+-	return TRUE;
+-error:
+-
+-	if (handle)
+-		FreeLibrary(handle);
+-
+-	pf_filters_filter_free(filter);
+-	return FALSE;
+-}
+diff -urN server/proxy/pf_filters.h ../../informatimago/FreeRDP/server/proxy/pf_filters.h
+--- server/proxy/pf_filters.h	2019-07-25 19:51:06.569925725 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_filters.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,76 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_FILTERS_H
+-#define FREERDP_SERVER_PROXY_FILTERS_H
+-
+-#include <winpr/wtypes.h>
+-#include <winpr/collections.h>
+-
+-#include "filters/filters_api.h"
+-
+-/* filter init method */
+-typedef BOOL (*filterInitFn)(proxyEvents* events);
+-
+-typedef wArrayList filters_list;
+-typedef struct proxy_filter proxyFilter;
+-
+-typedef enum _PF_FILTER_TYPE PF_FILTER_TYPE;
+-enum _PF_FILTER_TYPE
+-{
+-	FILTER_TYPE_KEYBOARD,
+-	FILTER_TYPE_MOUSE
+-};
+-
+-struct proxy_filter
+-{
+-	/* Handle to the loaded library. Used for freeing the library */
+-	HMODULE handle;
+-
+-	char* name;
+-	BOOL enabled;
+-	proxyEvents* events;
+-};
+-
+-BOOL pf_filters_init(filters_list** list);
+-BOOL pf_filters_register_new(filters_list* list, const char* module_path, const char* filter_name);
+-PF_FILTER_RESULT pf_filters_run_by_type(filters_list* list, PF_FILTER_TYPE type,
+-                                        connectionInfo* info, void* param);
+-void pf_filters_unregister_all(filters_list* list);
+-
+-#define RUN_FILTER(_filters, _type, _conn_info, _event_info, _ret, _cb, ...)      \
+-	do                                                                            \
+-	{                                                                             \
+-		switch (pf_filters_run_by_type(_filters, _type, _conn_info, _event_info)) \
+-		{                                                                         \
+-		case FILTER_PASS:                                                         \
+-			_ret = _cb(__VA_ARGS__);                                              \
+-			break;                                                                \
+-		case FILTER_IGNORE:                                                       \
+-			_ret = TRUE;                                                          \
+-			break;                                                                \
+-		case FILTER_DROP:                                                         \
+-		default:                                                                  \
+-			_ret = FALSE;                                                         \
+-		}                                                                         \
+-	} while (0)
+-
+-#endif /* FREERDP_SERVER_PROXY_FILTERS_H */
+diff -urN server/proxy/pf_gdi.c ../../informatimago/FreeRDP/server/proxy/pf_gdi.c
+--- server/proxy/pf_gdi.c	2019-07-25 19:51:06.573925745 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_gdi.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,143 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#	include "config.h"
+-#endif
+-
+-#include <freerdp/gdi/gdi.h>
+-#include <freerdp/codec/rfx.h>
+-#include <freerdp/codec/nsc.h>
+-#include <freerdp/constants.h>
+-#include <freerdp/codec/color.h>
+-#include <freerdp/codec/bitmap.h>
+-#include <freerdp/freerdp.h>
+-#include "pf_gdi.h"
+-#include "pf_log.h"
+-
+-#include <freerdp/log.h>
+-#define TAG PROXY_TAG("gdi")
+-
+-/* TODO: Figure how to use functions decleared in update.c */
+-static BOOL pf_gdi_set_bounds(rdpContext* context, const rdpBounds* bounds)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_dstblt(rdpContext* context, const DSTBLT_ORDER* dstblt)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_patblt(rdpContext* context, PATBLT_ORDER* patblt)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_scrblt(rdpContext* context, const SCRBLT_ORDER* scrblt)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_opaque_rect(rdpContext* context, const OPAQUE_RECT_ORDER* opaque_rect)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_multi_opaque_rect(rdpContext* context,
+-                                     const MULTI_OPAQUE_RECT_ORDER* multi_opaque_rect)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_line_to(rdpContext* context, const LINE_TO_ORDER* line_to)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_polyline(rdpContext* context, const POLYLINE_ORDER* polyline)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_memblt(rdpContext* context, MEMBLT_ORDER* memblt)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_mem3blt(rdpContext* context, MEM3BLT_ORDER* mem3blt)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_polygon_sc(rdpContext* context, const POLYGON_SC_ORDER* polygon_sc)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_polygon_cb(rdpContext* context, POLYGON_CB_ORDER* polygon_cb)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_surface_frame_marker(rdpContext* context,
+-                                        const SURFACE_FRAME_MARKER* surface_frame_marker)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-static BOOL pf_gdi_surface_bits(rdpContext* context, const SURFACE_BITS_COMMAND* cmd)
+-{
+-	WLog_INFO(TAG, __FUNCTION__);
+-	return TRUE;
+-}
+-
+-void pf_gdi_register_update_callbacks(rdpUpdate* update)
+-{
+-	rdpPrimaryUpdate* primary = update->primary;
+-	update->SetBounds = pf_gdi_set_bounds;
+-	primary->DstBlt = pf_gdi_dstblt;
+-	primary->PatBlt = pf_gdi_patblt;
+-	primary->ScrBlt = pf_gdi_scrblt;
+-	primary->OpaqueRect = pf_gdi_opaque_rect;
+-	primary->MultiOpaqueRect = pf_gdi_multi_opaque_rect;
+-	primary->LineTo = pf_gdi_line_to;
+-	primary->Polyline = pf_gdi_polyline;
+-	primary->MemBlt = pf_gdi_memblt;
+-	primary->Mem3Blt = pf_gdi_mem3blt;
+-	primary->PolygonSC = pf_gdi_polygon_sc;
+-	primary->PolygonCB = pf_gdi_polygon_cb;
+-	update->SurfaceBits = pf_gdi_surface_bits;
+-	update->SurfaceFrameMarker = pf_gdi_surface_frame_marker;
+-}
+diff -urN server/proxy/pf_gdi.h ../../informatimago/FreeRDP/server/proxy/pf_gdi.h
+--- server/proxy/pf_gdi.h	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_gdi.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,29 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_PFGDI_H
+-#define FREERDP_SERVER_PROXY_PFGDI_H
+-
+-#include <freerdp/gdi/gdi.h>
+-
+-void pf_gdi_register_update_callbacks(rdpUpdate* update);
+-
+-#endif /* FREERDP_SERVER_PROXY_PFGDI_H */
+diff -urN server/proxy/pf_graphics.c ../../informatimago/FreeRDP/server/proxy/pf_graphics.c
+--- server/proxy/pf_graphics.c	2019-07-25 19:51:06.573925745 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_graphics.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,166 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#	include "config.h"
+-#endif
+-
+-#include <winpr/crt.h>
+-
+-#include <freerdp/codec/bitmap.h>
+-
+-#include "pf_graphics.h"
+-#include "pf_log.h"
+-#include "pf_gdi.h"
+-#include "pf_context.h"
+-
+-#include <freerdp/gdi/dc.h>
+-#include <freerdp/gdi/shape.h>
+-#include <freerdp/gdi/region.h>
+-#include <freerdp/gdi/bitmap.h>
+-#include <freerdp/gdi/bitmap.h>
+-#include <freerdp/graphics.h>
+-#include <freerdp/log.h>
+-#define TAG PROXY_TAG("graphics")
+-
+-/* Bitmap Class */
+-static BOOL pf_Bitmap_New(rdpContext* context, rdpBitmap* bitmap)
+-{
+-	return TRUE;
+-}
+-
+-static void pf_Bitmap_Free(rdpContext* context, rdpBitmap* bitmap)
+-{
+-}
+-
+-static BOOL pf_Bitmap_Paint(rdpContext* context, rdpBitmap* bitmap)
+-{
+-	return TRUE;
+-}
+-
+-static BOOL pf_Bitmap_SetSurface(rdpContext* context, rdpBitmap* bitmap, BOOL primary)
+-{
+-	return TRUE;
+-}
+-
+-/* Pointer Class */
+-static BOOL pf_Pointer_New(rdpContext* context, rdpPointer* pointer)
+-{
+-	return TRUE;
+-}
+-
+-static void pf_Pointer_Free(rdpContext* context, rdpPointer* pointer)
+-{
+-}
+-
+-static BOOL pf_Pointer_Set(rdpContext* context, const rdpPointer* pointer)
+-{
+-	return TRUE;
+-}
+-
+-static BOOL pf_Pointer_SetNull(rdpContext* context)
+-{
+-	return TRUE;
+-}
+-
+-static BOOL pf_Pointer_SetDefault(rdpContext* context)
+-{
+-	return TRUE;
+-}
+-
+-static BOOL pf_Pointer_SetPosition(rdpContext* context, UINT32 x, UINT32 y)
+-{
+-	return TRUE;
+-}
+-
+-/* Glyph Class */
+-static BOOL pf_Glyph_New(rdpContext* context, const rdpGlyph* glyph)
+-{
+-	return TRUE;
+-}
+-
+-static void pf_Glyph_Free(rdpContext* context, rdpGlyph* glyph)
+-{
+-}
+-
+-static BOOL pf_Glyph_Draw(rdpContext* context, const rdpGlyph* glyph, INT32 x, INT32 y, INT32 w,
+-                          INT32 h, INT32 sx, INT32 sy, BOOL fOpRedundant)
+-{
+-	return TRUE;
+-}
+-
+-static BOOL pf_Glyph_BeginDraw(rdpContext* context, INT32 x, INT32 y, INT32 width, INT32 height,
+-                               UINT32 bgcolor, UINT32 fgcolor, BOOL fOpRedundant)
+-{
+-	return TRUE;
+-}
+-
+-static BOOL pf_Glyph_EndDraw(rdpContext* context, INT32 x, INT32 y, INT32 width, INT32 height,
+-                             UINT32 bgcolor, UINT32 fgcolor)
+-{
+-	return TRUE;
+-}
+-
+-/* Graphics Module */
+-BOOL pf_register_pointer(rdpGraphics* graphics)
+-{
+-	rdpPointer* pointer = NULL;
+-
+-	if (!(pointer = (rdpPointer*)calloc(1, sizeof(rdpPointer))))
+-		return FALSE;
+-
+-	pointer->size = sizeof(rdpPointer);
+-	pointer->New = pf_Pointer_New;
+-	pointer->Free = pf_Pointer_Free;
+-	pointer->Set = pf_Pointer_Set;
+-	pointer->SetNull = pf_Pointer_SetNull;
+-	pointer->SetDefault = pf_Pointer_SetDefault;
+-	pointer->SetPosition = pf_Pointer_SetPosition;
+-	graphics_register_pointer(graphics, pointer);
+-	free(pointer);
+-	return TRUE;
+-}
+-
+-BOOL pf_register_graphics(rdpGraphics* graphics)
+-{
+-	rdpBitmap bitmap;
+-	rdpGlyph glyph;
+-
+-	if (!graphics || !graphics->Bitmap_Prototype || !graphics->Glyph_Prototype)
+-		return FALSE;
+-
+-	bitmap = *graphics->Bitmap_Prototype;
+-	glyph = *graphics->Glyph_Prototype;
+-	bitmap.size = sizeof(rdpBitmap);
+-	bitmap.New = pf_Bitmap_New;
+-	bitmap.Free = pf_Bitmap_Free;
+-	bitmap.Paint = pf_Bitmap_Paint;
+-	bitmap.SetSurface = pf_Bitmap_SetSurface;
+-	graphics_register_bitmap(graphics, &bitmap);
+-	glyph.size = sizeof(rdpGlyph);
+-	glyph.New = pf_Glyph_New;
+-	glyph.Free = pf_Glyph_Free;
+-	glyph.Draw = pf_Glyph_Draw;
+-	glyph.BeginDraw = pf_Glyph_BeginDraw;
+-	glyph.EndDraw = pf_Glyph_EndDraw;
+-	graphics_register_glyph(graphics, &glyph);
+-	return TRUE;
+-}
+\ No newline at end of file
+diff -urN server/proxy/pf_graphics.h ../../informatimago/FreeRDP/server/proxy/pf_graphics.h
+--- server/proxy/pf_graphics.h	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_graphics.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,31 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_PFGRAPHICS_H
+-#define FREERDP_SERVER_PROXY_PFGRAPHICS_H
+-
+-#include <freerdp/freerdp.h>
+-#include "pf_client.h"
+-
+-BOOL pf_register_pointer(rdpGraphics* graphics);
+-BOOL pf_register_graphics(rdpGraphics* graphics);
+-
+-#endif /* FREERDP_SERVER_PROXY_PFGRAPHICS_H */
+diff -urN server/proxy/pf_input.c ../../informatimago/FreeRDP/server/proxy/pf_input.c
+--- server/proxy/pf_input.c	2019-07-25 19:51:06.577925764 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_input.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,105 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#include "pf_input.h"
+-#include "pf_context.h"
+-
+-static BOOL pf_server_synchronize_event(rdpInput* input, UINT32 flags)
+-{
+-	pServerContext* ps = (pServerContext*)input->context;
+-	pClientContext* pc = ps->pdata->pc;
+-	rdpContext* context = (rdpContext*)pc;
+-	return freerdp_input_send_synchronize_event(context->input, flags);
+-}
+-
+-static BOOL pf_server_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code)
+-{
+-	BOOL result = FALSE;
+-	pServerContext* ps = (pServerContext*)input->context;
+-	pClientContext* pc = ps->pdata->pc;
+-	rdpContext* context = (rdpContext*)pc;
+-	proxyConfig* config = ps->pdata->config;
+-	proxyKeyboardEventInfo event;
+-
+-	if (!config->Keyboard)
+-		return TRUE;
+-
+-	event.flags = flags;
+-	event.rdp_scan_code = code;
+-	RUN_FILTER(config->Filters, FILTER_TYPE_KEYBOARD, ps->pdata->info, &event, result,
+-	           freerdp_input_send_keyboard_event, context->input, flags, code);
+-	return result;
+-}
+-
+-static BOOL pf_server_unicode_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code)
+-{
+-	pServerContext* ps = (pServerContext*)input->context;
+-	pClientContext* pc = ps->pdata->pc;
+-	rdpContext* context = (rdpContext*)pc;
+-	proxyConfig* config = ps->pdata->config;
+-
+-	if (!config->Keyboard)
+-		return TRUE;
+-
+-	return freerdp_input_send_unicode_keyboard_event(context->input, flags, code);
+-}
+-
+-static BOOL pf_server_mouse_event(rdpInput* input, UINT16 flags, UINT16 x, UINT16 y)
+-{
+-	BOOL result = FALSE;
+-	pServerContext* ps = (pServerContext*)input->context;
+-	pClientContext* pc = ps->pdata->pc;
+-	rdpContext* context = (rdpContext*)pc;
+-	proxyConfig* config = ps->pdata->config;
+-	proxyMouseEventInfo event;
+-
+-	if (!config->Mouse)
+-		return TRUE;
+-
+-	event.flags = flags;
+-	event.x = x;
+-	event.y = y;
+-	RUN_FILTER(config->Filters, FILTER_TYPE_MOUSE, ps->pdata->info, &event, result,
+-	           freerdp_input_send_mouse_event, context->input, flags, x, y);
+-	return result;
+-}
+-
+-static BOOL pf_server_extended_mouse_event(rdpInput* input, UINT16 flags, UINT16 x, UINT16 y)
+-{
+-	pServerContext* ps = (pServerContext*)input->context;
+-	pClientContext* pc = ps->pdata->pc;
+-	rdpContext* context = (rdpContext*)pc;
+-	proxyConfig* config = ps->pdata->config;
+-
+-	if (!config->Mouse)
+-		return TRUE;
+-
+-	return freerdp_input_send_extended_mouse_event(context->input, flags, x, y);
+-}
+-
+-void pf_server_register_input_callbacks(rdpInput* input)
+-{
+-	input->SynchronizeEvent = pf_server_synchronize_event;
+-	input->KeyboardEvent = pf_server_keyboard_event;
+-	input->UnicodeKeyboardEvent = pf_server_unicode_keyboard_event;
+-	input->MouseEvent = pf_server_mouse_event;
+-	input->ExtendedMouseEvent = pf_server_extended_mouse_event;
+-}
+diff -urN server/proxy/pf_input.h ../../informatimago/FreeRDP/server/proxy/pf_input.h
+--- server/proxy/pf_input.h	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_input.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,29 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_PFINPUT_H
+-#define FREERDP_SERVER_PROXY_PFINPUT_H
+-
+-#include <freerdp/freerdp.h>
+-
+-void pf_server_register_input_callbacks(rdpInput* input);
+-
+-#endif /* FREERDP_SERVER_PROXY_PFINPUT_H */
+diff -urN server/proxy/pf_log.h ../../informatimago/FreeRDP/server/proxy/pf_log.h
+--- server/proxy/pf_log.h	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_log.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,29 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_PFLOG_H
+-#define FREERDP_SERVER_PROXY_PFLOG_H
+-
+-#include <winpr/wlog.h>
+-
+-#define PROXY_TAG(tag) "proxy." tag
+-
+-#endif /* FREERDP_SERVER_PROXY_PFLOG_H */
+\ No newline at end of file
+diff -urN server/proxy/pf_rdpgfx.c ../../informatimago/FreeRDP/server/proxy/pf_rdpgfx.c
+--- server/proxy/pf_rdpgfx.c	2019-07-25 19:51:06.585925804 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_rdpgfx.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,341 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#include <freerdp/client/rdpgfx.h>
+-#include <freerdp/server/rdpgfx.h>
+-
+-#include <winpr/synch.h>
+-
+-#include "pf_rdpgfx.h"
+-#include "pf_context.h"
+-#include "pf_log.h"
+-
+-#define TAG PROXY_TAG("gfx")
+-
+-BOOL pf_server_rdpgfx_init(pServerContext* ps)
+-{
+-	RdpgfxServerContext* gfx;
+-	gfx = ps->gfx = rdpgfx_server_context_new(ps->vcm);
+-
+-	if (!gfx)
+-	{
+-		return FALSE;
+-	}
+-
+-	gfx->rdpcontext = (rdpContext*)ps;
+-	return TRUE;
+-}
+-
+-static UINT pf_rdpgfx_reset_graphics(RdpgfxClientContext* context,
+-                                     const RDPGFX_RESET_GRAPHICS_PDU* resetGraphics)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->ResetGraphics(server, resetGraphics);
+-}
+-
+-static UINT pf_rdpgfx_start_frame(RdpgfxClientContext* context,
+-                                  const RDPGFX_START_FRAME_PDU* startFrame)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->StartFrame(server, startFrame);
+-}
+-
+-static UINT pf_rdpgfx_end_frame(RdpgfxClientContext* context, const RDPGFX_END_FRAME_PDU* endFrame)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->EndFrame(server, endFrame);
+-}
+-
+-static UINT pf_rdpgfx_surface_command(RdpgfxClientContext* context,
+-                                      const RDPGFX_SURFACE_COMMAND* cmd)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->SurfaceCommand(server, cmd);
+-}
+-
+-static UINT
+-pf_rdpgfx_delete_encoding_context(RdpgfxClientContext* context,
+-                                  const RDPGFX_DELETE_ENCODING_CONTEXT_PDU* deleteEncodingContext)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->DeleteEncodingContext(server, deleteEncodingContext);
+-}
+-
+-static UINT pf_rdpgfx_create_surface(RdpgfxClientContext* context,
+-                                     const RDPGFX_CREATE_SURFACE_PDU* createSurface)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->CreateSurface(server, createSurface);
+-}
+-
+-static UINT pf_rdpgfx_delete_surface(RdpgfxClientContext* context,
+-                                     const RDPGFX_DELETE_SURFACE_PDU* deleteSurface)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->DeleteSurface(server, deleteSurface);
+-}
+-
+-static UINT pf_rdpgfx_solid_fill(RdpgfxClientContext* context,
+-                                 const RDPGFX_SOLID_FILL_PDU* solidFill)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->SolidFill(server, solidFill);
+-}
+-
+-static UINT pf_rdpgfx_surface_to_surface(RdpgfxClientContext* context,
+-                                         const RDPGFX_SURFACE_TO_SURFACE_PDU* surfaceToSurface)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->SurfaceToSurface(server, surfaceToSurface);
+-}
+-
+-static UINT pf_rdpgfx_surface_to_cache(RdpgfxClientContext* context,
+-                                       const RDPGFX_SURFACE_TO_CACHE_PDU* surfaceToCache)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->SurfaceToCache(server, surfaceToCache);
+-}
+-
+-static UINT pf_rdpgfx_cache_to_surface(RdpgfxClientContext* context,
+-                                       const RDPGFX_CACHE_TO_SURFACE_PDU* cacheToSurface)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->CacheToSurface(server, cacheToSurface);
+-}
+-
+-static UINT pf_rdpgfx_cache_import_reply(RdpgfxClientContext* context,
+-                                         const RDPGFX_CACHE_IMPORT_REPLY_PDU* cacheImportReply)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->CacheImportReply(server, cacheImportReply);
+-}
+-
+-static UINT pf_rdpgfx_evict_cache_entry(RdpgfxClientContext* context,
+-                                        const RDPGFX_EVICT_CACHE_ENTRY_PDU* evictCacheEntry)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->EvictCacheEntry(server, evictCacheEntry);
+-}
+-
+-static UINT pf_rdpgfx_map_surface_to_output(RdpgfxClientContext* context,
+-                                            const RDPGFX_MAP_SURFACE_TO_OUTPUT_PDU* surfaceToOutput)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->MapSurfaceToOutput(server, surfaceToOutput);
+-}
+-
+-static UINT pf_rdpgfx_map_surface_to_window(RdpgfxClientContext* context,
+-                                            const RDPGFX_MAP_SURFACE_TO_WINDOW_PDU* surfaceToWindow)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->MapSurfaceToWindow(server, surfaceToWindow);
+-}
+-
+-static UINT pf_rdpgfx_map_surface_to_scaled_window(
+-    RdpgfxClientContext* context,
+-    const RDPGFX_MAP_SURFACE_TO_SCALED_WINDOW_PDU* surfaceToScaledWindow)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->MapSurfaceToScaledWindow(server, surfaceToScaledWindow);
+-}
+-
+-static UINT pf_rdpgfx_map_surface_to_scaled_output(
+-    RdpgfxClientContext* context,
+-    const RDPGFX_MAP_SURFACE_TO_SCALED_OUTPUT_PDU* surfaceToScaledOutput)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->MapSurfaceToScaledOutput(server, surfaceToScaledOutput);
+-}
+-
+-static UINT pf_rdpgfx_on_open(RdpgfxClientContext* context, BOOL* do_caps_advertise,
+-                              BOOL* send_frame_acks)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-
+-	if (NULL != do_caps_advertise)
+-		*do_caps_advertise = FALSE;
+-
+-	if (NULL != send_frame_acks)
+-		*send_frame_acks = FALSE;
+-
+-	/* Wait for the proxy's server's DYNVC to be in a ready state to safely open
+-	 * the GFX DYNVC. */
+-	WLog_DBG(TAG, "Waiting for proxy's server dynvc to be ready");
+-	WaitForSingleObject(pdata->ps->dynvcReady, INFINITE);
+-
+-	/* Check for error since the server's API doesn't return WTSAPI error codes */
+-	if (server->Open(server))
+-	{
+-		return CHANNEL_RC_OK;
+-	}
+-
+-	return CHANNEL_RC_INITIALIZATION_ERROR;
+-}
+-
+-static UINT pf_rdpgfx_on_close(RdpgfxClientContext* context)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->Close(server) ? CHANNEL_RC_OK : ERROR_INTERNAL_ERROR;
+-}
+-
+-static UINT pf_rdpgfx_caps_confirm(RdpgfxClientContext* context,
+-                                   const RDPGFX_CAPS_CONFIRM_PDU* capsConfirm)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxServerContext* server = (RdpgfxServerContext*)pdata->ps->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return server->CapsConfirm(server, capsConfirm);
+-}
+-
+-/* Proxy server side callbacks */
+-static UINT pf_rdpgfx_caps_advertise(RdpgfxServerContext* context,
+-                                     const RDPGFX_CAPS_ADVERTISE_PDU* capsAdvertise)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxClientContext* client = (RdpgfxClientContext*)pdata->pc->gfx;
+-	UINT16 index;
+-	UINT16 proxySupportedCapsSetCount = 0;
+-	RDPGFX_CAPS_ADVERTISE_PDU supportedCapsAdvertise;
+-	RDPGFX_CAPSET* proxySupportedCapsSet;
+-	RDPGFX_CAPSET proxySupportedCapsSets[RDPGFX_NUMBER_CAPSETS] = { 0 };
+-
+-	for (index = 0; index < capsAdvertise->capsSetCount; index++)
+-	{
+-		const RDPGFX_CAPSET* currentCaps = &capsAdvertise->capsSets[index];
+-
+-		/* Add cap to supported caps list if supported by FreeRDP.
+-		 * TODO: Have a better way of expressing max supported GFX caps version
+-		 * by FreeRDP.
+-		 */
+-		if (currentCaps->version <= RDPGFX_CAPVERSION_106)
+-		{
+-			proxySupportedCapsSet = &proxySupportedCapsSets[proxySupportedCapsSetCount++];
+-			proxySupportedCapsSet->version = currentCaps->version;
+-			proxySupportedCapsSet->length = currentCaps->length;
+-			proxySupportedCapsSet->flags = currentCaps->flags;
+-		}
+-	}
+-
+-	supportedCapsAdvertise.capsSetCount = proxySupportedCapsSetCount;
+-	supportedCapsAdvertise.capsSets = proxySupportedCapsSets;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return client->CapsAdvertise(client, &supportedCapsAdvertise);
+-}
+-
+-static UINT pf_rdpgfx_frame_acknowledge(RdpgfxServerContext* context,
+-                                        const RDPGFX_FRAME_ACKNOWLEDGE_PDU* frameAcknowledge)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxClientContext* client = (RdpgfxClientContext*)pdata->pc->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return client->FrameAcknowledge(client, frameAcknowledge);
+-}
+-
+-static UINT
+-pf_rdpgfx_qoe_frame_acknowledge(RdpgfxServerContext* context,
+-                                const RDPGFX_QOE_FRAME_ACKNOWLEDGE_PDU* qoeFrameAcknowledge)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxClientContext* client = (RdpgfxClientContext*)pdata->pc->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return client->QoeFrameAcknowledge(client, qoeFrameAcknowledge);
+-}
+-
+-static UINT pf_rdpgfx_cache_import_offer(RdpgfxServerContext* context,
+-                                         const RDPGFX_CACHE_IMPORT_OFFER_PDU* cacheImportOffer)
+-{
+-	proxyData* pdata = (proxyData*)context->custom;
+-	RdpgfxClientContext* client = (RdpgfxClientContext*)pdata->pc->gfx;
+-	WLog_DBG(TAG, __FUNCTION__);
+-	return client->CacheImportOffer(client, cacheImportOffer);
+-}
+-
+-void pf_rdpgfx_pipeline_init(RdpgfxClientContext* gfx, RdpgfxServerContext* server,
+-                             proxyData* pdata)
+-{
+-	/* Set server and client side references to proxy data */
+-	gfx->custom = (void*)pdata;
+-	server->custom = (void*)pdata;
+-	/* Set client callbacks */
+-	gfx->ResetGraphics = pf_rdpgfx_reset_graphics;
+-	gfx->StartFrame = pf_rdpgfx_start_frame;
+-	gfx->EndFrame = pf_rdpgfx_end_frame;
+-	gfx->SurfaceCommand = pf_rdpgfx_surface_command;
+-	gfx->DeleteEncodingContext = pf_rdpgfx_delete_encoding_context;
+-	gfx->CreateSurface = pf_rdpgfx_create_surface;
+-	gfx->DeleteSurface = pf_rdpgfx_delete_surface;
+-	gfx->SolidFill = pf_rdpgfx_solid_fill;
+-	gfx->SurfaceToSurface = pf_rdpgfx_surface_to_surface;
+-	gfx->SurfaceToCache = pf_rdpgfx_surface_to_cache;
+-	gfx->CacheToSurface = pf_rdpgfx_cache_to_surface;
+-	gfx->CacheImportReply = pf_rdpgfx_cache_import_reply;
+-	gfx->EvictCacheEntry = pf_rdpgfx_evict_cache_entry;
+-	gfx->MapSurfaceToOutput = pf_rdpgfx_map_surface_to_output;
+-	gfx->MapSurfaceToWindow = pf_rdpgfx_map_surface_to_window;
+-	gfx->MapSurfaceToScaledOutput = pf_rdpgfx_map_surface_to_scaled_output;
+-	gfx->MapSurfaceToScaledWindow = pf_rdpgfx_map_surface_to_scaled_window;
+-	gfx->OnOpen = pf_rdpgfx_on_open;
+-	gfx->OnClose = pf_rdpgfx_on_close;
+-	gfx->CapsConfirm = pf_rdpgfx_caps_confirm;
+-	/* Set server callbacks */
+-	server->CapsAdvertise = pf_rdpgfx_caps_advertise;
+-	server->FrameAcknowledge = pf_rdpgfx_frame_acknowledge;
+-	server->CacheImportOffer = pf_rdpgfx_cache_import_offer;
+-	server->QoeFrameAcknowledge = pf_rdpgfx_qoe_frame_acknowledge;
+-}
+diff -urN server/proxy/pf_rdpgfx.h ../../informatimago/FreeRDP/server/proxy/pf_rdpgfx.h
+--- server/proxy/pf_rdpgfx.h	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_rdpgfx.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,34 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_PFRDPGFX_H
+-#define FREERDP_SERVER_PROXY_PFRDPGFX_H
+-
+-#include <freerdp/client/rdpgfx.h>
+-#include <freerdp/server/rdpgfx.h>
+-
+-#include "pf_context.h"
+-
+-BOOL pf_server_rdpgfx_init(pServerContext* ps);
+-void pf_rdpgfx_pipeline_init(RdpgfxClientContext* gfx, RdpgfxServerContext* server,
+-                             proxyData* pdata);
+-
+-#endif /*FREERDP_SERVER_PROXY_PFRDPGFX_H*/
+\ No newline at end of file
+diff -urN server/proxy/pf_server.c ../../informatimago/FreeRDP/server/proxy/pf_server.c
+--- server/proxy/pf_server.c	2019-07-25 19:51:06.593925844 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_server.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,488 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#include <errno.h>
+-#include <signal.h>
+-
+-#include <freerdp/freerdp.h>
+-#include <freerdp/listener.h>
+-
+-#include <winpr/crt.h>
+-#include <winpr/ssl.h>
+-#include <winpr/synch.h>
+-#include <winpr/string.h>
+-#include <winpr/path.h>
+-#include <winpr/winsock.h>
+-#include <winpr/thread.h>
+-
+-#include <freerdp/channels/wtsvc.h>
+-#include <freerdp/channels/channels.h>
+-
+-#include <freerdp/constants.h>
+-#include <freerdp/server/rdpsnd.h>
+-#include <freerdp/server/rdpgfx.h>
+-
+-#include "pf_server.h"
+-#include "pf_common.h"
+-#include "pf_log.h"
+-#include "pf_config.h"
+-#include "pf_client.h"
+-#include "pf_context.h"
+-#include "pf_input.h"
+-#include "pf_update.h"
+-#include "pf_rdpgfx.h"
+-#include "pf_disp.h"
+-
+-#define TAG PROXY_TAG("server")
+-
+-static void pf_server_handle_client_disconnection(freerdp_peer* client)
+-{
+-	pServerContext* ps = (pServerContext*)client->context;
+-	rdpContext* pc = (rdpContext*)ps->pdata->pc;
+-	proxyData* pdata = ps->pdata;
+-	WLog_INFO(
+-	    TAG, "Connection with %s was closed; closing proxy's client <> target server connection %s",
+-	    client->hostname, pc->settings->ServerHostname);
+-	/* Mark connection closed for sContext */
+-	SetEvent(pdata->connectionClosed);
+-	freerdp_abort_connect(pc->instance);
+-	/* Close connection to remote host */
+-	WLog_DBG(TAG, "Waiting for proxy's client thread to finish");
+-	WaitForSingleObject(ps->thread, INFINITE);
+-	CloseHandle(ps->thread);
+-	ps->thread = NULL;
+-}
+-
+-static BOOL pf_server_parse_target_from_routing_token(rdpContext* context, char** target,
+-                                                      DWORD* port)
+-{
+-#define TARGET_MAX (100)
+-#define ROUTING_TOKEN_PREFIX "Cookie: msts="
+-	char* colon;
+-	size_t len;
+-	const size_t prefix_len = strlen(ROUTING_TOKEN_PREFIX);
+-	DWORD routing_token_length;
+-	const char* routing_token = freerdp_nego_get_routing_token(context, &routing_token_length);
+-
+-	if (routing_token == NULL)
+-	{
+-		/* no routing token */
+-		return FALSE;
+-	}
+-
+-	if ((routing_token_length <= prefix_len) || (routing_token_length >= TARGET_MAX))
+-	{
+-		WLog_ERR(
+-		    TAG,
+-		    "pf_server_parse_target_from_routing_token(): invalid routing token length: %" PRIu32
+-		    "",
+-		    routing_token_length);
+-		return FALSE;
+-	}
+-
+-	len = routing_token_length - prefix_len;
+-	*target = malloc(len + 1);
+-
+-	if (!(*target))
+-		return FALSE;
+-
+-	CopyMemory(*target, routing_token + prefix_len, len);
+-	*(*target + len) = '\0';
+-	colon = strchr(*target, ':');
+-
+-	if (colon)
+-	{
+-		/* port is specified */
+-		unsigned long p = strtoul(colon + 1, NULL, 10);
+-
+-		if (p > USHRT_MAX)
+-		{
+-			free(*target);
+-			return FALSE;
+-		}
+-
+-		*port = (DWORD)p;
+-		*colon = '\0';
+-	}
+-
+-	return TRUE;
+-}
+-
+-static BOOL pf_server_get_target_info(rdpContext* context, rdpSettings* settings,
+-                                      proxyConfig* config)
+-{
+-	WLog_INFO(TAG, "pf_server_get_target_info(): fetching target from %s",
+-	          config->UseLoadBalanceInfo ? "load-balance-info" : "config");
+-
+-	if (config->UseLoadBalanceInfo)
+-		return pf_server_parse_target_from_routing_token(context, &settings->ServerHostname,
+-		                                                 &settings->ServerPort);
+-
+-	/* use hardcoded target info from configuration */
+-	if (!(settings->ServerHostname = _strdup(config->TargetHost)))
+-	{
+-		WLog_DBG(TAG, "pf_server_get_target_info(): strdup failed!");
+-		return FALSE;
+-	}
+-
+-	settings->ServerPort = config->TargetPort > 0 ? 3389 : settings->ServerPort;
+-	return TRUE;
+-}
+-
+-/* Event callbacks */
+-/**
+- * This callback is called when the entire connection sequence is done (as
+- * described in MS-RDPBCGR section 1.3)
+- *
+- * The server may start sending graphics output and receiving keyboard/mouse
+- * input after this callback returns.
+- */
+-static BOOL pf_server_post_connect(freerdp_peer* client)
+-{
+-	pServerContext* ps;
+-	rdpContext* pc;
+-	proxyData* pdata;
+-	ps = (pServerContext*)client->context;
+-	pdata = ps->pdata;
+-	pc = p_client_context_create(client->settings);
+-
+-	if (pc == NULL)
+-	{
+-		WLog_ERR(TAG, "pf_server_post_connect(): p_client_context_create failed!");
+-		return FALSE;
+-	}
+-
+-	/* keep both sides of the connection in pdata */
+-	((pClientContext*)pc)->pdata = ps->pdata;
+-	pdata->pc = (pClientContext*)pc;
+-
+-	if (!pf_server_get_target_info(client->context, pc->settings, pdata->config))
+-	{
+-		WLog_ERR(TAG, "pf_server_post_connect(): pf_server_get_target_info failed!");
+-		return FALSE;
+-	}
+-
+-	WLog_INFO(TAG, "pf_server_post_connect(): target == %s:%" PRIu16 "",
+-	          pc->settings->ServerHostname, pc->settings->ServerPort);
+-	pf_server_rdpgfx_init(ps);
+-	pf_server_disp_init(ps);
+-
+-	/* Start a proxy's client in it's own thread */
+-	if (!(ps->thread = CreateThread(NULL, 0, pf_client_start, pc, 0, NULL)))
+-	{
+-		WLog_ERR(TAG, "CreateThread failed!");
+-		return FALSE;
+-	}
+-
+-	return TRUE;
+-}
+-
+-static BOOL pf_server_activate(freerdp_peer* client)
+-{
+-	client->settings->CompressionLevel = PACKET_COMPR_TYPE_RDP8;
+-	return TRUE;
+-}
+-
+-static BOOL pf_server_adjust_monitor_layout(freerdp_peer* peer)
+-{
+-	/* proxy as is, there's no need to do anything here */
+-	return TRUE;
+-}
+-
+-/**
+- * Handles an incoming client connection, to be run in it's own thread.
+- *
+- * arg is a pointer to a freerdp_peer representing the client.
+- */
+-static DWORD WINAPI pf_server_handle_client(LPVOID arg)
+-{
+-	HANDLE eventHandles[32];
+-	HANDLE ChannelEvent;
+-	DWORD eventCount;
+-	DWORD tmp;
+-	DWORD status;
+-	pServerContext* ps;
+-	rdpContext* pc;
+-	proxyData* pdata;
+-	proxyConfig* config;
+-	freerdp_peer* client = (freerdp_peer*)arg;
+-
+-	if (!init_p_server_context(client))
+-		goto out_free_peer;
+-
+-	ps = (pServerContext*)client->context;
+-
+-	if (!(ps->dynvcReady = CreateEvent(NULL, TRUE, FALSE, NULL)))
+-	{
+-		WLog_ERR(TAG, "pf_server_post_connect(): CreateEvent failed!");
+-		goto out_free_peer;
+-	}
+-
+-	if (!(pdata = ps->pdata = proxy_data_new()))
+-	{
+-		WLog_ERR(TAG, "pf_server_post_connect(): proxy_data_new failed!");
+-		goto out_free_peer;
+-	}
+-
+-	/* currently not supporting GDI orders */
+-	ZeroMemory(client->settings->OrderSupport, 32);
+-	client->update->autoCalculateBitmapData = FALSE;
+-	pdata->ps = ps;
+-	/* keep configuration in proxyData */
+-	pdata->config = client->ContextExtra;
+-	config = pdata->config;
+-	client->settings->UseMultimon = TRUE;
+-	client->settings->SupportGraphicsPipeline = config->GFX;
+-	client->settings->SupportDynamicChannels = TRUE;
+-	client->settings->CertificateFile = _strdup("server.crt");
+-	client->settings->PrivateKeyFile = _strdup("server.key");
+-	client->settings->RdpKeyFile = _strdup("server.key");
+-
+-	if (!client->settings->CertificateFile || !client->settings->PrivateKeyFile ||
+-	    !client->settings->RdpKeyFile)
+-	{
+-		WLog_ERR(TAG, "Memory allocation failed (strdup)");
+-		goto out_free_peer;
+-	}
+-
+-	client->settings->SupportDisplayControl = TRUE;
+-	client->settings->SupportMonitorLayoutPdu = TRUE;
+-	client->settings->DynamicResolutionUpdate = TRUE;
+-	client->settings->RdpSecurity = config->RdpSecurity;
+-	client->settings->TlsSecurity = config->TlsSecurity;
+-	client->settings->NlaSecurity = config->NlaSecurity;
+-	client->settings->EncryptionLevel = ENCRYPTION_LEVEL_CLIENT_COMPATIBLE;
+-	client->settings->ColorDepth = 32;
+-	client->settings->SuppressOutput = TRUE;
+-	client->settings->RefreshRect = TRUE;
+-	client->settings->DesktopResize = TRUE;
+-	client->PostConnect = pf_server_post_connect;
+-	client->Activate = pf_server_activate;
+-	client->AdjustMonitorsLayout = pf_server_adjust_monitor_layout;
+-	pf_server_register_input_callbacks(client->input);
+-	pf_server_register_update_callbacks(client->update);
+-	client->settings->MultifragMaxRequestSize = 0xFFFFFF; /* FIXME */
+-	client->Initialize(client);
+-	WLog_INFO(TAG, "Client connected: %s", client->local ? "(local)" : client->hostname);
+-	/* Main client event handling loop */
+-	ChannelEvent = WTSVirtualChannelManagerGetEventHandle(ps->vcm);
+-
+-	while (1)
+-	{
+-		eventCount = 0;
+-		{
+-			tmp = client->GetEventHandles(client, &eventHandles[eventCount], 32 - eventCount);
+-
+-			if (tmp == 0)
+-			{
+-				WLog_ERR(TAG, "Failed to get FreeRDP transport event handles");
+-				break;
+-			}
+-
+-			eventCount += tmp;
+-		}
+-		eventHandles[eventCount++] = ChannelEvent;
+-		eventHandles[eventCount++] = pdata->connectionClosed;
+-		eventHandles[eventCount++] = WTSVirtualChannelManagerGetEventHandle(ps->vcm);
+-		status = WaitForMultipleObjects(eventCount, eventHandles, FALSE, INFINITE);
+-
+-		if (status == WAIT_FAILED)
+-		{
+-			WLog_ERR(TAG, "WaitForMultipleObjects failed (errno: %d)", errno);
+-			break;
+-		}
+-
+-		if (pf_common_connection_aborted_by_peer(pdata))
+-		{
+-			WLog_INFO(TAG, "proxy's client disconnected, closing connection with client %s",
+-			          client->hostname);
+-			break;
+-		}
+-
+-		if (client->CheckFileDescriptor(client) != TRUE)
+-			break;
+-
+-		if (WaitForSingleObject(ChannelEvent, 0) == WAIT_OBJECT_0)
+-		{
+-			if (!WTSVirtualChannelManagerCheckFileDescriptor(ps->vcm))
+-			{
+-				WLog_ERR(TAG, "WTSVirtualChannelManagerCheckFileDescriptor failure");
+-				goto fail;
+-			}
+-		}
+-
+-		switch (WTSVirtualChannelManagerGetDrdynvcState(ps->vcm))
+-		{
+-		/* Dynamic channel status may have been changed after processing */
+-		case DRDYNVC_STATE_NONE:
+-
+-			/* Initialize drdynvc channel */
+-			if (!WTSVirtualChannelManagerCheckFileDescriptor(ps->vcm))
+-			{
+-				WLog_ERR(TAG, "Failed to initialize drdynvc channel");
+-				goto fail;
+-			}
+-
+-			break;
+-
+-		case DRDYNVC_STATE_READY:
+-			if (WaitForSingleObject(ps->dynvcReady, 0) == WAIT_TIMEOUT)
+-			{
+-				SetEvent(ps->dynvcReady);
+-			}
+-
+-			break;
+-
+-		default:
+-			break;
+-		}
+-	}
+-
+-fail:
+-
+-	if (ps->disp)
+-	{
+-		if (ps->dispOpened)
+-		{
+-			WLog_DBG(TAG, "Closing RDPEDISP server");
+-			(void)ps->disp->Close(ps->disp);
+-		}
+-
+-		disp_server_context_free(ps->disp);
+-	}
+-
+-	if (ps->gfx)
+-		rdpgfx_server_context_free(ps->gfx);
+-
+-	if (client->connected && !pf_common_connection_aborted_by_peer(pdata))
+-	{
+-		pf_server_handle_client_disconnection(client);
+-	}
+-
+-	pc = (rdpContext*)pdata->pc;
+-	freerdp_client_stop(pc);
+-	proxy_data_free(pdata);
+-	freerdp_client_context_free(pc);
+-	client->Disconnect(client);
+-out_free_peer:
+-	freerdp_peer_context_free(client);
+-	freerdp_peer_free(client);
+-	return 0;
+-}
+-
+-static BOOL pf_server_client_connected(freerdp_listener* listener, freerdp_peer* client)
+-{
+-	HANDLE hThread;
+-	client->ContextExtra = listener->info;
+-
+-	if (!(hThread = CreateThread(NULL, 0, pf_server_handle_client, (void*)client, 0, NULL)))
+-		return FALSE;
+-
+-	CloseHandle(hThread);
+-	return TRUE;
+-}
+-
+-static void pf_server_mainloop(freerdp_listener* listener)
+-{
+-	HANDLE eventHandles[32];
+-	DWORD eventCount;
+-	DWORD status;
+-
+-	while (1)
+-	{
+-		eventCount = listener->GetEventHandles(listener, eventHandles, 32);
+-
+-		if (0 == eventCount)
+-		{
+-			WLog_ERR(TAG, "Failed to get FreeRDP event handles");
+-			break;
+-		}
+-
+-		status = WaitForMultipleObjects(eventCount, eventHandles, FALSE, INFINITE);
+-
+-		if (WAIT_FAILED == status)
+-		{
+-			WLog_ERR(TAG, "select failed");
+-			break;
+-		}
+-
+-		if (listener->CheckFileDescriptor(listener) != TRUE)
+-		{
+-			WLog_ERR(TAG, "Failed to check FreeRDP file descriptor");
+-			break;
+-		}
+-	}
+-
+-	listener->Close(listener);
+-}
+-
+-int pf_server_start(proxyConfig* config)
+-{
+-	char* localSockPath;
+-	char localSockName[MAX_PATH];
+-	BOOL success;
+-	WSADATA wsaData;
+-	freerdp_listener* listener = freerdp_listener_new();
+-
+-	if (!listener)
+-		return -1;
+-
+-	WTSRegisterWtsApiFunctionTable(FreeRDP_InitWtsApi());
+-	winpr_InitializeSSL(WINPR_SSL_INIT_DEFAULT);
+-	listener->info = config;
+-	listener->PeerAccepted = pf_server_client_connected;
+-
+-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+-	{
+-		freerdp_listener_free(listener);
+-		return -1;
+-	}
+-
+-	/* Determine filepath for local socket */
+-	sprintf_s(localSockName, sizeof(localSockName), "proxy.%" PRIu16 "", config->Port);
+-	localSockPath = GetKnownSubPath(KNOWN_PATH_TEMP, localSockName);
+-
+-	if (!localSockPath)
+-	{
+-		freerdp_listener_free(listener);
+-		WSACleanup();
+-		return -1;
+-	}
+-
+-	/* Listen to local connections */
+-	success = listener->OpenLocal(listener, localSockPath);
+-
+-	/* Listen to remote connections */
+-	if (!config->LocalOnly)
+-	{
+-		success &= listener->Open(listener, config->Host, config->Port);
+-	}
+-
+-	if (success)
+-	{
+-		pf_server_mainloop(listener);
+-	}
+-
+-	free(localSockPath);
+-	freerdp_listener_free(listener);
+-	WSACleanup();
+-	return 0;
+-}
+diff -urN server/proxy/pf_server.h ../../informatimago/FreeRDP/server/proxy/pf_server.h
+--- server/proxy/pf_server.h	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_server.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,29 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_SERVER_H
+-#define FREERDP_SERVER_PROXY_SERVER_H
+-
+-#include "pf_config.h"
+-
+-int pf_server_start(proxyConfig* config);
+-
+-#endif /* FREERDP_SERVER_PROXY_SERVER_H */
+diff -urN server/proxy/pf_update.c ../../informatimago/FreeRDP/server/proxy/pf_update.c
+--- server/proxy/pf_update.c	2019-07-25 19:51:06.597925863 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_update.c	1970-01-01 03:00:00.000000000 +0300
+@@ -1,159 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#include <freerdp/display.h>
+-
+-#include "pf_update.h"
+-#include "pf_context.h"
+-
+-/* server callbacks */
+-
+-static BOOL pf_server_refresh_rect(rdpContext* context, BYTE count, const RECTANGLE_16* areas)
+-{
+-	pServerContext* ps = (pServerContext*)context;
+-	rdpContext* pc = (rdpContext*)ps->pdata->pc;
+-	return pc->update->RefreshRect(pc, count, areas);
+-}
+-
+-static BOOL pf_server_suppress_output(rdpContext* context, BYTE allow, const RECTANGLE_16* area)
+-{
+-	pServerContext* ps = (pServerContext*)context;
+-	rdpContext* pc = (rdpContext*)ps->pdata->pc;
+-	return pc->update->SuppressOutput(pc, allow, area);
+-}
+-
+-/* client callbacks */
+-
+-/**
+- * This function is called whenever a new frame starts.
+- * It can be used to reset invalidated areas.
+- */
+-static BOOL pf_client_begin_paint(rdpContext* context)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	proxyData* pdata = pc->pdata;
+-	rdpContext* ps = (rdpContext*)pdata->ps;
+-	return ps->update->BeginPaint(ps);
+-}
+-
+-/**
+- * This function is called when the library completed composing a new
+- * frame. Read out the changed areas and blit them to your output device.
+- * The image buffer will have the format specified by gdi_init
+- */
+-static BOOL pf_client_end_paint(rdpContext* context)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	proxyData* pdata = pc->pdata;
+-	rdpContext* ps = (rdpContext*)pdata->ps;
+-	return ps->update->EndPaint(ps);
+-}
+-
+-static BOOL pf_client_bitmap_update(rdpContext* context, const BITMAP_UPDATE* bitmap)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	proxyData* pdata = pc->pdata;
+-	rdpContext* ps = (rdpContext*)pdata->ps;
+-	return ps->update->BitmapUpdate(ps, bitmap);
+-}
+-
+-static BOOL pf_client_desktop_resize(rdpContext* context)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	proxyData* pdata = pc->pdata;
+-	rdpContext* ps = (rdpContext*)pdata->ps;
+-	ps->settings->DesktopWidth = context->settings->DesktopWidth;
+-	ps->settings->DesktopHeight = context->settings->DesktopHeight;
+-	return ps->update->DesktopResize(ps);
+-}
+-
+-static BOOL pf_client_remote_monitors(rdpContext* context, UINT32 count,
+-                                      const MONITOR_DEF* monitors)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	proxyData* pdata = pc->pdata;
+-	rdpContext* ps = (rdpContext*)pdata->ps;
+-	return freerdp_display_send_monitor_layout(ps, count, monitors);
+-}
+-
+-static BOOL pf_client_send_pointer_system(rdpContext* context,
+-                                          const POINTER_SYSTEM_UPDATE* pointer_system)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	proxyData* pdata = pc->pdata;
+-	rdpContext* ps = (rdpContext*)pdata->ps;
+-	return ps->update->pointer->PointerSystem(ps, pointer_system);
+-}
+-
+-static BOOL pf_client_send_pointer_position(rdpContext* context,
+-                                            const POINTER_POSITION_UPDATE* pointerPosition)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	proxyData* pdata = pc->pdata;
+-	rdpContext* ps = (rdpContext*)pdata->ps;
+-	return ps->update->pointer->PointerPosition(ps, pointerPosition);
+-}
+-
+-static BOOL pf_client_send_pointer_color(rdpContext* context,
+-                                         const POINTER_COLOR_UPDATE* pointer_color)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	proxyData* pdata = pc->pdata;
+-	rdpContext* ps = (rdpContext*)pdata->ps;
+-	return ps->update->pointer->PointerColor(ps, pointer_color);
+-}
+-
+-static BOOL pf_client_send_pointer_new(rdpContext* context, const POINTER_NEW_UPDATE* pointer_new)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	proxyData* pdata = pc->pdata;
+-	rdpContext* ps = (rdpContext*)pdata->ps;
+-	return ps->update->pointer->PointerNew(ps, pointer_new);
+-}
+-
+-static BOOL pf_client_send_pointer_cached(rdpContext* context,
+-                                          const POINTER_CACHED_UPDATE* pointer_cached)
+-{
+-	pClientContext* pc = (pClientContext*)context;
+-	proxyData* pdata = pc->pdata;
+-	rdpContext* ps = (rdpContext*)pdata->ps;
+-	return ps->update->pointer->PointerCached(ps, pointer_cached);
+-}
+-
+-void pf_client_register_update_callbacks(rdpUpdate* update)
+-{
+-	update->BeginPaint = pf_client_begin_paint;
+-	update->EndPaint = pf_client_end_paint;
+-	update->BitmapUpdate = pf_client_bitmap_update;
+-	update->DesktopResize = pf_client_desktop_resize;
+-	update->RemoteMonitors = pf_client_remote_monitors;
+-	update->pointer->PointerSystem = pf_client_send_pointer_system;
+-	update->pointer->PointerPosition = pf_client_send_pointer_position;
+-	update->pointer->PointerColor = pf_client_send_pointer_color;
+-	update->pointer->PointerNew = pf_client_send_pointer_new;
+-	update->pointer->PointerCached = pf_client_send_pointer_cached;
+-}
+-
+-void pf_server_register_update_callbacks(rdpUpdate* update)
+-{
+-	update->RefreshRect = pf_server_refresh_rect;
+-	update->SuppressOutput = pf_server_suppress_output;
+-}
+diff -urN server/proxy/pf_update.h ../../informatimago/FreeRDP/server/proxy/pf_update.h
+--- server/proxy/pf_update.h	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/pf_update.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,30 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * FreeRDP Proxy Server
+- *
+- * Copyright 2019 Mati Shabtay <matishabtay@gmail.com>
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- * Copyright 2019 Idan Freiberg <speidy@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_SERVER_PROXY_PFUPDATE_H
+-#define FREERDP_SERVER_PROXY_PFUPDATE_H
+-
+-#include <freerdp/freerdp.h>
+-
+-void pf_server_register_update_callbacks(rdpUpdate* update);
+-void pf_client_register_update_callbacks(rdpUpdate* update);
+-
+-#endif /* FREERDP_SERVER_PROXY_PFUPDATE_H */
+diff -urN server/proxy/server.crt ../../informatimago/FreeRDP/server/proxy/server.crt
+--- server/proxy/server.crt	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/server.crt	1970-01-01 03:00:00.000000000 +0300
+@@ -1,17 +0,0 @@
+------BEGIN CERTIFICATE-----
+-MIICyjCCAbKgAwIBAgIEIZtPcjANBgkqhkiG9w0BAQUFADAUMRIwEAYDVQQDEwlj
+-aGFtZWxlb24wHhcNMTQwNDE4MDMzNDIyWhcNMTUwNDE4MDMzNDIyWjAUMRIwEAYD
+-VQQDEwljaGFtZWxlb24wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCz
+-oGjWnPFjPPPi/iJOooPgmf1IMwQHY7VWrMegtrotnuSteW/m4r0QWSceYM8+oeIV
+-iU71AzNi074GR9EVbtXZCSgxn00jpPK+tgDBjbLmmqeCcwRkqpbBrS77/+Mq7UZM
+-lSRLPv74R01vUM5DyeII4WHf0C4T07BDiOnfFvs3T2AaLMEawfWT2408sXCZxgbY
+-IHp0WKnRXHQcG2Ys0iOSewe0iqhw8ODY/ze/eFtJ/5vdwCpN8AUOdU9PCXIA639d
+-ni9hKn7EXUvUZQ/SliBSaXsTfEw2Iu8Bo0/dcUfOwrPK8G2MOROi9GW80Prxtj+w
+-PTp7Z7h/JJCpygMkzmohAgMBAAGjJDAiMBMGA1UdJQQMMAoGCCsGAQUFBwMBMAsG
+-A1UdDwQEAwIEMDANBgkqhkiG9w0BAQUFAAOCAQEAaq84r/SZaUZYlpDnE/V3cJI2
+-Uzh8B81DqgVTgMqeuVAKAcgOEVf04Cp0oQ3+nS90a+afiqrT3A1eX5Wa1gxNkAIa
+-m26cSysGVl4I1xoXyddjZOIRy6GYVjdchdOGkE/lBy+NtuP0xwCkscUIQ6N8Es7r
+-DY8yMxtERYG2FHvnvZaw9oqstDpQtXoqzrl1JHz1nMcaVuFzyzdJdZrGvgQdMR7g
+-X1OT6dvmUYrUFGDxdPg+HHVeB4S5rUpvQUpqX/PGTwl8PIhahaqdPwHGsHfqp9Rk
+-ttjPkAw1fn7CUMj+OuNmF3WDSh4k+3chNyz/bkJqpPxjPXCYSXrlgJLwcmlKXA==
+------END CERTIFICATE-----
+diff -urN server/proxy/server.key ../../informatimago/FreeRDP/server/proxy/server.key
+--- server/proxy/server.key	2019-07-24 06:11:52.518197811 +0300
++++ ../../informatimago/FreeRDP/server/proxy/server.key	1970-01-01 03:00:00.000000000 +0300
+@@ -1,28 +0,0 @@
+------BEGIN PRIVATE KEY-----
+-MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCzoGjWnPFjPPPi
+-/iJOooPgmf1IMwQHY7VWrMegtrotnuSteW/m4r0QWSceYM8+oeIViU71AzNi074G
+-R9EVbtXZCSgxn00jpPK+tgDBjbLmmqeCcwRkqpbBrS77/+Mq7UZMlSRLPv74R01v
+-UM5DyeII4WHf0C4T07BDiOnfFvs3T2AaLMEawfWT2408sXCZxgbYIHp0WKnRXHQc
+-G2Ys0iOSewe0iqhw8ODY/ze/eFtJ/5vdwCpN8AUOdU9PCXIA639dni9hKn7EXUvU
+-ZQ/SliBSaXsTfEw2Iu8Bo0/dcUfOwrPK8G2MOROi9GW80Prxtj+wPTp7Z7h/JJCp
+-ygMkzmohAgMBAAECggEBAJxXJIiOxuZZ+ef6yz9n4aKORM4fYQVRela7QXEXOYpV
+-frGiPYxWkrn07sBZAGiCG7Yk8Wz9YS9GHmF3BntCIayqdKpj/Y7llUX6QUQ1oZ1m
+-xB8dHpjDhT2DD57UBBOruwES2ikH5oGQBcy6Jx0HTM3v5PEZT9F/8S2GsA+0/+gN
+-n5RKGds9nMN+GhGJoCPZTPqHxxsW7p0+W8Sqnv6dQ/lN9E8Iesag4H5my1+lpEWb
+-kI6h4Llk2xHUrcb3wL3+ttYLkkd8DGn7O/URKVbFwxPZLkx2kR2LFwL9wx88+HJ+
+-+zPBaQ5JBBvJ7s94iZPW1/rfbiVn8jZJHbzs4IrsvVUCgYEA3fciYy5BHVsNMmFW
+-NBxgLaNbMDjaCcN7bBItCpzpBKp/INDLIX31u6MH/OxcFCZGwuW0Tq85PXsgFfJW
+-rjFouqeGQDy0MFw1aSwz1Y6h+J0OM4Xtqh3wQtqrQKRJi4JjR8Nrw8NwfBZnQXwe
+-XrlgMSwqev0NbvVpYVTZHsDRs+MCgYEAzytXGiBnqG7micj2Ic+gABBiD9pkYFCa
+-LMAiFn7JqWTyvBL9Yte7QO6S5sxfuCxV0/tcanehP6KqQEC1cOenefy4JTM8M1pi
+-Osp+WPokxRGEN+enhDxA7IKAtIC5lV8vPFYpxel3ALwzQyIB11a7QwyZ0HV9DGyD
+-SWgqMV16cSsCgYEApKmznvQvZgGn9pnzA1GRoAmxmkJyrg+Qvgl11Iu26bk5+jQq
+-nTv+UiaNxHnrjR8gG3Ggo0amJg/zK5TN7QfGc8HXfEwMOFwPW2hpQ6I+UlrgsCRI
+-vYzcMhxaMugtjws5b4FvrpiMF+He09uqBAdtbs0e7oJPtuLkPEpfj8rnRpUCgYEA
+-l1TgdoxPTCFetC2hZgdlqEZPa6crhZO7W48qF2acZun/ylTQ1WAjQAZGNuP50+5G
+-7+eAlaE3n+VyGidqosQFeb2awknP4u9WK/35F4P6Uh4+iBvnKVheUKXv4Grbpfp2
+-5ctHDnRBYr8XbyWrVKLdfdf5j+YS531o1bmKgK75HysCgYAi1jqD5KSG5sLhO0kF
+-7BD9qYTIzW6Ocn4x1FRY6kxyGrE7Vb7VGNW2ULVexyn73pxhueuS4Qy5xHVDmdhO
+-ibolvvEr2TnSC0XR7QfOeXjmyV0m5Uvz97QNxoMnAHA60LWy8isj97LRAXuoSLEp
+-f2wfaMPwVN0WlBwa2PWAVm3zWA==
+------END PRIVATE KEY-----
+diff -urN server/Sample/sf_audin.c ../../informatimago/FreeRDP/server/Sample/sf_audin.c
+--- server/Sample/sf_audin.c	2019-07-25 19:51:06.409924931 +0300
++++ ../../informatimago/FreeRDP/server/Sample/sf_audin.c	2019-07-25 20:11:30.443994959 +0300
+@@ -51,8 +51,6 @@
+  */
+ static UINT sf_peer_audin_open_result(audin_server_context* context, UINT32 result)
+ {
+-	/* TODO: Implement */
+-	WLog_WARN(TAG, "%s not implemented", __FUNCTION__);
+ 	WLog_DBG(TAG, "AUDIN open result %" PRIu32 ".", result);
+ 	return CHANNEL_RC_OK;
+ }
+@@ -65,9 +63,7 @@
+ static UINT sf_peer_audin_receive_samples(audin_server_context* context, const AUDIO_FORMAT* format,
+                                           wStream* buf, size_t nframes)
+ {
+-	/* TODO: Implement */
+-	WLog_WARN(TAG, "%s not implemented", __FUNCTION__);
+-	WLog_DBG(TAG, "%s receive %" PRIdz " frames.", __FUNCTION__, nframes);
++	WLog_DBG(TAG, "AUDIN receive %" PRIdz " frames.", nframes);
+ 	return CHANNEL_RC_OK;
+ }
+ 
+diff -urN server/Sample/sf_rdpsnd.c ../../informatimago/FreeRDP/server/Sample/sf_rdpsnd.c
+--- server/Sample/sf_rdpsnd.c	2019-07-25 19:51:06.413924951 +0300
++++ ../../informatimago/FreeRDP/server/Sample/sf_rdpsnd.c	2019-07-25 20:11:30.447994978 +0300
+@@ -33,7 +33,6 @@
+ 
+ static void sf_peer_rdpsnd_activated(RdpsndServerContext* context)
+ {
+-	WINPR_UNUSED(context);
+ 	WLog_DBG(TAG, "RDPSND Activated");
+ }
+ 
+diff -urN server/Sample/sfreerdp.c ../../informatimago/FreeRDP/server/Sample/sfreerdp.c
+--- server/Sample/sfreerdp.c	2019-07-25 19:51:06.433925050 +0300
++++ ../../informatimago/FreeRDP/server/Sample/sfreerdp.c	2019-07-25 20:11:30.467995078 +0300
+@@ -99,8 +99,6 @@
+ 
+ void test_peer_context_free(freerdp_peer* client, testPeerContext* context)
+ {
+-	WINPR_UNUSED(client);
+-
+ 	if (context)
+ 	{
+ 		if (context->debug_channel_thread)
+@@ -633,7 +631,6 @@
+ 
+ BOOL tf_peer_synchronize_event(rdpInput* input, UINT32 flags)
+ {
+-	WINPR_UNUSED(input);
+ 	WLog_DBG(TAG, "Client sent a synchronize event (flags:0x%" PRIX32 ")", flags);
+ 	return TRUE;
+ }
+@@ -700,7 +697,6 @@
+ 
+ BOOL tf_peer_unicode_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code)
+ {
+-	WINPR_UNUSED(input);
+ 	WLog_DBG(TAG,
+ 	         "Client sent a unicode keyboard event (flags:0x%04" PRIX16 " code:0x%04" PRIX16 ")",
+ 	         flags, code);
+@@ -709,7 +705,6 @@
+ 
+ BOOL tf_peer_mouse_event(rdpInput* input, UINT16 flags, UINT16 x, UINT16 y)
+ {
+-	WINPR_UNUSED(flags);
+ 	// WLog_DBG(TAG, "Client sent a mouse event (flags:0x%04"PRIX16" pos:%"PRIu16",%"PRIu16")",
+ 	// flags, x, y);
+ 	test_peer_draw_icon(input->context->peer, x + 10, y);
+@@ -718,17 +713,14 @@
+ 
+ BOOL tf_peer_extended_mouse_event(rdpInput* input, UINT16 flags, UINT16 x, UINT16 y)
+ {
+-	WINPR_UNUSED(flags);
+ 	// WLog_DBG(TAG, "Client sent an extended mouse event (flags:0x%04"PRIX16"
+ 	// pos:%"PRIu16",%"PRIu16")", flags, x, y);
+-	test_peer_draw_icon(input->context->peer, x + 10, y);
+ 	return TRUE;
+ }
+ 
+ static BOOL tf_peer_refresh_rect(rdpContext* context, BYTE count, const RECTANGLE_16* areas)
+ {
+ 	BYTE i;
+-	WINPR_UNUSED(context);
+ 	WLog_DBG(TAG, "Client requested to refresh:");
+ 
+ 	for (i = 0; i < count; i++)
+@@ -742,8 +734,6 @@
+ 
+ static BOOL tf_peer_suppress_output(rdpContext* context, BYTE allow, const RECTANGLE_16* area)
+ {
+-	WINPR_UNUSED(context);
+-
+ 	if (allow > 0)
+ 	{
+ 		WLog_DBG(TAG,
+@@ -850,7 +840,6 @@
+ static BOOL test_peer_accepted(freerdp_listener* instance, freerdp_peer* client)
+ {
+ 	HANDLE hThread;
+-	WINPR_UNUSED(instance);
+ 
+ 	if (!(hThread = CreateThread(NULL, 0, test_peer_mainloop, (void*)client, 0, NULL)))
+ 		return FALSE;
+diff -urN server/shadow/shadow_audin.c ../../informatimago/FreeRDP/server/shadow/shadow_audin.c
+--- server/shadow/shadow_audin.c	2019-07-25 19:51:06.697926359 +0300
++++ ../../informatimago/FreeRDP/server/shadow/shadow_audin.c	2019-07-25 20:11:30.663996049 +0300
+@@ -69,8 +69,6 @@
+  */
+ static UINT AudinServerOpenResult(audin_server_context* context, UINT32 result)
+ {
+-	/* TODO: Implement */
+-	WLog_WARN(TAG, "%s not implemented", __FUNCTION__);
+ 	WLog_INFO(TAG, "AUDIN open result %" PRIu32 ".\n", result);
+ 	return CHANNEL_RC_OK;
+ }
+diff -urN server/shadow/shadow_client.c ../../informatimago/FreeRDP/server/shadow/shadow_client.c
+--- server/shadow/shadow_client.c	2019-07-25 19:51:06.749926617 +0300
++++ ../../informatimago/FreeRDP/server/shadow/shadow_client.c	2019-07-25 20:11:30.715996308 +0300
+@@ -211,7 +211,6 @@
+ static void shadow_client_context_free(freerdp_peer* peer, rdpShadowClient* client)
+ {
+ 	rdpShadowServer* server = client->server;
+-	WINPR_UNUSED(peer);
+ 	ArrayList_Remove(server->clients, (void*)client);
+ 
+ 	if (client->encoder)
+@@ -390,7 +389,7 @@
+ {
+ 	if (client->server->shareSubRect)
+ 	{
+-		UINT32 i = 0;
++		int i = 0;
+ 		UINT16 offsetX = client->server->subRect.left;
+ 		UINT16 offsetY = client->server->subRect.top;
+ 
+@@ -593,9 +592,8 @@
+ 	return TRUE;
+ }
+ 
+-static UINT
+-shadow_client_rdpgfx_frame_acknowledge(RdpgfxServerContext* context,
+-                                       const RDPGFX_FRAME_ACKNOWLEDGE_PDU* frameAcknowledge)
++static UINT shadow_client_rdpgfx_frame_acknowledge(RdpgfxServerContext* context,
++                                                   RDPGFX_FRAME_ACKNOWLEDGE_PDU* frameAcknowledge)
+ {
+ 	rdpShadowClient* client = (rdpShadowClient*)context->custom;
+ 	shadow_client_common_frame_acknowledge(client, frameAcknowledge->frameId);
+@@ -603,42 +601,25 @@
+ 	return CHANNEL_RC_OK;
+ }
+ 
+-static BOOL shadow_are_caps_filtered(const rdpSettings* settings, UINT32 caps)
+-{
+-	const UINT32 filter = settings->GfxCapsFilter;
+-	const UINT32 capList[] = {
+-		RDPGFX_CAPVERSION_8,   RDPGFX_CAPVERSION_81,  RDPGFX_CAPVERSION_10,
+-		RDPGFX_CAPVERSION_101, RDPGFX_CAPVERSION_102, RDPGFX_CAPVERSION_103,
+-		RDPGFX_CAPVERSION_104, RDPGFX_CAPVERSION_105, RDPGFX_CAPVERSION_106
+-	};
+-	UINT32 x;
+-
+-	for (x = 0; x < ARRAYSIZE(capList); x++)
+-	{
+-		if (caps == capList[x])
+-			return (filter & (1 << x)) != 0;
+-	}
+-
+-	return TRUE;
+-}
+-
+-static BOOL shadow_client_caps_test_version(RdpgfxServerContext* context,
+-                                            const RDPGFX_CAPSET* capsSets, UINT32 capsSetCount,
+-                                            UINT32 capsVersion, UINT* rc)
++/**
++ * Function description
++ *
++ * @return 0 on success, otherwise a Win32 error code
++ */
++static UINT shadow_client_rdpgfx_caps_advertise(RdpgfxServerContext* context,
++                                                RDPGFX_CAPS_ADVERTISE_PDU* capsAdvertise)
+ {
++	UINT16 index;
++	rdpSettings* settings = context->rdpcontext->settings;
+ 	UINT32 flags = 0;
+-	UINT32 index;
+-	rdpSettings* settings;
+-	settings = context->rdpcontext->settings;
+-
+-	if (shadow_are_caps_filtered(settings, capsVersion))
+-		return FALSE;
++	/* Request full screen update for new gfx channel */
++	shadow_client_refresh_rect((rdpShadowClient*)context->custom, 0, NULL);
+ 
+-	for (index = 0; index < capsSetCount; index++)
++	for (index = 0; index < capsAdvertise->capsSetCount; index++)
+ 	{
+-		const RDPGFX_CAPSET* currentCaps = &capsSets[index];
++		const RDPGFX_CAPSET* currentCaps = &capsAdvertise->capsSets[index];
+ 
+-		if (currentCaps->version == capsVersion)
++		if (currentCaps->version == RDPGFX_CAPVERSION_103)
+ 		{
+ 			RDPGFX_CAPSET caps = *currentCaps;
+ 			RDPGFX_CAPS_CONFIRM_PDU pdu;
+@@ -657,109 +638,109 @@
+ #endif
+ 			}
+ 
+-			*rc = context->CapsConfirm(context, &pdu);
+-			return TRUE;
++			return context->CapsConfirm(context, &pdu);
+ 		}
+ 	}
+ 
+-	return FALSE;
+-}
+-
+-/**
+- * Function description
+- *
+- * @return 0 on success, otherwise a Win32 error code
+- */
+-static UINT shadow_client_rdpgfx_caps_advertise(RdpgfxServerContext* context,
+-                                                const RDPGFX_CAPS_ADVERTISE_PDU* capsAdvertise)
+-{
+-	UINT16 index;
+-	UINT rc;
+-	rdpSettings* settings = context->rdpcontext->settings;
+-	UINT32 flags = 0;
+-	/* Request full screen update for new gfx channel */
+-	shadow_client_refresh_rect((rdpShadowClient*)context->custom, 0, NULL);
++	for (index = 0; index < capsAdvertise->capsSetCount; index++)
++	{
++		const RDPGFX_CAPSET* currentCaps = &capsAdvertise->capsSets[index];
+ 
+-	if (shadow_client_caps_test_version(context, capsAdvertise->capsSets,
+-	                                    capsAdvertise->capsSetCount, RDPGFX_CAPVERSION_106, &rc))
+-		return rc;
++		if (currentCaps->version == RDPGFX_CAPVERSION_102)
++		{
++			RDPGFX_CAPSET caps = *currentCaps;
++			RDPGFX_CAPS_CONFIRM_PDU pdu;
++			pdu.capsSet = &caps;
+ 
+-	if (shadow_client_caps_test_version(context, capsAdvertise->capsSets,
+-	                                    capsAdvertise->capsSetCount, RDPGFX_CAPVERSION_105, &rc))
+-		return rc;
++			if (settings)
++			{
++				flags = pdu.capsSet->flags;
++				settings->GfxSmallCache = (flags & RDPGFX_CAPS_FLAG_SMALL_CACHE);
++#ifndef WITH_GFX_H264
++				settings->GfxAVC444v2 = settings->GfxAVC444 = settings->GfxH264 = FALSE;
++				pdu.capsSet->flags |= RDPGFX_CAPS_FLAG_AVC_DISABLED;
++#else
++				settings->GfxAVC444v2 = settings->GfxAVC444 = settings->GfxH264 =
++				    !(flags & RDPGFX_CAPS_FLAG_AVC_DISABLED);
++#endif
++			}
+ 
+-	if (shadow_client_caps_test_version(context, capsAdvertise->capsSets,
+-	                                    capsAdvertise->capsSetCount, RDPGFX_CAPVERSION_104, &rc))
+-		return rc;
++			return context->CapsConfirm(context, &pdu);
++		}
++	}
+ 
+-	if (shadow_client_caps_test_version(context, capsAdvertise->capsSets,
+-	                                    capsAdvertise->capsSetCount, RDPGFX_CAPVERSION_103, &rc))
+-		return rc;
++	for (index = 0; index < capsAdvertise->capsSetCount; index++)
++	{
++		const RDPGFX_CAPSET* currentCaps = &capsAdvertise->capsSets[index];
+ 
+-	if (shadow_client_caps_test_version(context, capsAdvertise->capsSets,
+-	                                    capsAdvertise->capsSetCount, RDPGFX_CAPVERSION_102, &rc))
+-		return rc;
++		if (currentCaps->version == RDPGFX_CAPVERSION_10)
++		{
++			RDPGFX_CAPSET caps = *currentCaps;
++			RDPGFX_CAPS_CONFIRM_PDU pdu;
++			pdu.capsSet = &caps;
+ 
+-	if (shadow_client_caps_test_version(context, capsAdvertise->capsSets,
+-	                                    capsAdvertise->capsSetCount, RDPGFX_CAPVERSION_101, &rc))
+-		return rc;
++			if (settings)
++			{
++				flags = pdu.capsSet->flags;
++				settings->GfxSmallCache = (flags & RDPGFX_CAPS_FLAG_SMALL_CACHE);
++#ifndef WITH_GFX_H264
++				settings->GfxAVC444v2 = settings->GfxAVC444 = settings->GfxH264 = FALSE;
++				pdu.capsSet->flags |= RDPGFX_CAPS_FLAG_AVC_DISABLED;
++#else
++				settings->GfxAVC444 = settings->GfxH264 = !(flags & RDPGFX_CAPS_FLAG_AVC_DISABLED);
++#endif
++			}
+ 
+-	if (shadow_client_caps_test_version(context, capsAdvertise->capsSets,
+-	                                    capsAdvertise->capsSetCount, RDPGFX_CAPVERSION_10, &rc))
+-		return rc;
++			return context->CapsConfirm(context, &pdu);
++		}
++	}
+ 
+-	if (!shadow_are_caps_filtered(settings, RDPGFX_CAPVERSION_81))
++	for (index = 0; index < capsAdvertise->capsSetCount; index++)
+ 	{
+-		for (index = 0; index < capsAdvertise->capsSetCount; index++)
++		const RDPGFX_CAPSET* currentCaps = &capsAdvertise->capsSets[index];
++
++		if (currentCaps->version == RDPGFX_CAPVERSION_81)
+ 		{
+-			const RDPGFX_CAPSET* currentCaps = &capsAdvertise->capsSets[index];
++			RDPGFX_CAPSET caps = *currentCaps;
++			RDPGFX_CAPS_CONFIRM_PDU pdu;
++			pdu.capsSet = &caps;
+ 
+-			if (currentCaps->version == RDPGFX_CAPVERSION_81)
++			if (settings)
+ 			{
+-				RDPGFX_CAPSET caps = *currentCaps;
+-				RDPGFX_CAPS_CONFIRM_PDU pdu;
+-				pdu.capsSet = &caps;
+-
+-				if (settings)
+-				{
+-					flags = pdu.capsSet->flags;
+-					settings->GfxAVC444v2 = settings->GfxAVC444 = FALSE;
+-					settings->GfxThinClient = (flags & RDPGFX_CAPS_FLAG_THINCLIENT);
+-					settings->GfxSmallCache = (flags & RDPGFX_CAPS_FLAG_SMALL_CACHE);
++				flags = pdu.capsSet->flags;
++				settings->GfxAVC444v2 = settings->GfxAVC444 = FALSE;
++				settings->GfxThinClient = (flags & RDPGFX_CAPS_FLAG_THINCLIENT);
++				settings->GfxSmallCache = (flags & RDPGFX_CAPS_FLAG_SMALL_CACHE);
+ #ifndef WITH_GFX_H264
+-					settings->GfxH264 = FALSE;
+-					pdu.capsSet->flags &= ~RDPGFX_CAPS_FLAG_AVC420_ENABLED;
++				settings->GfxH264 = FALSE;
++				pdu.capsSet->flags &= ~RDPGFX_CAPS_FLAG_AVC420_ENABLED;
+ #else
+-					settings->GfxH264 = (flags & RDPGFX_CAPS_FLAG_AVC420_ENABLED);
++				settings->GfxH264 = (flags & RDPGFX_CAPS_FLAG_AVC420_ENABLED);
+ #endif
+-				}
+-
+-				return context->CapsConfirm(context, &pdu);
+ 			}
++
++			return context->CapsConfirm(context, &pdu);
+ 		}
+ 	}
+ 
+-	if (!shadow_are_caps_filtered(settings, RDPGFX_CAPVERSION_8))
++	for (index = 0; index < capsAdvertise->capsSetCount; index++)
+ 	{
+-		for (index = 0; index < capsAdvertise->capsSetCount; index++)
++		const RDPGFX_CAPSET* currentCaps = &capsAdvertise->capsSets[index];
++
++		if (currentCaps->version == RDPGFX_CAPVERSION_8)
+ 		{
+-			const RDPGFX_CAPSET* currentCaps = &capsAdvertise->capsSets[index];
++			RDPGFX_CAPSET caps = *currentCaps;
++			RDPGFX_CAPS_CONFIRM_PDU pdu;
++			pdu.capsSet = &caps;
+ 
+-			if (currentCaps->version == RDPGFX_CAPVERSION_8)
++			if (settings)
+ 			{
+-				RDPGFX_CAPSET caps = *currentCaps;
+-				RDPGFX_CAPS_CONFIRM_PDU pdu;
+-				pdu.capsSet = &caps;
+-
+-				if (settings)
+-				{
+-					flags = pdu.capsSet->flags;
+-					settings->GfxThinClient = (flags & RDPGFX_CAPS_FLAG_THINCLIENT);
+-					settings->GfxSmallCache = (flags & RDPGFX_CAPS_FLAG_SMALL_CACHE);
+-				}
+-
+-				return context->CapsConfirm(context, &pdu);
++				flags = pdu.capsSet->flags;
++				settings->GfxThinClient = (flags & RDPGFX_CAPS_FLAG_THINCLIENT);
++				settings->GfxSmallCache = (flags & RDPGFX_CAPS_FLAG_SMALL_CACHE);
+ 			}
++
++			return context->CapsConfirm(context, &pdu);
+ 		}
+ 	}
+ 
+@@ -1075,8 +1056,7 @@
+ 	BOOL ret = TRUE;
+ 	BYTE* data;
+ 	BYTE* buffer;
+-	size_t k;
+-	int yIdx, xIdx;
++	int yIdx, xIdx, k;
+ 	int rows, cols;
+ 	UINT32 DstSize;
+ 	UINT32 SrcFormat;
+@@ -1165,11 +1145,11 @@
+ 			bitmap->destLeft = nXSrc + (xIdx * 64);
+ 			bitmap->destTop = nYSrc + (yIdx * 64);
+ 
+-			if ((INT64)(bitmap->destLeft + bitmap->width) > (nXSrc + nWidth))
+-				bitmap->width = (UINT32)(nXSrc + nWidth) - bitmap->destLeft;
++			if ((bitmap->destLeft + bitmap->width) > (nXSrc + nWidth))
++				bitmap->width = (nXSrc + nWidth) - bitmap->destLeft;
+ 
+-			if ((INT64)(bitmap->destTop + bitmap->height) > (nYSrc + nHeight))
+-				bitmap->height = (UINT32)(nYSrc + nHeight) - bitmap->destTop;
++			if ((bitmap->destTop + bitmap->height) > (nYSrc + nHeight))
++				bitmap->height = (nYSrc + nHeight) - bitmap->destTop;
+ 
+ 			bitmap->destRight = bitmap->destLeft + bitmap->width - 1;
+ 			bitmap->destBottom = bitmap->destTop + bitmap->height - 1;
+@@ -1488,7 +1468,6 @@
+ {
+ 	rdpShadowServer* server;
+ 	rdpShadowSurface* surface;
+-	WINPR_UNUSED(pStatus);
+ 	server = client->server;
+ 	surface = client->inLobby ? server->lobby : server->surface;
+ 	return shadow_client_surface_update(client, &(surface->invalidRegion));
+diff -urN server/shadow/shadow_server.c ../../informatimago/FreeRDP/server/shadow/shadow_server.c
+--- server/shadow/shadow_server.c	2019-07-25 19:51:06.805926895 +0300
++++ ../../informatimago/FreeRDP/server/shadow/shadow_server.c	2019-07-25 20:11:30.771996585 +0300
+@@ -83,10 +83,6 @@
+ 	char* str;
+ 	int length;
+ 	COMMAND_LINE_ARGUMENT_A* arg;
+-
+-	if (argc < 1)
+-		return -1;
+-
+ 	WLog_INFO(TAG, "Usage: %s [options]", argv[0]);
+ 	WLog_INFO(TAG, "");
+ 	WLog_INFO(TAG, "Syntax:");
+@@ -151,8 +147,6 @@
+ int shadow_server_command_line_status_print(rdpShadowServer* server, int argc, char** argv,
+                                             int status)
+ {
+-	WINPR_UNUSED(server);
+-
+ 	if (status == COMMAND_LINE_STATUS_PRINT_VERSION)
+ 	{
+ 		WLog_INFO(TAG, "FreeRDP version %s (git %s)", FREERDP_VERSION_FULL, GIT_REVISION);
+@@ -354,7 +348,7 @@
+ 		}
+ 		CommandLineSwitchCase(arg, "sam-file")
+ 		{
+-			freerdp_settings_set_string(settings, FreeRDP_NtlmSamFile, arg->Value);
++			freerdp_set_param_string(settings, FreeRDP_NtlmSamFile, arg->Value);
+ 		}
+ 		CommandLineSwitchDefault(arg)
+ 		{
+diff -urN server/shadow/X11/x11_shadow.c ../../informatimago/FreeRDP/server/shadow/X11/x11_shadow.c
+--- server/shadow/X11/x11_shadow.c	2019-07-25 19:51:06.689926319 +0300
++++ ../../informatimago/FreeRDP/server/shadow/X11/x11_shadow.c	2019-07-25 20:11:30.659996030 +0300
+@@ -166,8 +166,6 @@
+ {
+ 	int pam_status;
+ 	SHADOW_PAM_AUTH_INFO* info;
+-	WINPR_UNUSED(subsystem);
+-	WINPR_UNUSED(client);
+ 	info = calloc(1, sizeof(SHADOW_PAM_AUTH_INFO));
+ 
+ 	if (!info)
+@@ -220,8 +218,6 @@
+ static BOOL x11_shadow_input_synchronize_event(rdpShadowSubsystem* subsystem,
+                                                rdpShadowClient* client, UINT32 flags)
+ {
+-	/* TODO: Implement */
+-	WLog_WARN(TAG, "%s not implemented", __FUNCTION__);
+ 	return TRUE;
+ }
+ 
+@@ -273,8 +269,6 @@
+                                                     rdpShadowClient* client, UINT16 flags,
+                                                     UINT16 code)
+ {
+-	/* TODO: Implement */
+-	WLog_WARN(TAG, "%s not implemented", __FUNCTION__);
+ 	return TRUE;
+ }
+ 
+@@ -561,7 +555,7 @@
+ 		y -= surface->y;
+ 	}
+ 
+-	if ((x != (INT64)subsystem->common.pointerX) || (y != (INT64)subsystem->common.pointerY))
++	if ((x != subsystem->common.pointerX) || (y != subsystem->common.pointerY))
+ 	{
+ 		subsystem->common.pointerX = x;
+ 		subsystem->common.pointerY = y;
+@@ -720,7 +714,7 @@
+ 	XGetWindowAttributes(subsystem->display, subsystem->root_window, &attr);
+ 	XUnlockDisplay(subsystem->display);
+ 
+-	if (attr.width != (INT64)subsystem->width || attr.height != (INT64)subsystem->height)
++	if (attr.width != subsystem->width || attr.height != subsystem->height)
+ 	{
+ 		/* Screen size changed. Refresh monitor definitions and trigger screen resize */
+ 		subsystem->common.numMonitors = x11_shadow_enum_monitors(subsystem->common.monitors, 16);
+@@ -1171,8 +1165,8 @@
+ 		{
+ 			screens = XineramaQueryScreens(display, &numMonitors);
+ 
+-			if (numMonitors > (INT64)maxMonitors)
+-				numMonitors = (int)maxMonitors;
++			if (numMonitors > maxMonitors)
++				numMonitors = maxMonitors;
+ 
+ 			if (screens && (numMonitors > 0))
+ 			{
+@@ -1265,7 +1259,7 @@
+ 	{
+ 		pf = pfs + i;
+ 
+-		if (pf->depth == (INT64)subsystem->depth)
++		if (pf->depth == subsystem->depth)
+ 		{
+ 			subsystem->bpp = pf->bits_per_pixel;
+ 			subsystem->scanline_pad = pf->scanline_pad;
+@@ -1290,7 +1284,7 @@
+ 	{
+ 		vi = vis + i;
+ 
+-		if (vi->depth == (INT64)subsystem->depth)
++		if (vi->depth == subsystem->depth)
+ 		{
+ 			subsystem->visual = vi->visual;
+ 			break;

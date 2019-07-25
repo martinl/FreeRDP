@@ -1,0 +1,2396 @@
+diff -urN include/freerdp/addin.h ../../informatimago/FreeRDP/include/freerdp/addin.h
+--- include/freerdp/addin.h	2019-07-25 19:51:00.793897085 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/addin.h	2019-07-25 20:11:24.795966954 +0300
+@@ -48,8 +48,8 @@
+ typedef struct _FREERDP_ADDIN FREERDP_ADDIN;
+ 
+ typedef PVIRTUALCHANNELENTRY (*FREERDP_LOAD_CHANNEL_ADDIN_ENTRY_FN)(LPCSTR pszName,
+-                                                                    LPCSTR pszSubsystem,
+-                                                                    LPCSTR pszType, DWORD dwFlags);
++                                                                    LPSTR pszSubsystem,
++                                                                    LPSTR pszType, DWORD dwFlags);
+ 
+ #ifdef __cplusplus
+ extern "C"
+@@ -65,13 +65,12 @@
+ 	FREERDP_API PVIRTUALCHANNELENTRY freerdp_load_dynamic_addin(LPCSTR pszFileName, LPCSTR pszPath,
+ 	                                                            LPCSTR pszEntryName);
+ 	FREERDP_API PVIRTUALCHANNELENTRY freerdp_load_dynamic_channel_addin_entry(LPCSTR pszName,
+-	                                                                          LPCSTR pszSubsystem,
+-	                                                                          LPCSTR pszType,
++	                                                                          LPSTR pszSubsystem,
++	                                                                          LPSTR pszType,
+ 	                                                                          DWORD dwFlags);
+ 	FREERDP_API PVIRTUALCHANNELENTRY freerdp_load_channel_addin_entry(LPCSTR pszName,
+-	                                                                  LPCSTR pszSubsystem,
+-	                                                                  LPCSTR pszType,
+-	                                                                  DWORD dwFlags);
++	                                                                  LPSTR pszSubsystem,
++	                                                                  LPSTR pszType, DWORD dwFlags);
+ 
+ #ifdef __cplusplus
+ }
+diff -urN include/freerdp/assistance.h ../../informatimago/FreeRDP/include/freerdp/assistance.h
+--- include/freerdp/assistance.h	2019-07-25 19:51:00.809897164 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/assistance.h	2019-07-25 20:11:24.807967013 +0300
+@@ -30,8 +30,8 @@
+ {
+ #endif
+ 
+-	FREERDP_API BYTE* freerdp_assistance_hex_string_to_bin(const void* str, size_t* size);
+-	FREERDP_API char* freerdp_assistance_bin_to_hex_string(const void* data, size_t size);
++	FREERDP_API BYTE* freerdp_assistance_hex_string_to_bin(const char* str, size_t* size);
++	FREERDP_API char* freerdp_assistance_bin_to_hex_string(const BYTE* data, size_t size);
+ 
+ 	FREERDP_API char* freerdp_assistance_generate_pass_stub(DWORD flags);
+ 	FREERDP_API char* freerdp_assistance_construct_expert_blob(const char* name, const char* pass);
+diff -urN include/freerdp/build-config.h ../../informatimago/FreeRDP/include/freerdp/build-config.h
+--- include/freerdp/build-config.h	2019-07-25 20:17:16.429710691 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/build-config.h	2019-07-25 20:11:24.811967033 +0300
+@@ -12,7 +12,7 @@
+ #define FREERDP_ADDIN_PATH "lib/freerdp2"
+ 
+ #define FREERDP_SHARED_LIBRARY_SUFFIX ".so"
+-#define FREERDP_SHARED_LIBRARY_PREFIX  "lib"
++#define FREERDP_SHARED_LIBRARY_PREFIX "lib"
+ 
+ #define FREERDP_VENDOR_STRING "FreeRDP"
+ #define FREERDP_PRODUCT_STRING "FreeRDP"
+diff -urN include/freerdp/channels/cliprdr.h ../../informatimago/FreeRDP/include/freerdp/channels/cliprdr.h
+--- include/freerdp/channels/cliprdr.h	2019-07-25 19:51:00.829897263 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/channels/cliprdr.h	2019-07-25 20:11:24.827967113 +0300
+@@ -206,7 +206,7 @@
+ {
+ 	DEFINE_CLIPRDR_HEADER_COMMON();
+ 
+-	const BYTE* requestedFormatData;
++	BYTE* requestedFormatData;
+ };
+ typedef struct _CLIPRDR_FORMAT_DATA_RESPONSE CLIPRDR_FORMAT_DATA_RESPONSE;
+ 
+@@ -232,7 +232,7 @@
+ 	UINT32 streamId;
+ 	UINT32 dwFlags;
+ 	UINT32 cbRequested;
+-	const BYTE* requestedData;
++	BYTE* requestedData;
+ };
+ typedef struct _CLIPRDR_FILE_CONTENTS_RESPONSE CLIPRDR_FILE_CONTENTS_RESPONSE;
+ 
+diff -urN include/freerdp/channels/disp.h ../../informatimago/FreeRDP/include/freerdp/channels/disp.h
+--- include/freerdp/channels/disp.h	2019-07-25 19:51:00.833897282 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/channels/disp.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,82 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * RDPEDISP Virtual Channel Extension
+- *
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *	 http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_CHANNEL_DISP_H
+-#define FREERDP_CHANNEL_DISP_H
+-
+-#include <freerdp/api.h>
+-#include <freerdp/types.h>
+-
+-#define DISPLAY_CONTROL_PDU_TYPE_CAPS 0x00000005
+-#define DISPLAY_CONTROL_PDU_TYPE_MONITOR_LAYOUT 0x00000002
+-#define DISPLAY_CONTROL_MONITOR_LAYOUT_SIZE 40
+-
+-#define DISP_DVC_CHANNEL_NAME "Microsoft::Windows::RDS::DisplayControl"
+-#define ORIENTATION_LANDSCAPE 0
+-#define ORIENTATION_PORTRAIT 90
+-#define ORIENTATION_LANDSCAPE_FLIPPED 180
+-#define ORIENTATION_PORTRAIT_FLIPPED 270
+-
+-#define DISPLAY_CONTROL_MONITOR_PRIMARY 0x00000001
+-#define DISPLAY_CONTROL_HEADER_LENGTH 0x00000008
+-
+-#define DISPLAY_CONTROL_MIN_MONITOR_WIDTH 200
+-#define DISPLAY_CONTROL_MAX_MONITOR_WIDTH 8192
+-
+-#define DISPLAY_CONTROL_MIN_MONITOR_HEIGHT 200
+-#define DISPLAY_CONTROL_MAX_MONITOR_HEIGHT 8192
+-
+-#define DISPLAY_CONTROL_MIN_PHYSICAL_MONITOR_WIDTH 10
+-#define DISPLAY_CONTROL_MAX_PHYSICAL_MONITOR_WIDTH 10000
+-
+-#define DISPLAY_CONTROL_MIN_PHYSICAL_MONITOR_HEIGHT 10
+-#define DISPLAY_CONTROL_MAX_PHYSICAL_MONITOR_HEIGHT 10000
+-
+-struct _DISPLAY_CONTROL_HEADER
+-{
+-	UINT32 type;
+-	UINT32 length;
+-};
+-typedef struct _DISPLAY_CONTROL_HEADER DISPLAY_CONTROL_HEADER;
+-
+-struct _DISPLAY_CONTROL_MONITOR_LAYOUT
+-{
+-	UINT32 Flags;
+-	INT32 Left;
+-	INT32 Top;
+-	UINT32 Width;
+-	UINT32 Height;
+-	UINT32 PhysicalWidth;
+-	UINT32 PhysicalHeight;
+-	UINT32 Orientation;
+-	UINT32 DesktopScaleFactor;
+-	UINT32 DeviceScaleFactor;
+-};
+-typedef struct _DISPLAY_CONTROL_MONITOR_LAYOUT DISPLAY_CONTROL_MONITOR_LAYOUT;
+-
+-struct _DISPLAY_CONTROL_MONITOR_LAYOUT_PDU
+-{
+-	UINT32 MonitorLayoutSize;
+-	UINT32 NumMonitors;
+-	DISPLAY_CONTROL_MONITOR_LAYOUT* Monitors;
+-};
+-
+-typedef struct _DISPLAY_CONTROL_MONITOR_LAYOUT_PDU DISPLAY_CONTROL_MONITOR_LAYOUT_PDU;
+-
+-#endif /* FREERDP_CHANNEL_DISP_H */
+diff -urN include/freerdp/channels/rdpdr.h ../../informatimago/FreeRDP/include/freerdp/channels/rdpdr.h
+--- include/freerdp/channels/rdpdr.h	2019-07-25 19:51:00.845897342 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/channels/rdpdr.h	2019-07-25 20:11:24.839967171 +0300
+@@ -316,8 +316,6 @@
+ typedef struct _IRP IRP;
+ typedef struct _DEVMAN DEVMAN;
+ 
+-typedef UINT (*pcCustomComponentRequest)(DEVICE* device, UINT16 component, UINT16 packetId,
+-                                         wStream* s);
+ typedef UINT (*pcIRPRequest)(DEVICE* device, IRP* irp);
+ typedef UINT (*pcInitDevice)(DEVICE* device);
+ typedef UINT (*pcFreeDevice)(DEVICE* device);
+@@ -330,7 +328,6 @@
+ 	const char* name;
+ 	wStream* data;
+ 
+-	pcCustomComponentRequest CustomComponentRequest;
+ 	pcIRPRequest IRPRequest;
+ 	pcInitDevice Init;
+ 	pcFreeDevice Free;
+diff -urN include/freerdp/channels/rdpgfx.h ../../informatimago/FreeRDP/include/freerdp/channels/rdpgfx.h
+--- include/freerdp/channels/rdpgfx.h	2019-07-25 19:51:00.853897382 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/channels/rdpgfx.h	2019-07-25 20:11:24.847967212 +0300
+@@ -74,8 +74,6 @@
+ #define RDPGFX_CMDID_UNUSED_0014 0x0014
+ #define RDPGFX_CMDID_MAPSURFACETOWINDOW 0x0015
+ #define RDPGFX_CMDID_QOEFRAMEACKNOWLEDGE 0x0016
+-#define RDPGFX_CMDID_MAPSURFACETOSCALEDOUTPUT 0x0017
+-#define RDPGFX_CMDID_MAPSURFACETOSCALEDWINDOW 0x0018
+ 
+ #define RDPGFX_HEADER_SIZE 8
+ 
+@@ -94,20 +92,15 @@
+ #define RDPGFX_CAPVERSION_8 0x00080004   /** [MS-RDPEGFX] 2.2.3.1 */
+ #define RDPGFX_CAPVERSION_81 0x00080105  /** [MS-RDPEGFX] 2.2.3.2 */
+ #define RDPGFX_CAPVERSION_10 0x000A0002  /** [MS-RDPEGFX] 2.2.3.3 */
+-#define RDPGFX_CAPVERSION_101 0x000A0100 /** [MS-RDPEGFX] 2.2.3.4 */
+-#define RDPGFX_CAPVERSION_102 0x000A0200 /** [MS-RDPEGFX] 2.2.3.5 */
+-#define RDPGFX_CAPVERSION_103 0x000A0301 /** [MS-RDPEGFX] 2.2.3.6 */
+-#define RDPGFX_CAPVERSION_104 0x000A0400 /** [MS-RDPEGFX] 2.2.3.7 */
+-#define RDPGFX_CAPVERSION_105 0x000A0502 /** [MS-RDPEGFX] 2.2.3.8 */
+-#define RDPGFX_CAPVERSION_106 0x000A0601 /** [MS-RDPEGFX] 2.2.3.9 */
++#define RDPGFX_CAPVERSION_102 0x000A0200 /** [MS-RDPEGFX] 2.2.3.4 */
++#define RDPGFX_CAPVERSION_103 0x000A0301 /** [MS-RDPEGFX] 2.2.3.5 */
+ 
+-#define RDPGFX_NUMBER_CAPSETS 9
+-#define RDPGFX_CAPSET_BASE_SIZE 8
++#define RDPGFX_NUMBER_CAPSETS 5
++#define RDPGFX_CAPSET_SIZE 12
+ 
+ struct _RDPGFX_CAPSET
+ {
+ 	UINT32 version;
+-	UINT32 length;
+ 	UINT32 flags;
+ };
+ typedef struct _RDPGFX_CAPSET RDPGFX_CAPSET;
+@@ -116,7 +109,6 @@
+ #define RDPGFX_CAPS_FLAG_SMALL_CACHE 0x00000002U    /* 8.0+ */
+ #define RDPGFX_CAPS_FLAG_AVC420_ENABLED 0x00000010U /* 8.1+ */
+ #define RDPGFX_CAPS_FLAG_AVC_DISABLED 0x00000020U   /* 10.0+ */
+-#define RDPGFX_CAPS_FLAG_AVC_THINCLIENT 0x00000040U /* 10.3+ */
+ 
+ struct _RDPGFX_CAPSET_VERSION8
+ {
+@@ -313,17 +305,6 @@
+ };
+ typedef struct _RDPGFX_MAP_SURFACE_TO_OUTPUT_PDU RDPGFX_MAP_SURFACE_TO_OUTPUT_PDU;
+ 
+-struct _RDPGFX_MAP_SURFACE_TO_SCALED_OUTPUT_PDU
+-{
+-	UINT16 surfaceId;
+-	UINT16 reserved;
+-	UINT32 outputOriginX;
+-	UINT32 outputOriginY;
+-	UINT32 targetWidth;
+-	UINT32 targetHeight;
+-};
+-typedef struct _RDPGFX_MAP_SURFACE_TO_SCALED_OUTPUT_PDU RDPGFX_MAP_SURFACE_TO_SCALED_OUTPUT_PDU;
+-
+ struct _RDPGFX_CACHE_ENTRY_METADATA
+ {
+ 	UINT64 cacheKey;
+@@ -367,17 +348,6 @@
+ };
+ typedef struct _RDPGFX_MAP_SURFACE_TO_WINDOW_PDU RDPGFX_MAP_SURFACE_TO_WINDOW_PDU;
+ 
+-struct _RDPGFX_MAP_SURFACE_TO_SCALED_WINDOW_PDU
+-{
+-	UINT16 surfaceId;
+-	UINT64 windowId;
+-	UINT32 mappedWidth;
+-	UINT32 mappedHeight;
+-	UINT32 targetWidth;
+-	UINT32 targetHeight;
+-};
+-typedef struct _RDPGFX_MAP_SURFACE_TO_SCALED_WINDOW_PDU RDPGFX_MAP_SURFACE_TO_SCALED_WINDOW_PDU;
+-
+ /* H264 */
+ 
+ struct _RDPGFX_H264_QUANT_QUALITY
+diff -urN include/freerdp/client/channels.h ../../informatimago/FreeRDP/include/freerdp/client/channels.h
+--- include/freerdp/client/channels.h	2019-07-25 19:51:00.869897462 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/client/channels.h	2019-07-25 20:11:24.863967291 +0300
+@@ -32,12 +32,12 @@
+ 	FREERDP_API void* freerdp_channels_client_find_static_entry(const char* name,
+ 	                                                            const char* identifier);
+ 	FREERDP_API PVIRTUALCHANNELENTRY freerdp_channels_load_static_addin_entry(LPCSTR pszName,
+-	                                                                          LPCSTR pszSubsystem,
+-	                                                                          LPCSTR pszType,
++	                                                                          LPSTR pszSubsystem,
++	                                                                          LPSTR pszType,
+ 	                                                                          DWORD dwFlags);
+ 
+-	FREERDP_API FREERDP_ADDIN** freerdp_channels_list_addins(LPCSTR lpName, LPCSTR lpSubsystem,
+-	                                                         LPCSTR lpType, DWORD dwFlags);
++	FREERDP_API FREERDP_ADDIN** freerdp_channels_list_addins(LPSTR lpName, LPSTR lpSubsystem,
++	                                                         LPSTR lpType, DWORD dwFlags);
+ 	FREERDP_API void freerdp_channels_addin_list_free(FREERDP_ADDIN** ppAddins);
+ 
+ #ifdef __cplusplus
+diff -urN include/freerdp/client/cliprdr.h ../../informatimago/FreeRDP/include/freerdp/client/cliprdr.h
+--- include/freerdp/client/cliprdr.h	2019-07-25 19:51:00.873897481 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/client/cliprdr.h	2019-07-25 20:11:24.867967311 +0300
+@@ -35,45 +35,45 @@
+ typedef struct _cliprdr_client_context CliprdrClientContext;
+ 
+ typedef UINT (*pcCliprdrServerCapabilities)(CliprdrClientContext* context,
+-                                            const CLIPRDR_CAPABILITIES* capabilities);
++                                            CLIPRDR_CAPABILITIES* capabilities);
+ typedef UINT (*pcCliprdrClientCapabilities)(CliprdrClientContext* context,
+-                                            const CLIPRDR_CAPABILITIES* capabilities);
++                                            CLIPRDR_CAPABILITIES* capabilities);
+ typedef UINT (*pcCliprdrMonitorReady)(CliprdrClientContext* context,
+-                                      const CLIPRDR_MONITOR_READY* monitorReady);
++                                      CLIPRDR_MONITOR_READY* monitorReady);
+ typedef UINT (*pcCliprdrTempDirectory)(CliprdrClientContext* context,
+-                                       const CLIPRDR_TEMP_DIRECTORY* tempDirectory);
++                                       CLIPRDR_TEMP_DIRECTORY* tempDirectory);
+ typedef UINT (*pcCliprdrClientFormatList)(CliprdrClientContext* context,
+-                                          const CLIPRDR_FORMAT_LIST* formatList);
++                                          CLIPRDR_FORMAT_LIST* formatList);
+ typedef UINT (*pcCliprdrServerFormatList)(CliprdrClientContext* context,
+-                                          const CLIPRDR_FORMAT_LIST* formatList);
+-typedef UINT (*pcCliprdrClientFormatListResponse)(
+-    CliprdrClientContext* context, const CLIPRDR_FORMAT_LIST_RESPONSE* formatListResponse);
+-typedef UINT (*pcCliprdrServerFormatListResponse)(
+-    CliprdrClientContext* context, const CLIPRDR_FORMAT_LIST_RESPONSE* formatListResponse);
+-typedef UINT (*pcCliprdrClientLockClipboardData)(
+-    CliprdrClientContext* context, const CLIPRDR_LOCK_CLIPBOARD_DATA* lockClipboardData);
+-typedef UINT (*pcCliprdrServerLockClipboardData)(
+-    CliprdrClientContext* context, const CLIPRDR_LOCK_CLIPBOARD_DATA* lockClipboardData);
++                                          CLIPRDR_FORMAT_LIST* formatList);
++typedef UINT (*pcCliprdrClientFormatListResponse)(CliprdrClientContext* context,
++                                                  CLIPRDR_FORMAT_LIST_RESPONSE* formatListResponse);
++typedef UINT (*pcCliprdrServerFormatListResponse)(CliprdrClientContext* context,
++                                                  CLIPRDR_FORMAT_LIST_RESPONSE* formatListResponse);
++typedef UINT (*pcCliprdrClientLockClipboardData)(CliprdrClientContext* context,
++                                                 CLIPRDR_LOCK_CLIPBOARD_DATA* lockClipboardData);
++typedef UINT (*pcCliprdrServerLockClipboardData)(CliprdrClientContext* context,
++                                                 CLIPRDR_LOCK_CLIPBOARD_DATA* lockClipboardData);
+ typedef UINT (*pcCliprdrClientUnlockClipboardData)(
+-    CliprdrClientContext* context, const CLIPRDR_UNLOCK_CLIPBOARD_DATA* unlockClipboardData);
++    CliprdrClientContext* context, CLIPRDR_UNLOCK_CLIPBOARD_DATA* unlockClipboardData);
+ typedef UINT (*pcCliprdrServerUnlockClipboardData)(
+-    CliprdrClientContext* context, const CLIPRDR_UNLOCK_CLIPBOARD_DATA* unlockClipboardData);
+-typedef UINT (*pcCliprdrClientFormatDataRequest)(
+-    CliprdrClientContext* context, const CLIPRDR_FORMAT_DATA_REQUEST* formatDataRequest);
+-typedef UINT (*pcCliprdrServerFormatDataRequest)(
+-    CliprdrClientContext* context, const CLIPRDR_FORMAT_DATA_REQUEST* formatDataRequest);
+-typedef UINT (*pcCliprdrClientFormatDataResponse)(
+-    CliprdrClientContext* context, const CLIPRDR_FORMAT_DATA_RESPONSE* formatDataResponse);
+-typedef UINT (*pcCliprdrServerFormatDataResponse)(
+-    CliprdrClientContext* context, const CLIPRDR_FORMAT_DATA_RESPONSE* formatDataResponse);
++    CliprdrClientContext* context, CLIPRDR_UNLOCK_CLIPBOARD_DATA* unlockClipboardData);
++typedef UINT (*pcCliprdrClientFormatDataRequest)(CliprdrClientContext* context,
++                                                 CLIPRDR_FORMAT_DATA_REQUEST* formatDataRequest);
++typedef UINT (*pcCliprdrServerFormatDataRequest)(CliprdrClientContext* context,
++                                                 CLIPRDR_FORMAT_DATA_REQUEST* formatDataRequest);
++typedef UINT (*pcCliprdrClientFormatDataResponse)(CliprdrClientContext* context,
++                                                  CLIPRDR_FORMAT_DATA_RESPONSE* formatDataResponse);
++typedef UINT (*pcCliprdrServerFormatDataResponse)(CliprdrClientContext* context,
++                                                  CLIPRDR_FORMAT_DATA_RESPONSE* formatDataResponse);
+ typedef UINT (*pcCliprdrClientFileContentsRequest)(
+-    CliprdrClientContext* context, const CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest);
++    CliprdrClientContext* context, CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest);
+ typedef UINT (*pcCliprdrServerFileContentsRequest)(
+-    CliprdrClientContext* context, const CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest);
++    CliprdrClientContext* context, CLIPRDR_FILE_CONTENTS_REQUEST* fileContentsRequest);
+ typedef UINT (*pcCliprdrClientFileContentsResponse)(
+-    CliprdrClientContext* context, const CLIPRDR_FILE_CONTENTS_RESPONSE* fileContentsResponse);
++    CliprdrClientContext* context, CLIPRDR_FILE_CONTENTS_RESPONSE* fileContentsResponse);
+ typedef UINT (*pcCliprdrServerFileContentsResponse)(
+-    CliprdrClientContext* context, const CLIPRDR_FILE_CONTENTS_RESPONSE* fileContentsResponse);
++    CliprdrClientContext* context, CLIPRDR_FILE_CONTENTS_RESPONSE* fileContentsResponse);
+ 
+ struct _cliprdr_client_context
+ {
+diff -urN include/freerdp/client/cmdline.h ../../informatimago/FreeRDP/include/freerdp/client/cmdline.h
+--- include/freerdp/client/cmdline.h	2019-07-25 19:51:00.877897501 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/client/cmdline.h	2019-07-25 20:11:24.867967311 +0300
+@@ -48,7 +48,7 @@
+ 
+ 	FREERDP_API BOOL freerdp_parse_username(const char* username, char** user, char** domain);
+ 	FREERDP_API BOOL freerdp_parse_hostname(const char* hostname, char** host, int* port);
+-	FREERDP_API BOOL freerdp_set_connection_type(rdpSettings* settings, UINT32 type);
++	FREERDP_API BOOL freerdp_set_connection_type(rdpSettings* settings, int type);
+ 
+ 	FREERDP_API BOOL freerdp_client_add_device_channel(rdpSettings* settings, int count,
+ 	                                                   char** params);
+diff -urN include/freerdp/client/disp.h ../../informatimago/FreeRDP/include/freerdp/client/disp.h
+--- include/freerdp/client/disp.h	2019-07-25 19:51:00.877897501 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/client/disp.h	2019-07-25 20:11:24.871967330 +0300
+@@ -22,7 +22,33 @@
+ #ifndef FREERDP_CHANNEL_DISP_CLIENT_DISP_H
+ #define FREERDP_CHANNEL_DISP_CLIENT_DISP_H
+ 
+-#include <freerdp/channels/disp.h>
++#define ORIENTATION_LANDSCAPE 0
++#define ORIENTATION_PORTRAIT 90
++#define ORIENTATION_LANDSCAPE_FLIPPED 180
++#define ORIENTATION_PORTRAIT_FLIPPED 270
++
++#define DISPLAY_CONTROL_MONITOR_PRIMARY 0x00000001
++
++struct _DISPLAY_CONTROL_MONITOR_LAYOUT
++{
++	UINT32 Flags;
++	INT32 Left;
++	INT32 Top;
++	UINT32 Width;
++	UINT32 Height;
++	UINT32 PhysicalWidth;
++	UINT32 PhysicalHeight;
++	UINT32 Orientation;
++	UINT32 DesktopScaleFactor;
++	UINT32 DeviceScaleFactor;
++};
++typedef struct _DISPLAY_CONTROL_MONITOR_LAYOUT DISPLAY_CONTROL_MONITOR_LAYOUT;
++
++/**
++ * Client Interface
++ */
++
++#define DISP_DVC_CHANNEL_NAME "Microsoft::Windows::RDS::DisplayControl"
+ 
+ typedef struct _disp_client_context DispClientContext;
+ 
+diff -urN include/freerdp/client/file.h ../../informatimago/FreeRDP/include/freerdp/client/file.h
+--- include/freerdp/client/file.h	2019-07-25 19:51:00.885897541 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/client/file.h	2019-07-25 20:11:24.879967370 +0300
+@@ -23,25 +23,155 @@
+ #include <freerdp/api.h>
+ #include <freerdp/freerdp.h>
+ 
++#define RDP_FILE_LINE_FLAG_FORMATTED 0x00000001
++#define RDP_FILE_LINE_FLAG_STANDARD 0x00000002
++#define RDP_FILE_LINE_FLAG_TYPE_STRING 0x00000010
++#define RDP_FILE_LINE_FLAG_TYPE_INTEGER 0x00000020
++#define RDP_FILE_LINE_FLAG_TYPE_BINARY 0x00000040
++
++struct rdp_file_line
++{
++	int index;
++	char* text;
++	DWORD flags;
++	char* name;
++	LPSTR sValue;
++	DWORD iValue;
++	PBYTE bValue;
++	int valueLength;
++};
++typedef struct rdp_file_line rdpFileLine;
++
++struct rdp_file
++{
++	DWORD UseMultiMon;                 /* use multimon */
++	DWORD ScreenModeId;                /* screen mode id */
++	DWORD SpanMonitors;                /* span monitors */
++	DWORD SmartSizing;                 /* smartsizing */
++	DWORD EnableSuperSpan;             /* enablesuperpan */
++	DWORD SuperSpanAccelerationFactor; /* superpanaccelerationfactor */
++
++	DWORD DesktopWidth;  /* desktopwidth */
++	DWORD DesktopHeight; /* desktopheight */
++	DWORD DesktopSizeId; /* desktop size id */
++	DWORD SessionBpp;    /* session bpp */
++
++	DWORD Compression;       /* compression */
++	DWORD KeyboardHook;      /* keyboardhook */
++	DWORD DisableCtrlAltDel; /* disable ctrl+alt+del */
++
++	DWORD AudioMode;         /* audiomode */
++	DWORD AudioQualityMode;  /* audioqualitymode */
++	DWORD AudioCaptureMode;  /* audiocapturemode */
++	DWORD VideoPlaybackMode; /* videoplaybackmode */
++
++	DWORD ConnectionType; /* connection type */
++
++	DWORD NetworkAutoDetect;   /* networkautodetect */
++	DWORD BandwidthAutoDetect; /* bandwidthautodetect */
++
++	DWORD PinConnectionBar;     /* pinconnectionbar */
++	DWORD DisplayConnectionBar; /* displayconnectionbar */
++
++	DWORD WorkspaceId;              /* workspaceid */
++	DWORD EnableWorkspaceReconnect; /* enableworkspacereconnect */
++
++	DWORD DisableWallpaper;        /* disable wallpaper */
++	DWORD AllowFontSmoothing;      /* allow font smoothing */
++	DWORD AllowDesktopComposition; /* allow desktop composition */
++	DWORD DisableFullWindowDrag;   /* disable full window drag */
++	DWORD DisableMenuAnims;        /* disable menu anims */
++	DWORD DisableThemes;           /* disable themes */
++	DWORD DisableCursorSetting;    /* disable cursor setting */
++
++	DWORD BitmapCacheSize;          /* bitmapcachesize */
++	DWORD BitmapCachePersistEnable; /* bitmapcachepersistenable */
++
++	LPSTR Username;   /* username */
++	LPSTR Domain;     /* domain */
++	LPSTR Password;   /*password*/
++	PBYTE Password51; /* password 51 */
++
++	LPSTR FullAddress;          /* full address */
++	LPSTR AlternateFullAddress; /* alternate full address */
++	DWORD ServerPort;           /* server port */
++
++	DWORD RedirectDrives;              /* redirectdrives */
++	DWORD RedirectPrinters;            /* redirectprinters */
++	DWORD RedirectComPorts;            /* redirectcomports */
++	DWORD RedirectSmartCards;          /* redirectsmartcards */
++	DWORD RedirectClipboard;           /* redirectclipboard */
++	DWORD RedirectPosDevices;          /* redirectposdevices */
++	DWORD RedirectDirectX;             /* redirectdirectx */
++	DWORD DisablePrinterRedirection;   /* disableprinterredirection */
++	DWORD DisableClipboardRedirection; /* disableclipboardredirection */
++	LPSTR UsbDevicesToRedirect;        /* usbdevicestoredirect */
++
++	DWORD ConnectToConsole;        /* connect to console */
++	DWORD AdministrativeSession;   /* administrative session */
++	DWORD AutoReconnectionEnabled; /* autoreconnection enabled */
++	DWORD AutoReconnectMaxRetries; /* autoreconnect max retries */
++
++	DWORD PublicMode;               /* public mode */
++	DWORD AuthenticationLevel;      /* authentication level */
++	DWORD PromptCredentialOnce;     /* promptcredentialonce */
++	DWORD PromptForCredentials;     /* prompt for credentials */
++	DWORD PromptForCredentialsOnce; /* promptcredentialonce */
++	DWORD NegotiateSecurityLayer;   /* negotiate security layer */
++	DWORD EnableCredSSPSupport;     /* enablecredsspsupport */
++	LPSTR LoadBalanceInfo;          /* loadbalanceinfo */
++
++	DWORD RemoteApplicationMode;             /* remoteapplicationmode */
++	LPSTR RemoteApplicationName;             /* remoteapplicationname */
++	LPSTR RemoteApplicationIcon;             /* remoteapplicationicon */
++	LPSTR RemoteApplicationProgram;          /* remoteapplicationprogram */
++	LPSTR RemoteApplicationFile;             /* remoteapplicationfile */
++	LPSTR RemoteApplicationGuid;             /* remoteapplicationguid */
++	LPSTR RemoteApplicationCmdLine;          /* remoteapplicationcmdline */
++	DWORD RemoteApplicationExpandCmdLine;    /* remoteapplicationexpandcmdline */
++	DWORD RemoteApplicationExpandWorkingDir; /* remoteapplicationexpandworkingdir */
++	DWORD DisableConnectionSharing;          /* disableconnectionsharing */
++	DWORD DisableRemoteAppCapsCheck;         /* disableremoteappcapscheck */
++
++	LPSTR AlternateShell;        /* alternate shell */
++	LPSTR ShellWorkingDirectory; /* shell working directory */
++
++	LPSTR GatewayHostname;           /* gatewayhostname */
++	DWORD GatewayUsageMethod;        /* gatewayusagemethod */
++	DWORD GatewayProfileUsageMethod; /* gatewayprofileusagemethod */
++	DWORD GatewayCredentialsSource;  /* gatewaycredentialssource */
++	LPSTR GatewayAccessToken;        /* gatewayaccesstoken */
++
++	DWORD UseRedirectionServerName; /* use redirection server name */
++
++	DWORD RdgIsKdcProxy; /* rdgiskdcproxy */
++	LPSTR KdcProxyName;  /* kdcproxyname */
++
++	LPSTR DrivesToRedirect;  /* drivestoredirect */
++	LPSTR DevicesToRedirect; /* devicestoredirect */
++	LPSTR WinPosStr;         /* winposstr */
++
++	LPSTR PreconnectionBlob; /* pcb */
++
++	int lineCount;
++	int lineSize;
++	rdpFileLine* lines;
++
++	int argc;
++	char** argv;
++	int argSize;
++};
++
+ typedef struct rdp_file rdpFile;
+-typedef BOOL (*rdp_file_fkt_parse)(void* context, const char* key, char type, const char* value);
+ 
+ #ifdef __cplusplus
+ extern "C"
+ {
+ #endif
+ 
+-	/* When using freerdp_client_parse_rdp_file_ex or freerdp_client_parse_rdp_file_buffer_ex
+-	 * set the context for the callback with this function. */
+-	FREERDP_API void freerdp_client_rdp_file_set_callback_context(rdpFile* file, void* context);
+-
+ 	FREERDP_API BOOL freerdp_client_parse_rdp_file(rdpFile* file, const char* name);
+-	FREERDP_API BOOL freerdp_client_parse_rdp_file_ex(rdpFile* file, const char* name,
+-	                                                  rdp_file_fkt_parse parse);
+ 	FREERDP_API BOOL freerdp_client_parse_rdp_file_buffer(rdpFile* file, const BYTE* buffer,
+ 	                                                      size_t size);
+-	FREERDP_API BOOL freerdp_client_parse_rdp_file_buffer_ex(rdpFile* file, const BYTE* buffer,
+-	                                                         size_t size, rdp_file_fkt_parse parse);
+ 	FREERDP_API BOOL freerdp_client_populate_settings_from_rdp_file(rdpFile* file,
+ 	                                                                rdpSettings* settings);
+ 
+diff -urN include/freerdp/client/rail.h ../../informatimago/FreeRDP/include/freerdp/client/rail.h
+--- include/freerdp/client/rail.h	2019-07-25 19:51:00.889897561 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/client/rail.h	2019-07-25 20:11:24.883967390 +0300
+@@ -48,6 +48,8 @@
+                                       const RAIL_HANDSHAKE_ORDER* handshake);
+ typedef UINT (*pcRailServerHandshake)(RailClientContext* context,
+                                       const RAIL_HANDSHAKE_ORDER* handshake);
++typedef UINT (*pcRailClientHandshakeEx)(RailClientContext* context,
++                                        const RAIL_HANDSHAKE_EX_ORDER* handshakeEx);
+ typedef UINT (*pcRailServerHandshakeEx)(RailClientContext* context,
+                                         const RAIL_HANDSHAKE_EX_ORDER* handshakeEx);
+ typedef UINT (*pcRailClientNotifyEvent)(RailClientContext* context,
+@@ -62,28 +64,16 @@
+                                         const RAIL_CLIENT_STATUS_ORDER* clientStatus);
+ typedef UINT (*pcRailClientSystemMenu)(RailClientContext* context,
+                                        const RAIL_SYSMENU_ORDER* sysmenu);
+-typedef UINT (*pcRailServerTaskBarInfo)(RailClientContext* context,
+-                                        const RAIL_TASKBAR_INFO_ORDER* taskBarInfo);
+ typedef UINT (*pcRailClientLanguageBarInfo)(RailClientContext* context,
+                                             const RAIL_LANGBAR_INFO_ORDER* langBarInfo);
+ typedef UINT (*pcRailServerLanguageBarInfo)(RailClientContext* context,
+                                             const RAIL_LANGBAR_INFO_ORDER* langBarInfo);
+-typedef UINT (*pcRailClientLanguageIMEInfo)(RailClientContext* context,
+-                                            const RAIL_LANGUAGEIME_INFO_ORDER* langBarInfo);
+ typedef UINT (*pcRailServerExecuteResult)(RailClientContext* context,
+                                           const RAIL_EXEC_RESULT_ORDER* execResult);
+ typedef UINT (*pcRailClientGetAppIdRequest)(RailClientContext* context,
+                                             const RAIL_GET_APPID_REQ_ORDER* getAppIdReq);
+ typedef UINT (*pcRailServerGetAppIdResponse)(RailClientContext* context,
+                                              const RAIL_GET_APPID_RESP_ORDER* getAppIdResp);
+-typedef UINT (*pcRailServerZOrderSync)(RailClientContext* context, const RAIL_ZORDER_SYNC* zorder);
+-typedef UINT (*pcRailServerCloak)(RailClientContext* context, const RAIL_CLOAK* cloak);
+-typedef UINT (*pcRailClientCloak)(RailClientContext* context, const RAIL_CLOAK* cloak);
+-typedef UINT (*pcRailServerPowerDisplayRequest)(RailClientContext* context,
+-                                                const RAIL_POWER_DISPLAY_REQUEST* power);
+-typedef UINT (*pcRailClientSnapArrange)(RailClientContext* context, const RAIL_SNAP_ARRANGE* snap);
+-typedef UINT (*pcRailServerGetAppidResponseExtended)(RailClientContext* context,
+-                                                     const RAIL_GET_APPID_RESP_EX* id);
+ 
+ struct _rail_client_context
+ {
+@@ -97,6 +87,7 @@
+ 	pcRailClientSystemCommand ClientSystemCommand;
+ 	pcRailClientHandshake ClientHandshake;
+ 	pcRailServerHandshake ServerHandshake;
++	pcRailClientHandshakeEx ClientHandshakeEx;
+ 	pcRailServerHandshakeEx ServerHandshakeEx;
+ 	pcRailClientNotifyEvent ClientNotifyEvent;
+ 	pcRailClientWindowMove ClientWindowMove;
+@@ -104,19 +95,11 @@
+ 	pcRailServerMinMaxInfo ServerMinMaxInfo;
+ 	pcRailClientInformation ClientInformation;
+ 	pcRailClientSystemMenu ClientSystemMenu;
+-	pcRailServerTaskBarInfo ServerTaskBarInfo;
+ 	pcRailClientLanguageBarInfo ClientLanguageBarInfo;
+ 	pcRailServerLanguageBarInfo ServerLanguageBarInfo;
+-	pcRailClientLanguageIMEInfo ClientLanguageIMEInfo;
+ 	pcRailServerExecuteResult ServerExecuteResult;
+ 	pcRailClientGetAppIdRequest ClientGetAppIdRequest;
+ 	pcRailServerGetAppIdResponse ServerGetAppIdResponse;
+-	pcRailServerZOrderSync ServerZOrderSync;
+-	pcRailClientCloak ClientCloak;
+-	pcRailServerCloak ServerCloak;
+-	pcRailServerPowerDisplayRequest ServerPowerDisplayRequest;
+-	pcRailClientSnapArrange ClientSnapArrange;
+-	pcRailServerGetAppidResponseExtended ServerGetAppidResponseExtended;
+ };
+ 
+ #endif /* FREERDP_CHANNEL_RAIL_CLIENT_RAIL_H */
+diff -urN include/freerdp/client/rdpgfx.h ../../informatimago/FreeRDP/include/freerdp/client/rdpgfx.h
+--- include/freerdp/client/rdpgfx.h	2019-07-25 19:51:00.893897580 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/client/rdpgfx.h	2019-07-25 20:11:24.887967409 +0300
+@@ -61,12 +61,9 @@
+                                         const RDPGFX_EVICT_CACHE_ENTRY_PDU* evictCacheEntry);
+ typedef UINT (*pcRdpgfxMapSurfaceToOutput)(RdpgfxClientContext* context,
+                                            const RDPGFX_MAP_SURFACE_TO_OUTPUT_PDU* surfaceToOutput);
+-typedef UINT (*pcRdpgfxMapSurfaceToScaledOutput)(
+-    RdpgfxClientContext* context, const RDPGFX_MAP_SURFACE_TO_SCALED_OUTPUT_PDU* surfaceToOutput);
+ typedef UINT (*pcRdpgfxMapSurfaceToWindow)(RdpgfxClientContext* context,
+                                            const RDPGFX_MAP_SURFACE_TO_WINDOW_PDU* surfaceToWindow);
+-typedef UINT (*pcRdpgfxMapSurfaceToScaledWindow)(
+-    RdpgfxClientContext* context, const RDPGFX_MAP_SURFACE_TO_SCALED_WINDOW_PDU* surfaceToWindow);
++
+ typedef UINT (*pcRdpgfxSetSurfaceData)(RdpgfxClientContext* context, UINT16 surfaceId, void* pData);
+ typedef void* (*pcRdpgfxGetSurfaceData)(RdpgfxClientContext* context, UINT16 surfaceId);
+ typedef UINT (*pcRdpgfxGetSurfaceIds)(RdpgfxClientContext* context, UINT16** ppSurfaceIds,
+@@ -80,22 +77,6 @@
+ typedef UINT (*pcRdpgfxUpdateSurfaceArea)(RdpgfxClientContext* context, UINT16 surfaceId,
+                                           UINT32 nrRects, const RECTANGLE_16* rects);
+ 
+-typedef UINT (*pcRdpgfxOnOpen)(RdpgfxClientContext* context, BOOL* do_caps_advertise,
+-                               BOOL* do_frame_acks);
+-typedef UINT (*pcRdpgfxOnClose)(RdpgfxClientContext* context);
+-typedef UINT (*pcRdpgfxCapsAdvertise)(RdpgfxClientContext* context,
+-                                      const RDPGFX_CAPS_ADVERTISE_PDU* capsAdvertise);
+-typedef UINT (*pcRdpgfxCapsConfirm)(RdpgfxClientContext* context,
+-                                    const RDPGFX_CAPS_CONFIRM_PDU* capsConfirm);
+-typedef UINT (*pcRdpgfxFrameAcknowledge)(RdpgfxClientContext* context,
+-                                         const RDPGFX_FRAME_ACKNOWLEDGE_PDU* frameAcknowledge);
+-typedef UINT (*pcRdpgfxQoeFrameAcknowledge)(
+-    RdpgfxClientContext* context, const RDPGFX_QOE_FRAME_ACKNOWLEDGE_PDU* qoeFrameAcknowledge);
+-
+-typedef UINT (*pcRdpgfxMapWindowForSurface)(RdpgfxClientContext* context, UINT16 surfaceID,
+-                                            UINT64 windowID);
+-typedef UINT (*pcRdpgfxUnmapWindowForSurface)(RdpgfxClientContext* context, UINT64 windowID);
+-
+ struct _rdpgfx_client_context
+ {
+ 	void* handle;
+@@ -117,9 +98,7 @@
+ 	pcRdpgfxCacheImportReply CacheImportReply;
+ 	pcRdpgfxEvictCacheEntry EvictCacheEntry;
+ 	pcRdpgfxMapSurfaceToOutput MapSurfaceToOutput;
+-	pcRdpgfxMapSurfaceToScaledOutput MapSurfaceToScaledOutput;
+ 	pcRdpgfxMapSurfaceToWindow MapSurfaceToWindow;
+-	pcRdpgfxMapSurfaceToScaledWindow MapSurfaceToScaledWindow;
+ 
+ 	pcRdpgfxGetSurfaceIds GetSurfaceIds;
+ 	pcRdpgfxSetSurfaceData SetSurfaceData;
+@@ -127,25 +106,10 @@
+ 	pcRdpgfxSetCacheSlotData SetCacheSlotData;
+ 	pcRdpgfxGetCacheSlotData GetCacheSlotData;
+ 
+-	/* Proxy callbacks */
+-	pcRdpgfxOnOpen OnOpen;
+-	pcRdpgfxOnClose OnClose;
+-	pcRdpgfxCapsAdvertise CapsAdvertise;
+-	pcRdpgfxCapsConfirm CapsConfirm;
+-	pcRdpgfxFrameAcknowledge FrameAcknowledge;
+-	pcRdpgfxQoeFrameAcknowledge QoeFrameAcknowledge;
+-
+ 	/* No locking required */
+ 	pcRdpgfxUpdateSurfaces UpdateSurfaces;
+ 	pcRdpgfxUpdateSurfaceArea UpdateSurfaceArea;
+ 
+-	/* These callbacks allow crating/destroying a window directly
+-	 * mapped to a surface.
+-	 * NOTE: The surface is already locked.
+-	 */
+-	pcRdpgfxMapWindowForSurface MapWindowForSurface;
+-	pcRdpgfxUnmapWindowForSurface UnmapWindowForSurface;
+-
+ 	CRITICAL_SECTION mux;
+ 	PROFILER_DEFINE(SurfaceProfiler)
+ };
+diff -urN include/freerdp/codec/color.h ../../informatimago/FreeRDP/include/freerdp/codec/color.h
+--- include/freerdp/codec/color.h	2019-07-25 19:51:00.925897739 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/codec/color.h	2019-07-25 20:11:24.919967568 +0300
+@@ -816,33 +816,6 @@
+ 	 * @param nYDst         destination buffer offset y
+ 	 * @param nWidth        width to copy in pixels
+ 	 * @param nHeight       height to copy in pixels
+-	 * @param bitsColor     icon's image data buffer
+-	 * @param cbBitsColor   length of the image data buffer in bytes
+-	 * @param bitsMask      icon's 1bpp image mask buffer
+-	 * @param cbBitsMask    length of the image mask buffer in bytes
+-	 * @param colorTable    icon's image color table
+-	 * @param cbBitsColor   length of the image color table buffer in bytes
+-	 * @param bpp           color image data bits per pixel
+-	 *
+-	 * @return              TRUE if success, FALSE otherwise
+-	 */
+-	FREERDP_API BOOL freerdp_image_copy_from_icon_data(BYTE* pDstData, UINT32 DstFormat,
+-	                                                   UINT32 nDstStep, UINT32 nXDst, UINT32 nYDst,
+-	                                                   UINT16 nWidth, UINT16 nHeight,
+-	                                                   const BYTE* bitsColor, UINT16 cbBitsColor,
+-	                                                   const BYTE* bitsMask, UINT16 cbBitsMask,
+-	                                                   const BYTE* colorTable, UINT16 cbColorTable,
+-	                                                   UINT32 bpp);
+-
+-	/***
+-	 *
+-	 * @param pDstData      destination buffer
+-	 * @param DstFormat     destination buffer format
+-	 * @param nDstStep      destination buffer stride (line in bytes) 0 for default
+-	 * @param nXDst         destination buffer offset x
+-	 * @param nYDst         destination buffer offset y
+-	 * @param nWidth        width to copy in pixels
+-	 * @param nHeight       height to copy in pixels
+ 	 * @param xorMask       XOR mask buffer
+ 	 * @param xorMaskLength XOR mask length in bytes
+ 	 * @param andMask       AND mask buffer
+@@ -884,31 +857,6 @@
+ 
+ 	/***
+ 	 *
+-	 * @param pDstData   destination buffer
+-	 * @param DstFormat  destination buffer format
+-	 * @param nDstStep   destination buffer stride (line in bytes) 0 for default
+-	 * @param nXDst      destination buffer offset x
+-	 * @param nYDst      destination buffer offset y
+-	 * @param nDstWidth  width of destination in pixels
+-	 * @param nDstHeight height of destination in pixels
+-	 * @param pSrcData   source buffer
+-	 * @param SrcFormat  source buffer format
+-	 * @param nSrcStep   source buffer stride (line in bytes) 0 for default
+-	 * @param nXSrc      source buffer x offset in pixels
+-	 * @param nYSrc      source buffer y offset in pixels
+-	 * @param nSrcWidth  width of source in pixels
+-	 * @param nSrcHeight height of source in pixels
+-	 *
+-	 * @return          TRUE if success, FALSE otherwise
+-	 */
+-	FREERDP_API BOOL freerdp_image_scale(BYTE* pDstData, DWORD DstFormat, UINT32 nDstStep,
+-	                                     UINT32 nXDst, UINT32 nYDst, UINT32 nDstWidth,
+-	                                     UINT32 nDstHeight, const BYTE* pSrcData, DWORD SrcFormat,
+-	                                     UINT32 nSrcStep, UINT32 nXSrc, UINT32 nYSrc,
+-	                                     UINT32 nSrcWidth, UINT32 nSrcHeight);
+-
+-	/***
+-	 *
+ 	 * @param pDstData  destionation buffer
+ 	 * @param DstFormat destionation buffer format
+ 	 * @param nDstStep  destionation buffer stride (line in bytes) 0 for default
+diff -urN include/freerdp/display.h ../../informatimago/FreeRDP/include/freerdp/display.h
+--- include/freerdp/display.h	2019-07-25 19:51:00.977897997 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/display.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,37 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * Display update notifications
+- *
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_DISPLAY_H
+-#define FREERDP_DISPLAY_H
+-
+-#include <freerdp/freerdp.h>
+-
+-#ifdef __cplusplus
+-extern "C"
+-{
+-#endif
+-
+-	FREERDP_API BOOL freerdp_display_send_monitor_layout(rdpContext* context, UINT32 monitorCount,
+-	                                                     const MONITOR_DEF* monitorDefArray);
+-
+-#ifdef __cplusplus
+-}
+-#endif
+-
+-#endif /* FREERDP_DISPLAY_UPDATE_H */
+diff -urN include/freerdp/freerdp.h ../../informatimago/FreeRDP/include/freerdp/freerdp.h
+--- include/freerdp/freerdp.h	2019-07-25 19:51:01.009898156 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/freerdp.h	2019-07-25 20:11:24.999967965 +0300
+@@ -180,10 +180,6 @@
+ 	typedef int (*pReceiveChannelData)(freerdp* instance, UINT16 channelId, BYTE* data, int size,
+ 	                                   int flags, int totalSize);
+ 
+-	typedef BOOL (*pPresentGatewayMessage)(freerdp* instance, UINT32 type, BOOL isDisplayMandatory,
+-	                                       BOOL isConsentMandatory, size_t length,
+-	                                       const WCHAR* message);
+-
+ 	/**
+ 	 * Defines the context for a given instance of RDP connection.
+ 	 * It is embedded in the rdp_freerdp structure, and allocated by a call to
+@@ -267,6 +263,12 @@
+ 
+ #include <freerdp/client.h>
+ 
++	typedef struct freerdp_blob
++	{
++		void* data;
++		void (*free)(struct freerdp_blob*);
++	} freerdp_blob;
++
+ 	/** Defines the options for a given instance of RDP connection.
+ 	 *  This is built by the client and given to the FreeRDP library to create the connection
+ 	 *  with the expected options.
+@@ -276,88 +278,79 @@
+ 	 */
+ 	struct rdp_freerdp
+ 	{
+-		ALIGN64
+-		    rdpContext* context; /**< (offset 0)
+-		                      Pointer to a rdpContext structure.
+-		                      Client applications can use the ContextSize field to register a
+-		                      context bigger than the rdpContext structure. This allow clients to
+-		                      use additional context information. When using this capability, client
+-		                      application should ALWAYS declare their structure with the rdpContext
+-		                      field first, and any additional content following it. Can be allocated
+-		                      by a call to freerdp_context_new(). Must be deallocated by a call to
+-		                      freerdp_context_free() before deallocating the current instance. */
++		ALIGN64 rdpContext* context; /**< (offset 0)
++		                 Pointer to a rdpContext structure.
++		                 Client applications can use the ContextSize field to register a context
++		                 bigger than the rdpContext structure. This allow clients to use additional
++		                 context information. When using this capability, client application should
++		                 ALWAYS declare their structure with the rdpContext field first, and any
++		                 additional content following it. Can be allocated by a call to
++		                 freerdp_context_new(). Must be deallocated by a call to
++		                 freerdp_context_free() before deallocating the current instance. */
+ 
+ 		ALIGN64 RDP_CLIENT_ENTRY_POINTS* pClientEntryPoints;
+ 
+ 		UINT64 paddingA[16 - 2]; /* 2 */
+ 
+-		ALIGN64 rdpInput* input; /* (offset 16)
+-		                    Input handle for the connection.
+-		                    Will be initialized by a call to freerdp_context_new() */
+-		ALIGN64 rdpUpdate*
+-		    update; /* (offset 17)
+-		       Update display parameters. Used to register display events callbacks and settings.
+-		       Will be initialized by a call to freerdp_context_new() */
+-		ALIGN64 rdpSettings*
+-		    settings;                      /**< (offset 18)
+-		                                Pointer to a rdpSettings structure. Will be used to maintain the required RDP
+-		                                settings.		              Will be initialized by a call to freerdp_context_new() */
++		ALIGN64 rdpInput* input;           /* (offset 16)
++		                       Input handle for the connection.
++		                       Will be initialized by a call to freerdp_context_new() */
++		ALIGN64 rdpUpdate* update;         /* (offset 17)
++		                       Update display parameters. Used to register display events callbacks and
++		                       settings.		 Will be initialized by a call to freerdp_context_new() */
++		ALIGN64 rdpSettings* settings;     /**< (offset 18)
++		                       Pointer to a rdpSettings structure. Will be used to maintain the required
++		                       RDP settings.	 Will be initialized by a call to freerdp_context_new() */
+ 		ALIGN64 rdpAutoDetect* autodetect; /* (offset 19)
+-		                                Auto-Detect handle for the connection.
+-		                                Will be initialized by a call to freerdp_context_new() */
++		                   Auto-Detect handle for the connection.
++		                   Will be initialized by a call to freerdp_context_new() */
+ 		UINT64 paddingB[32 - 20];          /* 20 */
+ 
+-		ALIGN64 size_t
+-		    ContextSize; /* (offset 32)
+-		             Specifies the size of the 'context' field. freerdp_context_new() will use this
+-		             size to allocate the context buffer. freerdp_new() sets it to
+-		             sizeof(rdpContext). If modifying it, there should always be a minimum of
+-		             sizeof(rdpContext), as the freerdp library will assume it can use the 'context'
+-		             field to set the required informations in it. Clients will typically make it
+-		             bigger, and use a context structure embedding the rdpContext, and adding
+-		             additional information after that.
+-		          */
+-
+-		ALIGN64 pContextNew
+-		    ContextNew; /**< (offset 33)
+-		             Callback for context allocation
+-		             Can be set before calling freerdp_context_new() to have it executed after
+-		             allocation and initialization. Must be set to NULL if not needed. */
+-
+-		ALIGN64 pContextFree
+-		    ContextFree;          /**< (offset 34)
+-		                       Callback for context deallocation
+-		                       Can be set before calling freerdp_context_free() to have it executed before
+-		                       deallocation.		  Must be set to NULL if not needed. */
+-		UINT64 paddingC[47 - 35]; /* 35 */
++		ALIGN64 size_t ContextSize; /* (offset 32)
++		                Specifies the size of the 'context' field. freerdp_context_new() will use
++		                this size to allocate the context buffer. freerdp_new() sets it to
++		                sizeof(rdpContext). If modifying it, there should always be a minimum of
++		                sizeof(rdpContext), as the freerdp library will assume it can use the
++		                'context' field to set the required informations in it.
++		                Clients will typically make it bigger, and use a context structure embedding
++		                the rdpContext, and adding additional information after that.
++		                */
++
++		ALIGN64 pContextNew ContextNew; /**< (offset 33)
++		                Callback for context allocation
++		                Can be set before calling freerdp_context_new() to have it executed after
++		                allocation and initialization. Must be set to NULL if not needed. */
++
++		ALIGN64 pContextFree ContextFree; /**< (offset 34)
++		                  Callback for context deallocation
++		                  Can be set before calling freerdp_context_free() to have it executed
++		                  before deallocation. Must be set to NULL if not needed. */
++		UINT64 paddingC[47 - 35];         /* 35 */
+ 
+ 		ALIGN64 UINT ConnectionCallbackState; /* 47 */
+ 
+-		ALIGN64 pPreConnect
+-		    PreConnect; /**< (offset 48)
+-		             Callback for pre-connect operations.
+-		             Can be set before calling freerdp_connect() to have it executed before the
+-		             actual connection happens. Must be set to NULL if not needed. */
+-
+-		ALIGN64 pPostConnect
+-		    PostConnect; /**< (offset 49)
+-		              Callback for post-connect operations.
+-		              Can be set before calling freerdp_connect() to have it executed after the
+-		              actual connection has succeeded. Must be set to NULL if not needed. */
+-
+-		ALIGN64 pAuthenticate Authenticate;           /**< (offset 50)
+-		                                           Callback for authentication.
+-		                                           It is used to get the username/password when it was not
+-		                                           provided at connection time. */
+-		ALIGN64 pVerifyCertificate VerifyCertificate; /**< (offset 51)
+-		                                           Callback for certificate validation.
+-		                                           Used to verify that an unknown certificate is
+-	 trusted. DEPRECATED: Use VerifyChangedCertificateEx*/
+-		ALIGN64 pVerifyChangedCertificate
+-		    VerifyChangedCertificate; /**< (offset 52)
+-		                           Callback for changed certificate validation.
+-		                           Used when a certificate differs from stored fingerprint.
+-DEPRECATED: Use VerifyChangedCertificateEx */
++		ALIGN64 pPreConnect PreConnect; /**< (offset 48)
++		                Callback for pre-connect operations.
++		                Can be set before calling freerdp_connect() to have it executed before the
++		                actual connection happens. Must be set to NULL if not needed. */
++
++		ALIGN64 pPostConnect PostConnect; /**< (offset 49)
++		                  Callback for post-connect operations.
++		                  Can be set before calling freerdp_connect() to have it executed after the
++		                  actual connection has succeeded. Must be set to NULL if not needed. */
++
++		ALIGN64 pAuthenticate
++		    Authenticate;                                           /**< (offset 50)
++		                                            Callback for authentication.
++		                                            It is used to get the username/password when it was not provided at connection time. */
++		ALIGN64 pVerifyCertificate VerifyCertificate;               /**< (offset 51)
++		                                        Callback for certificate validation.
++		                                        Used to verify that an unknown certificate is trusted.
++		                                        DEPRECATED: Use VerifyChangedCertificateEx*/
++		ALIGN64 pVerifyChangedCertificate VerifyChangedCertificate; /**< (offset 52)
++		                                Callback for changed certificate validation.
++		                                Used when a certificate differs from stored fingerprint.
++		                                DEPRECATED: Use VerifyChangedCertificateEx */
+ 
+ 		ALIGN64 pVerifyX509Certificate
+ 		    VerifyX509Certificate; /**< (offset 53)  Callback for X509 certificate verification (PEM
+@@ -367,43 +360,35 @@
+ 		    LogonErrorInfo; /**< (offset 54)  Callback for logon error info, important for logon
+ 		                       system messages with RemoteApp */
+ 
+-		ALIGN64 pPostDisconnect
+-		    PostDisconnect; /**< (offset 55)
+-		                                                                Callback for cleaning up
+-		                       resources allocated by connect callbacks. */
+-
+-		ALIGN64 pAuthenticate GatewayAuthenticate; /**< (offset 56)
+-		                                 Callback for gateway authentication.
+-		                                 It is used to get the username/password when it was not
+-		                                 provided at connection time. */
+-
+-		ALIGN64 pPresentGatewayMessage PresentGatewayMessage; /**< (offset 57)
+-		                                  Callback for gateway consent messages.
+-		                                  It is used to present consent messages to the user. */
+-
+-		UINT64 paddingD[64 - 58]; /* 58 */
+-
+-		ALIGN64 pSendChannelData
+-		    SendChannelData; /* (offset 64)
+-		                Callback for sending data to a channel.
+-		                By default, it is set by freerdp_new() to freerdp_send_channel_data(), which
+-		                eventually calls freerdp_channel_send() */
+-		ALIGN64 pReceiveChannelData
+-		    ReceiveChannelData; /* (offset 65)
+-		                   Callback for receiving data from a channel.
+-		                   This is called by freerdp_channel_process() (if not NULL).
+-		                   Clients will typically use a function that calls freerdp_channels_data()
+-		                   to perform the needed tasks. */
+-
+-		ALIGN64 pVerifyCertificateEx
+-		    VerifyCertificateEx; /**< (offset 66)
+-		                  Callback for certificate validation.
+-		                  Used to verify that an unknown certificate is trusted. */
+-		ALIGN64 pVerifyChangedCertificateEx
+-		    VerifyChangedCertificateEx; /**< (offset 67)
+-		                         Callback for changed certificate validation.
+-		                         Used when a certificate differs from stored fingerprint. */
+-		UINT64 paddingE[80 - 68];       /* 68 */
++		ALIGN64 pPostDisconnect PostDisconnect; /**< (offset 55)
++		                    Callback for cleaning up resources allocated
++		                    by connect callbacks. */
++
++		ALIGN64 pAuthenticate
++		    GatewayAuthenticate; /**< (offset 56)
++		     Callback for gateway authentication.
++		     It is used to get the username/password when it was not provided at connection time. */
++
++		UINT64 paddingD[64 - 57]; /* 57 */
++
++		ALIGN64 pSendChannelData SendChannelData;       /* (offset 64)
++		                            Callback for sending data to a channel.
++		                            By default, it is set by freerdp_new() to freerdp_send_channel_data(),
++		                            which eventually calls	   freerdp_channel_send() */
++		ALIGN64 pReceiveChannelData ReceiveChannelData; /* (offset 65)
++		                        Callback for receiving data from a channel.
++		                        This is called by freerdp_channel_process() (if not NULL).
++		                        Clients will typically use a function that calls
++		                        freerdp_channels_data() to perform the needed tasks. */
++
++		ALIGN64 pVerifyCertificateEx VerifyCertificateEx;               /**< (offset 66)
++		                                        Callback for certificate validation.
++		                                        Used to verify that an unknown certificate is trusted. */
++		ALIGN64 pVerifyChangedCertificateEx VerifyChangedCertificateEx; /**< (offset 67)
++		                                Callback for changed certificate validation.
++		                                Used when a certificate differs from stored fingerprint. */
++		UINT64 paddingE[79 - 68];                                       /* 68 */
++		ALIGN64 freerdp_blob* saved_identity;
+ 	};
+ 
+ 	struct rdp_channel_handles
+@@ -456,7 +441,6 @@
+ 
+ 	FREERDP_API UINT32 freerdp_error_info(freerdp* instance);
+ 	FREERDP_API void freerdp_set_error_info(rdpRdp* rdp, UINT32 error);
+-	FREERDP_API BOOL freerdp_send_error_info(rdpRdp* rdp);
+ 
+ 	FREERDP_API void freerdp_get_version(int* major, int* minor, int* revision);
+ 	FREERDP_API const char* freerdp_get_version_string(void);
+@@ -482,9 +466,6 @@
+ 
+ 	FREERDP_API ULONG freerdp_get_transport_sent(rdpContext* context, BOOL resetCount);
+ 
+-	FREERDP_API BOOL freerdp_nla_impersonate(rdpContext* context);
+-	FREERDP_API BOOL freerdp_nla_revert_to_self(rdpContext* context);
+-
+ 	FREERDP_API void clearChannelError(rdpContext* context);
+ 	FREERDP_API HANDLE getChannelErrorEventHandle(rdpContext* context);
+ 	FREERDP_API UINT getChannelError(rdpContext* context);
+@@ -492,7 +473,8 @@
+ 	FREERDP_API void setChannelError(rdpContext* context, UINT errorNum, char* description);
+ 	FREERDP_API BOOL checkChannelErrorEvent(rdpContext* context);
+ 
+-	FREERDP_API const char* freerdp_nego_get_routing_token(rdpContext* context, DWORD* length);
++	FREERDP_API freerdp_blob* freerdp_saved_identity(freerdp* instance);
++	FREERDP_API void freerdp_save_identity(freerdp* instance, freerdp_blob* identity);
+ 
+ #ifdef __cplusplus
+ }
+diff -urN include/freerdp/gdi/gfx.h ../../informatimago/FreeRDP/include/freerdp/gdi/gfx.h
+--- include/freerdp/gdi/gfx.h	2019-07-25 19:51:01.025898235 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/gdi/gfx.h	2019-07-25 20:11:25.011968024 +0300
+@@ -30,8 +30,6 @@
+ 	H264_CONTEXT* h264;
+ 	UINT32 width;
+ 	UINT32 height;
+-	UINT32 mappedWidth;
+-	UINT32 mappedHeight;
+ 	BYTE* data;
+ 	UINT32 scanline;
+ 	UINT32 format;
+@@ -39,9 +37,6 @@
+ 	UINT32 outputOriginX;
+ 	UINT32 outputOriginY;
+ 	REGION16 invalidRegion;
+-	UINT64 windowId;
+-	UINT32 outputTargetWidth;
+-	UINT32 outputTargetHeight;
+ };
+ typedef struct gdi_gfx_surface gdiGfxSurface;
+ 
+@@ -62,10 +57,6 @@
+ #endif
+ 
+ 	FREERDP_API BOOL gdi_graphics_pipeline_init(rdpGdi* gdi, RdpgfxClientContext* gfx);
+-	FREERDP_API BOOL gdi_graphics_pipeline_init_ex(rdpGdi* gdi, RdpgfxClientContext* gfx,
+-	                                               pcRdpgfxMapWindowForSurface map,
+-	                                               pcRdpgfxUnmapWindowForSurface unmap,
+-	                                               pcRdpgfxUpdateSurfaceArea update);
+ 	FREERDP_API void gdi_graphics_pipeline_uninit(rdpGdi* gdi, RdpgfxClientContext* gfx);
+ 
+ #ifdef __cplusplus
+diff -urN include/freerdp/input.h ../../informatimago/FreeRDP/include/freerdp/input.h
+--- include/freerdp/input.h	2019-07-25 19:51:01.037898295 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/input.h	2019-07-25 20:11:25.027968104 +0300
+@@ -31,7 +31,6 @@
+ 
+ /* keyboard Flags */
+ #define KBD_FLAGS_EXTENDED 0x0100
+-#define KBD_FLAGS_EXTENDED1 0x0200
+ #define KBD_FLAGS_DOWN 0x4000
+ #define KBD_FLAGS_RELEASE 0x8000
+ 
+diff -urN include/freerdp/license.h ../../informatimago/FreeRDP/include/freerdp/license.h
+--- include/freerdp/license.h	2019-07-25 19:51:01.041898314 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/license.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,163 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * Licensing API
+- *
+- * Copyright 2018 David Fort <contact@hardening-consulting.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_LICENSE_H
+-#define FREERDP_LICENSE_H
+-
+-#include <freerdp/api.h>
+-
+-typedef struct rdp_license rdpLicense;
+-
+-/** @brief Licensing Packet Types */
+-enum
+-{
+-	LICENSE_REQUEST = 0x01,
+-	PLATFORM_CHALLENGE = 0x02,
+-	NEW_LICENSE = 0x03,
+-	UPGRADE_LICENSE = 0x04,
+-	LICENSE_INFO = 0x12,
+-	NEW_LICENSE_REQUEST = 0x13,
+-	PLATFORM_CHALLENGE_RESPONSE = 0x15,
+-	ERROR_ALERT = 0xFF
+-};
+-
+-#define LICENSE_PKT_CS_MASK \
+-	(LICENSE_INFO | NEW_LICENSE_REQUEST | PLATFORM_CHALLENGE_RESPONSE | ERROR_ALERT)
+-#define LICENSE_PKT_SC_MASK \
+-	(LICENSE_REQUEST | PLATFORM_CHALLENGE | NEW_LICENSE | UPGRADE_LICENSE | ERROR_ALERT)
+-#define LICENSE_PKT_MASK (LICENSE_PKT_CS_MASK | LICENSE_PKT_SC_MASK)
+-
+-#define LICENSE_PREAMBLE_LENGTH 4
+-
+-/* Cryptographic Lengths */
+-
+-#define CLIENT_RANDOM_LENGTH 32
+-#define SERVER_RANDOM_LENGTH 32
+-#define MASTER_SECRET_LENGTH 48
+-#define PREMASTER_SECRET_LENGTH 48
+-#define SESSION_KEY_BLOB_LENGTH 48
+-#define MAC_SALT_KEY_LENGTH 16
+-#define LICENSING_ENCRYPTION_KEY_LENGTH 16
+-#define HWID_PLATFORM_ID_LENGTH 4
+-#define HWID_UNIQUE_DATA_LENGTH 16
+-#define HWID_LENGTH 20
+-#define LICENSING_PADDING_SIZE 8
+-
+-/* Preamble Flags */
+-
+-#define PREAMBLE_VERSION_2_0 0x02
+-#define PREAMBLE_VERSION_3_0 0x03
+-#define LicenseProtocolVersionMask 0x0F
+-#define EXTENDED_ERROR_MSG_SUPPORTED 0x80
+-
+-/** @brief binary Blob Types */
+-enum
+-{
+-	BB_ANY_BLOB = 0x0000,
+-	BB_DATA_BLOB = 0x0001,
+-	BB_RANDOM_BLOB = 0x0002,
+-	BB_CERTIFICATE_BLOB = 0x0003,
+-	BB_ERROR_BLOB = 0x0004,
+-	BB_ENCRYPTED_DATA_BLOB = 0x0009,
+-	BB_KEY_EXCHG_ALG_BLOB = 0x000D,
+-	BB_SCOPE_BLOB = 0x000E,
+-	BB_CLIENT_USER_NAME_BLOB = 0x000F,
+-	BB_CLIENT_MACHINE_NAME_BLOB = 0x0010
+-};
+-
+-/* License Key Exchange Algorithms */
+-
+-#define KEY_EXCHANGE_ALG_RSA 0x00000001
+-
+-/** @brief license Error Codes */
+-enum
+-{
+-	ERR_INVALID_SERVER_CERTIFICATE = 0x00000001,
+-	ERR_NO_LICENSE = 0x00000002,
+-	ERR_INVALID_MAC = 0x00000003,
+-	ERR_INVALID_SCOPE = 0x00000004,
+-	ERR_NO_LICENSE_SERVER = 0x00000006,
+-	STATUS_VALID_CLIENT = 0x00000007,
+-	ERR_INVALID_CLIENT = 0x00000008,
+-	ERR_INVALID_PRODUCT_ID = 0x0000000B,
+-	ERR_INVALID_MESSAGE_LENGTH = 0x0000000C
+-};
+-
+-/** @brief state Transition Codes */
+-enum
+-{
+-	ST_TOTAL_ABORT = 0x00000001,
+-	ST_NO_TRANSITION = 0x00000002,
+-	ST_RESET_PHASE_TO_START = 0x00000003,
+-	ST_RESEND_LAST_MESSAGE = 0x00000004
+-};
+-
+-/** @brief Platform Challenge Types */
+-enum
+-{
+-	WIN32_PLATFORM_CHALLENGE_TYPE = 0x0100,
+-	WIN16_PLATFORM_CHALLENGE_TYPE = 0x0200,
+-	WINCE_PLATFORM_CHALLENGE_TYPE = 0x0300,
+-	OTHER_PLATFORM_CHALLENGE_TYPE = 0xFF00
+-};
+-
+-/** @brief License Detail Levels */
+-enum
+-{
+-	LICENSE_DETAIL_SIMPLE = 0x0001,
+-	LICENSE_DETAIL_MODERATE = 0x0002,
+-	LICENSE_DETAIL_DETAIL = 0x0003
+-};
+-
+-/*
+- * PlatformId:
+- *
+- * The most significant byte of the PlatformId field contains the operating system version of the
+- * client. The second most significant byte of the PlatformId field identifies the ISV that provided
+- * the client image. The remaining two bytes in the PlatformId field are used by the ISV to identify
+- * the build number of the operating system.
+- *
+- * 0x04010000:
+- *
+- * CLIENT_OS_ID_WINNT_POST_52	(0x04000000)
+- * CLIENT_IMAGE_ID_MICROSOFT	(0x00010000)
+- */
+-enum
+-{
+-	CLIENT_OS_ID_WINNT_351 = 0x01000000,
+-	CLIENT_OS_ID_WINNT_40 = 0x02000000,
+-	CLIENT_OS_ID_WINNT_50 = 0x03000000,
+-	CLIENT_OS_ID_WINNT_POST_52 = 0x04000000,
+-
+-	CLIENT_IMAGE_ID_MICROSOFT = 0x00010000,
+-	CLIENT_IMAGE_ID_CITRIX = 0x00020000,
+-};
+-
+-#ifdef __cpluscplus
+-extern "C"
+-{
+-#endif
+-
+-	FREERDP_API BOOL license_send_valid_client_error_packet(rdpRdp* rdp);
+-
+-#ifdef __cpluscplus
+-}
+-#endif
+-
+-#endif /* FREERDP_LICENSE_H */
+diff -urN include/freerdp/peer.h ../../informatimago/FreeRDP/include/freerdp/peer.h
+--- include/freerdp/peer.h	2019-07-25 19:51:01.065898433 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/peer.h	2019-07-25 20:11:25.051968223 +0300
+@@ -65,18 +65,6 @@
+ typedef void* (*psPeerVirtualChannelGetData)(freerdp_peer* peer, HANDLE hChannel);
+ typedef int (*psPeerVirtualChannelSetData)(freerdp_peer* peer, HANDLE hChannel, void* data);
+ 
+-/** @brief the result of the license callback */
+-typedef enum
+-{
+-	LICENSE_CB_INTERNAL_ERROR, /** an internal error happened in the callback */
+-	LICENSE_CB_ABORT,          /** licensing process failed, abort the connection */
+-	LICENSE_CB_IN_PROGRESS, /** incoming packet has been treated, we're waiting for further packets
+-	                           to complete the workflow */
+-	LICENSE_CB_COMPLETED    /** the licensing workflow has completed, go to next step */
+-} LicenseCallbackResult;
+-
+-typedef LicenseCallbackResult (*psPeerLicenseCallback)(freerdp_peer* peer, wStream* s);
+-
+ struct rdp_freerdp_peer
+ {
+ 	rdpContext* context;
+@@ -132,7 +120,6 @@
+ 	psPeerAdjustMonitorsLayout AdjustMonitorsLayout;
+ 	psPeerClientCapabilities ClientCapabilities;
+ 	psPeerComputeNtlmHash ComputeNtlmHash;
+-	psPeerLicenseCallback LicenseCallback;
+ };
+ 
+ #ifdef __cplusplus
+diff -urN include/freerdp/rail.h ../../informatimago/FreeRDP/include/freerdp/rail.h
+--- include/freerdp/rail.h	2019-07-25 19:51:01.093898572 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/rail.h	2019-07-25 20:11:25.075968342 +0300
+@@ -22,23 +22,15 @@
+ #define FREERDP_RAIL_GLOBAL_H
+ 
+ #include <winpr/wnd.h>
+-#include <winpr/windows.h>
+ 
+ #include <freerdp/types.h>
+ 
+-/* DEPRECATED: RAIL PDU flags use the spec conformant naming with TS_ prefix */
++/* RAIL PDU flags */
+ #define RAIL_EXEC_FLAG_EXPAND_WORKINGDIRECTORY 0x0001
+ #define RAIL_EXEC_FLAG_TRANSLATE_FILES 0x0002
+ #define RAIL_EXEC_FLAG_FILE 0x0004
+ #define RAIL_EXEC_FLAG_EXPAND_ARGUMENTS 0x0008
+ 
+-/* RAIL PDU flags */
+-#define TS_RAIL_EXEC_FLAG_EXPAND_WORKINGDIRECTORY 0x0001
+-#define TS_RAIL_EXEC_FLAG_TRANSLATE_FILES 0x0002
+-#define TS_RAIL_EXEC_FLAG_FILE 0x0004
+-#define TS_RAIL_EXEC_FLAG_EXPAND_ARGUMENTS 0x0008
+-#define TS_RAIL_EXEC_FLAG_APP_USER_MODEL_ID 0x0010
+-
+ /* Notification Icon Balloon Tooltip */
+ #define NIIF_NONE 0x00000000
+ #define NIIF_INFO 0x00000001
+@@ -63,9 +55,17 @@
+ #define RAIL_EXEC_E_FAIL 0x0006
+ #define RAIL_EXEC_E_SESSION_LOCKED 0x0007
+ 
+-/* DEPRECATED: Server System Parameters Update PDU
+- * use the spec conformant naming scheme from winpr/windows.h
+- */
++/* Client System Parameters Update PDU */
++#define SPI_SET_DRAG_FULL_WINDOWS 0x00000025
++#define SPI_SET_KEYBOARD_CUES 0x0000100B
++#define SPI_SET_KEYBOARD_PREF 0x00000045
++#define SPI_SET_MOUSE_BUTTON_SWAP 0x00000021
++#define SPI_SET_WORK_AREA 0x0000002F
++#define SPI_DISPLAY_CHANGE 0x0000F001
++#define SPI_TASKBAR_POS 0x0000F000
++#define SPI_SET_HIGH_CONTRAST 0x00000043
++
++/* Server System Parameters Update PDU */
+ #define SPI_SET_SCREEN_SAVE_ACTIVE 0x00000011
+ #define SPI_SET_SCREEN_SAVE_SECURE 0x00000077
+ 
+@@ -81,25 +81,9 @@
+ 	SPI_MASK_TASKBAR_POS = 0x00000040,
+ 	SPI_MASK_SET_HIGH_CONTRAST = 0x00000080,
+ 	SPI_MASK_SET_SCREEN_SAVE_ACTIVE = 0x00000100,
+-	SPI_MASK_SET_SET_SCREEN_SAVE_SECURE = 0x00000200,
+-	SPI_MASK_SET_CARET_WIDTH = 0x00000400,
+-	SPI_MASK_SET_STICKY_KEYS = 0x00000800,
+-	SPI_MASK_SET_TOGGLE_KEYS = 0x00001000,
+-	SPI_MASK_SET_FILTER_KEYS = 0x00002000,
++	SPI_MASK_SET_SET_SCREEN_SAVE_SECURE = 0x00000200
+ };
+ 
+-/* Client System Parameters Update PDU
+- * some are defined in winuser.h (winpr/windows.h wrapper)
+- */
+-#define SPI_SET_DRAG_FULL_WINDOWS 0x00000025
+-#define SPI_SET_KEYBOARD_CUES 0x0000100B
+-#define SPI_SET_KEYBOARD_PREF 0x00000045
+-#define SPI_SET_MOUSE_BUTTON_SWAP 0x00000021
+-#define SPI_SET_WORK_AREA 0x0000002F
+-#define SPI_DISPLAY_CHANGE 0x0000F001
+-#define SPI_TASKBAR_POS 0x0000F000
+-#define SPI_SET_HIGH_CONTRAST 0x00000043
+-
+ /* Client System Command PDU */
+ #define SC_SIZE 0xF000
+ #define SC_MOVE 0xF010
+@@ -118,24 +102,20 @@
+ #	define NIN_BALLOONHIDE 0x00000403
+ #	define NIN_BALLOONTIMEOUT 0x00000404
+ #	define NIN_BALLOONUSERCLICK 0x00000405
+-#else
+-#	include <shellapi.h>
+ #endif
+ 
+-/* DEPRECATED: Client Information PDU
+- * use the spec conformant naming scheme TS_ below
+- */
++/* Client Information PDU */
+ #define RAIL_CLIENTSTATUS_ALLOWLOCALMOVESIZE 0x00000001
+ #define RAIL_CLIENTSTATUS_AUTORECONNECT 0x00000002
+ 
+-/* Client Information PDU */
+-#define TS_RAIL_CLIENTSTATUS_ALLOWLOCALMOVESIZE 0x00000001
+-#define TS_RAIL_CLIENTSTATUS_AUTORECONNECT 0x00000002
+-#define TS_RAIL_CLIENTSTATUS_ZORDER_SYNC 0x00000004
+-#define TS_RAIL_CLIENTSTATUS_WINDOW_RESIZE_MARGIN_SUPPORTED 0x00000010
+-#define TS_RAIL_CLIENTSTATUS_APPBAR_REMOTING_SUPPORTED 0x00000040
+-#define TS_RAIL_CLIENTSTATUS_POWER_DISPLAY_REQUEST_SUPPORTED 0x00000080
+-#define TS_RAIL_CLIENTSTATUS_BIDIRECTIONAL_CLOAK_SUPPORTED 0x00000200
++/* HIGHCONTRAST flags values */
++#define HCF_AVAILABLE 0x00000002
++#define HCF_CONFIRMHOTKEY 0x00000008
++#define HCF_HIGHCONTRASTON 0x00000001
++#define HCF_HOTKEYACTIVE 0x00000004
++#define HCF_HOTKEYAVAILABLE 0x00000040
++#define HCF_HOTKEYSOUND 0x00000010
++#define HCF_INDICATOR 0x00000020
+ 
+ /* Server Move/Size Start PDU */
+ #define RAIL_WMSZ_LEFT 0x0001
+@@ -164,85 +144,16 @@
+ #define TF_SFT_NOEXTRAICONSONMINIMIZED 0x00000400
+ #define TF_SFT_DESKBAND 0x00000800
+ 
+-/* DEPRECATED: Extended Handshake Flags
+- * use the spec conformant naming scheme TS_ below
+- */
+-#define RAIL_ORDER_HANDSHAKEEX_FLAGS_HIDEF 0x00000001
+-#define RAIL_ORDER_HANDSHAKE_EX_FLAGS_EXTENDED_SPI_SUPPORTED 0x00000002
+-#define RAIL_ORDER_HANDSHAKE_EX_FLAGS_SNAP_ARRANGE_SUPPORTED 0x00000004
+-
+ /* Extended Handshake Flags */
+-#define TS_RAIL_ORDER_HANDSHAKEEX_FLAGS_HIDEF 0x00000001
+-#define TS_RAIL_ORDER_HANDSHAKE_EX_FLAGS_EXTENDED_SPI_SUPPORTED 0x00000002
+-#define TS_RAIL_ORDER_HANDSHAKE_EX_FLAGS_SNAP_ARRANGE_SUPPORTED 0x00000004
++#define RAIL_ORDER_HANDSHAKEEX_FLAGS_HIDEF 0x00000001
+ 
+ /* Language Profile Information Flags */
+ #define TF_PROFILETYPE_INPUTPROCESSOR 0x00000001
+ #define TF_PROFILETYPE_KEYBOARDLAYOUT 0x00000002
+ 
+-/* LanguageProfileCLSID and ProfileGUID */
+-#ifndef _WIN32
+-#	define GUID_NULL                                                                  \
+-		{                                                                              \
+-			0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
+-		}
+-#else
+-#	include <cguid.h>
+-#endif
+-#define GUID_MSIME_JPN                                                             \
+-	{                                                                              \
+-		0x03B5835F, 0xF03C, 0x411B, 0x9C, 0xE2, 0xAA, 0x23, 0xE1, 0x17, 0x1E, 0x36 \
+-	}
+-#define GUID_MSIME_KOR                                                             \
+-	{                                                                              \
+-		0xA028AE76, 0x01B1, 0x46C2, 0x99, 0xC4, 0xAC, 0xD9, 0x85, 0x8A, 0xE0, 0x02 \
+-	}
+-#define GUID_CHSIME                                                                \
+-	{                                                                              \
+-		0x81D4E9C9, 0x1D3B, 0x41BC, 0x9E, 0x6C, 0x4B, 0x40, 0xBF, 0x79, 0xE3, 0x5E \
+-	}
+-#define GUID_CHTIME                                                                \
+-	{                                                                              \
+-		0x531FDEBF, 0x9B4C, 0x4A43, 0xA2, 0xAA, 0x96, 0x0E, 0x8F, 0xCD, 0xC7, 0x32 \
+-	}
+-#define GUID_PROFILE_NEWPHONETIC                                                   \
+-	{                                                                              \
+-		0xB2F9C502, 0x1742, 0x11D4, 0x97, 0x90, 0x00, 0x80, 0xC8, 0x82, 0x68, 0x7E \
+-	}
+-#define GUID_PROFILE_CHANGJIE                                                      \
+-	{                                                                              \
+-		0x4BDF9F03, 0xC7D3, 0x11D4, 0xB2, 0xAB, 0x00, 0x80, 0xC8, 0x82, 0x68, 0x7E \
+-	}
+-#define GUID_PROFILE_QUICK                                                         \
+-	{                                                                              \
+-		0x6024B45F, 0x5C54, 0x11D4, 0xB9, 0x21, 0x00, 0x80, 0xC8, 0x82, 0x68, 0x7E \
+-	}
+-#define GUID_PROFILE_CANTONESE                                                     \
+-	{                                                                              \
+-		0x0AEC109C, 0x7E96, 0x11D4, 0xB2, 0xEF, 0x00, 0x80, 0xC8, 0x82, 0x68, 0x7E \
+-	}
+-#define GUID_PROFILE_PINYIN                                                        \
+-	{                                                                              \
+-		0xF3BA9077, 0x6C7E, 0x11D4, 0x97, 0xFA, 0x00, 0x80, 0xC8, 0x82, 0x68, 0x7E \
+-	}
+-#define GUID_PROFILE_SIMPLEFAST                                                    \
+-	{                                                                              \
+-		0xFA550B04, 0x5AD7, 0x411F, 0xA5, 0xAC, 0xCA, 0x03, 0x8E, 0xC5, 0x15, 0xD7 \
+-	}
+-#define GUID_GUID_PROFILE_MSIME_JPN                                                \
+-	{                                                                              \
+-		0xA76C93D9, 0x5523, 0x4E90, 0xAA, 0xFA, 0x4D, 0xB1, 0x12, 0xF9, 0xAC, 0x76 \
+-	}
+-#define GUID_PROFILE_MSIME_KOR                                                     \
+-	{                                                                              \
+-		0xB5FE1F02, 0xD5F2, 0x4445, 0x9C, 0x03, 0xC5, 0x68, 0xF2, 0x3C, 0x99, 0xA1 \
+-	}
+-
+-/* ImeState */
+ #define IME_STATE_CLOSED 0x00000000
+ #define IME_STATE_OPEN 0x00000001
+ 
+-/* ImeConvMode */
+ #ifndef _IME_CMODES_
+ #	define IME_CMODE_NATIVE 0x00000001
+ #	define IME_CMODE_KATAKANA 0x00000002
+@@ -257,7 +168,6 @@
+ #	define IME_CMODE_FIXED 0x00000800
+ #endif
+ 
+-/* ImeSentenceMode */
+ #ifndef _IMM_
+ #	define IME_SMODE_NONE 0x00000000
+ #	define IME_SMODE_PLURALCASE 0x00000001
+@@ -267,24 +177,9 @@
+ #	define IME_SMODE_CONVERSATION 0x00000010
+ #endif
+ 
+-/* KANAMode */
+ #define KANA_MODE_OFF 0x00000000
+ #define KANA_MODE_ON 0x00000001
+ 
+-/* Taskbar */
+-#define RAIL_TASKBAR_MSG_TAB_REGISTER 0x00000001
+-#define RAIL_TASKBAR_MSG_TAB_UNREGISTER 0x00000002
+-#define RAIL_TASKBAR_MSG_TAB_ORDER 0x00000003
+-#define RAIL_TASKBAR_MSG_TAB_ACTIVE 0x00000004
+-#define RAIL_TASKBAR_MSG_TAB_PROPERTIES 0x00000005
+-
+-/* Taskbar body */
+-#define RAIL_TASKBAR_MSG_TAB_REGISTER 0x00000001
+-#define RAIL_TASKBAR_MSG_TAB_UNREGISTER 0x00000002
+-#define RAIL_TASKBAR_MSG_TAB_ORDER 0x00000003
+-#define RAIL_TASKBAR_MSG_TAB_ACTIVE 0x00000004
+-#define RAIL_TASKBAR_MSG_TAB_PROPERTIES 0x00000005
+-
+ struct _RAIL_UNICODE_STRING
+ {
+ 	UINT16 length;
+@@ -339,16 +234,6 @@
+ };
+ typedef struct _RAIL_EXEC_RESULT_ORDER RAIL_EXEC_RESULT_ORDER;
+ 
+-struct _TS_FILTERKEYS
+-{
+-	UINT32 Flags;
+-	UINT32 WaitTime;
+-	UINT32 DelayTime;
+-	UINT32 RepeatTime;
+-	UINT32 BounceTime;
+-};
+-typedef struct _TS_FILTERKEYS TS_FILTERKEYS;
+-
+ struct _RAIL_SYSPARAM_ORDER
+ {
+ 	UINT32 param;
+@@ -361,10 +246,6 @@
+ 	RECTANGLE_16 displayChange;
+ 	RECTANGLE_16 taskbarPos;
+ 	RAIL_HIGH_CONTRAST highContrast;
+-	UINT32 caretWidth;
+-	UINT32 stickyKeys;
+-	UINT32 toggleKeys;
+-	TS_FILTERKEYS filterKeys;
+ 	BOOL setScreenSaveActive;
+ 	BOOL setScreenSaveSecure;
+ };
+@@ -453,6 +334,15 @@
+ };
+ typedef struct _RAIL_LANGBAR_INFO_ORDER RAIL_LANGBAR_INFO_ORDER;
+ 
++struct _RAIL_LANGUAGE_IME_INFO_ORDER
++{
++	UINT32 ProfileType;
++	UINT32 LanguageId;
++	GUID LanguageProfileClsId;
++	GUID ProfileGuid;
++};
++typedef struct _RAIL_LANGUAGE_IME_INFO_ORDER RAIL_LANGUAGE_IME_INFO_ORDER;
++
+ struct _RAIL_COMPARTMENT_INFO_ORDER
+ {
+ 	UINT32 ImeState;
+@@ -462,65 +352,7 @@
+ };
+ typedef struct _RAIL_COMPARTMENT_INFO_ORDER RAIL_COMPARTMENT_INFO_ORDER;
+ 
+-struct _RAIL_ZORDER_SYNC
+-{
+-	UINT32 windowIdMarker;
+-};
+-typedef struct _RAIL_ZORDER_SYNC RAIL_ZORDER_SYNC;
+-
+-struct _RAIL_CLOAK
+-{
+-	UINT32 windowId;
+-	BOOL cloak;
+-};
+-typedef struct _RAIL_CLOAK RAIL_CLOAK;
+-
+-struct _RAIL_POWER_DISPLAY_REQUEST
+-{
+-	UINT32 active;
+-};
+-typedef struct _RAIL_POWER_DISPLAY_REQUEST RAIL_POWER_DISPLAY_REQUEST;
+-
+-struct _RAIL_TASKBAR_INFO_ORDER
+-{
+-	UINT32 TaskbarMessage;
+-	UINT32 WindowIdTab;
+-	UINT32 Body;
+-};
+-typedef struct _RAIL_TASKBAR_INFO_ORDER RAIL_TASKBAR_INFO_ORDER;
+-
+-struct _RAIL_LANGUAGEIME_INFO_ORDER
+-{
+-	UINT32 ProfileType;
+-	UINT32 LanguageID;
+-	GUID LanguageProfileCLSID;
+-	GUID ProfileGUID;
+-	UINT32 KeyboardLayout;
+-};
+-typedef struct _RAIL_LANGUAGEIME_INFO_ORDER RAIL_LANGUAGEIME_INFO_ORDER;
+-
+-struct _RAIL_SNAP_ARRANGE
+-{
+-	UINT32 windowId;
+-	UINT16 left;
+-	UINT16 top;
+-	UINT16 right;
+-	UINT16 bottom;
+-};
+-typedef struct _RAIL_SNAP_ARRANGE RAIL_SNAP_ARRANGE;
+-
+-struct _RAIL_GET_APPID_RESP_EX
+-{
+-	UINT32 windowID;
+-	WCHAR applicationID[512 / sizeof(WCHAR)];
+-	UINT32 processId;
+-	WCHAR processImageName[512 / sizeof(WCHAR)];
+-};
+-typedef struct _RAIL_GET_APPID_RESP_EX RAIL_GET_APPID_RESP_EX;
+-
+-/* DEPRECATED: RAIL Constants
+- * use the spec conformant naming scheme TS_ below
+- */
++/* RAIL Constants */
+ 
+ #define RDP_RAIL_ORDER_EXEC 0x0001
+ #define RDP_RAIL_ORDER_ACTIVATE 0x0002
+@@ -540,38 +372,6 @@
+ #define RDP_RAIL_ORDER_LANGUAGEIMEINFO 0x0011
+ #define RDP_RAIL_ORDER_COMPARTMENTINFO 0x0012
+ #define RDP_RAIL_ORDER_HANDSHAKE_EX 0x0013
+-#define RDP_RAIL_ORDER_ZORDER_SYNC 0x0014
+-#define RDP_RAIL_ORDER_CLOAK 0x0015
+-#define RDP_RAIL_ORDER_POWER_DISPLAY_REQUEST 0x0016
+-#define RDP_RAIL_ORDER_SNAP_ARRANGE 0x0017
+-#define RDP_RAIL_ORDER_GET_APPID_RESP_EX 0x0018
+-
+-/* RAIL Constants */
+-
+-#define TS_RAIL_ORDER_EXEC 0x0001
+-#define TS_RAIL_ORDER_ACTIVATE 0x0002
+-#define TS_RAIL_ORDER_SYSPARAM 0x0003
+-#define TS_RAIL_ORDER_SYSCOMMAND 0x0004
+-#define TS_RAIL_ORDER_HANDSHAKE 0x0005
+-#define TS_RAIL_ORDER_NOTIFY_EVENT 0x0006
+-#define TS_RAIL_ORDER_WINDOWMOVE 0x0008
+-#define TS_RAIL_ORDER_LOCALMOVESIZE 0x0009
+-#define TS_RAIL_ORDER_MINMAXINFO 0x000A
+-#define TS_RAIL_ORDER_CLIENTSTATUS 0x000B
+-#define TS_RAIL_ORDER_SYSMENU 0x000C
+-#define TS_RAIL_ORDER_LANGBARINFO 0x000D
+-#define TS_RAIL_ORDER_GET_APPID_REQ 0x000E
+-#define TS_RAIL_ORDER_GET_APPID_RESP 0x000F
+-#define TS_RAIL_ORDER_TASKBARINFO 0x0010
+-#define TS_RAIL_ORDER_LANGUAGEIMEINFO 0x0011
+-#define TS_RAIL_ORDER_COMPARTMENTINFO 0x0012
+-#define TS_RAIL_ORDER_HANDSHAKE_EX 0x0013
+-#define TS_RAIL_ORDER_ZORDER_SYNC 0x0014
+-#define TS_RAIL_ORDER_CLOAK 0x0015
+-#define TS_RAIL_ORDER_POWER_DISPLAY_REQUEST 0x0016
+-#define TS_RAIL_ORDER_SNAP_ARRANGE 0x0017
+-#define TS_RAIL_ORDER_GET_APPID_RESP_EX 0x0018
+-#define TS_RAIL_ORDER_EXEC_RESULT 0x0080
+ 
+ #ifdef __cplusplus
+ extern "C"
+diff -urN include/freerdp/server/disp.h ../../informatimago/FreeRDP/include/freerdp/server/disp.h
+--- include/freerdp/server/disp.h	2019-07-25 19:51:01.113898671 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/server/disp.h	1970-01-01 03:00:00.000000000 +0300
+@@ -1,70 +0,0 @@
+-/**
+- * FreeRDP: A Remote Desktop Protocol Implementation
+- * RDPEDISP Virtual Channel Extension
+- *
+- * Copyright 2019 Kobi Mizrachi <kmizrachi18@gmail.com>
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *	 http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef FREERDP_CHANNEL_DISP_SERVER_DISP_H
+-#define FREERDP_CHANNEL_DISP_SERVER_DISP_H
+-
+-#include <freerdp/channels/disp.h>
+-
+-#include <freerdp/freerdp.h>
+-#include <freerdp/api.h>
+-#include <freerdp/types.h>
+-
+-typedef struct _disp_server_private DispServerPrivate;
+-typedef struct _disp_server_context DispServerContext;
+-
+-typedef UINT (*psDispMonitorLayout)(DispServerContext* context,
+-                                    const DISPLAY_CONTROL_MONITOR_LAYOUT_PDU* pdu);
+-typedef UINT (*psDispCaps)(DispServerContext* context);
+-typedef UINT (*psDispOpen)(DispServerContext* context);
+-typedef UINT (*psDispClose)(DispServerContext* context);
+-
+-struct _disp_server_context
+-{
+-	void* custom;
+-	HANDLE vcm;
+-
+-	/* Server capabilities */
+-	UINT32 MaxNumMonitors;
+-	UINT32 MaxMonitorAreaFactorA;
+-	UINT32 MaxMonitorAreaFactorB;
+-
+-	psDispOpen Open;
+-	psDispClose Close;
+-
+-	psDispMonitorLayout DispMonitorLayout;
+-	psDispCaps DisplayControlCaps;
+-
+-	DispServerPrivate* priv;
+-	rdpContext* rdpcontext;
+-};
+-
+-#ifdef __cplusplus
+-extern "C"
+-{
+-#endif
+-
+-	FREERDP_API DispServerContext* disp_server_context_new(HANDLE vcm);
+-	FREERDP_API void disp_server_context_free(DispServerContext* context);
+-
+-#ifdef __cplusplus
+-}
+-#endif
+-
+-#endif /* FREERDP_CHANNEL_DISP_SERVER_DISP_H */
+diff -urN include/freerdp/server/rdpgfx.h ../../informatimago/FreeRDP/include/freerdp/server/rdpgfx.h
+--- include/freerdp/server/rdpgfx.h	2019-07-25 19:51:01.125898731 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/server/rdpgfx.h	2019-07-25 20:11:25.107968501 +0300
+@@ -21,7 +21,6 @@
+ #define FREERDP_CHANNEL_RDPGFX_SERVER_RDPGFX_H
+ 
+ #include <freerdp/channels/rdpgfx.h>
+-#include <freerdp/freerdp.h>
+ 
+ typedef struct _rdpgfx_server_context RdpgfxServerContext;
+ typedef struct _rdpgfx_server_private RdpgfxServerPrivate;
+@@ -30,53 +29,46 @@
+ typedef BOOL (*psRdpgfxServerClose)(RdpgfxServerContext* context);
+ 
+ typedef UINT (*psRdpgfxResetGraphics)(RdpgfxServerContext* context,
+-                                      const RDPGFX_RESET_GRAPHICS_PDU* resetGraphics);
++                                      RDPGFX_RESET_GRAPHICS_PDU* resetGraphics);
+ typedef UINT (*psRdpgfxStartFrame)(RdpgfxServerContext* context,
+-                                   const RDPGFX_START_FRAME_PDU* startFrame);
+-typedef UINT (*psRdpgfxEndFrame)(RdpgfxServerContext* context,
+-                                 const RDPGFX_END_FRAME_PDU* endFrame);
+-typedef UINT (*psRdpgfxSurfaceCommand)(RdpgfxServerContext* context,
+-                                       const RDPGFX_SURFACE_COMMAND* cmd);
++                                   RDPGFX_START_FRAME_PDU* startFrame);
++typedef UINT (*psRdpgfxEndFrame)(RdpgfxServerContext* context, RDPGFX_END_FRAME_PDU* endFrame);
++typedef UINT (*psRdpgfxSurfaceCommand)(RdpgfxServerContext* context, RDPGFX_SURFACE_COMMAND* cmd);
+ typedef UINT (*psRdpgfxSurfaceFrameCommand)(RdpgfxServerContext* context,
+-                                            const RDPGFX_SURFACE_COMMAND* cmd,
+-                                            const RDPGFX_START_FRAME_PDU* startFrame,
+-                                            const RDPGFX_END_FRAME_PDU* endFrame);
++                                            RDPGFX_SURFACE_COMMAND* cmd,
++                                            RDPGFX_START_FRAME_PDU* startFrame,
++                                            RDPGFX_END_FRAME_PDU* endFrame);
+ typedef UINT (*psRdpgfxDeleteEncodingContext)(
+-    RdpgfxServerContext* context, const RDPGFX_DELETE_ENCODING_CONTEXT_PDU* deleteEncodingContext);
++    RdpgfxServerContext* context, RDPGFX_DELETE_ENCODING_CONTEXT_PDU* deleteEncodingContext);
+ typedef UINT (*psRdpgfxCreateSurface)(RdpgfxServerContext* context,
+-                                      const RDPGFX_CREATE_SURFACE_PDU* createSurface);
++                                      RDPGFX_CREATE_SURFACE_PDU* createSurface);
+ typedef UINT (*psRdpgfxDeleteSurface)(RdpgfxServerContext* context,
+-                                      const RDPGFX_DELETE_SURFACE_PDU* deleteSurface);
+-typedef UINT (*psRdpgfxSolidFill)(RdpgfxServerContext* context,
+-                                  const RDPGFX_SOLID_FILL_PDU* solidFill);
++                                      RDPGFX_DELETE_SURFACE_PDU* deleteSurface);
++typedef UINT (*psRdpgfxSolidFill)(RdpgfxServerContext* context, RDPGFX_SOLID_FILL_PDU* solidFill);
+ typedef UINT (*psRdpgfxSurfaceToSurface)(RdpgfxServerContext* context,
+-                                         const RDPGFX_SURFACE_TO_SURFACE_PDU* surfaceToSurface);
++                                         RDPGFX_SURFACE_TO_SURFACE_PDU* surfaceToSurface);
+ typedef UINT (*psRdpgfxSurfaceToCache)(RdpgfxServerContext* context,
+-                                       const RDPGFX_SURFACE_TO_CACHE_PDU* surfaceToCache);
++                                       RDPGFX_SURFACE_TO_CACHE_PDU* surfaceToCache);
+ typedef UINT (*psRdpgfxCacheToSurface)(RdpgfxServerContext* context,
+-                                       const RDPGFX_CACHE_TO_SURFACE_PDU* cacheToSurface);
++                                       RDPGFX_CACHE_TO_SURFACE_PDU* cacheToSurface);
+ typedef UINT (*psRdpgfxCacheImportOffer)(RdpgfxServerContext* context,
+-                                         const RDPGFX_CACHE_IMPORT_OFFER_PDU* cacheImportOffer);
++                                         RDPGFX_CACHE_IMPORT_OFFER_PDU* cacheImportOffer);
+ typedef UINT (*psRdpgfxCacheImportReply)(RdpgfxServerContext* context,
+-                                         const RDPGFX_CACHE_IMPORT_REPLY_PDU* cacheImportReply);
++                                         RDPGFX_CACHE_IMPORT_REPLY_PDU* cacheImportReply);
+ typedef UINT (*psRdpgfxEvictCacheEntry)(RdpgfxServerContext* context,
+-                                        const RDPGFX_EVICT_CACHE_ENTRY_PDU* evictCacheEntry);
++                                        RDPGFX_EVICT_CACHE_ENTRY_PDU* evictCacheEntry);
+ typedef UINT (*psRdpgfxMapSurfaceToOutput)(RdpgfxServerContext* context,
+-                                           const RDPGFX_MAP_SURFACE_TO_OUTPUT_PDU* surfaceToOutput);
++                                           RDPGFX_MAP_SURFACE_TO_OUTPUT_PDU* surfaceToOutput);
+ typedef UINT (*psRdpgfxMapSurfaceToWindow)(RdpgfxServerContext* context,
+-                                           const RDPGFX_MAP_SURFACE_TO_WINDOW_PDU* surfaceToWindow);
+-typedef UINT (*psRdpgfxMapSurfaceToScaledOutput)(
+-    RdpgfxServerContext* context, const RDPGFX_MAP_SURFACE_TO_SCALED_OUTPUT_PDU* surfaceToOutput);
+-typedef UINT (*psRdpgfxMapSurfaceToScaledWindow)(
+-    RdpgfxServerContext* context, const RDPGFX_MAP_SURFACE_TO_SCALED_WINDOW_PDU* surfaceToWindow);
++                                           RDPGFX_MAP_SURFACE_TO_WINDOW_PDU* surfaceToWindow);
+ typedef UINT (*psRdpgfxCapsAdvertise)(RdpgfxServerContext* context,
+-                                      const RDPGFX_CAPS_ADVERTISE_PDU* capsAdvertise);
++                                      RDPGFX_CAPS_ADVERTISE_PDU* capsAdvertise);
+ typedef UINT (*psRdpgfxCapsConfirm)(RdpgfxServerContext* context,
+-                                    const RDPGFX_CAPS_CONFIRM_PDU* capsConfirm);
++                                    RDPGFX_CAPS_CONFIRM_PDU* capsConfirm);
+ typedef UINT (*psRdpgfxFrameAcknowledge)(RdpgfxServerContext* context,
+-                                         const RDPGFX_FRAME_ACKNOWLEDGE_PDU* frameAcknowledge);
+-typedef UINT (*psRdpgfxQoeFrameAcknowledge)(
+-    RdpgfxServerContext* context, const RDPGFX_QOE_FRAME_ACKNOWLEDGE_PDU* qoeFrameAcknowledge);
++                                         RDPGFX_FRAME_ACKNOWLEDGE_PDU* frameAcknowledge);
++typedef UINT (*psRdpgfxQoeFrameAcknowledge)(RdpgfxServerContext* context,
++                                            RDPGFX_QOE_FRAME_ACKNOWLEDGE_PDU* qoeFrameAcknowledge);
+ 
+ struct _rdpgfx_server_context
+ {
+@@ -103,8 +95,6 @@
+ 	psRdpgfxEvictCacheEntry EvictCacheEntry;
+ 	psRdpgfxMapSurfaceToOutput MapSurfaceToOutput;
+ 	psRdpgfxMapSurfaceToWindow MapSurfaceToWindow;
+-	psRdpgfxMapSurfaceToScaledOutput MapSurfaceToScaledOutput;
+-	psRdpgfxMapSurfaceToScaledWindow MapSurfaceToScaledWindow;
+ 	psRdpgfxCapsAdvertise CapsAdvertise;
+ 	psRdpgfxCapsConfirm CapsConfirm;
+ 	psRdpgfxFrameAcknowledge FrameAcknowledge;
+diff -urN include/freerdp/settings.h ../../informatimago/FreeRDP/include/freerdp/settings.h
+--- include/freerdp/settings.h	2019-07-25 19:51:01.201899108 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/settings.h	2019-07-25 20:11:25.179968858 +0300
+@@ -27,16 +27,6 @@
+ #include <freerdp/api.h>
+ #include <freerdp/types.h>
+ 
+-/* RAIL Support Level */
+-#define RAIL_LEVEL_SUPPORTED 0x00000001
+-#define RAIL_LEVEL_DOCKED_LANGBAR_SUPPORTED 0x00000002
+-#define RAIL_LEVEL_SHELL_INTEGRATION_SUPPORTED 0x00000004
+-#define RAIL_LEVEL_LANGUAGE_IME_SYNC_SUPPORTED 0x00000008
+-#define RAIL_LEVEL_SERVER_TO_CLIENT_IME_SYNC_SUPPORTED 0x00000010
+-#define RAIL_LEVEL_HIDE_MINIMIZED_APPS_SUPPORTED 0x00000020
+-#define RAIL_LEVEL_WINDOW_CLOAKING_SUPPORTED 0x00000040
+-#define RAIL_LEVEL_HANDSHAKE_EX_SUPPORTED 0x00000080
+-
+ /* Performance Flags */
+ #define PERF_FLAG_NONE 0x00000000
+ #define PERF_DISABLE_WALLPAPER 0x00000001
+@@ -82,13 +72,13 @@
+ {
+ 	RDP_VERSION_4 = 0x00080001,
+ 	RDP_VERSION_5_PLUS = 0x00080004,
+-	RDP_VERSION_10_0 = 0x00080005,
+-	RDP_VERSION_10_1 = 0x00080006,
+-	RDP_VERSION_10_2 = 0x00080007,
+-	RDP_VERSION_10_3 = 0x00080008,
+-	RDP_VERSION_10_4 = 0x00080009,
+-	RDP_VERSION_10_5 = 0x0008000a,
+-	RDP_VERSION_10_6 = 0x0008000b,
++	RDP_VERSION_10_0 = 0x00800005,
++	RDP_VERSION_10_1 = 0x00800006,
++	RDP_VERSION_10_2 = 0x00800007,
++	RDP_VERSION_10_3 = 0x00800008,
++	RDP_VERSION_10_4 = 0x00800009,
++	RDP_VERSION_10_5 = 0x0080000a,
++	RDP_VERSION_10_6 = 0x0080000b,
+ } RDP_VERSION;
+ 
+ /* Color depth */
+@@ -297,6 +287,11 @@
+ #define ORIENTATION_LANDSCAPE_FLIPPED 180
+ #define ORIENTATION_PORTRAIT_FLIPPED 270
+ 
++/* KeySpec https://docs.microsoft.com/en-us/windows/desktop/api/wincrypt/nf-wincrypt-cryptgenkey */
++#define AT_KEYEXCHANGE (1)
++#define AT_SIGNATURE (2)
++#define AT_AUTHENTICATE (3)
++
+ /* ARC_CS_PRIVATE_PACKET */
+ typedef struct
+ {
+@@ -677,7 +672,33 @@
+ #define FreeRDP_Password51 (1280)
+ #define FreeRDP_Password51Length (1281)
+ #define FreeRDP_SmartcardLogon (1282)
+-#define FreeRDP_PromptForCredentials (1283)
++#define FreeRDP_Pkcs11Module (1283)
++#define FreeRDP_PinLoginRequired (1284)
++#define FreeRDP_PinPadIsPresent (1285)
++#define FreeRDP_Pin (1286)
++#define FreeRDP_KeySpec (1287)
++#define FreeRDP_CardName (1288)
++#define FreeRDP_ReaderName (1289)
++#define FreeRDP_ContainerName (1290)
++#define FreeRDP_CspName (1291)
++#define FreeRDP_UserHint (1292)
++#define FreeRDP_DomainHint (1293)
++#define FreeRDP_CredentialsType (1294)
++#define FreeRDP_UserPrincipalName (1295)
++#define FreeRDP_CanonicalizedUserHint (1296)
++#define FreeRDP_IdCertificate (1297)
++#define FreeRDP_IdCertificateLength (1298)
++#define FreeRDP_PkinitIdentity (1299)
++#define FreeRDP_PkinitAnchors (1300)
++#define FreeRDP_SlotID (1301)
++#define FreeRDP_TokenLabel (1302)
++#define FreeRDP_TokenFlags (1303)
++#define FreeRDP_KerberosStartTime (1304)
++#define FreeRDP_KerberosLifeTime (1305)
++#define FreeRDP_KerberosRenewableLifeTime (1306)
++#define FreeRDP_Pkinit (1307)
++#define FreeRDP_PkinitCertificate (1308)
++#define FreeRDP_Krb5Trace (1309)
+ #define FreeRDP_KerberosKdc (1344)
+ #define FreeRDP_KerberosRealm (1345)
+ #define FreeRDP_IgnoreCertificate (1408)
+@@ -692,7 +713,6 @@
+ #define FreeRDP_PrivateKeyContent (1417)
+ #define FreeRDP_RdpKeyContent (1418)
+ #define FreeRDP_AutoAcceptCertificate (1419)
+-#define FreeRDP_AutoDenyCertificate (1420)
+ #define FreeRDP_Workarea (1536)
+ #define FreeRDP_Fullscreen (1537)
+ #define FreeRDP_PercentScreen (1538)
+@@ -766,9 +786,6 @@
+ #define FreeRDP_RemoteAppNumIconCacheEntries (2123)
+ #define FreeRDP_RemoteAppLanguageBarSupported (2124)
+ #define FreeRDP_RemoteWndSupportLevel (2125)
+-#define FreeRDP_RemoteApplicationSupportLevel (2126)
+-#define FreeRDP_RemoteApplicationSupportMask (2127)
+-#define FreeRDP_RemoteApplicationWorkingDir (2128)
+ #define FreeRDP_ReceivedCapabilities (2240)
+ #define FreeRDP_ReceivedCapabilitiesSize (2241)
+ #define FreeRDP_OsMajorType (2304)
+@@ -847,7 +864,6 @@
+ #define FreeRDP_GfxAVC444 (3845)
+ #define FreeRDP_GfxSendQoeAck (3846)
+ #define FreeRDP_GfxAVC444v2 (3847)
+-#define FreeRDP_GfxCapsFilter (3848)
+ #define FreeRDP_BitmapCacheV3CodecId (3904)
+ #define FreeRDP_DrawNineGridEnabled (3968)
+ #define FreeRDP_DrawNineGridCacheSize (3969)
+@@ -879,7 +895,6 @@
+ #define FreeRDP_SupportGeometryTracking (5186)
+ #define FreeRDP_SupportSSHAgentChannel (5187)
+ #define FreeRDP_SupportVideoOptimized (5188)
+-#define FreeRDP_RDP2TCPArgs (5189)
+ 
+ /**
+  * FreeRDP Settings Data Structure
+@@ -1040,10 +1055,10 @@
+ 	UINT64 padding0896[896 - 837];                            /* 837 */
+ 
+ 	/* Client Info (Time Zone) */
+-	ALIGN64 TIME_ZONE_INFORMATION* ClientTimeZone; /* 896 */
+-	ALIGN64 char* DynamicDSTTimeZoneKeyName;       /* 897 */
+-	ALIGN64 BOOL DynamicDaylightTimeDisabled;      /* 898 */
+-	UINT64 padding0960[960 - 899];                 /* 899 */
++	ALIGN64 LPTIME_ZONE_INFORMATION ClientTimeZone; /* 896 */
++	ALIGN64 char* DynamicDSTTimeZoneKeyName;        /* 897 */
++	ALIGN64 BOOL DynamicDaylightTimeDisabled;       /* 898 */
++	UINT64 padding0960[960 - 899];                  /* 899 */
+ 
+ 	/* Client Info (Performance Flags) */
+ 	ALIGN64 UINT32 PerformanceFlags;      /* 960 */
+@@ -1127,11 +1142,38 @@
+ 	 */
+ 
+ 	/* Credentials Cache */
+-	ALIGN64 BYTE* Password51;          /* 1280 */
+-	ALIGN64 UINT32 Password51Length;   /* 1281 */
+-	ALIGN64 BOOL SmartcardLogon;       /* 1282 */
+-	ALIGN64 BOOL PromptForCredentials; /* 1283 */
+-	UINT64 padding1344[1344 - 1284];   /* 1284 */
++
++	ALIGN64 BYTE* Password51; /* 1280 */        /* NOT USED */
++	ALIGN64 UINT32 Password51Length; /* 1281 */ /* NOT USED */
++	ALIGN64 BOOL SmartcardLogon;                /* 1282 */
++	ALIGN64 char* Pkcs11Module;                 /* 1283 */
++	ALIGN64 BOOL PinLoginRequired;              /* 1284 */
++	ALIGN64 BOOL PinPadIsPresent;               /* 1285 */
++	ALIGN64 char* Pin;                          /* 1286 */
++	ALIGN64 UINT32 KeySpec;                     /* 1287 */
++	ALIGN64 char* CardName;                     /* 1288 */
++	ALIGN64 char* ReaderName;                   /* 1289 */
++	ALIGN64 char* ContainerName;                /* 1290 */
++	ALIGN64 char* CspName;                      /* 1291 */
++	ALIGN64 char* UserHint;                     /* 1292 */
++	ALIGN64 char* DomainHint;                   /* 1293 */
++	ALIGN64 UINT32 CredentialsType;             /* 1294 */
++	ALIGN64 char* UserPrincipalName;            /* 1295 */
++	ALIGN64 char* CanonicalizedUserHint;        /* 1296 */
++	ALIGN64 char* IdCertificate;                /* 1297 */
++	ALIGN64 UINT64 IdCertificateLength;         /* 1298 */
++	ALIGN64 char* PkinitIdentity;               /* 1299 */
++	ALIGN64 char* PkinitAnchors;                /* 1300 */
++	ALIGN64 UINT64 SlotID;                      /* 1301 */
++	ALIGN64 char* TokenLabel;                   /* 1302 */
++	ALIGN64 INT32 TokenFlags;                   /* 1303 */
++	ALIGN64 char* KerberosStartTime;            /* 1304 */
++	ALIGN64 char* KerberosLifeTime;             /* 1305 */
++	ALIGN64 char* KerberosRenewableLifeTime;    /* 1306 */
++	ALIGN64 BOOL Pkinit;                        /* 1307 */
++	ALIGN64 char* PkinitCertificate;            /* 1308 */
++	ALIGN64 BOOL Krb5Trace;                     /* 1309 */
++	UINT64 padding1344[1344 - 1310];            /* 1310 */
+ 
+ 	/* Kerberos Authentication */
+ 	ALIGN64 char* KerberosKdc;       /* 1344 */
+@@ -1151,8 +1193,7 @@
+ 	ALIGN64 char* PrivateKeyContent;              /* 1417 */
+ 	ALIGN64 char* RdpKeyContent;                  /* 1418 */
+ 	ALIGN64 BOOL AutoAcceptCertificate;           /* 1419 */
+-	ALIGN64 BOOL AutoDenyCertificate;             /* 1420 */
+-	UINT64 padding1472[1472 - 1421];              /* 1421 */
++	UINT64 padding1472[1472 - 1420];              /* 1420 */
+ 	UINT64 padding1536[1536 - 1472];              /* 1472 */
+ 
+ 	/**
+@@ -1176,8 +1217,8 @@
+ 	ALIGN64 char* WmClass;                /* 1549 */
+ 	ALIGN64 BOOL EmbeddedWindow;          /* 1550 */
+ 	ALIGN64 BOOL SmartSizing;             /* 1551 */
+-	ALIGN64 INT32 XPan;                   /* 1552 */
+-	ALIGN64 INT32 YPan;                   /* 1553 */
++	ALIGN64 int XPan;                     /* 1552 */
++	ALIGN64 int YPan;                     /* 1553 */
+ 	ALIGN64 UINT32 SmartSizingWidth;      /* 1554 */
+ 	ALIGN64 UINT32 SmartSizingHeight;     /* 1555 */
+ 	ALIGN64 BOOL PercentScreenUseWidth;   /* 1556 */
+@@ -1267,10 +1308,7 @@
+ 	ALIGN64 UINT32 RemoteAppNumIconCacheEntries;      /* 2123 */
+ 	ALIGN64 BOOL RemoteAppLanguageBarSupported;       /* 2124 */
+ 	ALIGN64 UINT32 RemoteWndSupportLevel;             /* 2125 */
+-	ALIGN64 UINT32 RemoteApplicationSupportLevel;     /* 2126 */
+-	ALIGN64 UINT32 RemoteApplicationSupportMask;      /* 2127 */
+-	ALIGN64 char* RemoteApplicationWorkingDir;        /* 2128 */
+-	UINT64 padding2176[2176 - 2129];                  /* 2129 */
++	UINT64 padding2176[2176 - 2126];                  /* 2126 */
+ 	UINT64 padding2240[2240 - 2176];                  /* 2176 */
+ 
+ 	/**
+@@ -1434,8 +1472,7 @@
+ 	ALIGN64 BOOL GfxAVC444;          /* 3845 */
+ 	ALIGN64 BOOL GfxSendQoeAck;      /* 3846 */
+ 	ALIGN64 BOOL GfxAVC444v2;        /* 3847 */
+-	ALIGN64 UINT32 GfxCapsFilter;    /* 3848 */
+-	UINT64 padding3904[3904 - 3849]; /* 3849 */
++	UINT64 padding3904[3904 - 3848]; /* 3848 */
+ 
+ 	/**
+ 	 * Caches
+@@ -1519,8 +1556,7 @@
+ 	ALIGN64 BOOL SupportGeometryTracking; /* 5186 */
+ 	ALIGN64 BOOL SupportSSHAgentChannel;  /* 5187 */
+ 	ALIGN64 BOOL SupportVideoOptimized;   /* 5188 */
+-	ALIGN64 char* RDP2TCPArgs;            /* 5189 */
+-	UINT64 padding5312[5312 - 5190];      /* 5190 */
++	UINT64 padding5312[5312 - 5189];      /* 5189 */
+ 
+ 	/**
+ 	 * WARNING: End of ABI stable zone!
+@@ -1534,7 +1570,7 @@
+ 	 */
+ 
+ 	/* Extensions */
+-	ALIGN64 INT32 num_extensions;              /*  */
++	ALIGN64 int num_extensions;                /*  */
+ 	ALIGN64 struct rdp_ext_set extensions[16]; /*  */
+ 
+ 	ALIGN64 BYTE* SettingsModified; /* byte array marking fields that have been modified from their
+@@ -1555,8 +1591,7 @@
+ #define FREERDP_SETTINGS_SERVER_MODE 0x00000001
+ 
+ 	FREERDP_API rdpSettings* freerdp_settings_new(DWORD flags);
+-	FREERDP_API rdpSettings* freerdp_settings_clone(const rdpSettings* settings);
+-	FREERDP_API BOOL freerdp_settings_copy(rdpSettings* dst, const rdpSettings* src);
++	FREERDP_API rdpSettings* freerdp_settings_clone(rdpSettings* settings);
+ 	FREERDP_API void freerdp_settings_free(rdpSettings* settings);
+ 
+ 	FREERDP_API int freerdp_addin_set_argument(ADDIN_ARGV* args, char* argument);
+@@ -1593,16 +1628,12 @@
+ 	FREERDP_API void freerdp_performance_flags_make(rdpSettings* settings);
+ 	FREERDP_API void freerdp_performance_flags_split(rdpSettings* settings);
+ 
+-	FREERDP_API BOOL freerdp_set_gateway_usage_method(rdpSettings* settings,
++	FREERDP_API void freerdp_set_gateway_usage_method(rdpSettings* settings,
+ 	                                                  UINT32 GatewayUsageMethod);
+ 	FREERDP_API void freerdp_update_gateway_usage_method(rdpSettings* settings,
+ 	                                                     UINT32 GatewayEnabled,
+ 	                                                     UINT32 GatewayBypassLocal);
+ 
+-	/* DEPRECATED:
+-	 * the functions freerdp_get_param_* and freerdp_set_param_* are deprecated.
+-	 * use freerdp_settings_get_* and freerdp_settings_set_* as a replacement!
+-	 */
+ 	FREERDP_API BOOL freerdp_get_param_bool(rdpSettings* settings, int id);
+ 	FREERDP_API int freerdp_set_param_bool(rdpSettings* settings, int id, BOOL param);
+ 
+@@ -1618,33 +1649,6 @@
+ 	FREERDP_API char* freerdp_get_param_string(rdpSettings* settings, int id);
+ 	FREERDP_API int freerdp_set_param_string(rdpSettings* settings, int id, const char* param);
+ 
+-	FREERDP_API BOOL freerdp_settings_get_bool(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_bool(rdpSettings* settings, size_t id, BOOL param);
+-
+-	FREERDP_API INT16 freerdp_settings_get_int16(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_int16(rdpSettings* settings, size_t id, INT16 param);
+-
+-	FREERDP_API UINT16 freerdp_settings_get_uint16(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_uint16(rdpSettings* settings, size_t id, UINT16 param);
+-
+-	FREERDP_API INT32 freerdp_settings_get_int32(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_int32(rdpSettings* settings, size_t id, INT32 param);
+-
+-	FREERDP_API UINT32 freerdp_settings_get_uint32(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_uint32(rdpSettings* settings, size_t id, UINT32 param);
+-
+-	FREERDP_API INT64 freerdp_settings_get_int64(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_int64(rdpSettings* settings, size_t id, INT64 param);
+-
+-	FREERDP_API UINT64 freerdp_settings_get_uint64(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_uint64(rdpSettings* settings, size_t id, UINT64 param);
+-
+-	FREERDP_API const char* freerdp_settings_get_string(rdpSettings* settings, size_t id);
+-	FREERDP_API BOOL freerdp_settings_set_string(rdpSettings* settings, size_t id,
+-	                                             const char* param);
+-
+-	FREERDP_API const void* freerdp_settings_get_pointer(rdpSettings* settings, size_t id);
+-
+ #ifdef __cplusplus
+ }
+ #endif
+diff -urN include/freerdp/update.h ../../informatimago/FreeRDP/include/freerdp/update.h
+--- include/freerdp/update.h	2019-07-25 19:51:01.209899148 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/update.h	2019-07-25 20:11:25.187968898 +0300
+@@ -139,20 +139,6 @@
+ 	SURFACECMD_FRAMEACTION_END = 0x0001
+ };
+ 
+-/** @brief status code as in 2.2.5.2 Server Status Info PDU */
+-enum
+-{
+-	TS_STATUS_FINDING_DESTINATION = 0x00000401,
+-	TS_STATUS_LOADING_DESTINATION = 0x00000402,
+-	TS_STATUS_BRINGING_SESSION_ONLINE = 0x00000403,
+-	TS_STATUS_REDIRECTING_TO_DESTINATION = 0x00000404,
+-	TS_STATUS_VM_LOADING = 0x00000501,
+-	TS_STATUS_VM_WAKING = 0x00000502,
+-	TS_STATUS_VM_STARTING = 0x00000503,
+-	TS_STATUS_VM_STARTING_MONITORING = 0x00000504,
+-	TS_STATUS_VM_RETRYING_MONITORING = 0x00000505
+-};
+-
+ struct _SURFACE_FRAME
+ {
+ 	UINT32 frameId;
+@@ -192,7 +178,6 @@
+ typedef BOOL (*pSaveSessionInfo)(rdpContext* context, UINT32 type, void* data);
+ typedef BOOL (*pSetKeyboardImeStatus)(rdpContext* context, UINT16 imeId, UINT32 imeState,
+                                       UINT32 imeConvMode);
+-typedef BOOL (*pServerStatusInfo)(rdpContext* context, UINT32 status);
+ 
+ struct rdp_update
+ {
+@@ -229,8 +214,7 @@
+ 	pSurfaceFrameBits SurfaceFrameBits;               /* 67 */
+ 	pSurfaceFrameAcknowledge SurfaceFrameAcknowledge; /* 68 */
+ 	pSaveSessionInfo SaveSessionInfo;                 /* 69 */
+-	pServerStatusInfo ServerStatusInfo;               /* 70 */
+-	UINT32 paddingE[80 - 71];                         /* 71 */
++	UINT32 paddingE[80 - 70];                         /* 70 */
+ 
+ 	/* internal */
+ 
+@@ -250,12 +234,6 @@
+ 	BOOL combineUpdates;
+ 	rdpBounds currentBounds;
+ 	rdpBounds previousBounds;
+-	CRITICAL_SECTION mux;
+-
+-	/* if autoCalculateBitmapData is set to TRUE, the server automatically
+-	 * fills BITMAP_DATA struct members: flags, cbCompMainBodySize and cbCompFirstRowSize.
+-	 */
+-	BOOL autoCalculateBitmapData;
+ };
+ 
+ #endif /* FREERDP_UPDATE_H */
+diff -urN include/freerdp/version.h ../../informatimago/FreeRDP/include/freerdp/version.h
+--- include/freerdp/version.h	2019-07-25 20:17:16.429710691 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/version.h	2019-07-20 18:23:24.245103286 +0300
+@@ -27,6 +27,6 @@
+ #define FREERDP_API_VERSION "2"
+ #define FREERDP_VERSION "2.0.0"
+ #define FREERDP_VERSION_FULL "2.0.0-dev5"
+-#define GIT_REVISION "743551db2"
++#define GIT_REVISION "da5355e90"
+ 
+ #endif /* FREERDP_VERSION_H */
+diff -urN include/freerdp/window.h ../../informatimago/FreeRDP/include/freerdp/window.h
+--- include/freerdp/window.h	2019-07-25 19:51:01.233899266 +0300
++++ ../../informatimago/FreeRDP/include/freerdp/window.h	2019-07-25 20:11:25.211969016 +0300
+@@ -26,19 +26,14 @@
+ #define WINDOW_ORDER_TYPE_WINDOW 0x01000000
+ #define WINDOW_ORDER_TYPE_NOTIFY 0x02000000
+ #define WINDOW_ORDER_TYPE_DESKTOP 0x04000000
+-
+ #define WINDOW_ORDER_STATE_NEW 0x10000000
+ #define WINDOW_ORDER_STATE_DELETED 0x20000000
+-
+-/* Window Order Update */
+ #define WINDOW_ORDER_FIELD_OWNER 0x00000002
+ #define WINDOW_ORDER_FIELD_STYLE 0x00000008
+ #define WINDOW_ORDER_FIELD_SHOW 0x00000010
+ #define WINDOW_ORDER_FIELD_TITLE 0x00000004
+ #define WINDOW_ORDER_FIELD_CLIENT_AREA_OFFSET 0x00004000
+ #define WINDOW_ORDER_FIELD_CLIENT_AREA_SIZE 0x00010000
+-#define WINDOW_ORDER_FIELD_RESIZE_MARGIN_X 0x00000080
+-#define WINDOW_ORDER_FIELD_RESIZE_MARGIN_Y 0x08000000
+ #define WINDOW_ORDER_FIELD_RP_CONTENT 0x00020000
+ #define WINDOW_ORDER_FIELD_ROOT_PARENT 0x00040000
+ #define WINDOW_ORDER_FIELD_WND_OFFSET 0x00000800
+@@ -47,19 +42,9 @@
+ #define WINDOW_ORDER_FIELD_WND_RECTS 0x00000100
+ #define WINDOW_ORDER_FIELD_VIS_OFFSET 0x00001000
+ #define WINDOW_ORDER_FIELD_VISIBILITY 0x00000200
+-#define WINDOW_ORDER_FIELD_OVERLAY_DESCRIPTION 0x00400000
+-#define WINDOW_ORDER_FIELD_ICON_OVERLAY_NULL 0x00200000
+-#define WINDOW_ORDER_FIELD_TASKBAR_BUTTON 0x00800000
+-#define WINDOW_ORDER_FIELD_ENFORCE_SERVER_ZORDER 0x00080000
+-#define WINDOW_ORDER_FIELD_APPBAR_STATE 0x00000040
+-#define WINDOW_ORDER_FIELD_APPBAR_EDGE 0x00000001
+-
+-/* Window (chached) Icon */
++#define WINDOW_ORDER_FIELD_ICON_BIG 0x00002000
+ #define WINDOW_ORDER_ICON 0x40000000
+ #define WINDOW_ORDER_CACHED_ICON 0x80000000
+-#define WINDOW_ORDER_FIELD_ICON_BIG 0x00002000
+-#define WINDOW_ORDER_FIELD_ICON_OVERLAY 0x00100000
+-
+ #define WINDOW_ORDER_FIELD_NOTIFY_VERSION 0x00000008
+ #define WINDOW_ORDER_FIELD_NOTIFY_TIP 0x00000001
+ #define WINDOW_ORDER_FIELD_NOTIFY_INFO_TIP 0x00000002
+@@ -206,17 +191,8 @@
+ 	RECTANGLE_16* windowRects;
+ 	INT32 visibleOffsetX;
+ 	INT32 visibleOffsetY;
+-	UINT32 resizeMarginLeft;
+-	UINT32 resizeMarginTop;
+-	UINT32 resizeMarginRight;
+-	UINT32 resizeMarginBottom;
+ 	UINT32 numVisibilityRects;
+ 	RECTANGLE_16* visibilityRects;
+-	RAIL_UNICODE_STRING OverlayDescription;
+-	BYTE TaskbarButton;
+-	UINT8 EnforceServerZOrder;
+-	UINT8 AppBarState;
+-	UINT8 AppBarEdge;
+ };
+ typedef struct _WINDOW_STATE_ORDER WINDOW_STATE_ORDER;
+ 
+@@ -251,23 +227,23 @@
+ };
+ typedef struct _MONITORED_DESKTOP_ORDER MONITORED_DESKTOP_ORDER;
+ 
+-typedef BOOL (*pWindowCreate)(rdpContext* context, const WINDOW_ORDER_INFO* orderInfo,
+-                              const WINDOW_STATE_ORDER* window_state);
+-typedef BOOL (*pWindowUpdate)(rdpContext* context, const WINDOW_ORDER_INFO* orderInfo,
+-                              const WINDOW_STATE_ORDER* window_state);
+-typedef BOOL (*pWindowIcon)(rdpContext* context, const WINDOW_ORDER_INFO* orderInfo,
+-                            const WINDOW_ICON_ORDER* window_icon);
+-typedef BOOL (*pWindowCachedIcon)(rdpContext* context, const WINDOW_ORDER_INFO* orderInfo,
+-                                  const WINDOW_CACHED_ICON_ORDER* window_cached_icon);
+-typedef BOOL (*pWindowDelete)(rdpContext* context, const WINDOW_ORDER_INFO* orderInfo);
+-typedef BOOL (*pNotifyIconCreate)(rdpContext* context, const WINDOW_ORDER_INFO* orderInfo,
+-                                  const NOTIFY_ICON_STATE_ORDER* notify_icon_state);
+-typedef BOOL (*pNotifyIconUpdate)(rdpContext* context, const WINDOW_ORDER_INFO* orderInfo,
+-                                  const NOTIFY_ICON_STATE_ORDER* notify_icon_state);
+-typedef BOOL (*pNotifyIconDelete)(rdpContext* context, const WINDOW_ORDER_INFO* orderInfo);
+-typedef BOOL (*pMonitoredDesktop)(rdpContext* context, const WINDOW_ORDER_INFO* orderInfo,
+-                                  const MONITORED_DESKTOP_ORDER* monitored_desktop);
+-typedef BOOL (*pNonMonitoredDesktop)(rdpContext* context, const WINDOW_ORDER_INFO* orderInfo);
++typedef BOOL (*pWindowCreate)(rdpContext* context, WINDOW_ORDER_INFO* orderInfo,
++                              WINDOW_STATE_ORDER* window_state);
++typedef BOOL (*pWindowUpdate)(rdpContext* context, WINDOW_ORDER_INFO* orderInfo,
++                              WINDOW_STATE_ORDER* window_state);
++typedef BOOL (*pWindowIcon)(rdpContext* context, WINDOW_ORDER_INFO* orderInfo,
++                            WINDOW_ICON_ORDER* window_icon);
++typedef BOOL (*pWindowCachedIcon)(rdpContext* context, WINDOW_ORDER_INFO* orderInfo,
++                                  WINDOW_CACHED_ICON_ORDER* window_cached_icon);
++typedef BOOL (*pWindowDelete)(rdpContext* context, WINDOW_ORDER_INFO* orderInfo);
++typedef BOOL (*pNotifyIconCreate)(rdpContext* context, WINDOW_ORDER_INFO* orderInfo,
++                                  NOTIFY_ICON_STATE_ORDER* notify_icon_state);
++typedef BOOL (*pNotifyIconUpdate)(rdpContext* context, WINDOW_ORDER_INFO* orderInfo,
++                                  NOTIFY_ICON_STATE_ORDER* notify_icon_state);
++typedef BOOL (*pNotifyIconDelete)(rdpContext* context, WINDOW_ORDER_INFO* orderInfo);
++typedef BOOL (*pMonitoredDesktop)(rdpContext* context, WINDOW_ORDER_INFO* orderInfo,
++                                  MONITORED_DESKTOP_ORDER* monitored_desktop);
++typedef BOOL (*pNonMonitoredDesktop)(rdpContext* context, WINDOW_ORDER_INFO* orderInfo);
+ 
+ struct rdp_window_update
+ {
+@@ -287,6 +263,13 @@
+ 	UINT32 paddingB[32 - 26];                 /* 26 */
+ 
+ 	/* internal */
++
++	WINDOW_ORDER_INFO orderInfo;
++	WINDOW_STATE_ORDER window_state;
++	WINDOW_ICON_ORDER window_icon;
++	WINDOW_CACHED_ICON_ORDER window_cached_icon;
++	NOTIFY_ICON_STATE_ORDER notify_icon_state;
++	MONITORED_DESKTOP_ORDER monitored_desktop;
+ };
+ typedef struct rdp_window_update rdpWindowUpdate;
+ 
