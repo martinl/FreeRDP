@@ -7,7 +7,7 @@ Install Windows Updates
 Set static ip, gw, dns
 Set computer name: winsrv2016-1.test.local
 Restart
-Enable RDP, NLA on
+Enable RDP, NLA off
 
 Install AD Domain Services Role
 Restart
@@ -61,5 +61,6 @@ cd yubikey-manager
 qmake && make
 ./ykman-gui/ykman-gui &
 
+Follow the guide to request authentication certificate from CA:
 https://developers.yubico.com/PIV/Introduction/YubiKey_and_PIV.html
 
