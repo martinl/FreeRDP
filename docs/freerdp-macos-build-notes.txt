@@ -42,6 +42,9 @@ cmake --build . --target clangformat
 # debug build with unit tests
 cmake -DWITH_SSE2=ON -DWITH_GSSAPI=ON -DWITH_PKCS11H=ON -DWITH_KERBEROS=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DWITH_CUNIT=ON -DWITH_DEBUG_NTLM=ON -DWITH_DEBUG_NEGO=ON -DWITH_DEBUG_NLA=ON -DWITH_DEBUG_SCARD=ON . && make && make CTEST_OUTPUT_ON_FAILURE=1 test
 
+# minimal debug build with unit tests for upstream
+cmake -DWITH_SSE2=ON -DWITH_GSSAPI=OFF -DWITH_PKCS11H=OFF -DWITH_KERBEROS=OFF -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DWITH_CUNIT=ON -DWITH_DEBUG_NTLM=ON -DWITH_DEBUG_NEGO=ON -DWITH_DEBUG_NLA=ON -DWITH_DEBUG_SCARD=ON . && make && make CTEST_OUTPUT_ON_FAILURE=1 test
+
 # get buildconfig output
 ./client/Mac/cli/MacFreeRDP.app/Contents/MacOS/MacFreeRDP /buildconfig
 
