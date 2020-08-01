@@ -28,10 +28,10 @@ find . -name CMakeCache.txt | xargs rm
 find . -name CMakeFiles | xargs rm -r
 
 # generate makefiles
-# cmake -DWITH_PCSC=ON -DWITH-FFMPEG=ON -DWITH_PKCS11H=ON -DWITH_GSSAPI=ON  WITH_CLANG_FORMAT=ON .
+# cmake -DWITH_PCSC=ON -DWITH-FFMPEG=ON -DWITH_PKCS11H=ON -DWITH_GSSAPI=ON -DWITH_CLANG_FORMAT=ON .
 
 # for initial testing vs windows rdp
-# cmake -DWITH_PCSC=ON -DWITH-FFMPEG=ON -DWITH_PKCS11H=OFF -DWITH_GSSAPI=OFF  WITH_CLANG_FORMAT=ON .
+# cmake -DWITH_PCSC=ON -DWITH-FFMPEG=ON -DWITH_PKCS11H=OFF -DWITH_GSSAPI=OFF -DWITH_CLANG_FORMAT=ON .
 
 # build project
 cmake --build .
