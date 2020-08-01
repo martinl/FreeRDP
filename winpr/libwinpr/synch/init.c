@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/synch.h>
@@ -56,38 +56,39 @@ BOOL winpr_InitOnceExecuteOnce(PINIT_ONCE InitOnce, PINIT_ONCE_FN InitFn, PVOID 
 	{
 		switch ((ULONG_PTR)InitOnce->Ptr & 3)
 		{
-		case 2:
-			/* already completed successfully */
-			return TRUE;
-
-		case 0:
-
-			/* first time */
-			if (InterlockedCompareExchangePointer(&InitOnce->Ptr, (PVOID)1, (PVOID)0) != (PVOID)0)
-			{
-				/* some other thread was faster */
-				break;
-			}
-
-			/* it's our job to call the init function */
-			if (InitFn(InitOnce, Parameter, Context))
-			{
-				/* success */
-				InitOnce->Ptr = (PVOID)2;
+			case 2:
+				/* already completed successfully */
 				return TRUE;
-			}
 
-			/* the init function returned an error,  reset the status */
-			InitOnce->Ptr = (PVOID)0;
-			return FALSE;
+			case 0:
 
-		case 1:
-			/* in progress */
-			break;
+				/* first time */
+				if (InterlockedCompareExchangePointer(&InitOnce->Ptr, (PVOID)1, (PVOID)0) !=
+				    (PVOID)0)
+				{
+					/* some other thread was faster */
+					break;
+				}
 
-		default:
-			WLog_ERR(TAG, "internal error");
-			return FALSE;
+				/* it's our job to call the init function */
+				if (InitFn(InitOnce, Parameter, Context))
+				{
+					/* success */
+					InitOnce->Ptr = (PVOID)2;
+					return TRUE;
+				}
+
+				/* the init function returned an error,  reset the status */
+				InitOnce->Ptr = (PVOID)0;
+				return FALSE;
+
+			case 1:
+				/* in progress */
+				break;
+
+			default:
+				WLog_ERR(TAG, "internal error");
+				return FALSE;
 		}
 
 		Sleep(5);

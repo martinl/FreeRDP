@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "bulk.h"
@@ -129,29 +129,31 @@ int bulk_decompress(rdpBulk* bulk, BYTE* pSrcData, UINT32 SrcSize, BYTE** ppDstD
 	{
 		switch (type)
 		{
-		case PACKET_COMPR_TYPE_8K:
-			mppc_set_compression_level(bulk->mppcRecv, 0);
-			status = mppc_decompress(bulk->mppcRecv, pSrcData, SrcSize, ppDstData, pDstSize, flags);
-			break;
+			case PACKET_COMPR_TYPE_8K:
+				mppc_set_compression_level(bulk->mppcRecv, 0);
+				status =
+				    mppc_decompress(bulk->mppcRecv, pSrcData, SrcSize, ppDstData, pDstSize, flags);
+				break;
 
-		case PACKET_COMPR_TYPE_64K:
-			mppc_set_compression_level(bulk->mppcRecv, 1);
-			status = mppc_decompress(bulk->mppcRecv, pSrcData, SrcSize, ppDstData, pDstSize, flags);
-			break;
+			case PACKET_COMPR_TYPE_64K:
+				mppc_set_compression_level(bulk->mppcRecv, 1);
+				status =
+				    mppc_decompress(bulk->mppcRecv, pSrcData, SrcSize, ppDstData, pDstSize, flags);
+				break;
 
-		case PACKET_COMPR_TYPE_RDP6:
-			status =
-			    ncrush_decompress(bulk->ncrushRecv, pSrcData, SrcSize, ppDstData, pDstSize, flags);
-			break;
+			case PACKET_COMPR_TYPE_RDP6:
+				status = ncrush_decompress(bulk->ncrushRecv, pSrcData, SrcSize, ppDstData, pDstSize,
+				                           flags);
+				break;
 
-		case PACKET_COMPR_TYPE_RDP61:
-			status =
-			    xcrush_decompress(bulk->xcrushRecv, pSrcData, SrcSize, ppDstData, pDstSize, flags);
-			break;
+			case PACKET_COMPR_TYPE_RDP61:
+				status = xcrush_decompress(bulk->xcrushRecv, pSrcData, SrcSize, ppDstData, pDstSize,
+				                           flags);
+				break;
 
-		case PACKET_COMPR_TYPE_RDP8:
-			status = -1;
-			break;
+			case PACKET_COMPR_TYPE_RDP8:
+				status = -1;
+				break;
 		}
 	}
 	else

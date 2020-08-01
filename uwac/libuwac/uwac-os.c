@@ -30,13 +30,13 @@
 #define _GNU_SOURCE
 
 #if defined(__FreeBSD__) || defined(__DragonFly__)
-#	define USE_SHM
+#define USE_SHM
 #endif
 
 #include <sys/types.h>
 #include <sys/socket.h>
 #ifdef USE_SHM
-#	include <sys/mman.h>
+#include <sys/mman.h>
 #endif
 #include <unistd.h>
 #include <fcntl.h>

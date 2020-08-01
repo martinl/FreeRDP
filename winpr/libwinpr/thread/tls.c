@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/handle.h>
@@ -34,7 +34,7 @@
 
 #ifndef _WIN32
 
-#	include <pthread.h>
+#include <pthread.h>
 
 DWORD TlsAlloc(void)
 {

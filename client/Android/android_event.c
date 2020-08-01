@@ -11,7 +11,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -22,7 +22,7 @@
 #define TAG CLIENT_TAG("android")
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include "android_freerdp.h"
@@ -359,27 +359,27 @@ void android_event_free(ANDROID_EVENT* event)
 
 	switch (event->type)
 	{
-	case EVENT_TYPE_KEY:
-		android_event_key_free((ANDROID_EVENT_KEY*)event);
-		break;
+		case EVENT_TYPE_KEY:
+			android_event_key_free((ANDROID_EVENT_KEY*)event);
+			break;
 
-	case EVENT_TYPE_KEY_UNICODE:
-		android_event_unicodekey_free((ANDROID_EVENT_KEY*)event);
-		break;
+		case EVENT_TYPE_KEY_UNICODE:
+			android_event_unicodekey_free((ANDROID_EVENT_KEY*)event);
+			break;
 
-	case EVENT_TYPE_CURSOR:
-		android_event_cursor_free((ANDROID_EVENT_CURSOR*)event);
-		break;
+		case EVENT_TYPE_CURSOR:
+			android_event_cursor_free((ANDROID_EVENT_CURSOR*)event);
+			break;
 
-	case EVENT_TYPE_DISCONNECT:
-		android_event_disconnect_free((ANDROID_EVENT*)event);
-		break;
+		case EVENT_TYPE_DISCONNECT:
+			android_event_disconnect_free((ANDROID_EVENT*)event);
+			break;
 
-	case EVENT_TYPE_CLIPBOARD:
-		android_event_clipboard_free((ANDROID_EVENT_CLIPBOARD*)event);
-		break;
+		case EVENT_TYPE_CLIPBOARD:
+			android_event_clipboard_free((ANDROID_EVENT_CLIPBOARD*)event);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 }

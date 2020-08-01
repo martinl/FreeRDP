@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -49,7 +49,7 @@
  * CommWriteFile by WriteFile etc..  */
 #if defined __linux__ && !defined ANDROID
 
-#	define MAX_IRP_THREADS 5
+#define MAX_IRP_THREADS 5
 
 typedef struct _SERIAL_DEVICE SERIAL_DEVICE;
 
@@ -85,39 +85,39 @@ static UINT32 _GetLastErrorToIoStatus(SERIAL_DEVICE* serial)
 	 */
 	switch (GetLastError())
 	{
-	case ERROR_BAD_DEVICE:
-		return STATUS_INVALID_DEVICE_REQUEST;
+		case ERROR_BAD_DEVICE:
+			return STATUS_INVALID_DEVICE_REQUEST;
 
-	case ERROR_CALL_NOT_IMPLEMENTED:
-		return STATUS_NOT_IMPLEMENTED;
+		case ERROR_CALL_NOT_IMPLEMENTED:
+			return STATUS_NOT_IMPLEMENTED;
 
-	case ERROR_CANCELLED:
-		return STATUS_CANCELLED;
+		case ERROR_CANCELLED:
+			return STATUS_CANCELLED;
 
-	case ERROR_INSUFFICIENT_BUFFER:
-		return STATUS_BUFFER_TOO_SMALL; /* NB: STATUS_BUFFER_SIZE_TOO_SMALL not defined  */
+		case ERROR_INSUFFICIENT_BUFFER:
+			return STATUS_BUFFER_TOO_SMALL; /* NB: STATUS_BUFFER_SIZE_TOO_SMALL not defined  */
 
-	case ERROR_INVALID_DEVICE_OBJECT_PARAMETER: /* eg: SerCx2.sys' _purge() */
-		return STATUS_INVALID_DEVICE_STATE;
+		case ERROR_INVALID_DEVICE_OBJECT_PARAMETER: /* eg: SerCx2.sys' _purge() */
+			return STATUS_INVALID_DEVICE_STATE;
 
-	case ERROR_INVALID_HANDLE:
-		return STATUS_INVALID_DEVICE_REQUEST;
+		case ERROR_INVALID_HANDLE:
+			return STATUS_INVALID_DEVICE_REQUEST;
 
-	case ERROR_INVALID_PARAMETER:
-		return STATUS_INVALID_PARAMETER;
+		case ERROR_INVALID_PARAMETER:
+			return STATUS_INVALID_PARAMETER;
 
-	case ERROR_IO_DEVICE:
-		return STATUS_IO_DEVICE_ERROR;
+		case ERROR_IO_DEVICE:
+			return STATUS_IO_DEVICE_ERROR;
 
-	case ERROR_IO_PENDING:
-		return STATUS_PENDING;
+		case ERROR_IO_PENDING:
+			return STATUS_PENDING;
 
-	case ERROR_NOT_SUPPORTED:
-		return STATUS_NOT_SUPPORTED;
+		case ERROR_NOT_SUPPORTED:
+			return STATUS_NOT_SUPPORTED;
 
-	case ERROR_TIMEOUT:
-		return STATUS_TIMEOUT;
-		/* no default */
+		case ERROR_TIMEOUT:
+			return STATUS_TIMEOUT;
+			/* no default */
 	}
 
 	WLog_Print(serial->log, WLOG_DEBUG, "unexpected last-error: 0x%08" PRIX32 "", GetLastError());
@@ -147,7 +147,7 @@ static UINT serial_process_irp_create(SERIAL_DEVICE* serial, IRP* irp)
 
 	Stream_Seek(irp->input, PathLength); /* Path (variable) */
 	assert(PathLength == 0);             /* MS-RDPESP 2.2.2.2 */
-#	ifndef _WIN32
+#ifndef _WIN32
 	/* Windows 2012 server sends on a first call :
 	 *     DesiredAccess     = 0x00100080: SYNCHRONIZE | FILE_READ_ATTRIBUTES
 	 *     SharedAccess      = 0x00000007: FILE_SHARE_DELETE | FILE_SHARE_WRITE | FILE_SHARE_READ
@@ -171,7 +171,7 @@ static UINT serial_process_irp_create(SERIAL_DEVICE* serial, IRP* irp)
 	DesiredAccess = GENERIC_READ | GENERIC_WRITE;
 	SharedAccess = 0;
 	CreateDisposition = OPEN_EXISTING;
-#	endif
+#endif
 	serial->hComm =
 	    CreateFile(serial->device.name, DesiredAccess, SharedAccess, NULL, /* SecurityAttributes */
 	               CreateDisposition, 0,                                   /* FlagsAndAttributes */
@@ -448,34 +448,34 @@ static UINT serial_process_irp(SERIAL_DEVICE* serial, IRP* irp)
 
 	switch (irp->MajorFunction)
 	{
-	case IRP_MJ_CREATE:
-		error = serial_process_irp_create(serial, irp);
-		break;
+		case IRP_MJ_CREATE:
+			error = serial_process_irp_create(serial, irp);
+			break;
 
-	case IRP_MJ_CLOSE:
-		error = serial_process_irp_close(serial, irp);
-		break;
+		case IRP_MJ_CLOSE:
+			error = serial_process_irp_close(serial, irp);
+			break;
 
-	case IRP_MJ_READ:
-		if ((error = serial_process_irp_read(serial, irp)))
-			WLog_ERR(TAG, "serial_process_irp_read failed with error %" PRIu32 "!", error);
+		case IRP_MJ_READ:
+			if ((error = serial_process_irp_read(serial, irp)))
+				WLog_ERR(TAG, "serial_process_irp_read failed with error %" PRIu32 "!", error);
 
-		break;
+			break;
 
-	case IRP_MJ_WRITE:
-		error = serial_process_irp_write(serial, irp);
-		break;
+		case IRP_MJ_WRITE:
+			error = serial_process_irp_write(serial, irp);
+			break;
 
-	case IRP_MJ_DEVICE_CONTROL:
-		if ((error = serial_process_irp_device_control(serial, irp)))
-			WLog_ERR(TAG, "serial_process_irp_device_control failed with error %" PRIu32 "!",
-			         error);
+		case IRP_MJ_DEVICE_CONTROL:
+			if ((error = serial_process_irp_device_control(serial, irp)))
+				WLog_ERR(TAG, "serial_process_irp_device_control failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	default:
-		irp->IoStatus = STATUS_NOT_SUPPORTED;
-		break;
+		default:
+			irp->IoStatus = STATUS_NOT_SUPPORTED;
+			break;
 	}
 
 	return error;
@@ -797,9 +797,9 @@ static UINT serial_free(DEVICE* device)
 #endif /* __linux__ */
 
 #ifdef BUILTIN_CHANNELS
-#	define DeviceServiceEntry serial_DeviceServiceEntry
+#define DeviceServiceEntry serial_DeviceServiceEntry
 #else
-#	define DeviceServiceEntry FREERDP_API DeviceServiceEntry
+#define DeviceServiceEntry FREERDP_API DeviceServiceEntry
 #endif
 
 /**

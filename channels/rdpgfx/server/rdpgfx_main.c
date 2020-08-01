@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -441,33 +441,33 @@ static INLINE UINT32 rdpgfx_estimate_surface_command(const RDPGFX_SURFACE_COMMAN
 	/* Estimate stream size according to codec. */
 	switch (cmd->codecId)
 	{
-	case RDPGFX_CODECID_CAPROGRESSIVE:
-	case RDPGFX_CODECID_CAPROGRESSIVE_V2:
-		return RDPGFX_WIRE_TO_SURFACE_PDU_2_SIZE + cmd->length;
+		case RDPGFX_CODECID_CAPROGRESSIVE:
+		case RDPGFX_CODECID_CAPROGRESSIVE_V2:
+			return RDPGFX_WIRE_TO_SURFACE_PDU_2_SIZE + cmd->length;
 
-	case RDPGFX_CODECID_AVC420:
-		havc420 = (RDPGFX_AVC420_BITMAP_STREAM*)cmd->extra;
-		h264Size = rdpgfx_estimate_h264_avc420(havc420);
-		return RDPGFX_WIRE_TO_SURFACE_PDU_1_SIZE + h264Size;
+		case RDPGFX_CODECID_AVC420:
+			havc420 = (RDPGFX_AVC420_BITMAP_STREAM*)cmd->extra;
+			h264Size = rdpgfx_estimate_h264_avc420(havc420);
+			return RDPGFX_WIRE_TO_SURFACE_PDU_1_SIZE + h264Size;
 
-	case RDPGFX_CODECID_AVC444:
-		havc444 = (RDPGFX_AVC444_BITMAP_STREAM*)cmd->extra;
-		h264Size = sizeof(UINT32); /* cbAvc420EncodedBitstream1 */
-		/* avc420EncodedBitstream1 */
-		havc420 = &(havc444->bitstream[0]);
-		h264Size += rdpgfx_estimate_h264_avc420(havc420);
-
-		/* avc420EncodedBitstream2 */
-		if (havc444->LC == 0)
-		{
-			havc420 = &(havc444->bitstream[1]);
+		case RDPGFX_CODECID_AVC444:
+			havc444 = (RDPGFX_AVC444_BITMAP_STREAM*)cmd->extra;
+			h264Size = sizeof(UINT32); /* cbAvc420EncodedBitstream1 */
+			/* avc420EncodedBitstream1 */
+			havc420 = &(havc444->bitstream[0]);
 			h264Size += rdpgfx_estimate_h264_avc420(havc420);
-		}
 
-		return RDPGFX_WIRE_TO_SURFACE_PDU_1_SIZE + h264Size;
+			/* avc420EncodedBitstream2 */
+			if (havc444->LC == 0)
+			{
+				havc420 = &(havc444->bitstream[1]);
+				h264Size += rdpgfx_estimate_h264_avc420(havc420);
+			}
 
-	default:
-		return RDPGFX_WIRE_TO_SURFACE_PDU_1_SIZE + cmd->length;
+			return RDPGFX_WIRE_TO_SURFACE_PDU_1_SIZE + h264Size;
+
+		default:
+			return RDPGFX_WIRE_TO_SURFACE_PDU_1_SIZE + cmd->length;
 	}
 }
 
@@ -570,17 +570,17 @@ static UINT rdpgfx_write_surface_command(wStream* s, const RDPGFX_SURFACE_COMMAN
 
 	switch (cmd->format)
 	{
-	case PIXEL_FORMAT_BGRX32:
-		pixelFormat = GFX_PIXEL_FORMAT_XRGB_8888;
-		break;
+		case PIXEL_FORMAT_BGRX32:
+			pixelFormat = GFX_PIXEL_FORMAT_XRGB_8888;
+			break;
 
-	case PIXEL_FORMAT_BGRA32:
-		pixelFormat = GFX_PIXEL_FORMAT_ARGB_8888;
-		break;
+		case PIXEL_FORMAT_BGRA32:
+			pixelFormat = GFX_PIXEL_FORMAT_ARGB_8888;
+			break;
 
-	default:
-		WLog_ERR(TAG, "Format %s not supported!", FreeRDPGetColorFormatName(cmd->format));
-		return ERROR_INVALID_DATA;
+		default:
+			WLog_ERR(TAG, "Format %s not supported!", FreeRDPGetColorFormatName(cmd->format));
+			return ERROR_INVALID_DATA;
 	}
 
 	if (cmd->codecId == RDPGFX_CODECID_CAPROGRESSIVE ||
@@ -1285,45 +1285,45 @@ static UINT rdpgfx_server_receive_pdu(RdpgfxServerContext* context, wStream* s)
 
 	switch (header.cmdId)
 	{
-	case RDPGFX_CMDID_FRAMEACKNOWLEDGE:
-		if ((error = rdpgfx_recv_frame_acknowledge_pdu(context, s)))
-			WLog_ERR(TAG,
-			         "rdpgfx_recv_frame_acknowledge_pdu "
-			         "failed with error %" PRIu32 "!",
-			         error);
+		case RDPGFX_CMDID_FRAMEACKNOWLEDGE:
+			if ((error = rdpgfx_recv_frame_acknowledge_pdu(context, s)))
+				WLog_ERR(TAG,
+				         "rdpgfx_recv_frame_acknowledge_pdu "
+				         "failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case RDPGFX_CMDID_CACHEIMPORTOFFER:
-		if ((error = rdpgfx_recv_cache_import_offer_pdu(context, s)))
-			WLog_ERR(TAG,
-			         "rdpgfx_recv_cache_import_offer_pdu "
-			         "failed with error %" PRIu32 "!",
-			         error);
+		case RDPGFX_CMDID_CACHEIMPORTOFFER:
+			if ((error = rdpgfx_recv_cache_import_offer_pdu(context, s)))
+				WLog_ERR(TAG,
+				         "rdpgfx_recv_cache_import_offer_pdu "
+				         "failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case RDPGFX_CMDID_CAPSADVERTISE:
-		if ((error = rdpgfx_recv_caps_advertise_pdu(context, s)))
-			WLog_ERR(TAG,
-			         "rdpgfx_recv_caps_advertise_pdu "
-			         "failed with error %" PRIu32 "!",
-			         error);
+		case RDPGFX_CMDID_CAPSADVERTISE:
+			if ((error = rdpgfx_recv_caps_advertise_pdu(context, s)))
+				WLog_ERR(TAG,
+				         "rdpgfx_recv_caps_advertise_pdu "
+				         "failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case RDPGFX_CMDID_QOEFRAMEACKNOWLEDGE:
-		if ((error = rdpgfx_recv_qoe_frame_acknowledge_pdu(context, s)))
-			WLog_ERR(TAG,
-			         "rdpgfx_recv_qoe_frame_acknowledge_pdu "
-			         "failed with error %" PRIu32 "!",
-			         error);
+		case RDPGFX_CMDID_QOEFRAMEACKNOWLEDGE:
+			if ((error = rdpgfx_recv_qoe_frame_acknowledge_pdu(context, s)))
+				WLog_ERR(TAG,
+				         "rdpgfx_recv_qoe_frame_acknowledge_pdu "
+				         "failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	default:
-		error = CHANNEL_RC_BAD_PROC;
-		break;
+		default:
+			error = CHANNEL_RC_BAD_PROC;
+			break;
 	}
 
 	if (error)

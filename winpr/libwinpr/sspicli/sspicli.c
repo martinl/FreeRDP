@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/sspicli.h>
@@ -54,20 +54,20 @@
 
 #ifndef _WIN32
 
-#	include <winpr/crt.h>
+#include <winpr/crt.h>
 
-#	ifdef HAVE_UNISTD_H
-#		include <unistd.h>
-#	endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
-#	include <pthread.h>
+#include <pthread.h>
 
-#	include <pwd.h>
-#	include <grp.h>
+#include <pwd.h>
+#include <grp.h>
 
-#	include "../handle/handle.h"
+#include "../handle/handle.h"
 
-#	include "../security/security.h"
+#include "../security/security.h"
 
 static BOOL LogonUserCloseHandle(HANDLE handle);
 
@@ -205,34 +205,34 @@ BOOL GetUserNameExA(EXTENDED_NAME_FORMAT NameFormat, LPSTR lpNameBuffer, PULONG 
 
 	switch (NameFormat)
 	{
-	case NameSamCompatible:
-		login = getlogin();
-		length = strlen(login);
+		case NameSamCompatible:
+			login = getlogin();
+			length = strlen(login);
 
-		if (*nSize >= length)
-		{
-			CopyMemory(lpNameBuffer, login, length + 1);
-			return 1;
-		}
-		else
-		{
-			*nSize = length + 1;
-		}
+			if (*nSize >= length)
+			{
+				CopyMemory(lpNameBuffer, login, length + 1);
+				return 1;
+			}
+			else
+			{
+				*nSize = length + 1;
+			}
 
-		break;
+			break;
 
-	case NameFullyQualifiedDN:
-	case NameDisplay:
-	case NameUniqueId:
-	case NameCanonical:
-	case NameUserPrincipal:
-	case NameCanonicalEx:
-	case NameServicePrincipal:
-	case NameDnsDomain:
-		break;
+		case NameFullyQualifiedDN:
+		case NameDisplay:
+		case NameUniqueId:
+		case NameCanonical:
+		case NameUserPrincipal:
+		case NameCanonicalEx:
+		case NameServicePrincipal:
+		case NameDnsDomain:
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return 0;

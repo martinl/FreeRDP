@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -27,7 +27,7 @@
 
 #ifndef _WIN32
 
-#	include <string.h>
+#include <string.h>
 
 errno_t memmove_s(void* dest, size_t numberOfElements, const void* src, size_t count)
 {

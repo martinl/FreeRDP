@@ -4,14 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 #if defined(__APPLE__) || defined(PCSC)
-#	include <PCSC/winscard.h>
-#	include <PCSC/wintypes.h>
+#include <PCSC/winscard.h>
+#include <PCSC/wintypes.h>
 #elif defined(__linux__)
-#	include <winpr/crt.h>
-#	include <winpr/smartcard.h>
-#	include <winpr/synch.h>
+#include <winpr/crt.h>
+#include <winpr/smartcard.h>
+#include <winpr/synch.h>
 #else
-#	include <winscard.h>
+#include <winscard.h>
 #endif
 
 #if defined(PCSC)

@@ -46,59 +46,59 @@ bool UwacTouchAutomataInjectEvent(UwacTouchAutomata* automata, UwacEvent* event)
 
 	switch (event->type)
 	{
-	case UWAC_EVENT_TOUCH_FRAME_BEGIN:
-		break;
+		case UWAC_EVENT_TOUCH_FRAME_BEGIN:
+			break;
 
-	case UWAC_EVENT_TOUCH_UP:
-	{
-		UwacTouchUp* touchUp = &event->touchUp;
-		size_t toMove = automata->tp.size - sizeof(UwacTouchPoint);
-		wl_array_for_each(tp, &automata->tp)
+		case UWAC_EVENT_TOUCH_UP:
 		{
-			if ((int64_t)tp->id == touchUp->id)
+			UwacTouchUp* touchUp = &event->touchUp;
+			size_t toMove = automata->tp.size - sizeof(UwacTouchPoint);
+			wl_array_for_each(tp, &automata->tp)
 			{
-				if (toMove)
-					memmove(tp, tp + 1, toMove);
+				if ((int64_t)tp->id == touchUp->id)
+				{
+					if (toMove)
+						memmove(tp, tp + 1, toMove);
 
-				return true;
+					return true;
+				}
+
+				toMove -= sizeof(UwacTouchPoint);
 			}
-
-			toMove -= sizeof(UwacTouchPoint);
+			break;
 		}
-		break;
-	}
 
-	case UWAC_EVENT_TOUCH_DOWN:
-	{
-		UwacTouchDown* touchDown = &event->touchDown;
-		wl_array_for_each(tp, &automata->tp)
+		case UWAC_EVENT_TOUCH_DOWN:
 		{
-			if ((int64_t)tp->id == touchDown->id)
+			UwacTouchDown* touchDown = &event->touchDown;
+			wl_array_for_each(tp, &automata->tp)
 			{
-				tp->x = touchDown->x;
-				tp->y = touchDown->y;
-				return true;
+				if ((int64_t)tp->id == touchDown->id)
+				{
+					tp->x = touchDown->x;
+					tp->y = touchDown->y;
+					return true;
+				}
 			}
+			tp = wl_array_add(&automata->tp, sizeof(UwacTouchPoint));
+
+			if (!tp)
+				return false;
+
+			if (touchDown->id < 0)
+				return false;
+
+			tp->id = (uint32_t)touchDown->id;
+			tp->x = touchDown->x;
+			tp->y = touchDown->y;
+			break;
 		}
-		tp = wl_array_add(&automata->tp, sizeof(UwacTouchPoint));
 
-		if (!tp)
-			return false;
+		case UWAC_EVENT_TOUCH_FRAME_END:
+			break;
 
-		if (touchDown->id < 0)
-			return false;
-
-		tp->id = (uint32_t)touchDown->id;
-		tp->x = touchDown->x;
-		tp->y = touchDown->y;
-		break;
-	}
-
-	case UWAC_EVENT_TOUCH_FRAME_END:
-		break;
-
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return true;

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -704,23 +704,24 @@ static UINT drdynvc_send(drdynvcPlugin* drdynvc, wStream* s)
 
 	switch (status)
 	{
-	case CHANNEL_RC_OK:
-		return CHANNEL_RC_OK;
+		case CHANNEL_RC_OK:
+			return CHANNEL_RC_OK;
 
-	case CHANNEL_RC_NOT_CONNECTED:
-		Stream_Free(s, TRUE);
-		return CHANNEL_RC_OK;
+		case CHANNEL_RC_NOT_CONNECTED:
+			Stream_Free(s, TRUE);
+			return CHANNEL_RC_OK;
 
-	case CHANNEL_RC_BAD_CHANNEL_HANDLE:
-		Stream_Free(s, TRUE);
-		WLog_ERR(TAG, "VirtualChannelWriteEx failed with CHANNEL_RC_BAD_CHANNEL_HANDLE");
-		return status;
+		case CHANNEL_RC_BAD_CHANNEL_HANDLE:
+			Stream_Free(s, TRUE);
+			WLog_ERR(TAG, "VirtualChannelWriteEx failed with CHANNEL_RC_BAD_CHANNEL_HANDLE");
+			return status;
 
-	default:
-		Stream_Free(s, TRUE);
-		WLog_Print(drdynvc->log, WLOG_ERROR, "VirtualChannelWriteEx failed with %s [%08" PRIX32 "]",
-		           WTSErrorToString(status), status);
-		return status;
+		default:
+			Stream_Free(s, TRUE);
+			WLog_Print(drdynvc->log, WLOG_ERROR,
+			           "VirtualChannelWriteEx failed with %s [%08" PRIX32 "]",
+			           WTSErrorToString(status), status);
+			return status;
 	}
 }
 
@@ -904,14 +905,14 @@ static UINT32 drdynvc_cblen_to_bytes(int cbLen)
 {
 	switch (cbLen)
 	{
-	case 0:
-		return 1;
+		case 0:
+			return 1;
 
-	case 1:
-		return 2;
+		case 1:
+			return 2;
 
-	default:
-		return 4;
+		default:
+			return 4;
 	}
 }
 
@@ -921,17 +922,17 @@ static UINT32 drdynvc_read_variable_uint(wStream* s, int cbLen)
 
 	switch (cbLen)
 	{
-	case 0:
-		Stream_Read_UINT8(s, val);
-		break;
+		case 0:
+			Stream_Read_UINT8(s, val);
+			break;
 
-	case 1:
-		Stream_Read_UINT16(s, val);
-		break;
+		case 1:
+			Stream_Read_UINT16(s, val);
+			break;
 
-	default:
-		Stream_Read_UINT32(s, val);
-		break;
+		default:
+			Stream_Read_UINT32(s, val);
+			break;
 	}
 
 	return val;
@@ -1154,24 +1155,24 @@ static UINT drdynvc_order_recv(drdynvcPlugin* drdynvc, wStream* s)
 
 	switch (Cmd)
 	{
-	case CAPABILITY_REQUEST_PDU:
-		return drdynvc_process_capability_request(drdynvc, Sp, cbChId, s);
+		case CAPABILITY_REQUEST_PDU:
+			return drdynvc_process_capability_request(drdynvc, Sp, cbChId, s);
 
-	case CREATE_REQUEST_PDU:
-		return drdynvc_process_create_request(drdynvc, Sp, cbChId, s);
+		case CREATE_REQUEST_PDU:
+			return drdynvc_process_create_request(drdynvc, Sp, cbChId, s);
 
-	case DATA_FIRST_PDU:
-		return drdynvc_process_data_first(drdynvc, Sp, cbChId, s);
+		case DATA_FIRST_PDU:
+			return drdynvc_process_data_first(drdynvc, Sp, cbChId, s);
 
-	case DATA_PDU:
-		return drdynvc_process_data(drdynvc, Sp, cbChId, s);
+		case DATA_PDU:
+			return drdynvc_process_data(drdynvc, Sp, cbChId, s);
 
-	case CLOSE_REQUEST_PDU:
-		return drdynvc_process_close_request(drdynvc, Sp, cbChId, s);
+		case CLOSE_REQUEST_PDU:
+			return drdynvc_process_close_request(drdynvc, Sp, cbChId, s);
 
-	default:
-		WLog_Print(drdynvc->log, WLOG_ERROR, "unknown drdynvc cmd 0x%x", Cmd);
-		return ERROR_INTERNAL_ERROR;
+		default:
+			WLog_Print(drdynvc->log, WLOG_ERROR, "unknown drdynvc cmd 0x%x", Cmd);
+			return ERROR_INTERNAL_ERROR;
 	}
 }
 
@@ -1253,20 +1254,21 @@ static void VCAPITYPE drdynvc_virtual_channel_open_event_ex(LPVOID lpUserParam, 
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_DATA_RECEIVED:
-		if ((error = drdynvc_virtual_channel_event_data_received(drdynvc, pData, dataLength,
-		                                                         totalLength, dataFlags)))
-			WLog_Print(drdynvc->log, WLOG_ERROR,
-			           "drdynvc_virtual_channel_event_data_received failed with error %" PRIu32 "",
-			           error);
+		case CHANNEL_EVENT_DATA_RECEIVED:
+			if ((error = drdynvc_virtual_channel_event_data_received(drdynvc, pData, dataLength,
+			                                                         totalLength, dataFlags)))
+				WLog_Print(drdynvc->log, WLOG_ERROR,
+				           "drdynvc_virtual_channel_event_data_received failed with error %" PRIu32
+				           "",
+				           error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_WRITE_COMPLETE:
-		break;
+		case CHANNEL_EVENT_WRITE_COMPLETE:
+			break;
 
-	case CHANNEL_EVENT_USER:
-		break;
+		case CHANNEL_EVENT_USER:
+			break;
 	}
 
 	if (error && drdynvc->rdpcontext)
@@ -1591,48 +1593,49 @@ static VOID VCAPITYPE drdynvc_virtual_channel_init_event_ex(LPVOID lpUserParam, 
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_CONNECTED:
-		if ((error = drdynvc_virtual_channel_event_connected(drdynvc, pData, dataLength)))
-			WLog_Print(drdynvc->log, WLOG_ERROR,
-			           "drdynvc_virtual_channel_event_connected failed with error %" PRIu32 "",
-			           error);
+		case CHANNEL_EVENT_CONNECTED:
+			if ((error = drdynvc_virtual_channel_event_connected(drdynvc, pData, dataLength)))
+				WLog_Print(drdynvc->log, WLOG_ERROR,
+				           "drdynvc_virtual_channel_event_connected failed with error %" PRIu32 "",
+				           error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_DISCONNECTED:
-		if ((error = drdynvc_virtual_channel_event_disconnected(drdynvc)))
-			WLog_Print(drdynvc->log, WLOG_ERROR,
-			           "drdynvc_virtual_channel_event_disconnected failed with error %" PRIu32 "",
-			           error);
+		case CHANNEL_EVENT_DISCONNECTED:
+			if ((error = drdynvc_virtual_channel_event_disconnected(drdynvc)))
+				WLog_Print(drdynvc->log, WLOG_ERROR,
+				           "drdynvc_virtual_channel_event_disconnected failed with error %" PRIu32
+				           "",
+				           error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_TERMINATED:
-		if ((error = drdynvc_virtual_channel_event_terminated(drdynvc)))
-			WLog_Print(drdynvc->log, WLOG_ERROR,
-			           "drdynvc_virtual_channel_event_terminated failed with error %" PRIu32 "",
-			           error);
+		case CHANNEL_EVENT_TERMINATED:
+			if ((error = drdynvc_virtual_channel_event_terminated(drdynvc)))
+				WLog_Print(drdynvc->log, WLOG_ERROR,
+				           "drdynvc_virtual_channel_event_terminated failed with error %" PRIu32 "",
+				           error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_ATTACHED:
-		if ((error = drdynvc_virtual_channel_event_attached(drdynvc)))
-			WLog_Print(drdynvc->log, WLOG_ERROR,
-			           "drdynvc_virtual_channel_event_attached failed with error %" PRIu32 "",
-			           error);
+		case CHANNEL_EVENT_ATTACHED:
+			if ((error = drdynvc_virtual_channel_event_attached(drdynvc)))
+				WLog_Print(drdynvc->log, WLOG_ERROR,
+				           "drdynvc_virtual_channel_event_attached failed with error %" PRIu32 "",
+				           error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_DETACHED:
-		if ((error = drdynvc_virtual_channel_event_detached(drdynvc)))
-			WLog_Print(drdynvc->log, WLOG_ERROR,
-			           "drdynvc_virtual_channel_event_detached failed with error %" PRIu32 "",
-			           error);
+		case CHANNEL_EVENT_DETACHED:
+			if ((error = drdynvc_virtual_channel_event_detached(drdynvc)))
+				WLog_Print(drdynvc->log, WLOG_ERROR,
+				           "drdynvc_virtual_channel_event_detached failed with error %" PRIu32 "",
+				           error);
 
-		break;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	if (error && drdynvc->rdpcontext)

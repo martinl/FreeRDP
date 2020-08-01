@@ -19,7 +19,7 @@
  * limitations under the License.
  */
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/log.h>
@@ -57,13 +57,13 @@ typedef struct _H264_CONTEXT_OPENH264 H264_CONTEXT_OPENH264;
 
 #if defined(WITH_OPENH264_LOADING)
 static const char* openh264_library_names[] = {
-#	if defined(_WIN32)
+#if defined(_WIN32)
 	"openh264.dll"
-#	elif defined(__APPLE__)
+#elif defined(__APPLE__)
 	"libopenh264.dylib"
-#	else
+#else
 	"libopenh264.so"
-#	endif
+#endif
 };
 #endif
 
@@ -203,16 +203,17 @@ static int openh264_compress(H264_CONTEXT* h264, const BYTE** pYUVData, const UI
 
 		switch (h264->RateControlMode)
 		{
-		case H264_RATECONTROL_VBR:
-			sys->EncParamExt.iRCMode = RC_BITRATE_MODE;
-			sys->EncParamExt.iTargetBitrate = (int)h264->BitRate;
-			sys->EncParamExt.sSpatialLayers[0].iSpatialBitrate = sys->EncParamExt.iTargetBitrate;
-			break;
+			case H264_RATECONTROL_VBR:
+				sys->EncParamExt.iRCMode = RC_BITRATE_MODE;
+				sys->EncParamExt.iTargetBitrate = (int)h264->BitRate;
+				sys->EncParamExt.sSpatialLayers[0].iSpatialBitrate =
+				    sys->EncParamExt.iTargetBitrate;
+				break;
 
-		case H264_RATECONTROL_CQP:
-			sys->EncParamExt.iRCMode = RC_OFF_MODE;
-			sys->EncParamExt.sSpatialLayers[0].iDLayerQp = (int)h264->QP;
-			break;
+			case H264_RATECONTROL_CQP:
+				sys->EncParamExt.iRCMode = RC_OFF_MODE;
+				sys->EncParamExt.sSpatialLayers[0].iDLayerQp = (int)h264->QP;
+				break;
 		}
 
 		if (sys->EncParamExt.iMultipleThreadIdc > 1)
@@ -248,57 +249,57 @@ static int openh264_compress(H264_CONTEXT* h264, const BYTE** pYUVData, const UI
 	{
 		switch (h264->RateControlMode)
 		{
-		case H264_RATECONTROL_VBR:
-			if (sys->EncParamExt.iTargetBitrate != (int)h264->BitRate)
-			{
-				sys->EncParamExt.iTargetBitrate = (int)h264->BitRate;
-				bitrate.iLayer = SPATIAL_LAYER_ALL;
-				bitrate.iBitrate = (int)h264->BitRate;
-				status =
-				    (*sys->pEncoder)->SetOption(sys->pEncoder, ENCODER_OPTION_BITRATE, &bitrate);
-
-				if (status < 0)
+			case H264_RATECONTROL_VBR:
+				if (sys->EncParamExt.iTargetBitrate != (int)h264->BitRate)
 				{
-					WLog_Print(h264->log, WLOG_ERROR, "Failed to set encoder bitrate (status=%d)",
-					           status);
-					return status;
+					sys->EncParamExt.iTargetBitrate = (int)h264->BitRate;
+					bitrate.iLayer = SPATIAL_LAYER_ALL;
+					bitrate.iBitrate = (int)h264->BitRate;
+					status = (*sys->pEncoder)
+					             ->SetOption(sys->pEncoder, ENCODER_OPTION_BITRATE, &bitrate);
+
+					if (status < 0)
+					{
+						WLog_Print(h264->log, WLOG_ERROR,
+						           "Failed to set encoder bitrate (status=%d)", status);
+						return status;
+					}
 				}
-			}
 
-			if (sys->EncParamExt.fMaxFrameRate != (int)h264->FrameRate)
-			{
-				sys->EncParamExt.fMaxFrameRate = (int)h264->FrameRate;
-				status = (*sys->pEncoder)
-				             ->SetOption(sys->pEncoder, ENCODER_OPTION_FRAME_RATE,
-				                         &sys->EncParamExt.fMaxFrameRate);
-
-				if (status < 0)
+				if (sys->EncParamExt.fMaxFrameRate != (int)h264->FrameRate)
 				{
-					WLog_Print(h264->log, WLOG_ERROR, "Failed to set encoder framerate (status=%d)",
-					           status);
-					return status;
+					sys->EncParamExt.fMaxFrameRate = (int)h264->FrameRate;
+					status = (*sys->pEncoder)
+					             ->SetOption(sys->pEncoder, ENCODER_OPTION_FRAME_RATE,
+					                         &sys->EncParamExt.fMaxFrameRate);
+
+					if (status < 0)
+					{
+						WLog_Print(h264->log, WLOG_ERROR,
+						           "Failed to set encoder framerate (status=%d)", status);
+						return status;
+					}
 				}
-			}
 
-			break;
+				break;
 
-		case H264_RATECONTROL_CQP:
-			if (sys->EncParamExt.sSpatialLayers[0].iDLayerQp != (int)h264->QP)
-			{
-				sys->EncParamExt.sSpatialLayers[0].iDLayerQp = (int)h264->QP;
-				status = (*sys->pEncoder)
-				             ->SetOption(sys->pEncoder, ENCODER_OPTION_SVC_ENCODE_PARAM_EXT,
-				                         &sys->EncParamExt);
-
-				if (status < 0)
+			case H264_RATECONTROL_CQP:
+				if (sys->EncParamExt.sSpatialLayers[0].iDLayerQp != (int)h264->QP)
 				{
-					WLog_Print(h264->log, WLOG_ERROR,
-					           "Failed to set encoder parameters (status=%d)", status);
-					return status;
-				}
-			}
+					sys->EncParamExt.sSpatialLayers[0].iDLayerQp = (int)h264->QP;
+					status = (*sys->pEncoder)
+					             ->SetOption(sys->pEncoder, ENCODER_OPTION_SVC_ENCODE_PARAM_EXT,
+					                         &sys->EncParamExt);
 
-			break;
+					if (status < 0)
+					{
+						WLog_Print(h264->log, WLOG_ERROR,
+						           "Failed to set encoder parameters (status=%d)", status);
+						return status;
+					}
+				}
+
+				break;
 		}
 	}
 

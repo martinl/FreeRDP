@@ -24,14 +24,14 @@ freely, subject to the following restrictions:
 */
 
 #ifndef LODEPNG_H
-#	define LODEPNG_H
+#define LODEPNG_H
 
-#	include <string.h> /*for size_t*/
+#include <string.h> /*for size_t*/
 
-#	ifdef __cplusplus
-#		include <vector>
-#		include <string>
-#	endif /*__cplusplus*/
+#ifdef __cplusplus
+#include <vector>
+#include <string>
+#endif /*__cplusplus*/
 
 /*
 The following #defines are used to create code sections. They can be disabled
@@ -42,35 +42,35 @@ compiler command to disable them without modifying this header, e.g.
 */
 /*deflate & zlib. If disabled, you must specify alternative zlib functions in
 the custom_zlib field of the compress and decompress settings*/
-#	ifndef LODEPNG_NO_COMPILE_ZLIB
-#		define LODEPNG_COMPILE_ZLIB
-#	endif
+#ifndef LODEPNG_NO_COMPILE_ZLIB
+#define LODEPNG_COMPILE_ZLIB
+#endif
 /*png encoder and png decoder*/
-#	ifndef LODEPNG_NO_COMPILE_PNG
-#		define LODEPNG_COMPILE_PNG
-#	endif
+#ifndef LODEPNG_NO_COMPILE_PNG
+#define LODEPNG_COMPILE_PNG
+#endif
 /*deflate&zlib decoder and png decoder*/
-#	ifndef LODEPNG_NO_COMPILE_DECODER
-#		define LODEPNG_COMPILE_DECODER
-#	endif
+#ifndef LODEPNG_NO_COMPILE_DECODER
+#define LODEPNG_COMPILE_DECODER
+#endif
 /*deflate&zlib encoder and png encoder*/
-#	ifndef LODEPNG_NO_COMPILE_ENCODER
-#		define LODEPNG_COMPILE_ENCODER
-#	endif
+#ifndef LODEPNG_NO_COMPILE_ENCODER
+#define LODEPNG_COMPILE_ENCODER
+#endif
 /*the optional built in harddisk file loading and saving functions*/
-#	ifndef LODEPNG_NO_COMPILE_DISK
-#		define LODEPNG_COMPILE_DISK
-#	endif
+#ifndef LODEPNG_NO_COMPILE_DISK
+#define LODEPNG_COMPILE_DISK
+#endif
 /*support for chunks other than IHDR, IDAT, PLTE, tRNS, IEND: ancillary and unknown chunks*/
-#	ifndef LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
-#		define LODEPNG_COMPILE_ANCILLARY_CHUNKS
-#	endif
+#ifndef LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
+#define LODEPNG_COMPILE_ANCILLARY_CHUNKS
+#endif
 /*ability to convert error numerical codes to English text string*/
-#	ifndef LODEPNG_NO_COMPILE_ERROR_TEXT
-#		define LODEPNG_COMPILE_ERROR_TEXT
-#	endif
+#ifndef LODEPNG_NO_COMPILE_ERROR_TEXT
+#define LODEPNG_COMPILE_ERROR_TEXT
+#endif
 
-#	ifdef LODEPNG_COMPILE_PNG
+#ifdef LODEPNG_COMPILE_PNG
 /*The PNG color types (also used for raw).*/
 typedef enum LodePNGColorType
 {
@@ -81,7 +81,7 @@ typedef enum LodePNGColorType
 	LCT_RGBA = 6        /*RGB with alpha: 8,16 bit*/
 } LodePNGColorType;
 
-#		ifdef LODEPNG_COMPILE_DECODER
+#ifdef LODEPNG_COMPILE_DECODER
 /*
 Converts PNG data in memory to raw pixel data.
 out: Output parameter. Pointer to buffer that will contain the raw pixel data.
@@ -109,7 +109,7 @@ unsigned lodepng_decode32(unsigned char** out, unsigned* w, unsigned* h, const u
 unsigned lodepng_decode24(unsigned char** out, unsigned* w, unsigned* h, const unsigned char* in,
                           size_t insize);
 
-#			ifdef LODEPNG_COMPILE_DISK
+#ifdef LODEPNG_COMPILE_DISK
 /*
 Load PNG from disk, from file with given name.
 Same as the other decode functions, but instead takes a filename as input.
@@ -122,10 +122,10 @@ unsigned lodepng_decode32_file(unsigned char** out, unsigned* w, unsigned* h, co
 
 /*Same as lodepng_decode_file, but always decodes to 24-bit RGB raw image.*/
 unsigned lodepng_decode24_file(unsigned char** out, unsigned* w, unsigned* h, const char* filename);
-#			endif /*LODEPNG_COMPILE_DISK*/
-#		endif     /*LODEPNG_COMPILE_DECODER*/
+#endif /*LODEPNG_COMPILE_DISK*/
+#endif /*LODEPNG_COMPILE_DECODER*/
 
-#		ifdef LODEPNG_COMPILE_ENCODER
+#ifdef LODEPNG_COMPILE_ENCODER
 /*
 Converts raw pixel data into a PNG image in memory. The colortype and bitdepth
   of the output PNG image cannot be chosen, they are automatically determined
@@ -154,7 +154,7 @@ unsigned lodepng_encode32(unsigned char** out, size_t* outsize, const unsigned c
 unsigned lodepng_encode24(unsigned char** out, size_t* outsize, const unsigned char* image,
                           unsigned w, unsigned h);
 
-#			ifdef LODEPNG_COMPILE_DISK
+#ifdef LODEPNG_COMPILE_DISK
 /*
 Converts raw pixel data into a PNG file on disk.
 Same as the other encode functions, but instead takes a filename as output.
@@ -170,16 +170,16 @@ unsigned lodepng_encode32_file(const char* filename, const unsigned char* image,
 /*Same as lodepng_encode_file, but always encodes from 24-bit RGB raw image.*/
 unsigned lodepng_encode24_file(const char* filename, const unsigned char* image, unsigned w,
                                unsigned h);
-#			endif /*LODEPNG_COMPILE_DISK*/
-#		endif     /*LODEPNG_COMPILE_ENCODER*/
-#	endif         /*LODEPNG_COMPILE_PNG*/
+#endif /*LODEPNG_COMPILE_DISK*/
+#endif /*LODEPNG_COMPILE_ENCODER*/
+#endif /*LODEPNG_COMPILE_PNG*/
 
-#	ifdef LODEPNG_COMPILE_ERROR_TEXT
+#ifdef LODEPNG_COMPILE_ERROR_TEXT
 /*Returns an English description of the numerical error code.*/
 const char* lodepng_error_text(unsigned code);
-#	endif /*LODEPNG_COMPILE_ERROR_TEXT*/
+#endif /*LODEPNG_COMPILE_ERROR_TEXT*/
 
-#	ifdef LODEPNG_COMPILE_DECODER
+#ifdef LODEPNG_COMPILE_DECODER
 /*Settings for zlib decompression*/
 typedef struct LodePNGDecompressSettings LodePNGDecompressSettings;
 struct LodePNGDecompressSettings
@@ -201,9 +201,9 @@ struct LodePNGDecompressSettings
 
 extern const LodePNGDecompressSettings lodepng_default_decompress_settings;
 void lodepng_decompress_settings_init(LodePNGDecompressSettings* settings);
-#	endif /*LODEPNG_COMPILE_DECODER*/
+#endif /*LODEPNG_COMPILE_DECODER*/
 
-#	ifdef LODEPNG_COMPILE_ENCODER
+#ifdef LODEPNG_COMPILE_ENCODER
 /*
 Settings for zlib compression. Tweaking these settings tweaks the balance
 between speed and compression ratio.
@@ -237,9 +237,9 @@ struct LodePNGCompressSettings /*deflate = compress*/
 
 extern const LodePNGCompressSettings lodepng_default_compress_settings;
 void lodepng_compress_settings_init(LodePNGCompressSettings* settings);
-#	endif /*LODEPNG_COMPILE_ENCODER*/
+#endif /*LODEPNG_COMPILE_ENCODER*/
 
-#	ifdef LODEPNG_COMPILE_PNG
+#ifdef LODEPNG_COMPILE_PNG
 /*
 Color mode of an image. Contains all information required to decode the pixel
 bits to RGBA colors. This information is the same as used in the PNG file
@@ -324,7 +324,7 @@ unsigned lodepng_can_have_alpha(const LodePNGColorMode* info);
 /*Returns the byte size of a raw image buffer with given width, height and color mode*/
 size_t lodepng_get_raw_size(unsigned w, unsigned h, const LodePNGColorMode* color);
 
-#		ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
+#ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
 /*The information of a Time chunk in PNG.*/
 typedef struct LodePNGTime
 {
@@ -335,7 +335,7 @@ typedef struct LodePNGTime
 	unsigned minute; /*0-59*/
 	unsigned second; /*0-60 (to allow for leap seconds)*/
 } LodePNGTime;
-#		endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
+#endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 
 /*Information about the PNG image, except pixels, width and height.*/
 typedef struct LodePNGInfo
@@ -346,7 +346,7 @@ typedef struct LodePNGInfo
 	unsigned interlace_method;   /*interlace method of the original file*/
 	LodePNGColorMode color;      /*color type and bits, palette and transparency of the PNG file*/
 
-#		ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
+#ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
 	/*
 	suggested background color chunk (bKGD)
 	This color uses the same color mode as the PNG (except alpha channel), which can be 1-bit to
@@ -416,7 +416,7 @@ typedef struct LodePNGInfo
 	*/
 	unsigned char* unknown_chunks_data[3];
 	size_t unknown_chunks_size[3]; /*size in bytes of the unknown chunks, given for protection*/
-#		endif                     /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
+#endif                             /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 } LodePNGInfo;
 
 /*init, cleanup and copy functions to use with this struct*/
@@ -425,7 +425,7 @@ void lodepng_info_cleanup(LodePNGInfo* info);
 /*return value is error code (0 means no error)*/
 unsigned lodepng_info_copy(LodePNGInfo* dest, const LodePNGInfo* source);
 
-#		ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
+#ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
 void lodepng_clear_text(
     LodePNGInfo* info); /*use this to clear the texts again after you filled them in*/
 unsigned lodepng_add_text(LodePNGInfo* info, const char* key,
@@ -436,7 +436,7 @@ void lodepng_clear_itext(
 unsigned lodepng_add_itext(LodePNGInfo* info, const char* key, const char* langtag,
                            const char* transkey,
                            const char* str); /*push back the 4 texts of 1 chunk at once*/
-#		endif                               /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
+#endif                                       /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 
 /*
 Converts raw buffer from one color type to another color type, based on
@@ -451,7 +451,7 @@ is LodePNG error code
 unsigned lodepng_convert(unsigned char* out, const unsigned char* in, LodePNGColorMode* mode_out,
                          const LodePNGColorMode* mode_in, unsigned w, unsigned h);
 
-#		ifdef LODEPNG_COMPILE_DECODER
+#ifdef LODEPNG_COMPILE_DECODER
 /*
 Settings for the decoder. This contains settings for the PNG and the Zlib
 decoder, but not the Info settings from the Info structs.
@@ -464,19 +464,19 @@ typedef struct LodePNGDecoderSettings
 
 	unsigned color_convert; /*whether to convert the PNG to the color type you want. Default: yes*/
 
-#			ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
+#ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
 	unsigned read_text_chunks; /*if false but remember_unknown_chunks is true, they're stored in the
 	                              unknown chunks*/
 	/*store all bytes from unknown chunks in the LodePNGInfo (off by default, useful for a png
 	 * editor)*/
 	unsigned remember_unknown_chunks;
-#			endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
+#endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 } LodePNGDecoderSettings;
 
 void lodepng_decoder_settings_init(LodePNGDecoderSettings* settings);
-#		endif /*LODEPNG_COMPILE_DECODER*/
+#endif /*LODEPNG_COMPILE_DECODER*/
 
-#		ifdef LODEPNG_COMPILE_ENCODER
+#ifdef LODEPNG_COMPILE_ENCODER
 /*automatically use color type with less bits per pixel if losslessly possible. Default: AUTO*/
 typedef enum LodePNGFilterStrategy
 {
@@ -550,27 +550,27 @@ typedef struct LodePNGEncoderSettings
 	/*force creating a PLTE chunk if colortype is 2 or 6 (= a suggested palette).
 	If colortype is 3, PLTE is _always_ created.*/
 	unsigned force_palette;
-#			ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
+#ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
 	/*add LodePNG identifier and version as a text chunk, for debugging*/
 	unsigned add_id;
 	/*encode text chunks as zTXt chunks instead of tEXt chunks, and use compression in iTXt chunks*/
 	unsigned text_compression;
-#			endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
+#endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 } LodePNGEncoderSettings;
 
 void lodepng_encoder_settings_init(LodePNGEncoderSettings* settings);
-#		endif /*LODEPNG_COMPILE_ENCODER*/
+#endif /*LODEPNG_COMPILE_ENCODER*/
 
-#		if defined(LODEPNG_COMPILE_DECODER) || defined(LODEPNG_COMPILE_ENCODER)
+#if defined(LODEPNG_COMPILE_DECODER) || defined(LODEPNG_COMPILE_ENCODER)
 /*The settings, state and information for extended encoding and decoding.*/
 typedef struct LodePNGState
 {
-#			ifdef LODEPNG_COMPILE_DECODER
+#ifdef LODEPNG_COMPILE_DECODER
 	LodePNGDecoderSettings decoder; /*the decoding settings*/
-#			endif                  /*LODEPNG_COMPILE_DECODER*/
-#			ifdef LODEPNG_COMPILE_ENCODER
+#endif                              /*LODEPNG_COMPILE_DECODER*/
+#ifdef LODEPNG_COMPILE_ENCODER
 	LodePNGEncoderSettings encoder; /*the encoding settings*/
-#			endif                  /*LODEPNG_COMPILE_ENCODER*/
+#endif                              /*LODEPNG_COMPILE_ENCODER*/
 	LodePNGColorMode
 	    info_raw; /*specifies the format in which you would like to get the raw pixel buffer*/
 	LodePNGInfo info_png; /*info of the PNG image obtained after decoding*/
@@ -581,9 +581,9 @@ typedef struct LodePNGState
 void lodepng_state_init(LodePNGState* state);
 void lodepng_state_cleanup(LodePNGState* state);
 void lodepng_state_copy(LodePNGState* dest, const LodePNGState* source);
-#		endif /* defined(LODEPNG_COMPILE_DECODER) || defined(LODEPNG_COMPILE_ENCODER) */
+#endif /* defined(LODEPNG_COMPILE_DECODER) || defined(LODEPNG_COMPILE_ENCODER) */
 
-#		ifdef LODEPNG_COMPILE_DECODER
+#ifdef LODEPNG_COMPILE_DECODER
 /*
 Same as lodepng_decode_memory, but uses a LodePNGState to allow custom settings and
 getting much more information about the PNG image and color mode.
@@ -598,13 +598,13 @@ information is placed in the info_png field of the LodePNGState.
 */
 unsigned lodepng_inspect(unsigned* w, unsigned* h, LodePNGState* state, const unsigned char* in,
                          size_t insize);
-#		endif /*LODEPNG_COMPILE_DECODER*/
+#endif /*LODEPNG_COMPILE_DECODER*/
 
-#		ifdef LODEPNG_COMPILE_ENCODER
+#ifdef LODEPNG_COMPILE_ENCODER
 /*This function allocates the out buffer with standard malloc and stores the size in *outsize.*/
 unsigned lodepng_encode(unsigned char** out, size_t* outsize, const unsigned char* image,
                         unsigned w, unsigned h, LodePNGState* state);
-#		endif /*LODEPNG_COMPILE_ENCODER*/
+#endif /*LODEPNG_COMPILE_ENCODER*/
 
 /*
 The lodepng_chunk functions are normally not needed, except to traverse the
@@ -668,16 +668,16 @@ unsigned lodepng_chunk_create(unsigned char** out, size_t* outlength, unsigned l
 
 /*Calculate CRC32 of buffer*/
 unsigned lodepng_crc32(const unsigned char* buf, size_t len);
-#	endif /*LODEPNG_COMPILE_PNG*/
+#endif /*LODEPNG_COMPILE_PNG*/
 
-#	ifdef LODEPNG_COMPILE_ZLIB
+#ifdef LODEPNG_COMPILE_ZLIB
 /*
 This zlib part can be used independently to zlib compress and decompress a
 buffer. It cannot be used to create gzip files however, and it only supports the
 part of zlib that is required for PNG, it does not support dictionaries.
 */
 
-#		ifdef LODEPNG_COMPILE_DECODER
+#ifdef LODEPNG_COMPILE_DECODER
 /*Inflate a buffer. Inflate is the decompression step of deflate. Out buffer must be freed after
  * use.*/
 unsigned lodepng_inflate(unsigned char** out, size_t* outsize, const unsigned char* in,
@@ -691,9 +691,9 @@ buffer and *outsize its size in bytes. out must be freed by user after usage.
 */
 unsigned lodepng_zlib_decompress(unsigned char** out, size_t* outsize, const unsigned char* in,
                                  size_t insize, const LodePNGDecompressSettings* settings);
-#		endif /*LODEPNG_COMPILE_DECODER*/
+#endif /*LODEPNG_COMPILE_DECODER*/
 
-#		ifdef LODEPNG_COMPILE_ENCODER
+#ifdef LODEPNG_COMPILE_ENCODER
 /*
 Compresses data with Zlib. Reallocates the out buffer and appends the data.
 Zlib adds a small header and trailer around the deflate data.
@@ -715,10 +715,10 @@ unsigned lodepng_huffman_code_lengths(unsigned* lengths, const unsigned* frequen
 unsigned lodepng_deflate(unsigned char** out, size_t* outsize, const unsigned char* in,
                          size_t insize, const LodePNGCompressSettings* settings);
 
-#		endif /*LODEPNG_COMPILE_ENCODER*/
-#	endif     /*LODEPNG_COMPILE_ZLIB*/
+#endif /*LODEPNG_COMPILE_ENCODER*/
+#endif /*LODEPNG_COMPILE_ZLIB*/
 
-#	ifdef LODEPNG_COMPILE_DISK
+#ifdef LODEPNG_COMPILE_DISK
 /*
 Load a file from disk into buffer. The function allocates the out buffer, and
 after usage you should free it.
@@ -738,7 +738,7 @@ filename: the path to the file to save to
 return value: error code (0 means ok)
 */
 unsigned lodepng_save_file(const unsigned char* buffer, size_t buffersize, const char* filename);
-#	endif /*LODEPNG_COMPILE_DISK*/
+#endif /*LODEPNG_COMPILE_DISK*/
 
 /*
 TODO:

@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -27,18 +27,18 @@
 #include <winpr/string.h>
 
 #if defined(HAVE_EXECINFO_H)
-#	include <execinfo.h>
+#include <execinfo.h>
 #endif
 
 #if defined(ANDROID)
-#	include <corkscrew/backtrace.h>
+#include <corkscrew/backtrace.h>
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-#	include <io.h>
-#	include <windows.h>
-#	include <dbghelp.h>
-#	define write _write
+#include <io.h>
+#include <windows.h>
+#include <dbghelp.h>
+#define write _write
 #endif
 
 #include <winpr/crt.h>
@@ -98,9 +98,9 @@ typedef struct
 #endif
 
 #if defined(ANDROID)
-#	include <pthread.h>
-#	include <dlfcn.h>
-#	include <unistd.h>
+#include <pthread.h>
+#include <dlfcn.h>
+#include <unistd.h>
 
 typedef struct
 {
@@ -540,28 +540,28 @@ char* winpr_strerror(DWORD dw, char* dmsg, size_t size)
 	LPTSTR msg = NULL;
 	BOOL alloc = FALSE;
 	dwFlags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
-#	ifdef FORMAT_MESSAGE_ALLOCATE_BUFFER
+#ifdef FORMAT_MESSAGE_ALLOCATE_BUFFER
 	alloc = TRUE;
 	dwFlags |= FORMAT_MESSAGE_ALLOCATE_BUFFER;
-#	else
+#else
 	nSize = (DWORD)(size * 2);
 	msg = (LPTSTR)calloc(nSize, sizeof(TCHAR));
-#	endif
+#endif
 	rc = FormatMessage(dwFlags, NULL, dw, 0, alloc ? (LPTSTR)&msg : msg, nSize, NULL);
 
 	if (rc)
 	{
-#	if defined(UNICODE)
+#if defined(UNICODE)
 		WideCharToMultiByte(CP_ACP, 0, msg, rc, dmsg, size - 1, NULL, NULL);
-#	else  /* defined(UNICODE) */
+#else  /* defined(UNICODE) */
 		memcpy(dmsg, msg, min(rc, size - 1));
-#	endif /* defined(UNICODE) */
+#endif /* defined(UNICODE) */
 		dmsg[min(rc, size - 1)] = 0;
-#	ifdef FORMAT_MESSAGE_ALLOCATE_BUFFER
+#ifdef FORMAT_MESSAGE_ALLOCATE_BUFFER
 		LocalFree(msg);
-#	else
+#else
 		free(msg);
-#	endif
+#endif
 	}
 	else
 	{

@@ -574,15 +574,15 @@ public class BookmarkBase implements Parcelable, Cloneable
 		{
 			switch (colors)
 			{
-			case 32:
-			case 24:
-			case 16:
-			case 15:
-			case 8:
-				break;
-			default:
-				colors = 32;
-				break;
+				case 32:
+				case 24:
+				case 16:
+				case 15:
+				case 8:
+					break;
+				default:
+					colors = 32;
+					break;
 			}
 
 			if ((width <= 0) || (width > 65536))
@@ -597,14 +597,14 @@ public class BookmarkBase implements Parcelable, Cloneable
 
 			switch (resolution)
 			{
-			case FITSCREEN:
-			case AUTOMATIC:
-			case CUSTOM:
-			case PREDEFINED:
-				break;
-			default:
-				resolution = AUTOMATIC;
-				break;
+				case FITSCREEN:
+				case AUTOMATIC:
+				case CUSTOM:
+				case PREDEFINED:
+					break;
+				default:
+					resolution = AUTOMATIC;
+					break;
 			}
 		}
 
@@ -917,25 +917,25 @@ public class BookmarkBase implements Parcelable, Cloneable
 		{
 			switch (redirectSound)
 			{
-			case 0:
-			case 1:
-			case 2:
-				break;
-			default:
-				redirectSound = 0;
-				break;
+				case 0:
+				case 1:
+				case 2:
+					break;
+				default:
+					redirectSound = 0;
+					break;
 			}
 
 			switch (security)
 			{
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				break;
-			default:
-				security = 0;
-				break;
+				case 0:
+				case 1:
+				case 2:
+				case 3:
+					break;
+				default:
+					security = 0;
+					break;
 			}
 		}
 

@@ -14,7 +14,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/types.h>
@@ -22,12 +22,12 @@
 #include <winpr/sysinfo.h>
 
 #ifdef WITH_SSE2
-#	include <emmintrin.h>
-#	include <pmmintrin.h>
+#include <emmintrin.h>
+#include <pmmintrin.h>
 #endif /* WITH_SSE2 */
 
 #ifdef WITH_IPP
-#	include <ipps.h>
+#include <ipps.h>
 #endif /* WITH_IPP */
 
 #include "prim_internal.h"
@@ -36,7 +36,7 @@
 static primitives_t* generic = NULL;
 
 #ifdef WITH_SSE2
-#	if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
+#if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
 /* ------------------------------------------------------------------------- */
 SSE3_SCD_ROUTINE(sse2_lShiftC_16s, INT16, generic->lShiftC_16s, _mm_slli_epi16,
                  *dptr++ = *sptr++ << val)
@@ -49,7 +49,7 @@ SSE3_SCD_ROUTINE(sse2_lShiftC_16u, UINT16, generic->lShiftC_16u, _mm_slli_epi16,
 /* ------------------------------------------------------------------------- */
 SSE3_SCD_ROUTINE(sse2_rShiftC_16u, UINT16, generic->rShiftC_16u, _mm_srli_epi16,
                  *dptr++ = *sptr++ >> val)
-#	endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
+#endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
 #endif
 
 /* Note: the IPP version will have to call ippLShiftC_16s or ippRShiftC_16s

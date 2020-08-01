@@ -28,12 +28,12 @@
 #define TAG FREERDP_TAG("utils")
 
 #ifdef WITH_DEBUG_MSUSB
-#	define DEBUG_MSUSB(...) WLog_DBG(TAG, __VA_ARGS__)
+#define DEBUG_MSUSB(...) WLog_DBG(TAG, __VA_ARGS__)
 #else
-#	define DEBUG_MSUSB(...) \
-		do                   \
-		{                    \
-		} while (0)
+#define DEBUG_MSUSB(...) \
+	do                   \
+	{                    \
+	} while (0)
 #endif
 
 static MSUSB_PIPE_DESCRIPTOR* msusb_mspipe_new()
@@ -354,7 +354,8 @@ void msusb_msconfig_dump(MSUSB_CONFIG_DESCRIPTOR* MsConfig)
 		MsInterface = MsInterfaces[inum];
 		WLog_INFO(TAG, "	Interface: %" PRIu8 "", MsInterface->InterfaceNumber);
 		WLog_INFO(TAG, "	Length: %" PRIu16 "", MsInterface->Length);
-		WLog_INFO(TAG, "	NumberOfPipesExpected: %" PRIu16 "", MsInterface->NumberOfPipesExpected);
+		WLog_INFO(TAG, "	NumberOfPipesExpected: %" PRIu16 "",
+		          MsInterface->NumberOfPipesExpected);
 		WLog_INFO(TAG, "	AlternateSetting: %" PRIu8 "", MsInterface->AlternateSetting);
 		WLog_INFO(TAG, "	NumberOfPipes: %" PRIu32 "", MsInterface->NumberOfPipes);
 		WLog_INFO(TAG, "	InterfaceHandle: 0x%08" PRIx32 "", MsInterface->InterfaceHandle);

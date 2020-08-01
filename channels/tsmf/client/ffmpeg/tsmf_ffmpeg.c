@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -38,36 +38,36 @@
 
 /* Compatibility with older FFmpeg */
 #if LIBAVUTIL_VERSION_MAJOR < 50
-#	define AVMEDIA_TYPE_VIDEO 0
-#	define AVMEDIA_TYPE_AUDIO 1
+#define AVMEDIA_TYPE_VIDEO 0
+#define AVMEDIA_TYPE_AUDIO 1
 #endif
 
 #if LIBAVCODEC_VERSION_MAJOR < 54
-#	define MAX_AUDIO_FRAME_SIZE AVCODEC_MAX_AUDIO_FRAME_SIZE
+#define MAX_AUDIO_FRAME_SIZE AVCODEC_MAX_AUDIO_FRAME_SIZE
 #else
-#	define MAX_AUDIO_FRAME_SIZE 192000
+#define MAX_AUDIO_FRAME_SIZE 192000
 #endif
 
 #if LIBAVCODEC_VERSION_MAJOR < 55
-#	define AV_CODEC_ID_VC1 CODEC_ID_VC1
-#	define AV_CODEC_ID_WMAV2 CODEC_ID_WMAV2
-#	define AV_CODEC_ID_WMAPRO CODEC_ID_WMAPRO
-#	define AV_CODEC_ID_MP3 CODEC_ID_MP3
-#	define AV_CODEC_ID_MP2 CODEC_ID_MP2
-#	define AV_CODEC_ID_MPEG2VIDEO CODEC_ID_MPEG2VIDEO
-#	define AV_CODEC_ID_WMV3 CODEC_ID_WMV3
-#	define AV_CODEC_ID_AAC CODEC_ID_AAC
-#	define AV_CODEC_ID_H264 CODEC_ID_H264
-#	define AV_CODEC_ID_AC3 CODEC_ID_AC3
+#define AV_CODEC_ID_VC1 CODEC_ID_VC1
+#define AV_CODEC_ID_WMAV2 CODEC_ID_WMAV2
+#define AV_CODEC_ID_WMAPRO CODEC_ID_WMAPRO
+#define AV_CODEC_ID_MP3 CODEC_ID_MP3
+#define AV_CODEC_ID_MP2 CODEC_ID_MP2
+#define AV_CODEC_ID_MPEG2VIDEO CODEC_ID_MPEG2VIDEO
+#define AV_CODEC_ID_WMV3 CODEC_ID_WMV3
+#define AV_CODEC_ID_AAC CODEC_ID_AAC
+#define AV_CODEC_ID_H264 CODEC_ID_H264
+#define AV_CODEC_ID_AC3 CODEC_ID_AC3
 #endif
 
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 34, 2)
-#	define AV_CODEC_CAP_TRUNCATED CODEC_CAP_TRUNCATED
-#	define AV_CODEC_FLAG_TRUNCATED CODEC_FLAG_TRUNCATED
+#define AV_CODEC_CAP_TRUNCATED CODEC_CAP_TRUNCATED
+#define AV_CODEC_FLAG_TRUNCATED CODEC_FLAG_TRUNCATED
 #endif
 
 #if LIBAVUTIL_VERSION_MAJOR < 52
-#	define AV_PIX_FMT_YUV420P PIX_FMT_YUV420P
+#define AV_PIX_FMT_YUV420P PIX_FMT_YUV420P
 #endif
 
 typedef struct _TSMFFFmpegDecoder
@@ -128,21 +128,21 @@ static BOOL tsmf_ffmpeg_init_audio_stream(ITSMFDecoder* decoder, const TS_AM_MED
 	mdecoder->codec_context->channels = media_type->Channels;
 	mdecoder->codec_context->block_align = media_type->BlockAlign;
 #if LIBAVCODEC_VERSION_MAJOR < 55
-#	ifdef AV_CPU_FLAG_SSE2
+#ifdef AV_CPU_FLAG_SSE2
 	mdecoder->codec_context->dsp_mask = AV_CPU_FLAG_SSE2 | AV_CPU_FLAG_MMX2;
-#	else
-#		if LIBAVCODEC_VERSION_MAJOR < 53
+#else
+#if LIBAVCODEC_VERSION_MAJOR < 53
 	mdecoder->codec_context->dsp_mask = FF_MM_SSE2 | FF_MM_MMXEXT;
-#		else
+#else
 	mdecoder->codec_context->dsp_mask = FF_MM_SSE2 | FF_MM_MMX2;
-#		endif
-#	endif
+#endif
+#endif
 #else /* LIBAVCODEC_VERSION_MAJOR < 55 */
-#	ifdef AV_CPU_FLAG_SSE2
+#ifdef AV_CPU_FLAG_SSE2
 	av_set_cpu_flags_mask(AV_CPU_FLAG_SSE2 | AV_CPU_FLAG_MMXEXT);
-#	else
+#else
 	av_set_cpu_flags_mask(FF_MM_SSE2 | FF_MM_MMX2);
-#	endif
+#endif
 #endif /* LIBAVCODEC_VERSION_MAJOR < 55 */
 	return TRUE;
 }
@@ -166,21 +166,21 @@ static BOOL tsmf_ffmpeg_init_stream(ITSMFDecoder* decoder, const TS_AM_MEDIA_TYP
 
 	switch (mdecoder->media_type)
 	{
-	case AVMEDIA_TYPE_VIDEO:
-		if (!tsmf_ffmpeg_init_video_stream(decoder, media_type))
-			return FALSE;
+		case AVMEDIA_TYPE_VIDEO:
+			if (!tsmf_ffmpeg_init_video_stream(decoder, media_type))
+				return FALSE;
 
-		break;
+			break;
 
-	case AVMEDIA_TYPE_AUDIO:
-		if (!tsmf_ffmpeg_init_audio_stream(decoder, media_type))
-			return FALSE;
+		case AVMEDIA_TYPE_AUDIO:
+			if (!tsmf_ffmpeg_init_audio_stream(decoder, media_type))
+				return FALSE;
 
-		break;
+			break;
 
-	default:
-		WLog_ERR(TAG, "unknown media_type %d", mdecoder->media_type);
-		break;
+		default:
+			WLog_ERR(TAG, "unknown media_type %d", mdecoder->media_type);
+			break;
 	}
 
 	if (media_type->ExtraData)
@@ -247,73 +247,73 @@ static BOOL tsmf_ffmpeg_set_format(ITSMFDecoder* decoder, TS_AM_MEDIA_TYPE* medi
 
 	switch (media_type->MajorType)
 	{
-	case TSMF_MAJOR_TYPE_VIDEO:
-		mdecoder->media_type = AVMEDIA_TYPE_VIDEO;
-		break;
+		case TSMF_MAJOR_TYPE_VIDEO:
+			mdecoder->media_type = AVMEDIA_TYPE_VIDEO;
+			break;
 
-	case TSMF_MAJOR_TYPE_AUDIO:
-		mdecoder->media_type = AVMEDIA_TYPE_AUDIO;
-		break;
+		case TSMF_MAJOR_TYPE_AUDIO:
+			mdecoder->media_type = AVMEDIA_TYPE_AUDIO;
+			break;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	switch (media_type->SubType)
 	{
-	case TSMF_SUB_TYPE_WVC1:
-		mdecoder->codec_id = AV_CODEC_ID_VC1;
-		break;
+		case TSMF_SUB_TYPE_WVC1:
+			mdecoder->codec_id = AV_CODEC_ID_VC1;
+			break;
 
-	case TSMF_SUB_TYPE_WMA2:
-		mdecoder->codec_id = AV_CODEC_ID_WMAV2;
-		break;
+		case TSMF_SUB_TYPE_WMA2:
+			mdecoder->codec_id = AV_CODEC_ID_WMAV2;
+			break;
 
-	case TSMF_SUB_TYPE_WMA9:
-		mdecoder->codec_id = AV_CODEC_ID_WMAPRO;
-		break;
+		case TSMF_SUB_TYPE_WMA9:
+			mdecoder->codec_id = AV_CODEC_ID_WMAPRO;
+			break;
 
-	case TSMF_SUB_TYPE_MP3:
-		mdecoder->codec_id = AV_CODEC_ID_MP3;
-		break;
+		case TSMF_SUB_TYPE_MP3:
+			mdecoder->codec_id = AV_CODEC_ID_MP3;
+			break;
 
-	case TSMF_SUB_TYPE_MP2A:
-		mdecoder->codec_id = AV_CODEC_ID_MP2;
-		break;
+		case TSMF_SUB_TYPE_MP2A:
+			mdecoder->codec_id = AV_CODEC_ID_MP2;
+			break;
 
-	case TSMF_SUB_TYPE_MP2V:
-		mdecoder->codec_id = AV_CODEC_ID_MPEG2VIDEO;
-		break;
+		case TSMF_SUB_TYPE_MP2V:
+			mdecoder->codec_id = AV_CODEC_ID_MPEG2VIDEO;
+			break;
 
-	case TSMF_SUB_TYPE_WMV3:
-		mdecoder->codec_id = AV_CODEC_ID_WMV3;
-		break;
+		case TSMF_SUB_TYPE_WMV3:
+			mdecoder->codec_id = AV_CODEC_ID_WMV3;
+			break;
 
-	case TSMF_SUB_TYPE_AAC:
-		mdecoder->codec_id = AV_CODEC_ID_AAC;
+		case TSMF_SUB_TYPE_AAC:
+			mdecoder->codec_id = AV_CODEC_ID_AAC;
 
-		/* For AAC the pFormat is a HEAACWAVEINFO struct, and the codec data
-		   is at the end of it. See
-		   http://msdn.microsoft.com/en-us/library/dd757806.aspx */
-		if (media_type->ExtraData)
-		{
-			media_type->ExtraData += 12;
-			media_type->ExtraDataSize -= 12;
-		}
+			/* For AAC the pFormat is a HEAACWAVEINFO struct, and the codec data
+			   is at the end of it. See
+			   http://msdn.microsoft.com/en-us/library/dd757806.aspx */
+			if (media_type->ExtraData)
+			{
+				media_type->ExtraData += 12;
+				media_type->ExtraDataSize -= 12;
+			}
 
-		break;
+			break;
 
-	case TSMF_SUB_TYPE_H264:
-	case TSMF_SUB_TYPE_AVC1:
-		mdecoder->codec_id = AV_CODEC_ID_H264;
-		break;
+		case TSMF_SUB_TYPE_H264:
+		case TSMF_SUB_TYPE_AVC1:
+			mdecoder->codec_id = AV_CODEC_ID_H264;
+			break;
 
-	case TSMF_SUB_TYPE_AC3:
-		mdecoder->codec_id = AV_CODEC_ID_AC3;
-		break;
+		case TSMF_SUB_TYPE_AC3:
+			mdecoder->codec_id = AV_CODEC_ID_AC3;
+			break;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	if (!tsmf_ffmpeg_init_context(decoder))
@@ -465,11 +465,11 @@ static BOOL tsmf_ffmpeg_decode_audio(ITSMFDecoder* decoder, const BYTE* data, UI
 		                            src_size);
 #else
 		{
-#	if LIBAVCODEC_VERSION_MAJOR < 55
+#if LIBAVCODEC_VERSION_MAJOR < 55
 			AVFrame* decoded_frame = avcodec_alloc_frame();
-#	else
+#else
 			AVFrame* decoded_frame = av_frame_alloc();
-#	endif
+#endif
 			int got_frame = 0;
 			AVPacket pkt;
 			av_init_packet(&pkt);
@@ -537,15 +537,15 @@ static BOOL tsmf_ffmpeg_decode(ITSMFDecoder* decoder, const BYTE* data, UINT32 d
 
 	switch (mdecoder->media_type)
 	{
-	case AVMEDIA_TYPE_VIDEO:
-		return tsmf_ffmpeg_decode_video(decoder, data, data_size, extensions);
+		case AVMEDIA_TYPE_VIDEO:
+			return tsmf_ffmpeg_decode_video(decoder, data, data_size, extensions);
 
-	case AVMEDIA_TYPE_AUDIO:
-		return tsmf_ffmpeg_decode_audio(decoder, data, data_size, extensions);
+		case AVMEDIA_TYPE_AUDIO:
+			return tsmf_ffmpeg_decode_audio(decoder, data, data_size, extensions);
 
-	default:
-		WLog_ERR(TAG, "unknown media type.");
-		return FALSE;
+		default:
+			WLog_ERR(TAG, "unknown media type.");
+			return FALSE;
 	}
 }
 
@@ -566,12 +566,12 @@ static UINT32 tsmf_ffmpeg_get_decoded_format(ITSMFDecoder* decoder)
 
 	switch (mdecoder->codec_context->pix_fmt)
 	{
-	case AV_PIX_FMT_YUV420P:
-		return RDP_PIXFMT_I420;
+		case AV_PIX_FMT_YUV420P:
+			return RDP_PIXFMT_I420;
 
-	default:
-		WLog_ERR(TAG, "unsupported pixel format %u", mdecoder->codec_context->pix_fmt);
-		return (UINT32)-1;
+		default:
+			WLog_ERR(TAG, "unsupported pixel format %u", mdecoder->codec_context->pix_fmt);
+			return (UINT32)-1;
 	}
 }
 
@@ -620,10 +620,9 @@ static BOOL CALLBACK InitializeAvCodecs(PINIT_ONCE once, PVOID param, PVOID* con
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_tsmf_client_subsystem_entry ffmpeg_freerdp_tsmf_client_decoder_subsystem_entry
+#define freerdp_tsmf_client_subsystem_entry ffmpeg_freerdp_tsmf_client_decoder_subsystem_entry
 #else
-#	define freerdp_tsmf_client_subsystem_entry \
-		FREERDP_API freerdp_tsmf_client_decoder_subsystem_entry
+#define freerdp_tsmf_client_subsystem_entry FREERDP_API freerdp_tsmf_client_decoder_subsystem_entry
 #endif
 
 ITSMFDecoder* freerdp_tsmf_client_subsystem_entry(void)

@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "activation.h"
@@ -114,14 +114,14 @@ BOOL rdp_recv_server_control_pdu(rdpRdp* rdp, wStream* s)
 
 	switch (action)
 	{
-	case CTRLACTION_COOPERATE:
-		rdp->finalize_sc_pdus |= FINALIZE_SC_CONTROL_COOPERATE_PDU;
-		break;
+		case CTRLACTION_COOPERATE:
+			rdp->finalize_sc_pdus |= FINALIZE_SC_CONTROL_COOPERATE_PDU;
+			break;
 
-	case CTRLACTION_GRANTED_CONTROL:
-		rdp->finalize_sc_pdus |= FINALIZE_SC_CONTROL_GRANTED_PDU;
-		rdp->resendFocus = TRUE;
-		break;
+		case CTRLACTION_GRANTED_CONTROL:
+			rdp->finalize_sc_pdus |= FINALIZE_SC_CONTROL_GRANTED_PDU;
+			rdp->resendFocus = TRUE;
+			break;
 	}
 
 	return TRUE;

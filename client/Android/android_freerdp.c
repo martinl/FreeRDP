@@ -14,7 +14,7 @@
 */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -50,7 +50,7 @@
 #include "android_freerdp_jni.h"
 
 #if defined(WITH_GPROF)
-#	include "jni/prof.h"
+#include "jni/prof.h"
 #endif
 
 #define TAG CLIENT_TAG("android")
@@ -892,20 +892,20 @@ static jboolean JNICALL jni_freerdp_update_graphics(JNIEnv* env, jclass cls, jlo
 
 	switch (info.format)
 	{
-	case ANDROID_BITMAP_FORMAT_RGBA_8888:
-		DstFormat = PIXEL_FORMAT_RGBA32;
-		break;
+		case ANDROID_BITMAP_FORMAT_RGBA_8888:
+			DstFormat = PIXEL_FORMAT_RGBA32;
+			break;
 
-	case ANDROID_BITMAP_FORMAT_RGB_565:
-		DstFormat = PIXEL_FORMAT_RGB16;
-		break;
+		case ANDROID_BITMAP_FORMAT_RGB_565:
+			DstFormat = PIXEL_FORMAT_RGB16;
+			break;
 
-	case ANDROID_BITMAP_FORMAT_RGBA_4444:
-	case ANDROID_BITMAP_FORMAT_A_8:
-	case ANDROID_BITMAP_FORMAT_NONE:
-	default:
-		rc = JNI_FALSE;
-		break;
+		case ANDROID_BITMAP_FORMAT_RGBA_4444:
+		case ANDROID_BITMAP_FORMAT_A_8:
+		case ANDROID_BITMAP_FORMAT_NONE:
+		default:
+			rc = JNI_FALSE;
+			break;
 	}
 
 	if (rc)

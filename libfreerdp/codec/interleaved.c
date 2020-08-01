@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/codec/interleaved.h>
@@ -136,75 +136,75 @@ static INLINE UINT32 ExtractRunLength(UINT32 code, const BYTE* pbOrderHdr, UINT3
 
 	switch (code)
 	{
-	case REGULAR_FGBG_IMAGE:
-		runLength = (*pbOrderHdr) & g_MaskRegularRunLength;
+		case REGULAR_FGBG_IMAGE:
+			runLength = (*pbOrderHdr) & g_MaskRegularRunLength;
 
-		if (runLength == 0)
-		{
-			runLength = (*(pbOrderHdr + 1)) + 1;
-			ladvance += 1;
-		}
-		else
-		{
-			runLength = runLength * 8;
-		}
+			if (runLength == 0)
+			{
+				runLength = (*(pbOrderHdr + 1)) + 1;
+				ladvance += 1;
+			}
+			else
+			{
+				runLength = runLength * 8;
+			}
 
-		break;
+			break;
 
-	case LITE_SET_FG_FGBG_IMAGE:
-		runLength = (*pbOrderHdr) & g_MaskLiteRunLength;
+		case LITE_SET_FG_FGBG_IMAGE:
+			runLength = (*pbOrderHdr) & g_MaskLiteRunLength;
 
-		if (runLength == 0)
-		{
-			runLength = (*(pbOrderHdr + 1)) + 1;
-			ladvance += 1;
-		}
-		else
-		{
-			runLength = runLength * 8;
-		}
+			if (runLength == 0)
+			{
+				runLength = (*(pbOrderHdr + 1)) + 1;
+				ladvance += 1;
+			}
+			else
+			{
+				runLength = runLength * 8;
+			}
 
-		break;
+			break;
 
-	case REGULAR_BG_RUN:
-	case REGULAR_FG_RUN:
-	case REGULAR_COLOR_RUN:
-	case REGULAR_COLOR_IMAGE:
-		runLength = (*pbOrderHdr) & g_MaskRegularRunLength;
+		case REGULAR_BG_RUN:
+		case REGULAR_FG_RUN:
+		case REGULAR_COLOR_RUN:
+		case REGULAR_COLOR_IMAGE:
+			runLength = (*pbOrderHdr) & g_MaskRegularRunLength;
 
-		if (runLength == 0)
-		{
-			/* An extended (MEGA) run. */
-			runLength = (*(pbOrderHdr + 1)) + 32;
-			ladvance += 1;
-		}
+			if (runLength == 0)
+			{
+				/* An extended (MEGA) run. */
+				runLength = (*(pbOrderHdr + 1)) + 32;
+				ladvance += 1;
+			}
 
-		break;
+			break;
 
-	case LITE_SET_FG_FG_RUN:
-	case LITE_DITHERED_RUN:
-		runLength = (*pbOrderHdr) & g_MaskLiteRunLength;
+		case LITE_SET_FG_FG_RUN:
+		case LITE_DITHERED_RUN:
+			runLength = (*pbOrderHdr) & g_MaskLiteRunLength;
 
-		if (runLength == 0)
-		{
-			/* An extended (MEGA) run. */
-			runLength = (*(pbOrderHdr + 1)) + 16;
-			ladvance += 1;
-		}
+			if (runLength == 0)
+			{
+				/* An extended (MEGA) run. */
+				runLength = (*(pbOrderHdr + 1)) + 16;
+				ladvance += 1;
+			}
 
-		break;
+			break;
 
-	case MEGA_MEGA_BG_RUN:
-	case MEGA_MEGA_FG_RUN:
-	case MEGA_MEGA_SET_FG_RUN:
-	case MEGA_MEGA_DITHERED_RUN:
-	case MEGA_MEGA_COLOR_RUN:
-	case MEGA_MEGA_FGBG_IMAGE:
-	case MEGA_MEGA_SET_FGBG_IMAGE:
-	case MEGA_MEGA_COLOR_IMAGE:
-		runLength = ((UINT16)pbOrderHdr[1]) | ((UINT16)(pbOrderHdr[2] << 8));
-		ladvance += 2;
-		break;
+		case MEGA_MEGA_BG_RUN:
+		case MEGA_MEGA_FG_RUN:
+		case MEGA_MEGA_SET_FG_RUN:
+		case MEGA_MEGA_DITHERED_RUN:
+		case MEGA_MEGA_COLOR_RUN:
+		case MEGA_MEGA_FGBG_IMAGE:
+		case MEGA_MEGA_SET_FGBG_IMAGE:
+		case MEGA_MEGA_COLOR_IMAGE:
+			runLength = ((UINT16)pbOrderHdr[1]) | ((UINT16)(pbOrderHdr[2] << 8));
+			ladvance += 2;
+			break;
 	}
 
 	*advance = ladvance;
@@ -273,9 +273,9 @@ static INLINE void write_pixel_16(BYTE* _buf, UINT16 _pix)
 #define DESTWRITEPIXEL(_buf, _pix) write_pixel_16(_buf, _pix)
 #define DESTREADPIXEL(_pix, _buf) _pix = ((UINT16*)(_buf))[0]
 #ifdef HAVE_ALIGNED_REQUIRED
-#	define SRCREADPIXEL(_pix, _buf) _pix = (_buf)[0] | ((_buf)[1] << 8)
+#define SRCREADPIXEL(_pix, _buf) _pix = (_buf)[0] | ((_buf)[1] << 8)
 #else
-#	define SRCREADPIXEL(_pix, _buf) _pix = ((UINT16*)(_buf))[0]
+#define SRCREADPIXEL(_pix, _buf) _pix = ((UINT16*)(_buf))[0]
 #endif
 #define DESTNEXTPIXEL(_buf) _buf += 2
 #define SRCNEXTPIXEL(_buf) _buf += 2
@@ -326,29 +326,29 @@ BOOL interleaved_decompress(BITMAP_INTERLEAVED_CONTEXT* interleaved, const BYTE*
 
 	switch (bpp)
 	{
-	case 24:
-		scanline = nSrcWidth * 3;
-		SrcFormat = PIXEL_FORMAT_BGR24;
-		break;
+		case 24:
+			scanline = nSrcWidth * 3;
+			SrcFormat = PIXEL_FORMAT_BGR24;
+			break;
 
-	case 16:
-		scanline = nSrcWidth * 2;
-		SrcFormat = PIXEL_FORMAT_RGB16;
-		break;
+		case 16:
+			scanline = nSrcWidth * 2;
+			SrcFormat = PIXEL_FORMAT_RGB16;
+			break;
 
-	case 15:
-		scanline = nSrcWidth * 2;
-		SrcFormat = PIXEL_FORMAT_RGB15;
-		break;
+		case 15:
+			scanline = nSrcWidth * 2;
+			SrcFormat = PIXEL_FORMAT_RGB15;
+			break;
 
-	case 8:
-		scanline = nSrcWidth;
-		SrcFormat = PIXEL_FORMAT_RGB8;
-		break;
+		case 8:
+			scanline = nSrcWidth;
+			SrcFormat = PIXEL_FORMAT_RGB8;
+			break;
 
-	default:
-		WLog_ERR(TAG, "Invalid color depth %" PRIu32 "", bpp);
-		return FALSE;
+		default:
+			WLog_ERR(TAG, "Invalid color depth %" PRIu32 "", bpp);
+			return FALSE;
 	}
 
 	BufferSize = scanline * nSrcHeight;
@@ -364,30 +364,30 @@ BOOL interleaved_decompress(BITMAP_INTERLEAVED_CONTEXT* interleaved, const BYTE*
 
 	switch (bpp)
 	{
-	case 24:
-		if (!RleDecompress24to24(pSrcData, SrcSize, interleaved->TempBuffer, scanline, nSrcWidth,
-		                         nSrcHeight))
+		case 24:
+			if (!RleDecompress24to24(pSrcData, SrcSize, interleaved->TempBuffer, scanline,
+			                         nSrcWidth, nSrcHeight))
+				return FALSE;
+
+			break;
+
+		case 16:
+		case 15:
+			if (!RleDecompress16to16(pSrcData, SrcSize, interleaved->TempBuffer, scanline,
+			                         nSrcWidth, nSrcHeight))
+				return FALSE;
+
+			break;
+
+		case 8:
+			if (!RleDecompress8to8(pSrcData, SrcSize, interleaved->TempBuffer, scanline, nSrcWidth,
+			                       nSrcHeight))
+				return FALSE;
+
+			break;
+
+		default:
 			return FALSE;
-
-		break;
-
-	case 16:
-	case 15:
-		if (!RleDecompress16to16(pSrcData, SrcSize, interleaved->TempBuffer, scanline, nSrcWidth,
-		                         nSrcHeight))
-			return FALSE;
-
-		break;
-
-	case 8:
-		if (!RleDecompress8to8(pSrcData, SrcSize, interleaved->TempBuffer, scanline, nSrcWidth,
-		                       nSrcHeight))
-			return FALSE;
-
-		break;
-
-	default:
-		return FALSE;
 	}
 
 	return freerdp_image_copy(pDstData, DstFormat, nDstStep, nXDst, nYDst, nDstWidth, nDstHeight,
@@ -428,20 +428,20 @@ BOOL interleaved_compress(BITMAP_INTERLEAVED_CONTEXT* interleaved, BYTE* pDstDat
 
 	switch (bpp)
 	{
-	case 24:
-		DstFormat = PIXEL_FORMAT_BGRX32;
-		break;
+		case 24:
+			DstFormat = PIXEL_FORMAT_BGRX32;
+			break;
 
-	case 16:
-		DstFormat = PIXEL_FORMAT_RGB16;
-		break;
+		case 16:
+			DstFormat = PIXEL_FORMAT_RGB16;
+			break;
 
-	case 15:
-		DstFormat = PIXEL_FORMAT_RGB15;
-		break;
+		case 15:
+			DstFormat = PIXEL_FORMAT_RGB15;
+			break;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	if (!freerdp_image_copy(interleaved->TempBuffer, DstFormat, 0, 0, 0, nWidth, nHeight, pSrcData,

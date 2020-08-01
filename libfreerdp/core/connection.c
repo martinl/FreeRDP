@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "info.h"
@@ -128,8 +128,8 @@
  *collection of PDUs (specified in section 2.2.1.4) over a predetermined period of time with enough
  *data to ensure that the results are statistically relevant.
  *
- * 7.	Licensing: The goal of the licensing exchange is to transfer a license from the server to the
- *client. The client stores this license and on subsequent connections sends the license to the
+ * 7.	Licensing: The goal of the licensing exchange is to transfer a license from the server to
+ *the client. The client stores this license and on subsequent connections sends the license to the
  *server for validation. However, in some situations the client may not be issued a license to
  *store. In effect, the packets exchanged during this phase of the protocol depend on the licensing
  *mechanisms employed by the server. Within the context of this document, it is assumed that the
@@ -1107,71 +1107,71 @@ int rdp_client_transition_to_state(rdpRdp* rdp, int state)
 
 	switch (state)
 	{
-	case CONNECTION_STATE_INITIAL:
-		rdp->state = CONNECTION_STATE_INITIAL;
-		break;
+		case CONNECTION_STATE_INITIAL:
+			rdp->state = CONNECTION_STATE_INITIAL;
+			break;
 
-	case CONNECTION_STATE_NEGO:
-		rdp->state = CONNECTION_STATE_NEGO;
-		break;
+		case CONNECTION_STATE_NEGO:
+			rdp->state = CONNECTION_STATE_NEGO;
+			break;
 
-	case CONNECTION_STATE_NLA:
-		rdp->state = CONNECTION_STATE_NLA;
-		break;
+		case CONNECTION_STATE_NLA:
+			rdp->state = CONNECTION_STATE_NLA;
+			break;
 
-	case CONNECTION_STATE_MCS_CONNECT:
-		rdp->state = CONNECTION_STATE_MCS_CONNECT;
-		break;
+		case CONNECTION_STATE_MCS_CONNECT:
+			rdp->state = CONNECTION_STATE_MCS_CONNECT;
+			break;
 
-	case CONNECTION_STATE_MCS_ERECT_DOMAIN:
-		rdp->state = CONNECTION_STATE_MCS_ERECT_DOMAIN;
-		break;
+		case CONNECTION_STATE_MCS_ERECT_DOMAIN:
+			rdp->state = CONNECTION_STATE_MCS_ERECT_DOMAIN;
+			break;
 
-	case CONNECTION_STATE_MCS_ATTACH_USER:
-		rdp->state = CONNECTION_STATE_MCS_ATTACH_USER;
-		break;
+		case CONNECTION_STATE_MCS_ATTACH_USER:
+			rdp->state = CONNECTION_STATE_MCS_ATTACH_USER;
+			break;
 
-	case CONNECTION_STATE_MCS_CHANNEL_JOIN:
-		rdp->state = CONNECTION_STATE_MCS_CHANNEL_JOIN;
-		break;
+		case CONNECTION_STATE_MCS_CHANNEL_JOIN:
+			rdp->state = CONNECTION_STATE_MCS_CHANNEL_JOIN;
+			break;
 
-	case CONNECTION_STATE_RDP_SECURITY_COMMENCEMENT:
-		rdp->state = CONNECTION_STATE_RDP_SECURITY_COMMENCEMENT;
-		break;
+		case CONNECTION_STATE_RDP_SECURITY_COMMENCEMENT:
+			rdp->state = CONNECTION_STATE_RDP_SECURITY_COMMENCEMENT;
+			break;
 
-	case CONNECTION_STATE_SECURE_SETTINGS_EXCHANGE:
-		rdp->state = CONNECTION_STATE_SECURE_SETTINGS_EXCHANGE;
-		break;
+		case CONNECTION_STATE_SECURE_SETTINGS_EXCHANGE:
+			rdp->state = CONNECTION_STATE_SECURE_SETTINGS_EXCHANGE;
+			break;
 
-	case CONNECTION_STATE_CONNECT_TIME_AUTO_DETECT:
-		rdp->state = CONNECTION_STATE_CONNECT_TIME_AUTO_DETECT;
-		break;
+		case CONNECTION_STATE_CONNECT_TIME_AUTO_DETECT:
+			rdp->state = CONNECTION_STATE_CONNECT_TIME_AUTO_DETECT;
+			break;
 
-	case CONNECTION_STATE_LICENSING:
-		rdp->state = CONNECTION_STATE_LICENSING;
-		break;
+		case CONNECTION_STATE_LICENSING:
+			rdp->state = CONNECTION_STATE_LICENSING;
+			break;
 
-	case CONNECTION_STATE_MULTITRANSPORT_BOOTSTRAPPING:
-		rdp->state = CONNECTION_STATE_MULTITRANSPORT_BOOTSTRAPPING;
-		break;
+		case CONNECTION_STATE_MULTITRANSPORT_BOOTSTRAPPING:
+			rdp->state = CONNECTION_STATE_MULTITRANSPORT_BOOTSTRAPPING;
+			break;
 
-	case CONNECTION_STATE_CAPABILITIES_EXCHANGE:
-		rdp->state = CONNECTION_STATE_CAPABILITIES_EXCHANGE;
-		break;
+		case CONNECTION_STATE_CAPABILITIES_EXCHANGE:
+			rdp->state = CONNECTION_STATE_CAPABILITIES_EXCHANGE;
+			break;
 
-	case CONNECTION_STATE_FINALIZATION:
-		rdp->state = CONNECTION_STATE_FINALIZATION;
-		update_reset_state(rdp->update);
-		rdp->finalize_sc_pdus = 0;
-		break;
+		case CONNECTION_STATE_FINALIZATION:
+			rdp->state = CONNECTION_STATE_FINALIZATION;
+			update_reset_state(rdp->update);
+			rdp->finalize_sc_pdus = 0;
+			break;
 
-	case CONNECTION_STATE_ACTIVE:
-		rdp->state = CONNECTION_STATE_ACTIVE;
-		break;
+		case CONNECTION_STATE_ACTIVE:
+			rdp->state = CONNECTION_STATE_ACTIVE;
+			break;
 
-	default:
-		status = -1;
-		break;
+		default:
+			status = -1;
+			break;
 	}
 
 	return status;
@@ -1418,92 +1418,92 @@ int rdp_server_transition_to_state(rdpRdp* rdp, int state)
 
 	switch (state)
 	{
-	case CONNECTION_STATE_INITIAL:
-		rdp->state = CONNECTION_STATE_INITIAL;
-		break;
+		case CONNECTION_STATE_INITIAL:
+			rdp->state = CONNECTION_STATE_INITIAL;
+			break;
 
-	case CONNECTION_STATE_NEGO:
-		rdp->state = CONNECTION_STATE_NEGO;
-		break;
+		case CONNECTION_STATE_NEGO:
+			rdp->state = CONNECTION_STATE_NEGO;
+			break;
 
-	case CONNECTION_STATE_MCS_CONNECT:
-		rdp->state = CONNECTION_STATE_MCS_CONNECT;
-		break;
+		case CONNECTION_STATE_MCS_CONNECT:
+			rdp->state = CONNECTION_STATE_MCS_CONNECT;
+			break;
 
-	case CONNECTION_STATE_MCS_ERECT_DOMAIN:
-		rdp->state = CONNECTION_STATE_MCS_ERECT_DOMAIN;
-		break;
+		case CONNECTION_STATE_MCS_ERECT_DOMAIN:
+			rdp->state = CONNECTION_STATE_MCS_ERECT_DOMAIN;
+			break;
 
-	case CONNECTION_STATE_MCS_ATTACH_USER:
-		rdp->state = CONNECTION_STATE_MCS_ATTACH_USER;
-		break;
+		case CONNECTION_STATE_MCS_ATTACH_USER:
+			rdp->state = CONNECTION_STATE_MCS_ATTACH_USER;
+			break;
 
-	case CONNECTION_STATE_MCS_CHANNEL_JOIN:
-		rdp->state = CONNECTION_STATE_MCS_CHANNEL_JOIN;
-		break;
+		case CONNECTION_STATE_MCS_CHANNEL_JOIN:
+			rdp->state = CONNECTION_STATE_MCS_CHANNEL_JOIN;
+			break;
 
-	case CONNECTION_STATE_RDP_SECURITY_COMMENCEMENT:
-		rdp->state = CONNECTION_STATE_RDP_SECURITY_COMMENCEMENT;
-		break;
+		case CONNECTION_STATE_RDP_SECURITY_COMMENCEMENT:
+			rdp->state = CONNECTION_STATE_RDP_SECURITY_COMMENCEMENT;
+			break;
 
-	case CONNECTION_STATE_SECURE_SETTINGS_EXCHANGE:
-		rdp->state = CONNECTION_STATE_SECURE_SETTINGS_EXCHANGE;
-		break;
+		case CONNECTION_STATE_SECURE_SETTINGS_EXCHANGE:
+			rdp->state = CONNECTION_STATE_SECURE_SETTINGS_EXCHANGE;
+			break;
 
-	case CONNECTION_STATE_CONNECT_TIME_AUTO_DETECT:
-		rdp->state = CONNECTION_STATE_CONNECT_TIME_AUTO_DETECT;
-		break;
+		case CONNECTION_STATE_CONNECT_TIME_AUTO_DETECT:
+			rdp->state = CONNECTION_STATE_CONNECT_TIME_AUTO_DETECT;
+			break;
 
-	case CONNECTION_STATE_LICENSING:
-		rdp->state = CONNECTION_STATE_LICENSING;
-		break;
+		case CONNECTION_STATE_LICENSING:
+			rdp->state = CONNECTION_STATE_LICENSING;
+			break;
 
-	case CONNECTION_STATE_MULTITRANSPORT_BOOTSTRAPPING:
-		rdp->state = CONNECTION_STATE_MULTITRANSPORT_BOOTSTRAPPING;
-		break;
+		case CONNECTION_STATE_MULTITRANSPORT_BOOTSTRAPPING:
+			rdp->state = CONNECTION_STATE_MULTITRANSPORT_BOOTSTRAPPING;
+			break;
 
-	case CONNECTION_STATE_CAPABILITIES_EXCHANGE:
-		rdp->state = CONNECTION_STATE_CAPABILITIES_EXCHANGE;
-		rdp->AwaitCapabilities = FALSE;
-		break;
+		case CONNECTION_STATE_CAPABILITIES_EXCHANGE:
+			rdp->state = CONNECTION_STATE_CAPABILITIES_EXCHANGE;
+			rdp->AwaitCapabilities = FALSE;
+			break;
 
-	case CONNECTION_STATE_FINALIZATION:
-		rdp->state = CONNECTION_STATE_FINALIZATION;
-		rdp->finalize_sc_pdus = 0;
-		break;
+		case CONNECTION_STATE_FINALIZATION:
+			rdp->state = CONNECTION_STATE_FINALIZATION;
+			rdp->finalize_sc_pdus = 0;
+			break;
 
-	case CONNECTION_STATE_ACTIVE:
-		rdp->state = CONNECTION_STATE_ACTIVE;
-		update_reset_state(rdp->update);
+		case CONNECTION_STATE_ACTIVE:
+			rdp->state = CONNECTION_STATE_ACTIVE;
+			update_reset_state(rdp->update);
 
-		if (client)
-		{
-			if (!client->connected)
+			if (client)
 			{
-				/**
-				 * PostConnect should only be called once and should not
-				 * be called after a reactivation sequence.
-				 */
-				IFCALLRET(client->PostConnect, client->connected, client);
-
 				if (!client->connected)
-					return -1;
+				{
+					/**
+					 * PostConnect should only be called once and should not
+					 * be called after a reactivation sequence.
+					 */
+					IFCALLRET(client->PostConnect, client->connected, client);
+
+					if (!client->connected)
+						return -1;
+				}
+
+				if (rdp->state >= CONNECTION_STATE_ACTIVE)
+				{
+					IFCALLRET(client->Activate, client->activated, client);
+
+					if (!client->activated)
+						return -1;
+				}
 			}
 
-			if (rdp->state >= CONNECTION_STATE_ACTIVE)
-			{
-				IFCALLRET(client->Activate, client->activated, client);
+			break;
 
-				if (!client->activated)
-					return -1;
-			}
-		}
-
-		break;
-
-	default:
-		status = -1;
-		break;
+		default:
+			status = -1;
+			break;
 	}
 
 	return status;

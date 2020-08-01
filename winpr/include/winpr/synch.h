@@ -41,7 +41,7 @@ extern "C"
 #ifndef _WIN32
 
 /* Mutex */
-#	define CREATE_MUTEX_INITIAL_OWNER 0x00000001
+#define CREATE_MUTEX_INITIAL_OWNER 0x00000001
 
 	WINPR_API HANDLE CreateMutexA(LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner,
 	                              LPCSTR lpName);
@@ -58,15 +58,15 @@ extern "C"
 
 	WINPR_API BOOL ReleaseMutex(HANDLE hMutex);
 
-#	ifdef UNICODE
-#		define CreateMutex CreateMutexW
-#		define CreateMutexEx CreateMutexExW
-#		define OpenMutex OpenMutexW
-#	else
-#		define CreateMutex CreateMutexA
-#		define CreateMutexEx CreateMutexExA
-#		define OpenMutex OpenMutexA
-#	endif
+#ifdef UNICODE
+#define CreateMutex CreateMutexW
+#define CreateMutexEx CreateMutexExW
+#define OpenMutex OpenMutexW
+#else
+#define CreateMutex CreateMutexA
+#define CreateMutexEx CreateMutexExA
+#define OpenMutex OpenMutexA
+#endif
 
 	/* Semaphore */
 
@@ -78,19 +78,19 @@ extern "C"
 	WINPR_API HANDLE OpenSemaphoreA(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName);
 	WINPR_API HANDLE OpenSemaphoreW(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName);
 
-#	ifdef UNICODE
-#		define CreateSemaphore CreateSemaphoreW
-#		define OpenSemaphore OpenSemaphoreW
-#	else
-#		define CreateSemaphore CreateSemaphoreA
-#		define OpenSemaphore OpenSemaphoreA
-#	endif
+#ifdef UNICODE
+#define CreateSemaphore CreateSemaphoreW
+#define OpenSemaphore OpenSemaphoreW
+#else
+#define CreateSemaphore CreateSemaphoreA
+#define OpenSemaphore OpenSemaphoreA
+#endif
 
 	WINPR_API BOOL ReleaseSemaphore(HANDLE hSemaphore, LONG lReleaseCount, LPLONG lpPreviousCount);
 
 /* Event */
-#	define CREATE_EVENT_MANUAL_RESET 0x00000001
-#	define CREATE_EVENT_INITIAL_SET 0x00000002
+#define CREATE_EVENT_MANUAL_RESET 0x00000001
+#define CREATE_EVENT_INITIAL_SET 0x00000002
 
 	WINPR_API HANDLE CreateEventA(LPSECURITY_ATTRIBUTES lpEventAttributes, BOOL bManualReset,
 	                              BOOL bInitialState, LPCSTR lpName);
@@ -108,15 +108,15 @@ extern "C"
 	WINPR_API BOOL SetEvent(HANDLE hEvent);
 	WINPR_API BOOL ResetEvent(HANDLE hEvent);
 
-#	ifdef UNICODE
-#		define CreateEvent CreateEventW
-#		define CreateEventEx CreateEventExW
-#		define OpenEvent OpenEventW
-#	else
-#		define CreateEvent CreateEventA
-#		define CreateEventEx CreateEventExA
-#		define OpenEvent OpenEventA
-#	endif
+#ifdef UNICODE
+#define CreateEvent CreateEventW
+#define CreateEventEx CreateEventExW
+#define OpenEvent OpenEventW
+#else
+#define CreateEvent CreateEventA
+#define CreateEventEx CreateEventExA
+#define OpenEvent OpenEventA
+#endif
 
 	/* Slim Reader/Writer (SRW) Lock */
 
@@ -141,13 +141,13 @@ extern "C"
 
 	/* Critical Section */
 
-#	if defined(__linux__)
+#if defined(__linux__)
 /**
  * Linux NPTL thread synchronization primitives are implemented using
  * the futex system calls ... we can't beat futex with a spin loop.
  */
-#		define WINPR_CRITICAL_SECTION_DISABLE_SPINCOUNT
-#	endif
+#define WINPR_CRITICAL_SECTION_DISABLE_SPINCOUNT
+#endif
 
 	typedef struct _RTL_CRITICAL_SECTION
 	{
@@ -194,18 +194,18 @@ extern "C"
 
 	/* Wait */
 
-#	define INFINITE 0xFFFFFFFF
+#define INFINITE 0xFFFFFFFF
 
-#	define WAIT_OBJECT_0 0x00000000L
-#	define WAIT_ABANDONED 0x00000080L
+#define WAIT_OBJECT_0 0x00000000L
+#define WAIT_ABANDONED 0x00000080L
 
-#	ifndef WAIT_TIMEOUT
-#		define WAIT_TIMEOUT 0x00000102L
-#	endif
+#ifndef WAIT_TIMEOUT
+#define WAIT_TIMEOUT 0x00000102L
+#endif
 
-#	define WAIT_FAILED ((DWORD)0xFFFFFFFF)
+#define WAIT_FAILED ((DWORD)0xFFFFFFFF)
 
-#	define MAXIMUM_WAIT_OBJECTS 64
+#define MAXIMUM_WAIT_OBJECTS 64
 
 	WINPR_API DWORD WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds);
 	WINPR_API DWORD WaitForSingleObjectEx(HANDLE hHandle, DWORD dwMilliseconds, BOOL bAlertable);
@@ -219,14 +219,15 @@ extern "C"
 
 	/* Waitable Timer */
 
-#	define CREATE_WAITABLE_TIMER_MANUAL_RESET 0x00000001
+#define CREATE_WAITABLE_TIMER_MANUAL_RESET 0x00000001
 
 	typedef struct _REASON_CONTEXT
 	{
 		ULONG Version;
 		DWORD Flags;
 
-		union {
+		union
+		{
 			struct
 			{
 				HMODULE LocalizedReasonModule;
@@ -270,30 +271,30 @@ extern "C"
 
 	WINPR_API BOOL CancelWaitableTimer(HANDLE hTimer);
 
-#	ifdef UNICODE
-#		define CreateWaitableTimer CreateWaitableTimerW
-#		define CreateWaitableTimerEx CreateWaitableTimerExW
-#		define OpenWaitableTimer OpenWaitableTimerW
-#	else
-#		define CreateWaitableTimer CreateWaitableTimerA
-#		define CreateWaitableTimerEx CreateWaitableTimerExA
-#		define OpenWaitableTimer OpenWaitableTimerA
-#	endif
+#ifdef UNICODE
+#define CreateWaitableTimer CreateWaitableTimerW
+#define CreateWaitableTimerEx CreateWaitableTimerExW
+#define OpenWaitableTimer OpenWaitableTimerW
+#else
+#define CreateWaitableTimer CreateWaitableTimerA
+#define CreateWaitableTimerEx CreateWaitableTimerExA
+#define OpenWaitableTimer OpenWaitableTimerA
+#endif
 
 	/**
 	 * Timer-Queue Timer
 	 */
 
-#	define WT_EXECUTEDEFAULT 0x00000000
-#	define WT_EXECUTEINIOTHREAD 0x00000001
-#	define WT_EXECUTEINUITHREAD 0x00000002
-#	define WT_EXECUTEINWAITTHREAD 0x00000004
-#	define WT_EXECUTEONLYONCE 0x00000008
-#	define WT_EXECUTELONGFUNCTION 0x00000010
-#	define WT_EXECUTEINTIMERTHREAD 0x00000020
-#	define WT_EXECUTEINPERSISTENTIOTHREAD 0x00000040
-#	define WT_EXECUTEINPERSISTENTTHREAD 0x00000080
-#	define WT_TRANSFER_IMPERSONATION 0x00000100
+#define WT_EXECUTEDEFAULT 0x00000000
+#define WT_EXECUTEINIOTHREAD 0x00000001
+#define WT_EXECUTEINUITHREAD 0x00000002
+#define WT_EXECUTEINWAITTHREAD 0x00000004
+#define WT_EXECUTEONLYONCE 0x00000008
+#define WT_EXECUTELONGFUNCTION 0x00000010
+#define WT_EXECUTEINTIMERTHREAD 0x00000020
+#define WT_EXECUTEINPERSISTENTIOTHREAD 0x00000040
+#define WT_EXECUTEINPERSISTENTTHREAD 0x00000080
+#define WT_TRANSFER_IMPERSONATION 0x00000100
 
 	typedef VOID (*WAITORTIMERCALLBACK)(PVOID lpParameter, BOOLEAN TimerOrWaitFired);
 
@@ -311,23 +312,23 @@ extern "C"
 #endif
 
 #if (defined(_WIN32) && (_WIN32_WINNT < 0x0600))
-#	define InitializeCriticalSectionEx(lpCriticalSection, dwSpinCount, Flags) \
-		InitializeCriticalSectionAndSpinCount(lpCriticalSection, dwSpinCount)
+#define InitializeCriticalSectionEx(lpCriticalSection, dwSpinCount, Flags) \
+	InitializeCriticalSectionAndSpinCount(lpCriticalSection, dwSpinCount)
 #endif
 
 #ifndef _RTL_RUN_ONCE_DEF
-#	define _RTL_RUN_ONCE_DEF
+#define _RTL_RUN_ONCE_DEF
 
-#	define RTL_RUN_ONCE_INIT \
-		{                     \
-			0                 \
-		}
+#define RTL_RUN_ONCE_INIT \
+	{                     \
+		0                 \
+	}
 
-#	define RTL_RUN_ONCE_CHECK_ONLY 0x00000001
-#	define RTL_RUN_ONCE_ASYNC 0x00000002
-#	define RTL_RUN_ONCE_INIT_FAILED 0x00000004
+#define RTL_RUN_ONCE_CHECK_ONLY 0x00000001
+#define RTL_RUN_ONCE_ASYNC 0x00000002
+#define RTL_RUN_ONCE_INIT_FAILED 0x00000004
 
-#	define RTL_RUN_ONCE_CTX_RESERVED_BITS 2
+#define RTL_RUN_ONCE_CTX_RESERVED_BITS 2
 
 	typedef struct _RTL_RUN_ONCE
 	{
@@ -344,7 +345,7 @@ extern "C"
 
 	/* One-Time Initialization */
 
-#	define INIT_ONCE_STATIC_INIT RTL_RUN_ONCE_INIT
+#define INIT_ONCE_STATIC_INIT RTL_RUN_ONCE_INIT
 
 	typedef RTL_RUN_ONCE INIT_ONCE;
 	typedef PRTL_RUN_ONCE PINIT_ONCE;
@@ -358,16 +359,16 @@ extern "C"
 	                                         PVOID Parameter, LPVOID* Context);
 	WINPR_API VOID winpr_InitOnceInitialize(PINIT_ONCE InitOnce);
 
-#	define InitOnceBeginInitialize winpr_InitOnceBeginInitialize
-#	define InitOnceComplete winpr_InitOnceComplete
-#	define InitOnceExecuteOnce winpr_InitOnceExecuteOnce
-#	define InitOnceInitialize winpr_InitOnceInitialize
+#define InitOnceBeginInitialize winpr_InitOnceBeginInitialize
+#define InitOnceComplete winpr_InitOnceComplete
+#define InitOnceExecuteOnce winpr_InitOnceExecuteOnce
+#define InitOnceInitialize winpr_InitOnceInitialize
 #endif
 
 	/* Synchronization Barrier */
 
 #if (!defined(_WIN32)) || (defined(_WIN32) && (_WIN32_WINNT < 0x0602) && !defined(_SYNCHAPI_H_))
-#	define WINPR_SYNCHRONIZATION_BARRIER 1
+#define WINPR_SYNCHRONIZATION_BARRIER 1
 #endif
 
 #ifdef WINPR_SYNCHRONIZATION_BARRIER
@@ -385,9 +386,9 @@ extern "C"
 	typedef PRTL_BARRIER PSYNCHRONIZATION_BARRIER;
 	typedef PRTL_BARRIER LPSYNCHRONIZATION_BARRIER;
 
-#	define SYNCHRONIZATION_BARRIER_FLAGS_SPIN_ONLY 0x01
-#	define SYNCHRONIZATION_BARRIER_FLAGS_BLOCK_ONLY 0x02
-#	define SYNCHRONIZATION_BARRIER_FLAGS_NO_DELETE 0x04
+#define SYNCHRONIZATION_BARRIER_FLAGS_SPIN_ONLY 0x01
+#define SYNCHRONIZATION_BARRIER_FLAGS_BLOCK_ONLY 0x02
+#define SYNCHRONIZATION_BARRIER_FLAGS_NO_DELETE 0x04
 
 	WINPR_API BOOL WINAPI winpr_InitializeSynchronizationBarrier(
 	    LPSYNCHRONIZATION_BARRIER lpBarrier, LONG lTotalThreads, LONG lSpinCount);
@@ -395,9 +396,9 @@ extern "C"
 	                                                        DWORD dwFlags);
 	WINPR_API BOOL WINAPI winpr_DeleteSynchronizationBarrier(LPSYNCHRONIZATION_BARRIER lpBarrier);
 
-#	define InitializeSynchronizationBarrier winpr_InitializeSynchronizationBarrier
-#	define EnterSynchronizationBarrier winpr_EnterSynchronizationBarrier
-#	define DeleteSynchronizationBarrier winpr_DeleteSynchronizationBarrier
+#define InitializeSynchronizationBarrier winpr_InitializeSynchronizationBarrier
+#define EnterSynchronizationBarrier winpr_EnterSynchronizationBarrier
+#define DeleteSynchronizationBarrier winpr_DeleteSynchronizationBarrier
 
 #endif
 
@@ -416,9 +417,9 @@ extern "C"
 	                                       BOOL bManualReset, BOOL bInitialState, void* pObject);
 
 #ifdef UNICODE
-#	define CreateFileDescriptorEvent CreateFileDescriptorEventW
+#define CreateFileDescriptorEvent CreateFileDescriptorEventW
 #else
-#	define CreateFileDescriptorEvent CreateFileDescriptorEventA
+#define CreateFileDescriptorEvent CreateFileDescriptorEventA
 #endif
 
 	WINPR_API int GetEventFileDescriptor(HANDLE hEvent);

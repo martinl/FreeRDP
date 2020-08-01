@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -36,7 +36,7 @@ static INIT_ONCE g_Initialized = INIT_ONCE_STATIC_INIT;
 
 #ifdef WITH_GSSAPI
 
-#	include <gssapi/gssapi.h>
+#include <gssapi/gssapi.h>
 
 GSSAPI_FUNCTION_TABLE g_GssApiLink = {
 	(fn_sspi_gss_acquire_cred)gss_acquire_cred,                   /* gss_acquire_cred */
@@ -61,13 +61,13 @@ GSSAPI_FUNCTION_TABLE g_GssApiLink = {
 	(fn_sspi_gss_inquire_cred)gss_inquire_cred,                   /* gss_inquire_cred */
 	(fn_sspi_gss_inquire_context)gss_inquire_context,             /* gss_inquire_context */
 	(fn_sspi_gss_wrap_size_limit)gss_wrap_size_limit,             /* gss_wrap_size_limit */
-#	if 0
+#if 0
 	(fn_sspi_gss_import_name_object) gss_import_name_object, /* gss_import_name_object */
 	(fn_sspi_gss_export_name_object) gss_export_name_object, /* gss_export_name_object */
-#	else
+#else
 	(fn_sspi_gss_import_name_object)NULL, /* gss_import_name_object */
 	(fn_sspi_gss_export_name_object)NULL, /* gss_export_name_object */
-#	endif
+#endif
 	(fn_sspi_gss_add_cred)gss_add_cred,                         /* gss_add_cred */
 	(fn_sspi_gss_inquire_cred_by_mech)gss_inquire_cred_by_mech, /* gss_inquire_cred_by_mech */
 	(fn_sspi_gss_export_sec_context)gss_export_sec_context,     /* gss_export_sec_context */
@@ -76,11 +76,11 @@ GSSAPI_FUNCTION_TABLE g_GssApiLink = {
 	(fn_sspi_gss_create_empty_oid_set)gss_create_empty_oid_set, /* gss_create_empty_oid_set */
 	(fn_sspi_gss_add_oid_set_member)gss_add_oid_set_member,     /* gss_add_oid_set_member */
 	(fn_sspi_gss_test_oid_set_member)gss_test_oid_set_member,   /* gss_test_oid_set_member */
-#	if 0
+#if 0
 	(fn_sspi_gss_str_to_oid) gss_str_to_oid, /* gss_str_to_oid */
-#	else
+#else
 	(fn_sspi_gss_str_to_oid)NULL,         /* gss_str_to_oid */
-#	endif
+#endif
 	(fn_sspi_gss_oid_to_str)gss_oid_to_str,                         /* gss_oid_to_str */
 	(fn_sspi_gss_inquire_names_for_mech)gss_inquire_names_for_mech, /* gss_inquire_names_for_mech */
 	(fn_sspi_gss_inquire_mechs_for_name)gss_inquire_mechs_for_name, /* gss_inquire_mechs_for_name */
@@ -93,11 +93,11 @@ GSSAPI_FUNCTION_TABLE g_GssApiLink = {
 	(fn_sspi_gss_canonicalize_name)gss_canonicalize_name,           /* gss_canonicalize_name */
 	(fn_sspi_gss_pseudo_random)gss_pseudo_random,                   /* gss_pseudo_random */
 	(fn_sspi_gss_store_cred)gss_store_cred,                         /* gss_store_cred */
-#	if 0
+#if 0
 	(fn_sspi_gss_set_neg_mechs) gss_set_neg_mechs, /* gss_set_neg_mechs */
-#	else
+#else
 	(fn_sspi_gss_set_neg_mechs)NULL,      /* gss_set_neg_mechs */
-#	endif
+#endif
 };
 
 #endif

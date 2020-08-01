@@ -14,7 +14,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/types.h>
@@ -22,8 +22,8 @@
 #include <winpr/sysinfo.h>
 
 #ifdef WITH_SSE2
-#	include <emmintrin.h>
-#	include <tmmintrin.h>
+#include <emmintrin.h>
+#include <tmmintrin.h>
 #endif /* WITH_SSE2 */
 
 #include "prim_internal.h"

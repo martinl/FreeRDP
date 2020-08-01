@@ -18,13 +18,13 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include <winpr/security.h>
@@ -123,7 +123,7 @@
 
 #ifndef _WIN32
 
-#	include "security.h"
+#include "security.h"
 
 BOOL InitializeSecurityDescriptor(PSECURITY_DESCRIPTOR pSecurityDescriptor, DWORD dwRevision)
 {

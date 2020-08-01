@@ -118,22 +118,26 @@ struct ButtonItem cursorKeysItems[24] = { { @"", KEY_SKIP },
 	                                      { @"", KEY_SKIP },
 	                                      { @"img:icon_key_return", VK_RETURN | KBDEXT } };
 
-- (void)initFunctionKeysView {
+- (void)initFunctionKeysView
+{
 	_function_keys_view = [[self keyboardViewForItems:functionKeysItems columns:6 rows:4] retain];
 	[self addSubview:_function_keys_view];
 }
 
-- (void)initNumPadKeysView {
+- (void)initNumPadKeysView
+{
 	_numpad_keys_view = [[self keyboardViewForItems:numPadKeysItems columns:6 rows:4] retain];
 	[self addSubview:_numpad_keys_view];
 }
 
-- (void)initCursorKeysView {
+- (void)initCursorKeysView
+{
 	_cursor_keys_view = [[self keyboardViewForItems:cursorKeysItems columns:6 rows:4] retain];
 	[self addSubview:_cursor_keys_view];
 }
 
-- (id)initWithFrame:(CGRect)frame delegate:(NSObject<AdvancedKeyboardDelegate> *)delegate {
+- (id)initWithFrame:(CGRect)frame delegate:(NSObject<AdvancedKeyboardDelegate> *)delegate
+{
 	self = [super initWithFrame:frame];
 	if (self)
 	{
@@ -164,7 +168,8 @@ struct ButtonItem cursorKeysItems[24] = { { @"", KEY_SKIP },
 }
 */
 
-- (void)drawRect:(CGRect)rect {
+- (void)drawRect:(CGRect)rect
+{
 	// draw a nice background gradient
 	CGContextRef currentContext = UIGraphicsGetCurrentContext();
 
@@ -188,7 +193,8 @@ struct ButtonItem cursorKeysItems[24] = { { @"", KEY_SKIP },
 	CGColorSpaceRelease(rgbColorspace);
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[_function_keys_view autorelease];
 	[_numpad_keys_view autorelease];
 	[_cursor_keys_view autorelease];
@@ -198,43 +204,44 @@ struct ButtonItem cursorKeysItems[24] = { { @"", KEY_SKIP },
 #pragma mark -
 #pragma mark button events
 
-- (IBAction)keyPressed:(id)sender {
+- (IBAction)keyPressed:(id)sender
+{
 	UIButton *btn = (UIButton *)sender;
 	switch ([btn tag])
 	{
-	case KEY_SHOW_CURSORVIEW:
-		// switch to cursor view
-		[_cur_view setHidden:YES];
-		[_cursor_keys_view setHidden:NO];
-		_cur_view = _cursor_keys_view;
-		break;
+		case KEY_SHOW_CURSORVIEW:
+			// switch to cursor view
+			[_cur_view setHidden:YES];
+			[_cursor_keys_view setHidden:NO];
+			_cur_view = _cursor_keys_view;
+			break;
 
-	case KEY_SHOW_NUMPADVIEW:
-		// switch to numpad view
-		[_cur_view setHidden:YES];
-		[_numpad_keys_view setHidden:NO];
-		_cur_view = _numpad_keys_view;
-		break;
+		case KEY_SHOW_NUMPADVIEW:
+			// switch to numpad view
+			[_cur_view setHidden:YES];
+			[_numpad_keys_view setHidden:NO];
+			_cur_view = _numpad_keys_view;
+			break;
 
-	case KEY_SHOW_FUNCVIEW:
-		// switch to function keys view
-		[_cur_view setHidden:YES];
-		[_function_keys_view setHidden:NO];
-		_cur_view = _function_keys_view;
-		break;
+		case KEY_SHOW_FUNCVIEW:
+			// switch to function keys view
+			[_cur_view setHidden:YES];
+			[_function_keys_view setHidden:NO];
+			_cur_view = _function_keys_view;
+			break;
 
-	default:
-		if ([btn tag] & KEYCODE_UNICODE)
-		{
-			if ([[self delegate] respondsToSelector:@selector(advancedKeyPressedUnicode:)])
-				[[self delegate] advancedKeyPressedUnicode:([btn tag] & ~KEYCODE_UNICODE)];
-		}
-		else
-		{
-			if ([[self delegate] respondsToSelector:@selector(advancedKeyPressedVKey:)])
-				[[self delegate] advancedKeyPressedVKey:[btn tag]];
-		}
-		break;
+		default:
+			if ([btn tag] & KEYCODE_UNICODE)
+			{
+				if ([[self delegate] respondsToSelector:@selector(advancedKeyPressedUnicode:)])
+					[[self delegate] advancedKeyPressedUnicode:([btn tag] & ~KEYCODE_UNICODE)];
+			}
+			else
+			{
+				if ([[self delegate] respondsToSelector:@selector(advancedKeyPressedVKey:)])
+					[[self delegate] advancedKeyPressedVKey:[btn tag]];
+			}
+			break;
 	}
 }
 
@@ -243,7 +250,8 @@ struct ButtonItem cursorKeysItems[24] = { { @"", KEY_SKIP },
 #pragma mark -
 @implementation AdvancedKeyboardView (Private)
 
-- (UIView *)keyboardViewForItems:(struct ButtonItem *)items columns:(int)columns rows:(int)rows {
+- (UIView *)keyboardViewForItems:(struct ButtonItem *)items columns:(int)columns rows:(int)rows
+{
 	UIView *result_view = [[[UIView alloc] initWithFrame:self.bounds] autorelease];
 	result_view.autoresizingMask =
 	    UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;

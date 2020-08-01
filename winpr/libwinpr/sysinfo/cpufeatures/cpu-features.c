@@ -483,51 +483,51 @@ static void cpulist_read_from(CpuList* list, const char* filename)
 }
 #if defined(__aarch64__)
 // see <uapi/asm/hwcap.h> kernel header
-#	define HWCAP_FP (1 << 0)
-#	define HWCAP_ASIMD (1 << 1)
-#	define HWCAP_AES (1 << 3)
-#	define HWCAP_PMULL (1 << 4)
-#	define HWCAP_SHA1 (1 << 5)
-#	define HWCAP_SHA2 (1 << 6)
-#	define HWCAP_CRC32 (1 << 7)
+#define HWCAP_FP (1 << 0)
+#define HWCAP_ASIMD (1 << 1)
+#define HWCAP_AES (1 << 3)
+#define HWCAP_PMULL (1 << 4)
+#define HWCAP_SHA1 (1 << 5)
+#define HWCAP_SHA2 (1 << 6)
+#define HWCAP_CRC32 (1 << 7)
 #endif
 
 #if defined(__arm__)
 
 // See <asm/hwcap.h> kernel header.
-#	define HWCAP_VFP (1 << 6)
-#	define HWCAP_IWMMXT (1 << 9)
-#	define HWCAP_NEON (1 << 12)
-#	define HWCAP_VFPv3 (1 << 13)
-#	define HWCAP_VFPv3D16 (1 << 14)
-#	define HWCAP_VFPv4 (1 << 16)
-#	define HWCAP_IDIVA (1 << 17)
-#	define HWCAP_IDIVT (1 << 18)
+#define HWCAP_VFP (1 << 6)
+#define HWCAP_IWMMXT (1 << 9)
+#define HWCAP_NEON (1 << 12)
+#define HWCAP_VFPv3 (1 << 13)
+#define HWCAP_VFPv3D16 (1 << 14)
+#define HWCAP_VFPv4 (1 << 16)
+#define HWCAP_IDIVA (1 << 17)
+#define HWCAP_IDIVT (1 << 18)
 
 // see <uapi/asm/hwcap.h> kernel header
-#	define HWCAP2_AES (1 << 0)
-#	define HWCAP2_PMULL (1 << 1)
-#	define HWCAP2_SHA1 (1 << 2)
-#	define HWCAP2_SHA2 (1 << 3)
-#	define HWCAP2_CRC32 (1 << 4)
+#define HWCAP2_AES (1 << 0)
+#define HWCAP2_PMULL (1 << 1)
+#define HWCAP2_SHA1 (1 << 2)
+#define HWCAP2_SHA2 (1 << 3)
+#define HWCAP2_CRC32 (1 << 4)
 
 // This is the list of 32-bit ARMv7 optional features that are _always_
 // supported by ARMv8 CPUs, as mandated by the ARM Architecture Reference
 // Manual.
-#	define HWCAP_SET_FOR_ARMV8 \
-		(HWCAP_VFP | HWCAP_NEON | HWCAP_VFPv3 | HWCAP_VFPv4 | HWCAP_IDIVA | HWCAP_IDIVT)
+#define HWCAP_SET_FOR_ARMV8 \
+	(HWCAP_VFP | HWCAP_NEON | HWCAP_VFPv3 | HWCAP_VFPv4 | HWCAP_IDIVA | HWCAP_IDIVT)
 #endif
 
 #if defined(__mips__)
 // see <uapi/asm/hwcap.h> kernel header
-#	define HWCAP_MIPS_R6 (1 << 0)
-#	define HWCAP_MIPS_MSA (1 << 1)
+#define HWCAP_MIPS_R6 (1 << 0)
+#define HWCAP_MIPS_MSA (1 << 1)
 #endif
 
 #if defined(__arm__) || defined(__aarch64__) || defined(__mips__)
 
-#	define AT_HWCAP 16
-#	define AT_HWCAP2 26
+#define AT_HWCAP 16
+#define AT_HWCAP2 26
 
 // Probe the system's C library for a 'getauxval' function and call it if
 // it exits, or return 0 for failure. This function is available since API
@@ -1093,9 +1093,9 @@ static void android_cpuInit(void)
 #if defined(__i386__) || defined(__x86_64__)
 	int regs[4];
 	/* According to http://en.wikipedia.org/wiki/CPUID */
-#	define VENDOR_INTEL_b 0x756e6547
-#	define VENDOR_INTEL_c 0x6c65746e
-#	define VENDOR_INTEL_d 0x49656e69
+#define VENDOR_INTEL_b 0x756e6547
+#define VENDOR_INTEL_c 0x6c65746e
+#define VENDOR_INTEL_d 0x49656e69
 	x86_cpuid(0, regs);
 	int vendorIsIntel =
 	    (regs[1] == VENDOR_INTEL_b && regs[2] == VENDOR_INTEL_c && regs[3] == VENDOR_INTEL_d);

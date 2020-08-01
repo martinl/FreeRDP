@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -233,45 +233,45 @@ static BOOL update_process_glyph_fragments(rdpContext* context, const BYTE* data
 
 		switch (op)
 		{
-		case GLYPH_FRAGMENT_USE:
-			if (index + 1 > length)
-				return FALSE;
-
-			id = data[index++];
-			fragments = (BYTE*)glyph_cache_fragment_get(glyph_cache, id, &size);
-
-			if (fragments == NULL)
-				return FALSE;
-
-			for (n = 0; n < size;)
-			{
-				const UINT32 fop = fragments[n++];
-				n = update_glyph_offset(fragments, n, &x, &y, ulCharInc, flAccel);
-
-				if (!update_process_glyph(context, fragments, fop, &x, &y, cacheId, flAccel,
-				                          fOpRedundant, &bound))
+			case GLYPH_FRAGMENT_USE:
+				if (index + 1 > length)
 					return FALSE;
-			}
 
-			break;
+				id = data[index++];
+				fragments = (BYTE*)glyph_cache_fragment_get(glyph_cache, id, &size);
 
-		case GLYPH_FRAGMENT_ADD:
-			if (index + 2 > length)
-				return FALSE;
+				if (fragments == NULL)
+					return FALSE;
 
-			id = data[index++];
-			size = data[index++];
-			glyph_cache_fragment_put(glyph_cache, id, size, data);
-			break;
+				for (n = 0; n < size;)
+				{
+					const UINT32 fop = fragments[n++];
+					n = update_glyph_offset(fragments, n, &x, &y, ulCharInc, flAccel);
 
-		default:
-			index = update_glyph_offset(data, index, &x, &y, ulCharInc, flAccel);
+					if (!update_process_glyph(context, fragments, fop, &x, &y, cacheId, flAccel,
+					                          fOpRedundant, &bound))
+						return FALSE;
+				}
 
-			if (!update_process_glyph(context, data, op, &x, &y, cacheId, flAccel, fOpRedundant,
-			                          &bound))
-				return FALSE;
+				break;
 
-			break;
+			case GLYPH_FRAGMENT_ADD:
+				if (index + 2 > length)
+					return FALSE;
+
+				id = data[index++];
+				size = data[index++];
+				glyph_cache_fragment_put(glyph_cache, id, size, data);
+				break;
+
+			default:
+				index = update_glyph_offset(data, index, &x, &y, ulCharInc, flAccel);
+
+				if (!update_process_glyph(context, data, op, &x, &y, cacheId, flAccel, fOpRedundant,
+				                          &bound))
+					return FALSE;
+
+				break;
 		}
 	}
 

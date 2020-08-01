@@ -22,12 +22,12 @@
 
 #if defined __linux__ && !defined ANDROID
 
-#	include <assert.h>
-#	include <termios.h>
+#include <assert.h>
+#include <termios.h>
 
-#	include <winpr/wlog.h>
+#include <winpr/wlog.h>
 
-#	include "comm_serial_sys.h"
+#include "comm_serial_sys.h"
 
 static BOOL _set_handflow(WINPR_COMM* pComm, const SERIAL_HANDFLOW* pHandflow)
 {

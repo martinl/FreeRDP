@@ -21,7 +21,8 @@
 
 @implementation CredentialsEditorController
 
-- (id)initWithBookmark:(ComputerBookmark *)bookmark {
+- (id)initWithBookmark:(ComputerBookmark *)bookmark
+{
 	if ((self = [super initWithStyle:UITableViewStyleGrouped]))
 	{
 		// set additional settings state according to bookmark data
@@ -31,28 +32,33 @@
 	return self;
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
 	[super viewDidLoad];
 	[self setTitle:NSLocalizedString(@"Credentials", @"Credentials title")];
 }
 
-- (void)viewDidUnload {
+- (void)viewDidUnload
+{
 	[super viewDidUnload];
 	// Release any retained subviews of the main view.
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
 	[super viewWillDisappear:animated];
 
 	// foce any active editing to stop
 	[[self view] endEditing:NO];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
 	return YES;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[super dealloc];
 	[_bookmark release];
 }
@@ -60,51 +66,55 @@
 #pragma mark -
 #pragma mark Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
 	// Return the number of sections.
 	return SECTION_COUNT;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
 	// Return the number of rows in the section.
 	switch (section)
 	{
-	case SECTION_CREDENTIALS: // credentials
-		return 3;
-	default:
-		break;
+		case SECTION_CREDENTIALS: // credentials
+			return 3;
+		default:
+			break;
 	}
 
 	return 0;
 }
 
 // set section headers
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
 	switch (section)
 	{
-	case SECTION_CREDENTIALS:
-		return NSLocalizedString(@"Credentials", @"'Credentials': credentials settings header");
+		case SECTION_CREDENTIALS:
+			return NSLocalizedString(@"Credentials", @"'Credentials': credentials settings header");
 	}
 	return @"unknown";
 }
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView
-         cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+         cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 
 	// determine the required cell type
 	NSString *cellType = nil;
 	switch ([indexPath section])
 	{
-	case SECTION_CREDENTIALS: // credentials
-		if ([indexPath row] == 1)
-			cellType = TableCellIdentifierSecretText; // password field
-		else
-			cellType = TableCellIdentifierText;
-		break;
+		case SECTION_CREDENTIALS: // credentials
+			if ([indexPath row] == 1)
+				cellType = TableCellIdentifierSecretText; // password field
+			else
+				cellType = TableCellIdentifierText;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 	NSAssert(cellType != nil, @"Couldn't determine cell type");
 
@@ -115,81 +125,89 @@
 	// set cell values
 	switch ([indexPath section])
 	{
-		// credentials
-	case SECTION_CREDENTIALS:
-		[self initCredentialSettings:indexPath cell:cell];
-		break;
+			// credentials
+		case SECTION_CREDENTIALS:
+			[self initCredentialSettings:indexPath cell:cell];
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return cell;
 }
 
 // updates credentials in the UI
-- (void)initCredentialSettings:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell {
+- (void)initCredentialSettings:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell
+{
 	switch (indexPath.row)
 	{
-	case 0:
-	{
-		EditTextTableViewCell *textCell = (EditTextTableViewCell *)cell;
-		[[textCell textfield] setTag:GET_TAG_FROM_PATH(indexPath)];
-		[[textCell label] setText:NSLocalizedString(@"Username", @"'Username': Bookmark username")];
-		[[textCell textfield] setText:[_params StringForKey:@"username"]];
-		[[textCell textfield] setPlaceholder:NSLocalizedString(@"not set", @"not set placeholder")];
-		break;
-	}
-	case 1:
-	{
-		EditSecretTextTableViewCell *textCell = (EditSecretTextTableViewCell *)cell;
-		[[textCell textfield] setTag:GET_TAG_FROM_PATH(indexPath)];
-		[[textCell label] setText:NSLocalizedString(@"Password", @"'Password': Bookmark password")];
-		[[textCell textfield] setText:[_params StringForKey:@"password"]];
-		[[textCell textfield] setPlaceholder:NSLocalizedString(@"not set", @"not set placeholder")];
-		break;
-	}
-	case 2:
-	{
-		EditTextTableViewCell *textCell = (EditTextTableViewCell *)cell;
-		[[textCell textfield] setTag:GET_TAG_FROM_PATH(indexPath)];
-		[[textCell label] setText:NSLocalizedString(@"Domain", @"'Domain': Bookmark domain")];
-		[[textCell textfield] setText:[_params StringForKey:@"domain"]];
-		[[textCell textfield] setPlaceholder:NSLocalizedString(@"not set", @"not set placeholder")];
-		break;
-	}
-	default:
-		NSLog(@"Invalid row index in settings table!");
-		break;
+		case 0:
+		{
+			EditTextTableViewCell *textCell = (EditTextTableViewCell *)cell;
+			[[textCell textfield] setTag:GET_TAG_FROM_PATH(indexPath)];
+			[[textCell label]
+			    setText:NSLocalizedString(@"Username", @"'Username': Bookmark username")];
+			[[textCell textfield] setText:[_params StringForKey:@"username"]];
+			[[textCell textfield]
+			    setPlaceholder:NSLocalizedString(@"not set", @"not set placeholder")];
+			break;
+		}
+		case 1:
+		{
+			EditSecretTextTableViewCell *textCell = (EditSecretTextTableViewCell *)cell;
+			[[textCell textfield] setTag:GET_TAG_FROM_PATH(indexPath)];
+			[[textCell label]
+			    setText:NSLocalizedString(@"Password", @"'Password': Bookmark password")];
+			[[textCell textfield] setText:[_params StringForKey:@"password"]];
+			[[textCell textfield]
+			    setPlaceholder:NSLocalizedString(@"not set", @"not set placeholder")];
+			break;
+		}
+		case 2:
+		{
+			EditTextTableViewCell *textCell = (EditTextTableViewCell *)cell;
+			[[textCell textfield] setTag:GET_TAG_FROM_PATH(indexPath)];
+			[[textCell label] setText:NSLocalizedString(@"Domain", @"'Domain': Bookmark domain")];
+			[[textCell textfield] setText:[_params StringForKey:@"domain"]];
+			[[textCell textfield]
+			    setPlaceholder:NSLocalizedString(@"not set", @"not set placeholder")];
+			break;
+		}
+		default:
+			NSLog(@"Invalid row index in settings table!");
+			break;
 	}
 }
 
 #pragma mark -
 #pragma mark Text Field delegate
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
 	[textField resignFirstResponder];
 	return NO;
 }
 
-- (BOOL)textFieldShouldEndEditing:(UITextField *)textField {
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField
+{
 	switch (textField.tag)
 	{
-		// update credentials settings
-	case GET_TAG(SECTION_CREDENTIALS, 0):
-		[_params setValue:[textField text] forKey:@"username"];
-		break;
+			// update credentials settings
+		case GET_TAG(SECTION_CREDENTIALS, 0):
+			[_params setValue:[textField text] forKey:@"username"];
+			break;
 
-	case GET_TAG(SECTION_CREDENTIALS, 1):
-		[_params setValue:[textField text] forKey:@"password"];
-		break;
+		case GET_TAG(SECTION_CREDENTIALS, 1):
+			[_params setValue:[textField text] forKey:@"password"];
+			break;
 
-	case GET_TAG(SECTION_CREDENTIALS, 2):
-		[_params setValue:[textField text] forKey:@"domain"];
-		break;
+		case GET_TAG(SECTION_CREDENTIALS, 2):
+			[_params setValue:[textField text] forKey:@"domain"];
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 	return YES;
 }

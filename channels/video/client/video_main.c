@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -137,14 +137,14 @@ static const char* video_command_name(BYTE cmd)
 {
 	switch (cmd)
 	{
-	case TSMM_START_PRESENTATION:
-		return "start";
+		case TSMM_START_PRESENTATION:
+			return "start";
 
-	case TSMM_STOP_PRESENTATION:
-		return "stop";
+		case TSMM_STOP_PRESENTATION:
+			return "stop";
 
-	default:
-		return "<unknown>";
+		default:
+			return "<unknown>";
 	}
 }
 
@@ -559,14 +559,14 @@ static UINT video_control_on_data_received(IWTSVirtualChannelCallback* pChannelC
 
 	switch (packetType)
 	{
-	case TSMM_PACKET_TYPE_PRESENTATION_REQUEST:
-		ret = video_read_tsmm_presentation_req(context, s);
-		break;
+		case TSMM_PACKET_TYPE_PRESENTATION_REQUEST:
+			ret = video_read_tsmm_presentation_req(context, s);
+			break;
 
-	default:
-		WLog_ERR(TAG, "not expecting packet type %" PRIu32 "", packetType);
-		ret = ERROR_UNSUPPORTED_TYPE;
-		break;
+		default:
+			WLog_ERR(TAG, "not expecting packet type %" PRIu32 "", packetType);
+			ret = ERROR_UNSUPPORTED_TYPE;
+			break;
 	}
 
 	return ret;
@@ -1075,9 +1075,9 @@ static UINT video_plugin_terminated(IWTSPlugin* pPlugin)
  */
 
 #ifdef BUILTIN_CHANNELS
-#	define DVCPluginEntry video_DVCPluginEntry
+#define DVCPluginEntry video_DVCPluginEntry
 #else
-#	define DVCPluginEntry FREERDP_API DVCPluginEntry
+#define DVCPluginEntry FREERDP_API DVCPluginEntry
 #endif
 
 /**

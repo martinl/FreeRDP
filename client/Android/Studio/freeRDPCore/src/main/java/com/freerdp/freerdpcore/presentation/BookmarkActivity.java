@@ -304,33 +304,33 @@ public class BookmarkActivity extends PreferenceActivity implements OnSharedPref
 		settings_changed = true;
 		switch (current_preferences)
 		{
-		case PREFERENCES_DEBUG:
-			debugSettingsChanged(sharedPreferences, key);
-			break;
+			case PREFERENCES_DEBUG:
+				debugSettingsChanged(sharedPreferences, key);
+				break;
 
-		case PREFERENCES_BOOKMARK:
-			bookmarkSettingsChanged(sharedPreferences, key);
-			break;
+			case PREFERENCES_BOOKMARK:
+				bookmarkSettingsChanged(sharedPreferences, key);
+				break;
 
-		case PREFERENCES_ADVANCED:
-			advancedSettingsChanged(sharedPreferences, key);
-			break;
+			case PREFERENCES_ADVANCED:
+				advancedSettingsChanged(sharedPreferences, key);
+				break;
 
-		case PREFERENCES_CREDENTIALS:
-			credentialsSettingsChanged(sharedPreferences, key);
-			break;
+			case PREFERENCES_CREDENTIALS:
+				credentialsSettingsChanged(sharedPreferences, key);
+				break;
 
-		case PREFERENCES_SCREEN:
-		case PREFERENCES_SCREEN3G:
-			screenSettingsChanged(sharedPreferences, key);
-			break;
+			case PREFERENCES_SCREEN:
+			case PREFERENCES_SCREEN3G:
+				screenSettingsChanged(sharedPreferences, key);
+				break;
 
-		case PREFERENCES_GATEWAY:
-			gatewaySettingsChanged(sharedPreferences, key);
-			break;
+			case PREFERENCES_GATEWAY:
+				gatewaySettingsChanged(sharedPreferences, key);
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -338,36 +338,36 @@ public class BookmarkActivity extends PreferenceActivity implements OnSharedPref
 	{
 		switch (current_preferences)
 		{
-		case PREFERENCES_BOOKMARK:
-			initBookmarkSettings(sharedPreferences);
-			break;
+			case PREFERENCES_BOOKMARK:
+				initBookmarkSettings(sharedPreferences);
+				break;
 
-		case PREFERENCES_ADVANCED:
-			initAdvancedSettings(sharedPreferences);
-			break;
+			case PREFERENCES_ADVANCED:
+				initAdvancedSettings(sharedPreferences);
+				break;
 
-		case PREFERENCES_CREDENTIALS:
-			initCredentialsSettings(sharedPreferences);
-			break;
+			case PREFERENCES_CREDENTIALS:
+				initCredentialsSettings(sharedPreferences);
+				break;
 
-		case PREFERENCES_SCREEN:
-			initScreenSettings(sharedPreferences);
-			break;
+			case PREFERENCES_SCREEN:
+				initScreenSettings(sharedPreferences);
+				break;
 
-		case PREFERENCES_SCREEN3G:
-			initScreenSettings3G(sharedPreferences);
-			break;
+			case PREFERENCES_SCREEN3G:
+				initScreenSettings3G(sharedPreferences);
+				break;
 
-		case PREFERENCES_GATEWAY:
-			initGatewaySettings(sharedPreferences);
-			break;
+			case PREFERENCES_GATEWAY:
+				initGatewaySettings(sharedPreferences);
+				break;
 
-		case PREFERENCES_DEBUG:
-			initDebugSettings(sharedPreferences);
-			break;
+			case PREFERENCES_DEBUG:
+				initDebugSettings(sharedPreferences);
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 

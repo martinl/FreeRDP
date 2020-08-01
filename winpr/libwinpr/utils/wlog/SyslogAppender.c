@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "SyslogAppender.h"
@@ -35,25 +35,25 @@ static int getSyslogLevel(DWORD level)
 {
 	switch (level)
 	{
-	case WLOG_TRACE:
-	case WLOG_DEBUG:
-		return LOG_DEBUG;
+		case WLOG_TRACE:
+		case WLOG_DEBUG:
+			return LOG_DEBUG;
 
-	case WLOG_INFO:
-		return LOG_INFO;
+		case WLOG_INFO:
+			return LOG_INFO;
 
-	case WLOG_WARN:
-		return LOG_WARNING;
+		case WLOG_WARN:
+			return LOG_WARNING;
 
-	case WLOG_ERROR:
-		return LOG_ERR;
+		case WLOG_ERROR:
+			return LOG_ERR;
 
-	case WLOG_FATAL:
-		return LOG_CRIT;
+		case WLOG_FATAL:
+			return LOG_CRIT;
 
-	case WLOG_OFF:
-	default:
-		return -1;
+		case WLOG_OFF:
+		default:
+			return -1;
 	}
 }
 

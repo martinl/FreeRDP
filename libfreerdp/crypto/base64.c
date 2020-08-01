@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -67,24 +67,24 @@ char* crypto_base64_encode(const BYTE* data, int length)
 	/* then remainder */
 	switch (length % 3)
 	{
-	case 0:
-		break;
+		case 0:
+			break;
 
-	case 1:
-		c = (q[0] << 16);
-		*p++ = base64[(c & 0x00FC0000) >> 18];
-		*p++ = base64[(c & 0x0003F000) >> 12];
-		*p++ = '=';
-		*p++ = '=';
-		break;
+		case 1:
+			c = (q[0] << 16);
+			*p++ = base64[(c & 0x00FC0000) >> 18];
+			*p++ = base64[(c & 0x0003F000) >> 12];
+			*p++ = '=';
+			*p++ = '=';
+			break;
 
-	case 2:
-		c = (q[0] << 16) + (q[1] << 8);
-		*p++ = base64[(c & 0x00FC0000) >> 18];
-		*p++ = base64[(c & 0x0003F000) >> 12];
-		*p++ = base64[(c & 0x00000FC0) >> 6];
-		*p++ = '=';
-		break;
+		case 2:
+			c = (q[0] << 16) + (q[1] << 8);
+			*p++ = base64[(c & 0x00FC0000) >> 18];
+			*p++ = base64[(c & 0x0003F000) >> 12];
+			*p++ = base64[(c & 0x00000FC0) >> 6];
+			*p++ = '=';
+			break;
 	}
 
 	*p = 0;

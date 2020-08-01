@@ -23,12 +23,12 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #ifndef _WIN32
-#	include <sys/time.h>
-#	include <signal.h>
+#include <sys/time.h>
+#include <signal.h>
 #endif
 
 #include <stdio.h>
@@ -596,33 +596,33 @@ static UINT rdpsnd_recv_pdu(rdpsndPlugin* rdpsnd, wStream* s)
 
 	switch (msgType)
 	{
-	case SNDC_FORMATS:
-		status = rdpsnd_recv_server_audio_formats_pdu(rdpsnd, s);
-		break;
+		case SNDC_FORMATS:
+			status = rdpsnd_recv_server_audio_formats_pdu(rdpsnd, s);
+			break;
 
-	case SNDC_TRAINING:
-		status = rdpsnd_recv_training_pdu(rdpsnd, s);
-		break;
+		case SNDC_TRAINING:
+			status = rdpsnd_recv_training_pdu(rdpsnd, s);
+			break;
 
-	case SNDC_WAVE:
-		status = rdpsnd_recv_wave_info_pdu(rdpsnd, s, BodySize);
-		break;
+		case SNDC_WAVE:
+			status = rdpsnd_recv_wave_info_pdu(rdpsnd, s, BodySize);
+			break;
 
-	case SNDC_CLOSE:
-		rdpsnd_recv_close_pdu(rdpsnd);
-		break;
+		case SNDC_CLOSE:
+			rdpsnd_recv_close_pdu(rdpsnd);
+			break;
 
-	case SNDC_SETVOLUME:
-		status = rdpsnd_recv_volume_pdu(rdpsnd, s);
-		break;
+		case SNDC_SETVOLUME:
+			status = rdpsnd_recv_volume_pdu(rdpsnd, s);
+			break;
 
-	case SNDC_WAVE2:
-		status = rdpsnd_recv_wave2_pdu(rdpsnd, s, BodySize);
-		break;
+		case SNDC_WAVE2:
+			status = rdpsnd_recv_wave2_pdu(rdpsnd, s, BodySize);
+			break;
 
-	default:
-		WLog_ERR(TAG, "unknown msgType %" PRIu8 "", msgType);
-		break;
+		default:
+			WLog_ERR(TAG, "unknown msgType %" PRIu8 "", msgType);
+			break;
 	}
 
 out:
@@ -979,20 +979,20 @@ static VOID VCAPITYPE rdpsnd_virtual_channel_open_event_ex(LPVOID lpUserParam, D
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_DATA_RECEIVED:
-		if ((error = rdpsnd_virtual_channel_event_data_received(rdpsnd, pData, dataLength,
-		                                                        totalLength, dataFlags)))
-			WLog_ERR(TAG,
-			         "rdpsnd_virtual_channel_event_data_received failed with error %" PRIu32 "",
-			         error);
+		case CHANNEL_EVENT_DATA_RECEIVED:
+			if ((error = rdpsnd_virtual_channel_event_data_received(rdpsnd, pData, dataLength,
+			                                                        totalLength, dataFlags)))
+				WLog_ERR(TAG,
+				         "rdpsnd_virtual_channel_event_data_received failed with error %" PRIu32 "",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_WRITE_COMPLETE:
-		break;
+		case CHANNEL_EVENT_WRITE_COMPLETE:
+			break;
 
-	case CHANNEL_EVENT_USER:
-		break;
+		case CHANNEL_EVENT_USER:
+			break;
 	}
 
 	if (error && rdpsnd->rdpcontext)
@@ -1022,20 +1022,20 @@ static DWORD WINAPI rdpsnd_virtual_channel_client_thread(LPVOID arg)
 
 		switch (status)
 		{
-		case WAIT_OBJECT_0:
-		{
-			wStream* s = Queue_Dequeue(rdpsnd->queue);
-			error = rdpsnd_recv_pdu(rdpsnd, s);
-		}
-		break;
-
-		case WAIT_OBJECT_0 + 1:
-			running = FALSE;
+			case WAIT_OBJECT_0:
+			{
+				wStream* s = Queue_Dequeue(rdpsnd->queue);
+				error = rdpsnd_recv_pdu(rdpsnd, s);
+			}
 			break;
 
-		default:
-			error = status;
-			break;
+			case WAIT_OBJECT_0 + 1:
+				running = FALSE;
+				break;
+
+			default:
+				error = status;
+				break;
 		}
 	} while ((error == CHANNEL_RC_OK) && running);
 
@@ -1212,42 +1212,44 @@ static VOID VCAPITYPE rdpsnd_virtual_channel_init_event_ex(LPVOID lpUserParam, L
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_INITIALIZED:
-		if ((error = rdpsnd_virtual_channel_event_initialized(plugin, pData, dataLength)))
-			WLog_ERR(TAG, "rdpsnd_virtual_channel_event_initialized failed with error %" PRIu32 "!",
-			         error);
+		case CHANNEL_EVENT_INITIALIZED:
+			if ((error = rdpsnd_virtual_channel_event_initialized(plugin, pData, dataLength)))
+				WLog_ERR(TAG,
+				         "rdpsnd_virtual_channel_event_initialized failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_CONNECTED:
-		if ((error = rdpsnd_virtual_channel_event_connected(plugin, pData, dataLength)))
-			WLog_ERR(TAG, "rdpsnd_virtual_channel_event_connected failed with error %" PRIu32 "!",
-			         error);
+		case CHANNEL_EVENT_CONNECTED:
+			if ((error = rdpsnd_virtual_channel_event_connected(plugin, pData, dataLength)))
+				WLog_ERR(TAG,
+				         "rdpsnd_virtual_channel_event_connected failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_DISCONNECTED:
-		if ((error = rdpsnd_virtual_channel_event_disconnected(plugin)))
-			WLog_ERR(TAG,
-			         "rdpsnd_virtual_channel_event_disconnected failed with error %" PRIu32 "!",
-			         error);
+		case CHANNEL_EVENT_DISCONNECTED:
+			if ((error = rdpsnd_virtual_channel_event_disconnected(plugin)))
+				WLog_ERR(TAG,
+				         "rdpsnd_virtual_channel_event_disconnected failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_TERMINATED:
-		rdpsnd_virtual_channel_event_terminated(plugin);
-		break;
+		case CHANNEL_EVENT_TERMINATED:
+			rdpsnd_virtual_channel_event_terminated(plugin);
+			break;
 
-	case CHANNEL_EVENT_ATTACHED:
-		plugin->attached = TRUE;
-		break;
+		case CHANNEL_EVENT_ATTACHED:
+			plugin->attached = TRUE;
+			break;
 
-	case CHANNEL_EVENT_DETACHED:
-		plugin->attached = FALSE;
-		break;
+		case CHANNEL_EVENT_DETACHED:
+			plugin->attached = FALSE;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	if (error && plugin && plugin->rdpcontext)

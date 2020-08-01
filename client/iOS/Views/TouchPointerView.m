@@ -38,7 +38,8 @@
 
 @synthesize delegate = _delegate;
 
-- (void)awakeFromNib {
+- (void)awakeFromNib
+{
 	[super awakeFromNib];
 
 	// set content mode when rotating (keep aspect ratio)
@@ -115,7 +116,8 @@
 	[self addGestureRecognizer:pointerMoveScrollRecognizer];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[super dealloc];
 	[_default_pointer_img autorelease];
 	[_active_pointer_img autorelease];
@@ -130,7 +132,8 @@
 #pragma mark - Public interface
 
 // positions the pointer on screen if it got offscreen after an orentation change
-- (void)ensurePointerIsVisible {
+- (void)ensurePointerIsVisible
+{
 	CGRect bounds = [self bounds];
 	if (_pointer_transformation.tx > (bounds.size.width - _cur_pointer_img.size.width))
 		_pointer_transformation.tx = bounds.size.width - _cur_pointer_img.size.width;
@@ -140,7 +143,8 @@
 }
 
 // show/hides the touch pointer
-- (void)setHidden:(BOOL)hidden {
+- (void)setHidden:(BOOL)hidden
+{
 	[super setHidden:hidden];
 
 	// if shown center pointer in view
@@ -153,19 +157,23 @@
 	}
 }
 
-- (UIEdgeInsets)getEdgeInsets {
+- (UIEdgeInsets)getEdgeInsets
+{
 	return UIEdgeInsetsMake(0, 0, [_cur_pointer_img size].width, [_cur_pointer_img size].height);
 }
 
-- (CGPoint)getPointerPosition {
+- (CGPoint)getPointerPosition
+{
 	return CGPointMake(_pointer_transformation.tx, _pointer_transformation.ty);
 }
 
-- (int)getPointerWidth {
+- (int)getPointerWidth
+{
 	return [_cur_pointer_img size].width;
 }
 
-- (int)getPointerHeight {
+- (int)getPointerHeight
+{
 	return [_cur_pointer_img size].height;
 }
 
@@ -173,12 +181,14 @@
 
 @implementation TouchPointerView (Private)
 
-- (void)setCurrentPointerImage:(UIImage *)image {
+- (void)setCurrentPointerImage:(UIImage *)image
+{
 	_cur_pointer_img = image;
 	[self setNeedsDisplay];
 }
 
-- (void)displayPointerActionImage:(UIImage *)image {
+- (void)displayPointerActionImage:(UIImage *)image
+{
 	[self setCurrentPointerImage:image];
 	[self performSelector:@selector(setCurrentPointerImage:)
 	           withObject:_default_pointer_img
@@ -187,7 +197,8 @@
 
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
+- (void)drawRect:(CGRect)rect
+{
 	// Drawing code
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	CGContextSaveGState(context);
@@ -199,33 +210,38 @@
 }
 
 // helper that returns YES if the given point is within the pointer
-- (BOOL)pointInsidePointer:(CGPoint)point {
+- (BOOL)pointInsidePointer:(CGPoint)point
+{
 	CGRect rec = CGRectMake(0, 0, [_cur_pointer_img size].width, [_cur_pointer_img size].height);
 	return CGRectContainsPoint(CGRectApplyAffineTransform(rec, _pointer_transformation), point);
 }
 
 // helper that returns YES if the given point is within the given pointer area
-- (BOOL)pointInsidePointerArea:(int)area point:(CGPoint)point {
+- (BOOL)pointInsidePointerArea:(int)area point:(CGPoint)point
+{
 	CGRect rec = _pointer_areas[area];
 	return CGRectContainsPoint(CGRectApplyAffineTransform(rec, _pointer_transformation), point);
 }
 
 // returns the position of the cursor
-- (CGPoint)getCursorPosition {
+- (CGPoint)getCursorPosition
+{
 	CGRect transPointerArea =
 	    CGRectApplyAffineTransform(_pointer_areas[POINTER_ACTION_CURSOR], _pointer_transformation);
 	return CGPointMake(CGRectGetMidX(transPointerArea), CGRectGetMidY(transPointerArea));
 }
 
 // this filters events - if the pointer was clicked the scrollview won't get any events
-- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
+{
 	return [self pointInsidePointer:point];
 }
 
 #pragma mark - Action handlers
 
 // handles single tap gestures, returns YES if the event was handled by the pointer, NO otherwise
-- (void)handleSingleTap:(UITapGestureRecognizer *)gesture {
+- (void)handleSingleTap:(UITapGestureRecognizer *)gesture
+{
 	// get touch position within our view
 	CGPoint touchPos = [gesture locationInView:self];
 
@@ -261,7 +277,8 @@
 	}
 }
 
-- (void)handlerForGesture:(UIGestureRecognizer *)gesture sendClick:(BOOL)sendClick {
+- (void)handlerForGesture:(UIGestureRecognizer *)gesture sendClick:(BOOL)sendClick
+{
 	if ([gesture state] == UIGestureRecognizerStateBegan)
 	{
 		CGPoint touchPos = [gesture locationInView:self];
@@ -329,11 +346,13 @@
 }
 
 // handles long press gestures
-- (void)handleDragDrop:(UILongPressGestureRecognizer *)gesture {
+- (void)handleDragDrop:(UILongPressGestureRecognizer *)gesture
+{
 	[self handlerForGesture:gesture sendClick:YES];
 }
 
-- (void)handlePointerMoveScroll:(UILongPressGestureRecognizer *)gesture {
+- (void)handlePointerMoveScroll:(UILongPressGestureRecognizer *)gesture
+{
 	[self handlerForGesture:gesture sendClick:NO];
 }
 

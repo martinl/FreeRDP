@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/synch.h>
@@ -30,12 +30,12 @@
 
 #ifndef _WIN32
 
-#	include <errno.h>
+#include <errno.h>
 
-#	include "../handle/handle.h"
+#include "../handle/handle.h"
 
-#	include "../log.h"
-#	define TAG WINPR_TAG("sync.mutex")
+#include "../log.h"
+#define TAG WINPR_TAG("sync.mutex")
 
 static BOOL MutexCloseHandle(HANDLE handle);
 
@@ -75,7 +75,7 @@ BOOL MutexCloseHandle(HANDLE handle)
 	if ((rc = pthread_mutex_destroy(&mutex->mutex)))
 	{
 		WLog_ERR(TAG, "pthread_mutex_destroy failed with %s [%d]", strerror(rc), rc);
-#	if defined(WITH_DEBUG_MUTEX)
+#if defined(WITH_DEBUG_MUTEX)
 		{
 			size_t used = 0, i;
 			void* stack = winpr_backtrace(20);
@@ -93,7 +93,7 @@ BOOL MutexCloseHandle(HANDLE handle)
 			free(msg);
 			winpr_backtrace_free(stack);
 		}
-#	endif
+#endif
 		/**
 		 * Note: unfortunately we may not return FALSE here since CloseHandle(hmutex) on
 		 * Windows always seems to succeed independently of the mutex object locking state

@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -28,11 +28,11 @@
 
 #ifndef _WIN32
 
-#	include "ndr_context.h"
-#	include "ndr_private.h"
+#include "ndr_context.h"
+#include "ndr_private.h"
 
-#	include "../log.h"
-#	define TAG WINPR_TAG("rpc")
+#include "../log.h"
+#define TAG WINPR_TAG("rpc")
 
 void NdrContextHandleBufferSize(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory,
                                 PFORMAT_STRING pFormat)

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -36,16 +36,16 @@
 #define TAG CLIENT_TAG("x11")
 
 #ifdef WITH_XINERAMA
-#	include <X11/extensions/Xinerama.h>
+#include <X11/extensions/Xinerama.h>
 #endif
 
 #ifdef WITH_XRANDR
-#	include <X11/extensions/Xrandr.h>
-#	include <X11/extensions/randr.h>
+#include <X11/extensions/Xrandr.h>
+#include <X11/extensions/randr.h>
 
-#	if (RANDR_MAJOR * 100 + RANDR_MINOR) >= 105
-#		define USABLE_XRANDR
-#	endif
+#if (RANDR_MAJOR * 100 + RANDR_MINOR) >= 105
+#define USABLE_XRANDR
+#endif
 
 #endif
 

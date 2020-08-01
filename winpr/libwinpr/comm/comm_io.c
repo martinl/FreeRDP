@@ -18,21 +18,21 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #if defined __linux__ && !defined ANDROID
 
-#	include <assert.h>
-#	include <errno.h>
-#	include <termios.h>
-#	include <unistd.h>
+#include <assert.h>
+#include <errno.h>
+#include <termios.h>
+#include <unistd.h>
 
-#	include <winpr/io.h>
-#	include <winpr/wlog.h>
-#	include <winpr/wtypes.h>
+#include <winpr/io.h>
+#include <winpr/wlog.h>
+#include <winpr/wtypes.h>
 
-#	include "comm.h"
+#include "comm.h"
 
 BOOL _comm_set_permissive(HANDLE hDevice, BOOL permissive)
 {

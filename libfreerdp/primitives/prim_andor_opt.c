@@ -14,7 +14,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/types.h>
@@ -22,12 +22,12 @@
 #include <winpr/sysinfo.h>
 
 #ifdef WITH_SSE2
-#	include <emmintrin.h>
-#	include <pmmintrin.h>
+#include <emmintrin.h>
+#include <pmmintrin.h>
 #endif /* WITH_SSE2 */
 
 #ifdef WITH_IPP
-#	include <ipps.h>
+#include <ipps.h>
 #endif /* WITH_IPP */
 
 #include "prim_internal.h"
@@ -36,12 +36,12 @@
 static primitives_t* generic = NULL;
 
 #ifdef WITH_SSE2
-#	if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
+#if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
 /* ------------------------------------------------------------------------- */
 SSE3_SCD_PRE_ROUTINE(sse3_andC_32u, UINT32, generic->andC_32u, _mm_and_si128,
                      *dptr++ = *sptr++ & val)
 SSE3_SCD_PRE_ROUTINE(sse3_orC_32u, UINT32, generic->orC_32u, _mm_or_si128, *dptr++ = *sptr++ | val)
-#	endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
+#endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
 #endif
 
 /* ------------------------------------------------------------------------- */

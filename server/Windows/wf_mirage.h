@@ -38,7 +38,7 @@ enum
 
 #ifdef _WIN64
 
-#	define CLIENT_64BIT 0x8000
+#define CLIENT_64BIT 0x8000
 
 enum
 {

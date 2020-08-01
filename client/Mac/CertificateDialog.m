@@ -46,11 +46,13 @@
 @synthesize changed;
 @synthesize result;
 
-- (id)init {
+- (id)init
+{
 	return [self initWithWindowNibName:@"CertificateDialog"];
 }
 
-- (void)windowDidLoad {
+- (void)windowDidLoad
+{
 	[super windowDidLoad];
 	// Implement this method to handle any initialization after your window controller's window has
 	// been loaded from its nib file.
@@ -77,19 +79,23 @@
 	[self.textSubject setStringValue:self.subject];
 }
 
-- (IBAction)onAccept:(NSObject *)sender {
+- (IBAction)onAccept:(NSObject *)sender
+{
 	[NSApp stopModalWithCode:1];
 }
 
-- (IBAction)onTemporary:(NSObject *)sender {
+- (IBAction)onTemporary:(NSObject *)sender
+{
 	[NSApp stopModalWithCode:2];
 }
 
-- (IBAction)onCancel:(NSObject *)sender {
+- (IBAction)onCancel:(NSObject *)sender
+{
 	[NSApp stopModalWithCode:0];
 }
 
-- (int)runModal:(NSWindow *)mainWindow {
+- (int)runModal:(NSWindow *)mainWindow
+{
 	if ([mainWindow respondsToSelector:@selector(beginSheet:completionHandler:)])
 	{
 		[mainWindow beginSheet:self.window completionHandler:nil];
@@ -111,7 +117,8 @@
 	return self.result;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[textCommonName release];
 	[textFingerprint release];
 	[textIssuer release];

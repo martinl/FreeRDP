@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -464,20 +464,20 @@ static int extract_string(GENERAL_NAME* name, void* data, int index, int count)
 
 	switch (name->type)
 	{
-	case GEN_URI:
-		str = name->d.uniformResourceIdentifier;
-		break;
+		case GEN_URI:
+			str = name->d.uniformResourceIdentifier;
+			break;
 
-	case GEN_DNS:
-		str = name->d.dNSName;
-		break;
+		case GEN_DNS:
+			str = name->d.dNSName;
+			break;
 
-	case GEN_EMAIL:
-		str = name->d.rfc822Name;
-		break;
+		case GEN_EMAIL:
+			str = name->d.rfc822Name;
+			break;
 
-	default:
-		return 1;
+		default:
+			return 1;
 	}
 
 	if ((ASN1_STRING_to_UTF8(&cstring, str)) < 0)

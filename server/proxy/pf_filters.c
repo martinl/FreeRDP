@@ -94,13 +94,13 @@ PF_FILTER_RESULT pf_filters_run_by_type(filters_list* list, PF_FILTER_TYPE type,
 
 		switch (type)
 		{
-		case FILTER_TYPE_KEYBOARD:
-			IFCALLRET(events->KeyboardEvent, result, info, param);
-			break;
+			case FILTER_TYPE_KEYBOARD:
+				IFCALLRET(events->KeyboardEvent, result, info, param);
+				break;
 
-		case FILTER_TYPE_MOUSE:
-			IFCALLRET(events->MouseEvent, result, info, param);
-			break;
+			case FILTER_TYPE_MOUSE:
+				IFCALLRET(events->MouseEvent, result, info, param);
+				break;
 		}
 
 		if (result != FILTER_PASS)

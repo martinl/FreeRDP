@@ -9,7 +9,7 @@
 #endif
 
 #ifdef WITH_CRYPTUI
-#	include <cryptuiapi.h>
+#include <cryptuiapi.h>
 #endif
 
 int TestCryptoCertEnumCertificatesInStore(int argc, char* argv[])

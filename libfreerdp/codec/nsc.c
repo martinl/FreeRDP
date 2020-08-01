@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -39,10 +39,10 @@
 #include "nsc_sse2.h"
 
 #ifndef NSC_INIT_SIMD
-#	define NSC_INIT_SIMD(_nsc_context) \
-		do                              \
-		{                               \
-		} while (0)
+#define NSC_INIT_SIMD(_nsc_context) \
+	do                              \
+	{                               \
+	} while (0)
 #endif
 
 static BOOL nsc_decode(NSC_CONTEXT* context)
@@ -407,29 +407,29 @@ BOOL nsc_process_message(NSC_CONTEXT* context, UINT16 bpp, UINT32 width, UINT32 
 
 	switch (bpp)
 	{
-	case 32:
-		context->format = PIXEL_FORMAT_BGRA32;
-		break;
+		case 32:
+			context->format = PIXEL_FORMAT_BGRA32;
+			break;
 
-	case 24:
-		context->format = PIXEL_FORMAT_BGR24;
-		break;
+		case 24:
+			context->format = PIXEL_FORMAT_BGR24;
+			break;
 
-	case 16:
-		context->format = PIXEL_FORMAT_BGR16;
-		break;
+		case 16:
+			context->format = PIXEL_FORMAT_BGR16;
+			break;
 
-	case 8:
-		context->format = PIXEL_FORMAT_RGB8;
-		break;
+		case 8:
+			context->format = PIXEL_FORMAT_RGB8;
+			break;
 
-	case 4:
-		context->format = PIXEL_FORMAT_A4;
-		break;
+		case 4:
+			context->format = PIXEL_FORMAT_A4;
+			break;
 
-	default:
-		Stream_Free(s, TRUE);
-		return FALSE;
+		default:
+			Stream_Free(s, TRUE);
+			return FALSE;
 	}
 
 	context->width = width;

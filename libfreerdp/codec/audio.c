@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -77,38 +77,38 @@ char* audio_format_get_tag_string(UINT16 wFormatTag)
 {
 	switch (wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		return "WAVE_FORMAT_PCM";
+		case WAVE_FORMAT_PCM:
+			return "WAVE_FORMAT_PCM";
 
-	case WAVE_FORMAT_ADPCM:
-		return "WAVE_FORMAT_ADPCM";
+		case WAVE_FORMAT_ADPCM:
+			return "WAVE_FORMAT_ADPCM";
 
-	case WAVE_FORMAT_ALAW:
-		return "WAVE_FORMAT_ALAW";
+		case WAVE_FORMAT_ALAW:
+			return "WAVE_FORMAT_ALAW";
 
-	case WAVE_FORMAT_MULAW:
-		return "WAVE_FORMAT_MULAW";
+		case WAVE_FORMAT_MULAW:
+			return "WAVE_FORMAT_MULAW";
 
-	case WAVE_FORMAT_DVI_ADPCM:
-		return "WAVE_FORMAT_DVI_ADPCM";
+		case WAVE_FORMAT_DVI_ADPCM:
+			return "WAVE_FORMAT_DVI_ADPCM";
 
-	case WAVE_FORMAT_GSM610:
-		return "WAVE_FORMAT_GSM610";
+		case WAVE_FORMAT_GSM610:
+			return "WAVE_FORMAT_GSM610";
 
-	case WAVE_FORMAT_MSG723:
-		return "WAVE_FORMAT_MSG723";
+		case WAVE_FORMAT_MSG723:
+			return "WAVE_FORMAT_MSG723";
 
-	case WAVE_FORMAT_DSPGROUP_TRUESPEECH:
-		return "WAVE_FORMAT_DSPGROUP_TRUESPEECH	";
+		case WAVE_FORMAT_DSPGROUP_TRUESPEECH:
+			return "WAVE_FORMAT_DSPGROUP_TRUESPEECH	";
 
-	case WAVE_FORMAT_MPEGLAYER3:
-		return "WAVE_FORMAT_MPEGLAYER3";
+		case WAVE_FORMAT_MPEGLAYER3:
+			return "WAVE_FORMAT_MPEGLAYER3";
 
-	case WAVE_FORMAT_WMAUDIO2:
-		return "WAVE_FORMAT_WMAUDIO2";
+		case WAVE_FORMAT_WMAUDIO2:
+			return "WAVE_FORMAT_WMAUDIO2";
 
-	case WAVE_FORMAT_AAC_MS:
-		return "WAVE_FORMAT_AAC_MS";
+		case WAVE_FORMAT_AAC_MS:
+			return "WAVE_FORMAT_AAC_MS";
 	}
 
 	return "WAVE_FORMAT_UNKNOWN";

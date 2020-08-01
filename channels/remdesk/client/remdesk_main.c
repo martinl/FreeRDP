@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -556,101 +556,104 @@ static UINT remdesk_recv_ctl_pdu(remdeskPlugin* remdesk, wStream* s, REMDESK_CHA
 
 	switch (msgType)
 	{
-	case REMDESK_CTL_REMOTE_CONTROL_DESKTOP:
-		break;
-
-	case REMDESK_CTL_RESULT:
-		if ((error = remdesk_recv_ctl_result_pdu(remdesk, s, header, &result)))
-			WLog_ERR(TAG, "remdesk_recv_ctl_result_pdu failed with error %" PRIu32 "", error);
-
-		break;
-
-	case REMDESK_CTL_AUTHENTICATE:
-		break;
-
-	case REMDESK_CTL_SERVER_ANNOUNCE:
-		if ((error = remdesk_recv_ctl_server_announce_pdu(remdesk, s, header)))
-			WLog_ERR(TAG, "remdesk_recv_ctl_server_announce_pdu failed with error %" PRIu32 "",
-			         error);
-
-		break;
-
-	case REMDESK_CTL_DISCONNECT:
-		break;
-
-	case REMDESK_CTL_VERSIONINFO:
-		if ((error = remdesk_recv_ctl_version_info_pdu(remdesk, s, header)))
-		{
-			WLog_ERR(TAG, "remdesk_recv_ctl_version_info_pdu failed with error %" PRIu32 "", error);
+		case REMDESK_CTL_REMOTE_CONTROL_DESKTOP:
 			break;
-		}
 
-		if (remdesk->Version == 1)
-		{
-			if ((error = remdesk_send_ctl_version_info_pdu(remdesk)))
+		case REMDESK_CTL_RESULT:
+			if ((error = remdesk_recv_ctl_result_pdu(remdesk, s, header, &result)))
+				WLog_ERR(TAG, "remdesk_recv_ctl_result_pdu failed with error %" PRIu32 "", error);
+
+			break;
+
+		case REMDESK_CTL_AUTHENTICATE:
+			break;
+
+		case REMDESK_CTL_SERVER_ANNOUNCE:
+			if ((error = remdesk_recv_ctl_server_announce_pdu(remdesk, s, header)))
+				WLog_ERR(TAG, "remdesk_recv_ctl_server_announce_pdu failed with error %" PRIu32 "",
+				         error);
+
+			break;
+
+		case REMDESK_CTL_DISCONNECT:
+			break;
+
+		case REMDESK_CTL_VERSIONINFO:
+			if ((error = remdesk_recv_ctl_version_info_pdu(remdesk, s, header)))
 			{
-				WLog_ERR(TAG, "remdesk_send_ctl_version_info_pdu failed with error %" PRIu32 "",
+				WLog_ERR(TAG, "remdesk_recv_ctl_version_info_pdu failed with error %" PRIu32 "",
 				         error);
 				break;
 			}
 
-			if ((error = remdesk_send_ctl_authenticate_pdu(remdesk)))
+			if (remdesk->Version == 1)
 			{
-				WLog_ERR(TAG, "remdesk_send_ctl_authenticate_pdu failed with error %" PRIu32 "",
-				         error);
-				break;
+				if ((error = remdesk_send_ctl_version_info_pdu(remdesk)))
+				{
+					WLog_ERR(TAG, "remdesk_send_ctl_version_info_pdu failed with error %" PRIu32 "",
+					         error);
+					break;
+				}
+
+				if ((error = remdesk_send_ctl_authenticate_pdu(remdesk)))
+				{
+					WLog_ERR(TAG, "remdesk_send_ctl_authenticate_pdu failed with error %" PRIu32 "",
+					         error);
+					break;
+				}
+
+				if ((error = remdesk_send_ctl_remote_control_desktop_pdu(remdesk)))
+				{
+					WLog_ERR(
+					    TAG,
+					    "remdesk_send_ctl_remote_control_desktop_pdu failed with error %" PRIu32 "",
+					    error);
+					break;
+				}
+			}
+			else if (remdesk->Version == 2)
+			{
+				if ((error = remdesk_send_ctl_expert_on_vista_pdu(remdesk)))
+				{
+					WLog_ERR(TAG,
+					         "remdesk_send_ctl_expert_on_vista_pdu failed with error %" PRIu32 "",
+					         error);
+					break;
+				}
+
+				if ((error = remdesk_send_ctl_verify_password_pdu(remdesk)))
+				{
+					WLog_ERR(TAG,
+					         "remdesk_send_ctl_verify_password_pdu failed with error %" PRIu32 "",
+					         error);
+					break;
+				}
 			}
 
-			if ((error = remdesk_send_ctl_remote_control_desktop_pdu(remdesk)))
-			{
-				WLog_ERR(TAG,
-				         "remdesk_send_ctl_remote_control_desktop_pdu failed with error %" PRIu32
-				         "",
-				         error);
-				break;
-			}
-		}
-		else if (remdesk->Version == 2)
-		{
-			if ((error = remdesk_send_ctl_expert_on_vista_pdu(remdesk)))
-			{
-				WLog_ERR(TAG, "remdesk_send_ctl_expert_on_vista_pdu failed with error %" PRIu32 "",
-				         error);
-				break;
-			}
+			break;
 
-			if ((error = remdesk_send_ctl_verify_password_pdu(remdesk)))
-			{
-				WLog_ERR(TAG, "remdesk_send_ctl_verify_password_pdu failed with error %" PRIu32 "",
-				         error);
-				break;
-			}
-		}
+		case REMDESK_CTL_ISCONNECTED:
+			break;
 
-		break;
+		case REMDESK_CTL_VERIFY_PASSWORD:
+			break;
 
-	case REMDESK_CTL_ISCONNECTED:
-		break;
+		case REMDESK_CTL_EXPERT_ON_VISTA:
+			break;
 
-	case REMDESK_CTL_VERIFY_PASSWORD:
-		break;
+		case REMDESK_CTL_RANOVICE_NAME:
+			break;
 
-	case REMDESK_CTL_EXPERT_ON_VISTA:
-		break;
+		case REMDESK_CTL_RAEXPERT_NAME:
+			break;
 
-	case REMDESK_CTL_RANOVICE_NAME:
-		break;
+		case REMDESK_CTL_TOKEN:
+			break;
 
-	case REMDESK_CTL_RAEXPERT_NAME:
-		break;
-
-	case REMDESK_CTL_TOKEN:
-		break;
-
-	default:
-		WLog_ERR(TAG, "unknown msgType: %" PRIu32 "", msgType);
-		error = ERROR_INVALID_DATA;
-		break;
+		default:
+			WLog_ERR(TAG, "unknown msgType: %" PRIu32 "", msgType);
+			error = ERROR_INVALID_DATA;
+			break;
 	}
 
 	return error;
@@ -785,24 +788,25 @@ static VOID VCAPITYPE remdesk_virtual_channel_open_event_ex(LPVOID lpUserParam, 
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_DATA_RECEIVED:
-		if ((error = remdesk_virtual_channel_event_data_received(remdesk, pData, dataLength,
-		                                                         totalLength, dataFlags)))
-			WLog_ERR(TAG,
-			         "remdesk_virtual_channel_event_data_received failed with error %" PRIu32 "!",
-			         error);
+		case CHANNEL_EVENT_DATA_RECEIVED:
+			if ((error = remdesk_virtual_channel_event_data_received(remdesk, pData, dataLength,
+			                                                         totalLength, dataFlags)))
+				WLog_ERR(TAG,
+				         "remdesk_virtual_channel_event_data_received failed with error %" PRIu32
+				         "!",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_WRITE_COMPLETE:
-		break;
+		case CHANNEL_EVENT_WRITE_COMPLETE:
+			break;
 
-	case CHANNEL_EVENT_USER:
-		break;
+		case CHANNEL_EVENT_USER:
+			break;
 
-	default:
-		WLog_ERR(TAG, "unhandled event %" PRIu32 "!", event);
-		error = ERROR_INTERNAL_ERROR;
+		default:
+			WLog_ERR(TAG, "unhandled event %" PRIu32 "!", event);
+			error = ERROR_INTERNAL_ERROR;
 	}
 
 	if (error && remdesk->rdpcontext)
@@ -970,29 +974,30 @@ static VOID VCAPITYPE remdesk_virtual_channel_init_event_ex(LPVOID lpUserParam, 
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_CONNECTED:
-		if ((error = remdesk_virtual_channel_event_connected(remdesk, pData, dataLength)))
-			WLog_ERR(TAG, "remdesk_virtual_channel_event_connected failed with error %" PRIu32 "",
-			         error);
+		case CHANNEL_EVENT_CONNECTED:
+			if ((error = remdesk_virtual_channel_event_connected(remdesk, pData, dataLength)))
+				WLog_ERR(TAG,
+				         "remdesk_virtual_channel_event_connected failed with error %" PRIu32 "",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_DISCONNECTED:
-		if ((error = remdesk_virtual_channel_event_disconnected(remdesk)))
-			WLog_ERR(TAG,
-			         "remdesk_virtual_channel_event_disconnected failed with error %" PRIu32 "",
-			         error);
+		case CHANNEL_EVENT_DISCONNECTED:
+			if ((error = remdesk_virtual_channel_event_disconnected(remdesk)))
+				WLog_ERR(TAG,
+				         "remdesk_virtual_channel_event_disconnected failed with error %" PRIu32 "",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_TERMINATED:
-		remdesk_virtual_channel_event_terminated(remdesk);
-		break;
+		case CHANNEL_EVENT_TERMINATED:
+			remdesk_virtual_channel_event_terminated(remdesk);
+			break;
 
-	case CHANNEL_EVENT_ATTACHED:
-	case CHANNEL_EVENT_DETACHED:
-	default:
-		break;
+		case CHANNEL_EVENT_ATTACHED:
+		case CHANNEL_EVENT_DETACHED:
+		default:
+			break;
 	}
 
 	if (error && remdesk->rdpcontext)

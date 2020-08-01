@@ -21,7 +21,7 @@
 #include <sys/stat.h>
 
 #ifndef _WIN32
-#	include <termios.h>
+#include <termios.h>
 #endif
 
 #include <winpr/comm.h>

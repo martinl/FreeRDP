@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -550,68 +550,68 @@ BOOL update_recv_pointer(rdpUpdate* update, wStream* s)
 
 	switch (messageType)
 	{
-	case PTR_MSG_TYPE_POSITION:
-	{
-		POINTER_POSITION_UPDATE* pointer_position = update_read_pointer_position(update, s);
-
-		if (pointer_position)
+		case PTR_MSG_TYPE_POSITION:
 		{
-			rc = IFCALLRESULT(FALSE, pointer->PointerPosition, context, pointer_position);
-			free_pointer_position_update(context, pointer_position);
+			POINTER_POSITION_UPDATE* pointer_position = update_read_pointer_position(update, s);
+
+			if (pointer_position)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerPosition, context, pointer_position);
+				free_pointer_position_update(context, pointer_position);
+			}
 		}
-	}
-	break;
-
-	case PTR_MSG_TYPE_SYSTEM:
-	{
-		POINTER_SYSTEM_UPDATE* pointer_system = update_read_pointer_system(update, s);
-
-		if (pointer_system)
-		{
-			rc = IFCALLRESULT(FALSE, pointer->PointerSystem, context, pointer_system);
-			free_pointer_system_update(context, pointer_system);
-		}
-	}
-	break;
-
-	case PTR_MSG_TYPE_COLOR:
-	{
-		POINTER_COLOR_UPDATE* pointer_color = update_read_pointer_color(update, s, 24);
-
-		if (pointer_color)
-		{
-			rc = IFCALLRESULT(FALSE, pointer->PointerColor, context, pointer_color);
-			free_pointer_color_update(context, pointer_color);
-		}
-	}
-	break;
-
-	case PTR_MSG_TYPE_POINTER:
-	{
-		POINTER_NEW_UPDATE* pointer_new = update_read_pointer_new(update, s);
-
-		if (pointer_new)
-		{
-			rc = IFCALLRESULT(FALSE, pointer->PointerNew, context, pointer_new);
-			free_pointer_new_update(context, pointer_new);
-		}
-	}
-	break;
-
-	case PTR_MSG_TYPE_CACHED:
-	{
-		POINTER_CACHED_UPDATE* pointer_cached = update_read_pointer_cached(update, s);
-
-		if (pointer_cached)
-		{
-			rc = IFCALLRESULT(FALSE, pointer->PointerCached, context, pointer_cached);
-			free_pointer_cached_update(context, pointer_cached);
-		}
-	}
-	break;
-
-	default:
 		break;
+
+		case PTR_MSG_TYPE_SYSTEM:
+		{
+			POINTER_SYSTEM_UPDATE* pointer_system = update_read_pointer_system(update, s);
+
+			if (pointer_system)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerSystem, context, pointer_system);
+				free_pointer_system_update(context, pointer_system);
+			}
+		}
+		break;
+
+		case PTR_MSG_TYPE_COLOR:
+		{
+			POINTER_COLOR_UPDATE* pointer_color = update_read_pointer_color(update, s, 24);
+
+			if (pointer_color)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerColor, context, pointer_color);
+				free_pointer_color_update(context, pointer_color);
+			}
+		}
+		break;
+
+		case PTR_MSG_TYPE_POINTER:
+		{
+			POINTER_NEW_UPDATE* pointer_new = update_read_pointer_new(update, s);
+
+			if (pointer_new)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerNew, context, pointer_new);
+				free_pointer_new_update(context, pointer_new);
+			}
+		}
+		break;
+
+		case PTR_MSG_TYPE_CACHED:
+		{
+			POINTER_CACHED_UPDATE* pointer_cached = update_read_pointer_cached(update, s);
+
+			if (pointer_cached)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerCached, context, pointer_cached);
+				free_pointer_cached_update(context, pointer_cached);
+			}
+		}
+		break;
+
+		default:
+			break;
 	}
 
 	return rc;
@@ -637,47 +637,47 @@ BOOL update_recv(rdpUpdate* update, wStream* s)
 
 	switch (updateType)
 	{
-	case UPDATE_TYPE_ORDERS:
-		rc = update_recv_orders(update, s);
-		break;
+		case UPDATE_TYPE_ORDERS:
+			rc = update_recv_orders(update, s);
+			break;
 
-	case UPDATE_TYPE_BITMAP:
-	{
-		BITMAP_UPDATE* bitmap_update = update_read_bitmap_update(update, s);
-
-		if (!bitmap_update)
+		case UPDATE_TYPE_BITMAP:
 		{
-			WLog_ERR(TAG, "UPDATE_TYPE_BITMAP - update_read_bitmap_update() failed");
-			goto fail;
+			BITMAP_UPDATE* bitmap_update = update_read_bitmap_update(update, s);
+
+			if (!bitmap_update)
+			{
+				WLog_ERR(TAG, "UPDATE_TYPE_BITMAP - update_read_bitmap_update() failed");
+				goto fail;
+			}
+
+			rc = IFCALLRESULT(FALSE, update->BitmapUpdate, context, bitmap_update);
+			free_bitmap_update(update->context, bitmap_update);
 		}
+		break;
 
-		rc = IFCALLRESULT(FALSE, update->BitmapUpdate, context, bitmap_update);
-		free_bitmap_update(update->context, bitmap_update);
-	}
-	break;
-
-	case UPDATE_TYPE_PALETTE:
-	{
-		PALETTE_UPDATE* palette_update = update_read_palette(update, s);
-
-		if (!palette_update)
+		case UPDATE_TYPE_PALETTE:
 		{
-			WLog_ERR(TAG, "UPDATE_TYPE_PALETTE - update_read_palette() failed");
-			goto fail;
+			PALETTE_UPDATE* palette_update = update_read_palette(update, s);
+
+			if (!palette_update)
+			{
+				WLog_ERR(TAG, "UPDATE_TYPE_PALETTE - update_read_palette() failed");
+				goto fail;
+			}
+
+			rc = IFCALLRESULT(FALSE, update->Palette, context, palette_update);
+			free_palette_update(context, palette_update);
 		}
-
-		rc = IFCALLRESULT(FALSE, update->Palette, context, palette_update);
-		free_palette_update(context, palette_update);
-	}
-	break;
-
-	case UPDATE_TYPE_SYNCHRONIZE:
-		update_read_synchronize(update, s);
-		rc = IFCALLRESULT(TRUE, update->Synchronize, context);
 		break;
 
-	default:
-		break;
+		case UPDATE_TYPE_SYNCHRONIZE:
+			update_read_synchronize(update, s);
+			rc = IFCALLRESULT(TRUE, update->Synchronize, context);
+			break;
+
+		default:
+			break;
 	}
 
 fail:

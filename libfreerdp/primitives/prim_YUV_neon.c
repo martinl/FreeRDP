@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/sysinfo.h>
@@ -32,7 +32,7 @@
 #include "prim_internal.h"
 
 #if !defined(WITH_NEON)
-#	error "This file must only be included if WITH_NEON is active!"
+#error "This file must only be included if WITH_NEON is active!"
 #endif
 
 #include <arm_neon.h>
@@ -261,24 +261,24 @@ static pstatus_t neon_YUV420ToRGB_8u_P3AC4R(const BYTE* pSrc[3], const UINT32 sr
 {
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 2, 1, 0, 3);
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 2, 1, 0, 3);
 
-	case PIXEL_FORMAT_RGBA32:
-	case PIXEL_FORMAT_RGBX32:
-		return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 0, 1, 2, 3);
+		case PIXEL_FORMAT_RGBA32:
+		case PIXEL_FORMAT_RGBX32:
+			return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 0, 1, 2, 3);
 
-	case PIXEL_FORMAT_ARGB32:
-	case PIXEL_FORMAT_XRGB32:
-		return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 1, 2, 3, 0);
+		case PIXEL_FORMAT_ARGB32:
+		case PIXEL_FORMAT_XRGB32:
+			return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 1, 2, 3, 0);
 
-	case PIXEL_FORMAT_ABGR32:
-	case PIXEL_FORMAT_XBGR32:
-		return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 3, 2, 1, 0);
+		case PIXEL_FORMAT_ABGR32:
+		case PIXEL_FORMAT_XBGR32:
+			return neon_YUV420ToX(pSrc, srcStep, pDst, dstStep, roi, 3, 2, 1, 0);
 
-	default:
-		return generic->YUV420ToRGB_8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		default:
+			return generic->YUV420ToRGB_8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
 	}
 }
 
@@ -352,24 +352,24 @@ static pstatus_t neon_YUV444ToRGB_8u_P3AC4R(const BYTE* pSrc[3], const UINT32 sr
 {
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 2, 1, 0, 3);
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 2, 1, 0, 3);
 
-	case PIXEL_FORMAT_RGBA32:
-	case PIXEL_FORMAT_RGBX32:
-		return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 0, 1, 2, 3);
+		case PIXEL_FORMAT_RGBA32:
+		case PIXEL_FORMAT_RGBX32:
+			return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 0, 1, 2, 3);
 
-	case PIXEL_FORMAT_ARGB32:
-	case PIXEL_FORMAT_XRGB32:
-		return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 1, 2, 3, 0);
+		case PIXEL_FORMAT_ARGB32:
+		case PIXEL_FORMAT_XRGB32:
+			return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 1, 2, 3, 0);
 
-	case PIXEL_FORMAT_ABGR32:
-	case PIXEL_FORMAT_XBGR32:
-		return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 3, 2, 1, 0);
+		case PIXEL_FORMAT_ABGR32:
+		case PIXEL_FORMAT_XBGR32:
+			return neon_YUV444ToX(pSrc, srcStep, pDst, dstStep, roi, 3, 2, 1, 0);
 
-	default:
-		return generic->YUV444ToRGB_8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		default:
+			return generic->YUV444ToRGB_8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
 	}
 }
 
@@ -721,17 +721,17 @@ static pstatus_t neon_YUV420CombineToYUV444(avc444_frame_type type, const BYTE* 
 
 	switch (type)
 	{
-	case AVC444_LUMA:
-		return neon_LumaToYUV444(pSrc, srcStep, pDst, dstStep, roi);
+		case AVC444_LUMA:
+			return neon_LumaToYUV444(pSrc, srcStep, pDst, dstStep, roi);
 
-	case AVC444_CHROMAv1:
-		return neon_ChromaV1ToYUV444(pSrc, srcStep, pDst, dstStep, roi);
+		case AVC444_CHROMAv1:
+			return neon_ChromaV1ToYUV444(pSrc, srcStep, pDst, dstStep, roi);
 
-	case AVC444_CHROMAv2:
-		return neon_ChromaV2ToYUV444(pSrc, srcStep, nWidth, nHeight, pDst, dstStep, roi);
+		case AVC444_CHROMAv2:
+			return neon_ChromaV2ToYUV444(pSrc, srcStep, nWidth, nHeight, pDst, dstStep, roi);
 
-	default:
-		return -1;
+		default:
+			return -1;
 	}
 }
 

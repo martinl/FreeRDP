@@ -18,16 +18,16 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/error.h>
 
 #ifndef _WIN32
 
-#	include <stdio.h>
+#include <stdio.h>
 
-#	include <winpr/nt.h>
+#include <winpr/nt.h>
 
 UINT GetErrorMode(void)
 {

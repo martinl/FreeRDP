@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -27,22 +27,22 @@
 #include <winpr/winsock.h>
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 #ifdef HAVE_SYS_FILIO_H
-#	include <sys/filio.h>
+#include <sys/filio.h>
 #endif
 #ifdef HAVE_SYS_SOCKIO_H
-#	include <sys/sockio.h>
+#include <sys/sockio.h>
 #endif
 
 #ifndef _WIN32
-#	include <fcntl.h>
+#include <fcntl.h>
 #endif
 
 #ifdef __APPLE__
-#	define WSAIOCTL_IFADDRS
-#	include <ifaddrs.h>
+#define WSAIOCTL_IFADDRS
+#include <ifaddrs.h>
 #endif
 
 /**
@@ -232,7 +232,7 @@
 
 #ifdef _WIN32
 
-#	if (_WIN32_WINNT < 0x0600)
+#if (_WIN32_WINNT < 0x0600)
 
 PCSTR winpr_inet_ntop(INT Family, PVOID pAddr, PSTR pStringBuf, size_t StringBufSize)
 {
@@ -284,22 +284,22 @@ INT winpr_inet_pton(INT Family, PCSTR pszAddrString, PVOID pAddrBuf)
 	return 1;
 }
 
-#	endif /* (_WIN32_WINNT < 0x0600) */
+#endif /* (_WIN32_WINNT < 0x0600) */
 
 #else /* _WIN32 */
 
-#	include <netdb.h>
-#	include <errno.h>
-#	include <unistd.h>
-#	include <sys/ioctl.h>
-#	include <sys/socket.h>
-#	include <netinet/in.h>
-#	include <netinet/tcp.h>
-#	include <net/if.h>
+#include <netdb.h>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <net/if.h>
 
-#	ifndef MSG_NOSIGNAL
-#		define MSG_NOSIGNAL 0
-#	endif
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
 
 int WSAStartup(WORD wVersionRequired, LPWSADATA lpWSAData)
 {
@@ -318,182 +318,182 @@ void WSASetLastError(int iError)
 {
 	switch (iError)
 	{
-	/* Base error codes */
-	case WSAEINTR:
-		errno = EINTR;
-		break;
+		/* Base error codes */
+		case WSAEINTR:
+			errno = EINTR;
+			break;
 
-	case WSAEBADF:
-		errno = EBADF;
-		break;
+		case WSAEBADF:
+			errno = EBADF;
+			break;
 
-	case WSAEACCES:
-		errno = EACCES;
-		break;
+		case WSAEACCES:
+			errno = EACCES;
+			break;
 
-	case WSAEFAULT:
-		errno = EFAULT;
-		break;
+		case WSAEFAULT:
+			errno = EFAULT;
+			break;
 
-	case WSAEINVAL:
-		errno = EINVAL;
-		break;
+		case WSAEINVAL:
+			errno = EINVAL;
+			break;
 
-	case WSAEMFILE:
-		errno = EMFILE;
-		break;
+		case WSAEMFILE:
+			errno = EMFILE;
+			break;
 
-		/* BSD sockets error codes */
+			/* BSD sockets error codes */
 
-	case WSAEWOULDBLOCK:
-		errno = EWOULDBLOCK;
-		break;
+		case WSAEWOULDBLOCK:
+			errno = EWOULDBLOCK;
+			break;
 
-	case WSAEINPROGRESS:
-		errno = EINPROGRESS;
-		break;
+		case WSAEINPROGRESS:
+			errno = EINPROGRESS;
+			break;
 
-	case WSAEALREADY:
-		errno = EALREADY;
-		break;
+		case WSAEALREADY:
+			errno = EALREADY;
+			break;
 
-	case WSAENOTSOCK:
-		errno = ENOTSOCK;
-		break;
+		case WSAENOTSOCK:
+			errno = ENOTSOCK;
+			break;
 
-	case WSAEDESTADDRREQ:
-		errno = EDESTADDRREQ;
-		break;
+		case WSAEDESTADDRREQ:
+			errno = EDESTADDRREQ;
+			break;
 
-	case WSAEMSGSIZE:
-		errno = EMSGSIZE;
-		break;
+		case WSAEMSGSIZE:
+			errno = EMSGSIZE;
+			break;
 
-	case WSAEPROTOTYPE:
-		errno = EPROTOTYPE;
-		break;
+		case WSAEPROTOTYPE:
+			errno = EPROTOTYPE;
+			break;
 
-	case WSAENOPROTOOPT:
-		errno = ENOPROTOOPT;
-		break;
+		case WSAENOPROTOOPT:
+			errno = ENOPROTOOPT;
+			break;
 
-	case WSAEPROTONOSUPPORT:
-		errno = EPROTONOSUPPORT;
-		break;
+		case WSAEPROTONOSUPPORT:
+			errno = EPROTONOSUPPORT;
+			break;
 
-	case WSAESOCKTNOSUPPORT:
-		errno = ESOCKTNOSUPPORT;
-		break;
+		case WSAESOCKTNOSUPPORT:
+			errno = ESOCKTNOSUPPORT;
+			break;
 
-	case WSAEOPNOTSUPP:
-		errno = EOPNOTSUPP;
-		break;
+		case WSAEOPNOTSUPP:
+			errno = EOPNOTSUPP;
+			break;
 
-	case WSAEPFNOSUPPORT:
-		errno = EPFNOSUPPORT;
-		break;
+		case WSAEPFNOSUPPORT:
+			errno = EPFNOSUPPORT;
+			break;
 
-	case WSAEAFNOSUPPORT:
-		errno = EAFNOSUPPORT;
-		break;
+		case WSAEAFNOSUPPORT:
+			errno = EAFNOSUPPORT;
+			break;
 
-	case WSAEADDRINUSE:
-		errno = EADDRINUSE;
-		break;
+		case WSAEADDRINUSE:
+			errno = EADDRINUSE;
+			break;
 
-	case WSAEADDRNOTAVAIL:
-		errno = EADDRNOTAVAIL;
-		break;
+		case WSAEADDRNOTAVAIL:
+			errno = EADDRNOTAVAIL;
+			break;
 
-	case WSAENETDOWN:
-		errno = ENETDOWN;
-		break;
+		case WSAENETDOWN:
+			errno = ENETDOWN;
+			break;
 
-	case WSAENETUNREACH:
-		errno = ENETUNREACH;
-		break;
+		case WSAENETUNREACH:
+			errno = ENETUNREACH;
+			break;
 
-	case WSAENETRESET:
-		errno = ENETRESET;
-		break;
+		case WSAENETRESET:
+			errno = ENETRESET;
+			break;
 
-	case WSAECONNABORTED:
-		errno = ECONNABORTED;
-		break;
+		case WSAECONNABORTED:
+			errno = ECONNABORTED;
+			break;
 
-	case WSAECONNRESET:
-		errno = ECONNRESET;
-		break;
+		case WSAECONNRESET:
+			errno = ECONNRESET;
+			break;
 
-	case WSAENOBUFS:
-		errno = ENOBUFS;
-		break;
+		case WSAENOBUFS:
+			errno = ENOBUFS;
+			break;
 
-	case WSAEISCONN:
-		errno = EISCONN;
-		break;
+		case WSAEISCONN:
+			errno = EISCONN;
+			break;
 
-	case WSAENOTCONN:
-		errno = ENOTCONN;
-		break;
+		case WSAENOTCONN:
+			errno = ENOTCONN;
+			break;
 
-	case WSAESHUTDOWN:
-		errno = ESHUTDOWN;
-		break;
+		case WSAESHUTDOWN:
+			errno = ESHUTDOWN;
+			break;
 
-	case WSAETOOMANYREFS:
-		errno = ETOOMANYREFS;
-		break;
+		case WSAETOOMANYREFS:
+			errno = ETOOMANYREFS;
+			break;
 
-	case WSAETIMEDOUT:
-		errno = ETIMEDOUT;
-		break;
+		case WSAETIMEDOUT:
+			errno = ETIMEDOUT;
+			break;
 
-	case WSAECONNREFUSED:
-		errno = ECONNREFUSED;
-		break;
+		case WSAECONNREFUSED:
+			errno = ECONNREFUSED;
+			break;
 
-	case WSAELOOP:
-		errno = ELOOP;
-		break;
+		case WSAELOOP:
+			errno = ELOOP;
+			break;
 
-	case WSAENAMETOOLONG:
-		errno = ENAMETOOLONG;
-		break;
+		case WSAENAMETOOLONG:
+			errno = ENAMETOOLONG;
+			break;
 
-	case WSAEHOSTDOWN:
-		errno = EHOSTDOWN;
-		break;
+		case WSAEHOSTDOWN:
+			errno = EHOSTDOWN;
+			break;
 
-	case WSAEHOSTUNREACH:
-		errno = EHOSTUNREACH;
-		break;
+		case WSAEHOSTUNREACH:
+			errno = EHOSTUNREACH;
+			break;
 
-	case WSAENOTEMPTY:
-		errno = ENOTEMPTY;
-		break;
-#	ifdef EPROCLIM
+		case WSAENOTEMPTY:
+			errno = ENOTEMPTY;
+			break;
+#ifdef EPROCLIM
 
-	case WSAEPROCLIM:
-		errno = EPROCLIM;
-		break;
-#	endif
+		case WSAEPROCLIM:
+			errno = EPROCLIM;
+			break;
+#endif
 
-	case WSAEUSERS:
-		errno = EUSERS;
-		break;
+		case WSAEUSERS:
+			errno = EUSERS;
+			break;
 
-	case WSAEDQUOT:
-		errno = EDQUOT;
-		break;
+		case WSAEDQUOT:
+			errno = EDQUOT;
+			break;
 
-	case WSAESTALE:
-		errno = ESTALE;
-		break;
+		case WSAESTALE:
+			errno = ESTALE;
+			break;
 
-	case WSAEREMOTE:
-		errno = EREMOTE;
-		break;
+		case WSAEREMOTE:
+			errno = EREMOTE;
+			break;
 	}
 }
 
@@ -503,195 +503,195 @@ int WSAGetLastError(void)
 
 	switch (errno)
 	{
-	/* Base error codes */
-	case EINTR:
-		iError = WSAEINTR;
-		break;
+		/* Base error codes */
+		case EINTR:
+			iError = WSAEINTR;
+			break;
 
-	case EBADF:
-		iError = WSAEBADF;
-		break;
+		case EBADF:
+			iError = WSAEBADF;
+			break;
 
-	case EACCES:
-		iError = WSAEACCES;
-		break;
+		case EACCES:
+			iError = WSAEACCES;
+			break;
 
-	case EFAULT:
-		iError = WSAEFAULT;
-		break;
+		case EFAULT:
+			iError = WSAEFAULT;
+			break;
 
-	case EINVAL:
-		iError = WSAEINVAL;
-		break;
+		case EINVAL:
+			iError = WSAEINVAL;
+			break;
 
-	case EMFILE:
-		iError = WSAEMFILE;
-		break;
+		case EMFILE:
+			iError = WSAEMFILE;
+			break;
 
-		/* BSD sockets error codes */
+			/* BSD sockets error codes */
 
-	case EWOULDBLOCK:
-		iError = WSAEWOULDBLOCK;
-		break;
+		case EWOULDBLOCK:
+			iError = WSAEWOULDBLOCK;
+			break;
 
-	case EINPROGRESS:
-		iError = WSAEINPROGRESS;
-		break;
+		case EINPROGRESS:
+			iError = WSAEINPROGRESS;
+			break;
 
-	case EALREADY:
-		iError = WSAEALREADY;
-		break;
+		case EALREADY:
+			iError = WSAEALREADY;
+			break;
 
-	case ENOTSOCK:
-		iError = WSAENOTSOCK;
-		break;
+		case ENOTSOCK:
+			iError = WSAENOTSOCK;
+			break;
 
-	case EDESTADDRREQ:
-		iError = WSAEDESTADDRREQ;
-		break;
+		case EDESTADDRREQ:
+			iError = WSAEDESTADDRREQ;
+			break;
 
-	case EMSGSIZE:
-		iError = WSAEMSGSIZE;
-		break;
+		case EMSGSIZE:
+			iError = WSAEMSGSIZE;
+			break;
 
-	case EPROTOTYPE:
-		iError = WSAEPROTOTYPE;
-		break;
+		case EPROTOTYPE:
+			iError = WSAEPROTOTYPE;
+			break;
 
-	case ENOPROTOOPT:
-		iError = WSAENOPROTOOPT;
-		break;
+		case ENOPROTOOPT:
+			iError = WSAENOPROTOOPT;
+			break;
 
-	case EPROTONOSUPPORT:
-		iError = WSAEPROTONOSUPPORT;
-		break;
+		case EPROTONOSUPPORT:
+			iError = WSAEPROTONOSUPPORT;
+			break;
 
-	case ESOCKTNOSUPPORT:
-		iError = WSAESOCKTNOSUPPORT;
-		break;
+		case ESOCKTNOSUPPORT:
+			iError = WSAESOCKTNOSUPPORT;
+			break;
 
-	case EOPNOTSUPP:
-		iError = WSAEOPNOTSUPP;
-		break;
+		case EOPNOTSUPP:
+			iError = WSAEOPNOTSUPP;
+			break;
 
-	case EPFNOSUPPORT:
-		iError = WSAEPFNOSUPPORT;
-		break;
+		case EPFNOSUPPORT:
+			iError = WSAEPFNOSUPPORT;
+			break;
 
-	case EAFNOSUPPORT:
-		iError = WSAEAFNOSUPPORT;
-		break;
+		case EAFNOSUPPORT:
+			iError = WSAEAFNOSUPPORT;
+			break;
 
-	case EADDRINUSE:
-		iError = WSAEADDRINUSE;
-		break;
+		case EADDRINUSE:
+			iError = WSAEADDRINUSE;
+			break;
 
-	case EADDRNOTAVAIL:
-		iError = WSAEADDRNOTAVAIL;
-		break;
+		case EADDRNOTAVAIL:
+			iError = WSAEADDRNOTAVAIL;
+			break;
 
-	case ENETDOWN:
-		iError = WSAENETDOWN;
-		break;
+		case ENETDOWN:
+			iError = WSAENETDOWN;
+			break;
 
-	case ENETUNREACH:
-		iError = WSAENETUNREACH;
-		break;
+		case ENETUNREACH:
+			iError = WSAENETUNREACH;
+			break;
 
-	case ENETRESET:
-		iError = WSAENETRESET;
-		break;
+		case ENETRESET:
+			iError = WSAENETRESET;
+			break;
 
-	case ECONNABORTED:
-		iError = WSAECONNABORTED;
-		break;
+		case ECONNABORTED:
+			iError = WSAECONNABORTED;
+			break;
 
-	case ECONNRESET:
-		iError = WSAECONNRESET;
-		break;
+		case ECONNRESET:
+			iError = WSAECONNRESET;
+			break;
 
-	case ENOBUFS:
-		iError = WSAENOBUFS;
-		break;
+		case ENOBUFS:
+			iError = WSAENOBUFS;
+			break;
 
-	case EISCONN:
-		iError = WSAEISCONN;
-		break;
+		case EISCONN:
+			iError = WSAEISCONN;
+			break;
 
-	case ENOTCONN:
-		iError = WSAENOTCONN;
-		break;
+		case ENOTCONN:
+			iError = WSAENOTCONN;
+			break;
 
-	case ESHUTDOWN:
-		iError = WSAESHUTDOWN;
-		break;
+		case ESHUTDOWN:
+			iError = WSAESHUTDOWN;
+			break;
 
-	case ETOOMANYREFS:
-		iError = WSAETOOMANYREFS;
-		break;
+		case ETOOMANYREFS:
+			iError = WSAETOOMANYREFS;
+			break;
 
-	case ETIMEDOUT:
-		iError = WSAETIMEDOUT;
-		break;
+		case ETIMEDOUT:
+			iError = WSAETIMEDOUT;
+			break;
 
-	case ECONNREFUSED:
-		iError = WSAECONNREFUSED;
-		break;
+		case ECONNREFUSED:
+			iError = WSAECONNREFUSED;
+			break;
 
-	case ELOOP:
-		iError = WSAELOOP;
-		break;
+		case ELOOP:
+			iError = WSAELOOP;
+			break;
 
-	case ENAMETOOLONG:
-		iError = WSAENAMETOOLONG;
-		break;
+		case ENAMETOOLONG:
+			iError = WSAENAMETOOLONG;
+			break;
 
-	case EHOSTDOWN:
-		iError = WSAEHOSTDOWN;
-		break;
+		case EHOSTDOWN:
+			iError = WSAEHOSTDOWN;
+			break;
 
-	case EHOSTUNREACH:
-		iError = WSAEHOSTUNREACH;
-		break;
+		case EHOSTUNREACH:
+			iError = WSAEHOSTUNREACH;
+			break;
 
-	case ENOTEMPTY:
-		iError = WSAENOTEMPTY;
-		break;
-#	ifdef EPROCLIM
+		case ENOTEMPTY:
+			iError = WSAENOTEMPTY;
+			break;
+#ifdef EPROCLIM
 
-	case EPROCLIM:
-		iError = WSAEPROCLIM;
-		break;
-#	endif
+		case EPROCLIM:
+			iError = WSAEPROCLIM;
+			break;
+#endif
 
-	case EUSERS:
-		iError = WSAEUSERS;
-		break;
+		case EUSERS:
+			iError = WSAEUSERS;
+			break;
 
-	case EDQUOT:
-		iError = WSAEDQUOT;
-		break;
+		case EDQUOT:
+			iError = WSAEDQUOT;
+			break;
 
-	case ESTALE:
-		iError = WSAESTALE;
-		break;
+		case ESTALE:
+			iError = WSAESTALE;
+			break;
 
-	case EREMOTE:
-		iError = WSAEREMOTE;
-		break;
-		/* Special cases */
-#	if (EAGAIN != EWOULDBLOCK)
+		case EREMOTE:
+			iError = WSAEREMOTE;
+			break;
+			/* Special cases */
+#if (EAGAIN != EWOULDBLOCK)
 
-	case EAGAIN:
-		iError = WSAEWOULDBLOCK;
-		break;
-#	endif
-#	if defined(EPROTO)
+		case EAGAIN:
+			iError = WSAEWOULDBLOCK;
+			break;
+#endif
+#if defined(EPROTO)
 
-	case EPROTO:
-		iError = WSAECONNRESET;
-		break;
-#	endif
+		case EPROTO:
+			iError = WSAECONNRESET;
+			break;
+#endif
 	}
 
 	/**
@@ -820,7 +820,7 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer, DWORD cbInBuff
 	fd = (int)s;
 	pInterfaces = (INTERFACE_INFO*)lpvOutBuffer;
 	maxNumInterfaces = cbOutBuffer / sizeof(INTERFACE_INFO);
-#	ifdef WSAIOCTL_IFADDRS
+#ifdef WSAIOCTL_IFADDRS
 	{
 		struct ifaddrs* ifa = NULL;
 		struct ifaddrs* ifap = NULL;
@@ -911,7 +911,7 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer, DWORD cbInBuff
 		freeifaddrs(ifap);
 		return 0;
 	}
-#	endif
+#endif
 	ifconf.ifc_len = sizeof(buffer);
 	ifconf.ifc_buf = buffer;
 
@@ -987,11 +987,11 @@ int WSAIoctl(SOCKET s, DWORD dwIoControlCode, LPVOID lpvInBuffer, DWORD cbInBuff
 		inet_pton(ifreq->ifr_addr.sa_family, netmask, (void*)&pNetmask->sin_addr);
 		numInterfaces++;
 	next_ifreq:
-#	if !defined(__linux__) && !defined(__sun__) && !defined(__CYGWIN__)
+#if !defined(__linux__) && !defined(__sun__) && !defined(__CYGWIN__)
 		ifreq_len = IFNAMSIZ + ifreq->ifr_addr.sa_len;
-#	else
+#else
 		ifreq_len = sizeof(*ifreq);
-#	endif
+#endif
 		ifreq = (struct ifreq*)&((BYTE*)ifreq)[ifreq_len];
 		offset += ifreq_len;
 		index++;
@@ -1200,17 +1200,17 @@ int _shutdown(SOCKET s, int how)
 
 	switch (how)
 	{
-	case SD_RECEIVE:
-		s_how = SHUT_RD;
-		break;
+		case SD_RECEIVE:
+			s_how = SHUT_RD;
+			break;
 
-	case SD_SEND:
-		s_how = SHUT_WR;
-		break;
+		case SD_SEND:
+			s_how = SHUT_WR;
+			break;
 
-	case SD_BOTH:
-		s_how = SHUT_RDWR;
-		break;
+		case SD_BOTH:
+			s_how = SHUT_RDWR;
+			break;
 	}
 
 	if (s_how < 0)

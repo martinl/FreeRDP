@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -70,20 +70,20 @@ static void audin_pulse_context_state_callback(pa_context* context, void* userda
 
 	switch (state)
 	{
-	case PA_CONTEXT_READY:
-		WLog_Print(pulse->log, WLOG_DEBUG, "PA_CONTEXT_READY");
-		pa_threaded_mainloop_signal(pulse->mainloop, 0);
-		break;
+		case PA_CONTEXT_READY:
+			WLog_Print(pulse->log, WLOG_DEBUG, "PA_CONTEXT_READY");
+			pa_threaded_mainloop_signal(pulse->mainloop, 0);
+			break;
 
-	case PA_CONTEXT_FAILED:
-	case PA_CONTEXT_TERMINATED:
-		WLog_Print(pulse->log, WLOG_DEBUG, "state %d", state);
-		pa_threaded_mainloop_signal(pulse->mainloop, 0);
-		break;
+		case PA_CONTEXT_FAILED:
+		case PA_CONTEXT_TERMINATED:
+			WLog_Print(pulse->log, WLOG_DEBUG, "state %d", state);
+			pa_threaded_mainloop_signal(pulse->mainloop, 0);
+			break;
 
-	default:
-		WLog_Print(pulse->log, WLOG_DEBUG, "state %d", state);
-		break;
+		default:
+			WLog_Print(pulse->log, WLOG_DEBUG, "state %d", state);
+			break;
 	}
 }
 
@@ -186,29 +186,29 @@ static BOOL audin_pulse_format_supported(IAudinDevice* device, const AUDIO_FORMA
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		if (format->cbSize == 0 && (format->nSamplesPerSec <= PA_RATE_MAX) &&
-		    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
-		    (format->nChannels >= 1 && format->nChannels <= PA_CHANNELS_MAX))
-		{
-			return TRUE;
-		}
+		case WAVE_FORMAT_PCM:
+			if (format->cbSize == 0 && (format->nSamplesPerSec <= PA_RATE_MAX) &&
+			    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
+			    (format->nChannels >= 1 && format->nChannels <= PA_CHANNELS_MAX))
+			{
+				return TRUE;
+			}
 
-		break;
+			break;
 
-	case WAVE_FORMAT_ALAW:  /* A-LAW */
-	case WAVE_FORMAT_MULAW: /* U-LAW */
-		if (format->cbSize == 0 && (format->nSamplesPerSec <= PA_RATE_MAX) &&
-		    (format->wBitsPerSample == 8) &&
-		    (format->nChannels >= 1 && format->nChannels <= PA_CHANNELS_MAX))
-		{
-			return TRUE;
-		}
+		case WAVE_FORMAT_ALAW:  /* A-LAW */
+		case WAVE_FORMAT_MULAW: /* U-LAW */
+			if (format->cbSize == 0 && (format->nSamplesPerSec <= PA_RATE_MAX) &&
+			    (format->wBitsPerSample == 8) &&
+			    (format->nChannels >= 1 && format->nChannels <= PA_CHANNELS_MAX))
+			{
+				return TRUE;
+			}
 
-		break;
+			break;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	return FALSE;
@@ -239,33 +239,33 @@ static UINT audin_pulse_set_format(IAudinDevice* device, const AUDIO_FORMAT* for
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM: /* PCM */
-		switch (format->wBitsPerSample)
-		{
-		case 8:
-			sample_spec.format = PA_SAMPLE_U8;
+		case WAVE_FORMAT_PCM: /* PCM */
+			switch (format->wBitsPerSample)
+			{
+				case 8:
+					sample_spec.format = PA_SAMPLE_U8;
+					break;
+
+				case 16:
+					sample_spec.format = PA_SAMPLE_S16LE;
+					break;
+
+				default:
+					return ERROR_INTERNAL_ERROR;
+			}
+
 			break;
 
-		case 16:
-			sample_spec.format = PA_SAMPLE_S16LE;
+		case WAVE_FORMAT_ALAW: /* A-LAW */
+			sample_spec.format = PA_SAMPLE_ALAW;
+			break;
+
+		case WAVE_FORMAT_MULAW: /* U-LAW */
+			sample_spec.format = PA_SAMPLE_ULAW;
 			break;
 
 		default:
 			return ERROR_INTERNAL_ERROR;
-		}
-
-		break;
-
-	case WAVE_FORMAT_ALAW: /* A-LAW */
-		sample_spec.format = PA_SAMPLE_ALAW;
-		break;
-
-	case WAVE_FORMAT_MULAW: /* U-LAW */
-		sample_spec.format = PA_SAMPLE_ULAW;
-		break;
-
-	default:
-		return ERROR_INTERNAL_ERROR;
 	}
 
 	pulse->sample_spec = sample_spec;
@@ -281,20 +281,20 @@ static void audin_pulse_stream_state_callback(pa_stream* stream, void* userdata)
 
 	switch (state)
 	{
-	case PA_STREAM_READY:
-		WLog_Print(pulse->log, WLOG_DEBUG, "PA_STREAM_READY");
-		pa_threaded_mainloop_signal(pulse->mainloop, 0);
-		break;
+		case PA_STREAM_READY:
+			WLog_Print(pulse->log, WLOG_DEBUG, "PA_STREAM_READY");
+			pa_threaded_mainloop_signal(pulse->mainloop, 0);
+			break;
 
-	case PA_STREAM_FAILED:
-	case PA_STREAM_TERMINATED:
-		WLog_Print(pulse->log, WLOG_DEBUG, "state %d", state);
-		pa_threaded_mainloop_signal(pulse->mainloop, 0);
-		break;
+		case PA_STREAM_FAILED:
+		case PA_STREAM_TERMINATED:
+			WLog_Print(pulse->log, WLOG_DEBUG, "state %d", state);
+			pa_threaded_mainloop_signal(pulse->mainloop, 0);
+			break;
 
-	default:
-		WLog_Print(pulse->log, WLOG_DEBUG, "state %d", state);
-		break;
+		default:
+			WLog_Print(pulse->log, WLOG_DEBUG, "state %d", state);
+			break;
 	}
 }
 
@@ -467,9 +467,9 @@ static UINT audin_pulse_parse_addin_args(AudinPulseDevice* device, ADDIN_ARGV* a
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_audin_client_subsystem_entry pulse_freerdp_audin_client_subsystem_entry
+#define freerdp_audin_client_subsystem_entry pulse_freerdp_audin_client_subsystem_entry
 #else
-#	define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
+#define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
 #endif
 
 /**

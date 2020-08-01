@@ -84,7 +84,7 @@ struct _IWTSVirtualChannelManager
 {
 	/* Returns an instance of a listener object that listens on a specific
 	   endpoint, or creates a static channel. */
-	UINT (*CreateListener)
+	UINT(*CreateListener)
 	(IWTSVirtualChannelManager* pChannelMgr, const char* pszChannelName, ULONG ulFlags,
 	 IWTSListenerCallback* pListenerCallback, IWTSListener** ppListener);
 	/* Find the channel or ID to send data to a specific endpoint. */
@@ -121,7 +121,7 @@ struct _IWTSListenerCallback
 {
 	/* Accepts or denies a connection request for an incoming connection to
 	   the associated listener. */
-	UINT (*OnNewChannelConnection)
+	UINT(*OnNewChannelConnection)
 	(IWTSListenerCallback* pListenerCallback, IWTSVirtualChannel* pChannel, BYTE* Data,
 	 BOOL* pbAccept, IWTSVirtualChannelCallback** ppCallback);
 };
@@ -140,7 +140,7 @@ struct _IWTSVirtualChannelCallback
 typedef struct _IDRDYNVC_ENTRY_POINTS IDRDYNVC_ENTRY_POINTS;
 struct _IDRDYNVC_ENTRY_POINTS
 {
-	UINT (*RegisterPlugin)
+	UINT(*RegisterPlugin)
 	(IDRDYNVC_ENTRY_POINTS* pEntryPoints, const char* name, IWTSPlugin* pPlugin);
 	IWTSPlugin* (*GetPlugin)(IDRDYNVC_ENTRY_POINTS* pEntryPoints, const char* name);
 	ADDIN_ARGV* (*GetPluginData)(IDRDYNVC_ENTRY_POINTS* pEntryPoints);

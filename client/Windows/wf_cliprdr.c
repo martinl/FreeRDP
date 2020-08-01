@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #define CINTERFACE
@@ -48,12 +48,12 @@
 #define TAG CLIENT_TAG("windows")
 
 #ifdef WITH_DEBUG_CLIPRDR
-#	define DEBUG_CLIPRDR(...) WLog_DBG(TAG, __VA_ARGS__)
+#define DEBUG_CLIPRDR(...) WLog_DBG(TAG, __VA_ARGS__)
 #else
-#	define DEBUG_CLIPRDR(...) \
-		do                     \
-		{                      \
-		} while (0)
+#define DEBUG_CLIPRDR(...) \
+	do                     \
+	{                      \
+	} while (0)
 #endif
 
 typedef BOOL(WINAPI* fnAddClipboardFormatListener)(HWND hwnd);
@@ -278,20 +278,20 @@ static HRESULT STDMETHODCALLTYPE CliprdrStream_Seek(IStream* This, LARGE_INTEGER
 
 	switch (dwOrigin)
 	{
-	case STREAM_SEEK_SET:
-		newoffset = dlibMove.QuadPart;
-		break;
+		case STREAM_SEEK_SET:
+			newoffset = dlibMove.QuadPart;
+			break;
 
-	case STREAM_SEEK_CUR:
-		newoffset += dlibMove.QuadPart;
-		break;
+		case STREAM_SEEK_CUR:
+			newoffset += dlibMove.QuadPart;
+			break;
 
-	case STREAM_SEEK_END:
-		newoffset = instance->m_lSize.QuadPart + dlibMove.QuadPart;
-		break;
+		case STREAM_SEEK_END:
+			newoffset = instance->m_lSize.QuadPart + dlibMove.QuadPart;
+			break;
 
-	default:
-		return E_INVALIDARG;
+		default:
+			return E_INVALIDARG;
 	}
 
 	if (newoffset < 0 || newoffset >= instance->m_lSize.QuadPart)
@@ -372,22 +372,22 @@ static HRESULT STDMETHODCALLTYPE CliprdrStream_Stat(IStream* This, STATSTG* psta
 
 	switch (grfStatFlag)
 	{
-	case STATFLAG_DEFAULT:
-		return STG_E_INSUFFICIENTMEMORY;
+		case STATFLAG_DEFAULT:
+			return STG_E_INSUFFICIENTMEMORY;
 
-	case STATFLAG_NONAME:
-		pstatstg->cbSize.QuadPart = instance->m_lSize.QuadPart;
-		pstatstg->grfLocksSupported = LOCK_EXCLUSIVE;
-		pstatstg->grfMode = GENERIC_READ;
-		pstatstg->grfStateBits = 0;
-		pstatstg->type = STGTY_STREAM;
-		break;
+		case STATFLAG_NONAME:
+			pstatstg->cbSize.QuadPart = instance->m_lSize.QuadPart;
+			pstatstg->grfLocksSupported = LOCK_EXCLUSIVE;
+			pstatstg->grfMode = GENERIC_READ;
+			pstatstg->grfStateBits = 0;
+			pstatstg->type = STGTY_STREAM;
+			break;
 
-	case STATFLAG_NOOPEN:
-		return STG_E_INVALIDFLAG;
+		case STATFLAG_NOOPEN:
+			return STG_E_INVALIDFLAG;
 
-	default:
-		return STG_E_INVALIDFLAG;
+		default:
+			return STG_E_INVALIDFLAG;
 	}
 
 	return S_OK;
@@ -1350,153 +1350,153 @@ static LRESULT CALLBACK cliprdr_proc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM 
 
 	switch (Msg)
 	{
-	case WM_CREATE:
-		DEBUG_CLIPRDR("info: WM_CREATE");
-		clipboard = (wfClipboard*)((CREATESTRUCT*)lParam)->lpCreateParams;
-		clipboard->hwnd = hWnd;
+		case WM_CREATE:
+			DEBUG_CLIPRDR("info: WM_CREATE");
+			clipboard = (wfClipboard*)((CREATESTRUCT*)lParam)->lpCreateParams;
+			clipboard->hwnd = hWnd;
 
-		if (!clipboard->legacyApi)
-			clipboard->AddClipboardFormatListener(hWnd);
-		else
-			clipboard->hWndNextViewer = SetClipboardViewer(hWnd);
+			if (!clipboard->legacyApi)
+				clipboard->AddClipboardFormatListener(hWnd);
+			else
+				clipboard->hWndNextViewer = SetClipboardViewer(hWnd);
 
-		break;
+			break;
 
-	case WM_CLOSE:
-		DEBUG_CLIPRDR("info: WM_CLOSE");
+		case WM_CLOSE:
+			DEBUG_CLIPRDR("info: WM_CLOSE");
 
-		if (!clipboard->legacyApi)
-			clipboard->RemoveClipboardFormatListener(hWnd);
+			if (!clipboard->legacyApi)
+				clipboard->RemoveClipboardFormatListener(hWnd);
 
-		break;
+			break;
 
-	case WM_DESTROY:
-		if (clipboard->legacyApi)
-			ChangeClipboardChain(hWnd, clipboard->hWndNextViewer);
+		case WM_DESTROY:
+			if (clipboard->legacyApi)
+				ChangeClipboardChain(hWnd, clipboard->hWndNextViewer);
 
-		break;
+			break;
 
-	case WM_CLIPBOARDUPDATE:
-		DEBUG_CLIPRDR("info: WM_CLIPBOARDUPDATE");
+		case WM_CLIPBOARDUPDATE:
+			DEBUG_CLIPRDR("info: WM_CLIPBOARDUPDATE");
 
-		if (clipboard->sync)
-		{
-			if ((GetClipboardOwner() != clipboard->hwnd) &&
-			    (S_FALSE == OleIsCurrentClipboard(clipboard->data_obj)))
+			if (clipboard->sync)
 			{
+				if ((GetClipboardOwner() != clipboard->hwnd) &&
+				    (S_FALSE == OleIsCurrentClipboard(clipboard->data_obj)))
+				{
+					if (clipboard->hmem)
+					{
+						GlobalFree(clipboard->hmem);
+						clipboard->hmem = NULL;
+					}
+
+					cliprdr_send_format_list(clipboard);
+				}
+			}
+
+			break;
+
+		case WM_RENDERALLFORMATS:
+			DEBUG_CLIPRDR("info: WM_RENDERALLFORMATS");
+
+			/* discard all contexts in clipboard */
+			if (!OpenClipboard(clipboard->hwnd))
+			{
+				DEBUG_CLIPRDR("OpenClipboard failed with 0x%x", GetLastError());
+				break;
+			}
+
+			EmptyClipboard();
+			CloseClipboard();
+			break;
+
+		case WM_RENDERFORMAT:
+			DEBUG_CLIPRDR("info: WM_RENDERFORMAT");
+
+			if (cliprdr_send_data_request(clipboard, (UINT32)wParam) != 0)
+			{
+				DEBUG_CLIPRDR("error: cliprdr_send_data_request failed.");
+				break;
+			}
+
+			if (!SetClipboardData((UINT)wParam, clipboard->hmem))
+			{
+				DEBUG_CLIPRDR("SetClipboardData failed with 0x%x", GetLastError());
+
 				if (clipboard->hmem)
 				{
 					GlobalFree(clipboard->hmem);
 					clipboard->hmem = NULL;
 				}
-
-				cliprdr_send_format_list(clipboard);
 			}
-		}
 
-		break;
-
-	case WM_RENDERALLFORMATS:
-		DEBUG_CLIPRDR("info: WM_RENDERALLFORMATS");
-
-		/* discard all contexts in clipboard */
-		if (!OpenClipboard(clipboard->hwnd))
-		{
-			DEBUG_CLIPRDR("OpenClipboard failed with 0x%x", GetLastError());
+			/* Note: GlobalFree() is not needed when success */
 			break;
-		}
 
-		EmptyClipboard();
-		CloseClipboard();
-		break;
-
-	case WM_RENDERFORMAT:
-		DEBUG_CLIPRDR("info: WM_RENDERFORMAT");
-
-		if (cliprdr_send_data_request(clipboard, (UINT32)wParam) != 0)
-		{
-			DEBUG_CLIPRDR("error: cliprdr_send_data_request failed.");
-			break;
-		}
-
-		if (!SetClipboardData((UINT)wParam, clipboard->hmem))
-		{
-			DEBUG_CLIPRDR("SetClipboardData failed with 0x%x", GetLastError());
-
-			if (clipboard->hmem)
+		case WM_DRAWCLIPBOARD:
+			if (clipboard->legacyApi)
 			{
-				GlobalFree(clipboard->hmem);
-				clipboard->hmem = NULL;
-			}
-		}
-
-		/* Note: GlobalFree() is not needed when success */
-		break;
-
-	case WM_DRAWCLIPBOARD:
-		if (clipboard->legacyApi)
-		{
-			if ((GetClipboardOwner() != clipboard->hwnd) &&
-			    (S_FALSE == OleIsCurrentClipboard(clipboard->data_obj)))
-			{
-				cliprdr_send_format_list(clipboard);
-			}
-
-			SendMessage(clipboard->hWndNextViewer, Msg, wParam, lParam);
-		}
-
-		break;
-
-	case WM_CHANGECBCHAIN:
-		if (clipboard->legacyApi)
-		{
-			HWND hWndCurrViewer = (HWND)wParam;
-			HWND hWndNextViewer = (HWND)lParam;
-
-			if (hWndCurrViewer == clipboard->hWndNextViewer)
-				clipboard->hWndNextViewer = hWndNextViewer;
-			else if (clipboard->hWndNextViewer)
-				SendMessage(clipboard->hWndNextViewer, Msg, wParam, lParam);
-		}
-
-		break;
-
-	case WM_CLIPRDR_MESSAGE:
-		DEBUG_CLIPRDR("info: WM_CLIPRDR_MESSAGE");
-
-		switch (wParam)
-		{
-		case OLE_SETCLIPBOARD:
-			DEBUG_CLIPRDR("info: OLE_SETCLIPBOARD");
-
-			if (S_FALSE == OleIsCurrentClipboard(clipboard->data_obj))
-			{
-				if (wf_create_file_obj(clipboard, &clipboard->data_obj))
+				if ((GetClipboardOwner() != clipboard->hwnd) &&
+				    (S_FALSE == OleIsCurrentClipboard(clipboard->data_obj)))
 				{
-					if (OleSetClipboard(clipboard->data_obj) != S_OK)
-					{
-						wf_destroy_file_obj(clipboard->data_obj);
-						clipboard->data_obj = NULL;
-					}
+					cliprdr_send_format_list(clipboard);
 				}
+
+				SendMessage(clipboard->hWndNextViewer, Msg, wParam, lParam);
 			}
 
 			break;
 
-		default:
+		case WM_CHANGECBCHAIN:
+			if (clipboard->legacyApi)
+			{
+				HWND hWndCurrViewer = (HWND)wParam;
+				HWND hWndNextViewer = (HWND)lParam;
+
+				if (hWndCurrViewer == clipboard->hWndNextViewer)
+					clipboard->hWndNextViewer = hWndNextViewer;
+				else if (clipboard->hWndNextViewer)
+					SendMessage(clipboard->hWndNextViewer, Msg, wParam, lParam);
+			}
+
 			break;
-		}
 
-		break;
+		case WM_CLIPRDR_MESSAGE:
+			DEBUG_CLIPRDR("info: WM_CLIPRDR_MESSAGE");
 
-	case WM_DESTROYCLIPBOARD:
-	case WM_ASKCBFORMATNAME:
-	case WM_HSCROLLCLIPBOARD:
-	case WM_PAINTCLIPBOARD:
-	case WM_SIZECLIPBOARD:
-	case WM_VSCROLLCLIPBOARD:
-	default:
-		return DefWindowProc(hWnd, Msg, wParam, lParam);
+			switch (wParam)
+			{
+				case OLE_SETCLIPBOARD:
+					DEBUG_CLIPRDR("info: OLE_SETCLIPBOARD");
+
+					if (S_FALSE == OleIsCurrentClipboard(clipboard->data_obj))
+					{
+						if (wf_create_file_obj(clipboard, &clipboard->data_obj))
+						{
+							if (OleSetClipboard(clipboard->data_obj) != S_OK)
+							{
+								wf_destroy_file_obj(clipboard->data_obj);
+								clipboard->data_obj = NULL;
+							}
+						}
+					}
+
+					break;
+
+				default:
+					break;
+			}
+
+			break;
+
+		case WM_DESTROYCLIPBOARD:
+		case WM_ASKCBFORMATNAME:
+		case WM_HSCROLLCLIPBOARD:
+		case WM_PAINTCLIPBOARD:
+		case WM_SIZECLIPBOARD:
+		case WM_VSCROLLCLIPBOARD:
+		default:
+			return DefWindowProc(hWnd, Msg, wParam, lParam);
 	}
 
 	return 0;

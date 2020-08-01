@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <ApplicationServices/ApplicationServices.h>
@@ -306,45 +306,45 @@ BOOL mf_input_keyboard_event(rdpInput* input, UINT16 flags, UINT16 code)
 	{
 		switch (code)
 		{
-		// case 0x52: //insert
-		case 0x53:
-			kCode = kVK_ForwardDelete;
-			break;
+			// case 0x52: //insert
+			case 0x53:
+				kCode = kVK_ForwardDelete;
+				break;
 
-		case 0x4B:
-			kCode = kVK_LeftArrow;
-			break;
+			case 0x4B:
+				kCode = kVK_LeftArrow;
+				break;
 
-		case 0x47:
-			kCode = kVK_Home;
-			break;
+			case 0x47:
+				kCode = kVK_Home;
+				break;
 
-		case 0x4F:
-			kCode = kVK_End;
-			break;
+			case 0x4F:
+				kCode = kVK_End;
+				break;
 
-		case 0x48:
-			kCode = kVK_UpArrow;
-			break;
+			case 0x48:
+				kCode = kVK_UpArrow;
+				break;
 
-		case 0x50:
-			kCode = kVK_DownArrow;
-			break;
+			case 0x50:
+				kCode = kVK_DownArrow;
+				break;
 
-		case 0x49:
-			kCode = kVK_PageUp;
-			break;
+			case 0x49:
+				kCode = kVK_PageUp;
+				break;
 
-		case 0x51:
-			kCode = kVK_PageDown;
-			break;
+			case 0x51:
+				kCode = kVK_PageDown;
+				break;
 
-		case 0x4D:
-			kCode = kVK_RightArrow;
-			break;
+			case 0x4D:
+				kCode = kVK_RightArrow;
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 	else

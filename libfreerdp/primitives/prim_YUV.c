@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/types.h>
@@ -277,17 +277,17 @@ static pstatus_t general_YUV420CombineToYUV444(avc444_frame_type type, const BYT
 
 	switch (type)
 	{
-	case AVC444_LUMA:
-		return general_LumaToYUV444(pSrc, srcStep, pDst, dstStep, roi);
+		case AVC444_LUMA:
+			return general_LumaToYUV444(pSrc, srcStep, pDst, dstStep, roi);
 
-	case AVC444_CHROMAv1:
-		return general_ChromaV1ToYUV444(pSrc, srcStep, pDst, dstStep, roi);
+		case AVC444_CHROMAv1:
+			return general_ChromaV1ToYUV444(pSrc, srcStep, pDst, dstStep, roi);
 
-	case AVC444_CHROMAv2:
-		return general_ChromaV2ToYUV444(pSrc, srcStep, nWidth, nHeight, pDst, dstStep, roi);
+		case AVC444_CHROMAv2:
+			return general_ChromaV2ToYUV444(pSrc, srcStep, nWidth, nHeight, pDst, dstStep, roi);
 
-	default:
-		return -1;
+		default:
+			return -1;
 	}
 }
 
@@ -448,12 +448,13 @@ static pstatus_t general_YUV444ToRGB_8u_P3AC4R(const BYTE* pSrc[3], const UINT32
 {
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return general_YUV444ToRGB_8u_P3AC4R_BGRX(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return general_YUV444ToRGB_8u_P3AC4R_BGRX(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
 
-	default:
-		return general_YUV444ToRGB_8u_P3AC4R_general(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		default:
+			return general_YUV444ToRGB_8u_P3AC4R_general(pSrc, srcStep, pDst, dstStep, DstFormat,
+			                                             roi);
 	}
 }
 /**
@@ -851,16 +852,16 @@ static pstatus_t general_RGBToYUV420_8u_P3AC4R(const BYTE* pSrc, UINT32 srcForma
 {
 	switch (srcFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return general_RGBToYUV420_BGRX(pSrc, srcStep, pDst, dstStep, roi);
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return general_RGBToYUV420_BGRX(pSrc, srcStep, pDst, dstStep, roi);
 
-	case PIXEL_FORMAT_RGBA32:
-	case PIXEL_FORMAT_RGBX32:
-		return general_RGBToYUV420_RGBX(pSrc, srcStep, pDst, dstStep, roi);
+		case PIXEL_FORMAT_RGBA32:
+		case PIXEL_FORMAT_RGBX32:
+			return general_RGBToYUV420_RGBX(pSrc, srcStep, pDst, dstStep, roi);
 
-	default:
-		return general_RGBToYUV420_ANY(pSrc, srcFormat, srcStep, pDst, dstStep, roi);
+		default:
+			return general_RGBToYUV420_ANY(pSrc, srcFormat, srcStep, pDst, dstStep, roi);
 	}
 }
 
@@ -1333,17 +1334,19 @@ static INLINE pstatus_t general_RGBToAVC444YUV(const BYTE* pSrc, UINT32 srcForma
 
 	switch (srcFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return general_RGBToAVC444YUV_BGRX(pSrc, srcStep, pDst1, dst1Step, pDst2, dst2Step, roi);
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return general_RGBToAVC444YUV_BGRX(pSrc, srcStep, pDst1, dst1Step, pDst2, dst2Step,
+			                                   roi);
 
-	case PIXEL_FORMAT_RGBA32:
-	case PIXEL_FORMAT_RGBX32:
-		return general_RGBToAVC444YUV_RGBX(pSrc, srcStep, pDst1, dst1Step, pDst2, dst2Step, roi);
+		case PIXEL_FORMAT_RGBA32:
+		case PIXEL_FORMAT_RGBX32:
+			return general_RGBToAVC444YUV_RGBX(pSrc, srcStep, pDst1, dst1Step, pDst2, dst2Step,
+			                                   roi);
 
-	default:
-		return general_RGBToAVC444YUV_ANY(pSrc, srcFormat, srcStep, pDst1, dst1Step, pDst2,
-		                                  dst2Step, roi);
+		default:
+			return general_RGBToAVC444YUV_ANY(pSrc, srcFormat, srcStep, pDst1, dst1Step, pDst2,
+			                                  dst2Step, roi);
 	}
 
 	return !PRIMITIVES_SUCCESS;
@@ -1724,13 +1727,14 @@ static INLINE pstatus_t general_RGBToAVC444YUVv2(const BYTE* pSrc, UINT32 srcFor
 {
 	switch (srcFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return general_RGBToAVC444YUVv2_BGRX(pSrc, srcStep, pDst1, dst1Step, pDst2, dst2Step, roi);
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return general_RGBToAVC444YUVv2_BGRX(pSrc, srcStep, pDst1, dst1Step, pDst2, dst2Step,
+			                                     roi);
 
-	default:
-		return general_RGBToAVC444YUVv2_ANY(pSrc, srcFormat, srcStep, pDst1, dst1Step, pDst2,
-		                                    dst2Step, roi);
+		default:
+			return general_RGBToAVC444YUVv2_ANY(pSrc, srcFormat, srcStep, pDst1, dst1Step, pDst2,
+			                                    dst2Step, roi);
 	}
 
 	return !PRIMITIVES_SUCCESS;

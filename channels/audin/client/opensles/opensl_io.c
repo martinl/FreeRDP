@@ -117,56 +117,56 @@ static SLresult openSLRecOpen(OPENSL_STREAM* p)
 	{
 		switch (sr)
 		{
-		case 8000:
-			sr = SL_SAMPLINGRATE_8;
-			break;
+			case 8000:
+				sr = SL_SAMPLINGRATE_8;
+				break;
 
-		case 11025:
-			sr = SL_SAMPLINGRATE_11_025;
-			break;
+			case 11025:
+				sr = SL_SAMPLINGRATE_11_025;
+				break;
 
-		case 16000:
-			sr = SL_SAMPLINGRATE_16;
-			break;
+			case 16000:
+				sr = SL_SAMPLINGRATE_16;
+				break;
 
-		case 22050:
-			sr = SL_SAMPLINGRATE_22_05;
-			break;
+			case 22050:
+				sr = SL_SAMPLINGRATE_22_05;
+				break;
 
-		case 24000:
-			sr = SL_SAMPLINGRATE_24;
-			break;
+			case 24000:
+				sr = SL_SAMPLINGRATE_24;
+				break;
 
-		case 32000:
-			sr = SL_SAMPLINGRATE_32;
-			break;
+			case 32000:
+				sr = SL_SAMPLINGRATE_32;
+				break;
 
-		case 44100:
-			sr = SL_SAMPLINGRATE_44_1;
-			break;
+			case 44100:
+				sr = SL_SAMPLINGRATE_44_1;
+				break;
 
-		case 48000:
-			sr = SL_SAMPLINGRATE_48;
-			break;
+			case 48000:
+				sr = SL_SAMPLINGRATE_48;
+				break;
 
-		case 64000:
-			sr = SL_SAMPLINGRATE_64;
-			break;
+			case 64000:
+				sr = SL_SAMPLINGRATE_64;
+				break;
 
-		case 88200:
-			sr = SL_SAMPLINGRATE_88_2;
-			break;
+			case 88200:
+				sr = SL_SAMPLINGRATE_88_2;
+				break;
 
-		case 96000:
-			sr = SL_SAMPLINGRATE_96;
-			break;
+			case 96000:
+				sr = SL_SAMPLINGRATE_96;
+				break;
 
-		case 192000:
-			sr = SL_SAMPLINGRATE_192;
-			break;
+			case 192000:
+				sr = SL_SAMPLINGRATE_192;
+				break;
 
-		default:
-			return -1;
+			default:
+				return -1;
 		}
 
 		// configure audio source

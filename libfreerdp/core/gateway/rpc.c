@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -34,7 +34,7 @@
 #include <openssl/bio.h>
 
 #ifdef HAVE_VALGRIND_MEMCHECK_H
-#	include <valgrind/memcheck.h>
+#include <valgrind/memcheck.h>
 #endif
 
 #include "../proxy.h"
@@ -253,25 +253,25 @@ BOOL rpc_get_stub_data_info(rdpRpc* rpc, BYTE* buffer, UINT32* offset, UINT32* l
 
 	switch (header->common.ptype)
 	{
-	case PTYPE_RESPONSE:
-		*offset += 8;
-		rpc_offset_align(offset, 8);
-		alloc_hint = header->response.alloc_hint;
-		break;
+		case PTYPE_RESPONSE:
+			*offset += 8;
+			rpc_offset_align(offset, 8);
+			alloc_hint = header->response.alloc_hint;
+			break;
 
-	case PTYPE_REQUEST:
-		*offset += 4;
-		rpc_offset_align(offset, 8);
-		alloc_hint = header->request.alloc_hint;
-		break;
+		case PTYPE_REQUEST:
+			*offset += 4;
+			rpc_offset_align(offset, 8);
+			alloc_hint = header->request.alloc_hint;
+			break;
 
-	case PTYPE_RTS:
-		*offset += 4;
-		break;
+		case PTYPE_RTS:
+			*offset += 4;
+			break;
 
-	default:
-		WLog_ERR(TAG, "Unknown PTYPE: 0x%02" PRIX8 "", header->common.ptype);
-		return FALSE;
+		default:
+			WLog_ERR(TAG, "Unknown PTYPE: 0x%02" PRIX8 "", header->common.ptype);
+			return FALSE;
 	}
 
 	if (!length)
@@ -353,33 +353,33 @@ BOOL rpc_in_channel_transition_to_state(RpcInChannel* inChannel, CLIENT_IN_CHANN
 
 	switch (state)
 	{
-	case CLIENT_IN_CHANNEL_STATE_INITIAL:
-		str = "CLIENT_IN_CHANNEL_STATE_INITIAL";
-		break;
+		case CLIENT_IN_CHANNEL_STATE_INITIAL:
+			str = "CLIENT_IN_CHANNEL_STATE_INITIAL";
+			break;
 
-	case CLIENT_IN_CHANNEL_STATE_CONNECTED:
-		str = "CLIENT_IN_CHANNEL_STATE_CONNECTED";
-		break;
+		case CLIENT_IN_CHANNEL_STATE_CONNECTED:
+			str = "CLIENT_IN_CHANNEL_STATE_CONNECTED";
+			break;
 
-	case CLIENT_IN_CHANNEL_STATE_SECURITY:
-		str = "CLIENT_IN_CHANNEL_STATE_SECURITY";
-		break;
+		case CLIENT_IN_CHANNEL_STATE_SECURITY:
+			str = "CLIENT_IN_CHANNEL_STATE_SECURITY";
+			break;
 
-	case CLIENT_IN_CHANNEL_STATE_NEGOTIATED:
-		str = "CLIENT_IN_CHANNEL_STATE_NEGOTIATED";
-		break;
+		case CLIENT_IN_CHANNEL_STATE_NEGOTIATED:
+			str = "CLIENT_IN_CHANNEL_STATE_NEGOTIATED";
+			break;
 
-	case CLIENT_IN_CHANNEL_STATE_OPENED:
-		str = "CLIENT_IN_CHANNEL_STATE_OPENED";
-		break;
+		case CLIENT_IN_CHANNEL_STATE_OPENED:
+			str = "CLIENT_IN_CHANNEL_STATE_OPENED";
+			break;
 
-	case CLIENT_IN_CHANNEL_STATE_OPENED_A4W:
-		str = "CLIENT_IN_CHANNEL_STATE_OPENED_A4W";
-		break;
+		case CLIENT_IN_CHANNEL_STATE_OPENED_A4W:
+			str = "CLIENT_IN_CHANNEL_STATE_OPENED_A4W";
+			break;
 
-	case CLIENT_IN_CHANNEL_STATE_FINAL:
-		str = "CLIENT_IN_CHANNEL_STATE_FINAL";
-		break;
+		case CLIENT_IN_CHANNEL_STATE_FINAL:
+			str = "CLIENT_IN_CHANNEL_STATE_FINAL";
+			break;
 	}
 
 	if (!inChannel)
@@ -471,45 +471,45 @@ BOOL rpc_out_channel_transition_to_state(RpcOutChannel* outChannel, CLIENT_OUT_C
 
 	switch (state)
 	{
-	case CLIENT_OUT_CHANNEL_STATE_INITIAL:
-		str = "CLIENT_OUT_CHANNEL_STATE_INITIAL";
-		break;
+		case CLIENT_OUT_CHANNEL_STATE_INITIAL:
+			str = "CLIENT_OUT_CHANNEL_STATE_INITIAL";
+			break;
 
-	case CLIENT_OUT_CHANNEL_STATE_CONNECTED:
-		str = "CLIENT_OUT_CHANNEL_STATE_CONNECTED";
-		break;
+		case CLIENT_OUT_CHANNEL_STATE_CONNECTED:
+			str = "CLIENT_OUT_CHANNEL_STATE_CONNECTED";
+			break;
 
-	case CLIENT_OUT_CHANNEL_STATE_SECURITY:
-		str = "CLIENT_OUT_CHANNEL_STATE_SECURITY";
-		break;
+		case CLIENT_OUT_CHANNEL_STATE_SECURITY:
+			str = "CLIENT_OUT_CHANNEL_STATE_SECURITY";
+			break;
 
-	case CLIENT_OUT_CHANNEL_STATE_NEGOTIATED:
-		str = "CLIENT_OUT_CHANNEL_STATE_NEGOTIATED";
-		break;
+		case CLIENT_OUT_CHANNEL_STATE_NEGOTIATED:
+			str = "CLIENT_OUT_CHANNEL_STATE_NEGOTIATED";
+			break;
 
-	case CLIENT_OUT_CHANNEL_STATE_OPENED:
-		str = "CLIENT_OUT_CHANNEL_STATE_OPENED";
-		break;
+		case CLIENT_OUT_CHANNEL_STATE_OPENED:
+			str = "CLIENT_OUT_CHANNEL_STATE_OPENED";
+			break;
 
-	case CLIENT_OUT_CHANNEL_STATE_OPENED_A6W:
-		str = "CLIENT_OUT_CHANNEL_STATE_OPENED_A6W";
-		break;
+		case CLIENT_OUT_CHANNEL_STATE_OPENED_A6W:
+			str = "CLIENT_OUT_CHANNEL_STATE_OPENED_A6W";
+			break;
 
-	case CLIENT_OUT_CHANNEL_STATE_OPENED_A10W:
-		str = "CLIENT_OUT_CHANNEL_STATE_OPENED_A10W";
-		break;
+		case CLIENT_OUT_CHANNEL_STATE_OPENED_A10W:
+			str = "CLIENT_OUT_CHANNEL_STATE_OPENED_A10W";
+			break;
 
-	case CLIENT_OUT_CHANNEL_STATE_OPENED_B3W:
-		str = "CLIENT_OUT_CHANNEL_STATE_OPENED_B3W";
-		break;
+		case CLIENT_OUT_CHANNEL_STATE_OPENED_B3W:
+			str = "CLIENT_OUT_CHANNEL_STATE_OPENED_B3W";
+			break;
 
-	case CLIENT_OUT_CHANNEL_STATE_RECYCLED:
-		str = "CLIENT_OUT_CHANNEL_STATE_RECYCLED";
-		break;
+		case CLIENT_OUT_CHANNEL_STATE_RECYCLED:
+			str = "CLIENT_OUT_CHANNEL_STATE_RECYCLED";
+			break;
 
-	case CLIENT_OUT_CHANNEL_STATE_FINAL:
-		str = "CLIENT_OUT_CHANNEL_STATE_FINAL";
-		break;
+		case CLIENT_OUT_CHANNEL_STATE_FINAL:
+			str = "CLIENT_OUT_CHANNEL_STATE_FINAL";
+			break;
 	}
 
 	if (!outChannel)
@@ -555,29 +555,29 @@ BOOL rpc_virtual_connection_transition_to_state(rdpRpc* rpc, RpcVirtualConnectio
 
 	switch (state)
 	{
-	case VIRTUAL_CONNECTION_STATE_INITIAL:
-		str = "VIRTUAL_CONNECTION_STATE_INITIAL";
-		break;
+		case VIRTUAL_CONNECTION_STATE_INITIAL:
+			str = "VIRTUAL_CONNECTION_STATE_INITIAL";
+			break;
 
-	case VIRTUAL_CONNECTION_STATE_OUT_CHANNEL_WAIT:
-		str = "VIRTUAL_CONNECTION_STATE_OUT_CHANNEL_WAIT";
-		break;
+		case VIRTUAL_CONNECTION_STATE_OUT_CHANNEL_WAIT:
+			str = "VIRTUAL_CONNECTION_STATE_OUT_CHANNEL_WAIT";
+			break;
 
-	case VIRTUAL_CONNECTION_STATE_WAIT_A3W:
-		str = "VIRTUAL_CONNECTION_STATE_WAIT_A3W";
-		break;
+		case VIRTUAL_CONNECTION_STATE_WAIT_A3W:
+			str = "VIRTUAL_CONNECTION_STATE_WAIT_A3W";
+			break;
 
-	case VIRTUAL_CONNECTION_STATE_WAIT_C2:
-		str = "VIRTUAL_CONNECTION_STATE_WAIT_C2";
-		break;
+		case VIRTUAL_CONNECTION_STATE_WAIT_C2:
+			str = "VIRTUAL_CONNECTION_STATE_WAIT_C2";
+			break;
 
-	case VIRTUAL_CONNECTION_STATE_OPENED:
-		str = "VIRTUAL_CONNECTION_STATE_OPENED";
-		break;
+		case VIRTUAL_CONNECTION_STATE_OPENED:
+			str = "VIRTUAL_CONNECTION_STATE_OPENED";
+			break;
 
-	case VIRTUAL_CONNECTION_STATE_FINAL:
-		str = "VIRTUAL_CONNECTION_STATE_FINAL";
-		break;
+		case VIRTUAL_CONNECTION_STATE_FINAL:
+			str = "VIRTUAL_CONNECTION_STATE_FINAL";
+			break;
 	}
 
 	if (!connection)

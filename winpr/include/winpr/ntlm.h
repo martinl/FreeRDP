@@ -56,13 +56,13 @@ extern "C"
 #endif
 
 #ifdef UNICODE
-#	define NTOWFv1 NTOWFv1W
-#	define NTOWFv2 NTOWFv2W
-#	define NTOWFv2FromHash NTOWFv2FromHashW
+#define NTOWFv1 NTOWFv1W
+#define NTOWFv2 NTOWFv2W
+#define NTOWFv2FromHash NTOWFv2FromHashW
 #else
-#	define NTOWFv1 NTOWFv1A
-#	define NTOWFv2 NTOWFv2A
-#	define NTOWFv2FromHash NTOWFv2FromHashA
+#define NTOWFv1 NTOWFv1A
+#define NTOWFv2 NTOWFv2A
+#define NTOWFv2FromHash NTOWFv2FromHashA
 #endif
 
 #endif /* WINPR_UTILS_NTLM_H */

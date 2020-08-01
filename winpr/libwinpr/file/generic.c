@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -28,49 +28,49 @@
 #include <winpr/file.h>
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 #ifdef HAVE_FCNTL_H
-#	include <fcntl.h>
+#include <fcntl.h>
 #endif
 
 #include "../log.h"
 #define TAG WINPR_TAG("file")
 
 #ifdef _WIN32
-#	include <io.h>
-#	include <sys/stat.h>
+#include <io.h>
+#include <sys/stat.h>
 #else
-#	include <assert.h>
-#	include <pthread.h>
-#	include <dirent.h>
-#	include <libgen.h>
-#	include <errno.h>
+#include <assert.h>
+#include <pthread.h>
+#include <dirent.h>
+#include <libgen.h>
+#include <errno.h>
 
-#	include <sys/un.h>
-#	include <sys/stat.h>
-#	include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
 
-#	ifdef HAVE_AIO_H
-#		undef HAVE_AIO_H /* disable for now, incomplete */
-#	endif
+#ifdef HAVE_AIO_H
+#undef HAVE_AIO_H /* disable for now, incomplete */
+#endif
 
-#	ifdef HAVE_AIO_H
-#		include <aio.h>
-#	endif
+#ifdef HAVE_AIO_H
+#include <aio.h>
+#endif
 
-#	ifdef ANDROID
-#		include <sys/vfs.h>
-#	else
-#		include <sys/statvfs.h>
-#	endif
+#ifdef ANDROID
+#include <sys/vfs.h>
+#else
+#include <sys/statvfs.h>
+#endif
 
-#	include "../handle/handle.h"
+#include "../handle/handle.h"
 
-#	include "../pipe/pipe.h"
+#include "../pipe/pipe.h"
 
-#	include "file.h"
+#include "file.h"
 
 /**
  * api-ms-win-core-file-l1-2-0.dll:
@@ -176,8 +176,8 @@
  * http://code.google.com/p/kernel/wiki/AIOUserGuide
  */
 
-#	define EPOCH_DIFF 11644473600LL
-#	define STAT_TIME_TO_FILETIME(_t) (((UINT64)(_t) + EPOCH_DIFF) * 10000000LL)
+#define EPOCH_DIFF 11644473600LL
+#define STAT_TIME_TO_FILETIME(_t) (((UINT64)(_t) + EPOCH_DIFF) * 10000000LL)
 
 static wArrayList* _HandleCreators;
 
@@ -185,9 +185,9 @@ static pthread_once_t _HandleCreatorsInitialized = PTHREAD_ONCE_INIT;
 
 HANDLE_CREATOR* GetNamedPipeClientHandleCreator(void);
 
-#	if defined __linux__ && !defined ANDROID
+#if defined __linux__ && !defined ANDROID
 HANDLE_CREATOR* GetCommHandleCreator(void);
-#	endif /* __linux__ && !defined ANDROID */
+#endif /* __linux__ && !defined ANDROID */
 
 static void _HandleCreatorsInit()
 {
@@ -201,13 +201,13 @@ static void _HandleCreatorsInit()
 	 * Register all file handle creators.
 	 */
 	ArrayList_Add(_HandleCreators, GetNamedPipeClientHandleCreator());
-#	if defined __linux__ && !defined ANDROID
+#if defined __linux__ && !defined ANDROID
 	ArrayList_Add(_HandleCreators, GetCommHandleCreator());
-#	endif /* __linux__ && !defined ANDROID */
+#endif /* __linux__ && !defined ANDROID */
 	ArrayList_Add(_HandleCreators, GetFileHandleCreator());
 }
 
-#	ifdef HAVE_AIO_H
+#ifdef HAVE_AIO_H
 
 static BOOL g_AioSignalHandlerInstalled = FALSE;
 
@@ -232,7 +232,7 @@ int InstallAioSignalHandler()
 	return 0;
 }
 
-#	endif /* HAVE_AIO_H */
+#endif /* HAVE_AIO_H */
 
 HANDLE CreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
                    LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
@@ -811,11 +811,11 @@ static BOOL FindDataFromStat(const char* path, const struct stat* fileStat,
 	if (!(fileStat->st_mode & S_IWUSR))
 		lpFindFileData->dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
 
-#	ifdef _DARWIN_FEATURE_64_BIT_INODE
+#ifdef _DARWIN_FEATURE_64_BIT_INODE
 	ft = STAT_TIME_TO_FILETIME(fileStat->st_birthtime);
-#	else
+#else
 	ft = STAT_TIME_TO_FILETIME(fileStat->st_ctime);
-#	endif
+#endif
 	lpFindFileData->ftCreationTime.dwHighDateTime = ((UINT64)ft) >> 32ULL;
 	lpFindFileData->ftCreationTime.dwLowDateTime = ft & 0xFFFFFFFF;
 	ft = STAT_TIME_TO_FILETIME(fileStat->st_mtime);
@@ -1143,12 +1143,12 @@ BOOL FindClose(HANDLE hFindFile)
 	/* Since INVALID_HANDLE_VALUE != NULL the analyzer guesses that there
 	 * is a initialized HANDLE that is not freed properly.
 	 * Disable this return to stop confusing the analyzer. */
-#	ifndef __clang_analyzer__
+#ifndef __clang_analyzer__
 
 	if (!pFileSearch || (pFileSearch == INVALID_HANDLE_VALUE))
 		return FALSE;
 
-#	endif
+#endif
 	free(pFileSearch->lpPath);
 	free(pFileSearch->lpPattern);
 

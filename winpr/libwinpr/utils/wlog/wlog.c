@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -31,8 +31,8 @@
 #include <winpr/wlog.h>
 
 #if defined(ANDROID)
-#	include <android/log.h>
-#	include "../log.h"
+#include <android/log.h>
+#include "../log.h"
 #endif
 
 #include "wlog.h"
@@ -345,51 +345,51 @@ BOOL WLog_PrintMessageVA(wLog* log, DWORD type, DWORD level, DWORD line, const c
 
 	switch (type)
 	{
-	case WLOG_MESSAGE_TEXT:
-		message.FormatString = va_arg(args, const char*);
+		case WLOG_MESSAGE_TEXT:
+			message.FormatString = va_arg(args, const char*);
 
-		if (!strchr(message.FormatString, '%'))
-		{
-			message.TextString = (LPSTR)message.FormatString;
-			status = WLog_Write(log, &message);
-		}
-		else
-		{
-			char formattedLogMessage[WLOG_MAX_STRING_SIZE];
+			if (!strchr(message.FormatString, '%'))
+			{
+				message.TextString = (LPSTR)message.FormatString;
+				status = WLog_Write(log, &message);
+			}
+			else
+			{
+				char formattedLogMessage[WLOG_MAX_STRING_SIZE];
 
-			if (wvsnprintfx(formattedLogMessage, WLOG_MAX_STRING_SIZE - 1, message.FormatString,
-			                args) < 0)
-				return FALSE;
+				if (wvsnprintfx(formattedLogMessage, WLOG_MAX_STRING_SIZE - 1, message.FormatString,
+				                args) < 0)
+					return FALSE;
 
-			message.TextString = formattedLogMessage;
-			status = WLog_Write(log, &message);
-		}
+				message.TextString = formattedLogMessage;
+				status = WLog_Write(log, &message);
+			}
 
-		break;
+			break;
 
-	case WLOG_MESSAGE_DATA:
-		message.Data = va_arg(args, void*);
-		message.Length = va_arg(args, int);
-		status = WLog_WriteData(log, &message);
-		break;
+		case WLOG_MESSAGE_DATA:
+			message.Data = va_arg(args, void*);
+			message.Length = va_arg(args, int);
+			status = WLog_WriteData(log, &message);
+			break;
 
-	case WLOG_MESSAGE_IMAGE:
-		message.ImageData = va_arg(args, void*);
-		message.ImageWidth = va_arg(args, int);
-		message.ImageHeight = va_arg(args, int);
-		message.ImageBpp = va_arg(args, int);
-		status = WLog_WriteImage(log, &message);
-		break;
+		case WLOG_MESSAGE_IMAGE:
+			message.ImageData = va_arg(args, void*);
+			message.ImageWidth = va_arg(args, int);
+			message.ImageHeight = va_arg(args, int);
+			message.ImageBpp = va_arg(args, int);
+			status = WLog_WriteImage(log, &message);
+			break;
 
-	case WLOG_MESSAGE_PACKET:
-		message.PacketData = va_arg(args, void*);
-		message.PacketLength = va_arg(args, int);
-		message.PacketFlags = va_arg(args, int);
-		status = WLog_WritePacket(log, &message);
-		break;
+		case WLOG_MESSAGE_PACKET:
+			message.PacketData = va_arg(args, void*);
+			message.PacketLength = va_arg(args, int);
+			message.PacketFlags = va_arg(args, int);
+			status = WLog_WritePacket(log, &message);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return status;

@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -120,9 +120,9 @@ static UINT rdpsnd_fake_parse_addin_args(rdpsndFakePlugin* fake, ADDIN_ARGV* arg
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_rdpsnd_client_subsystem_entry fake_freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry fake_freerdp_rdpsnd_client_subsystem_entry
 #else
-#	define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
 #endif
 
 /**

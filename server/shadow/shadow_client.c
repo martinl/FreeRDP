@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -233,14 +233,14 @@ static void shadow_client_message_free(wMessage* message)
 {
 	switch (message->id)
 	{
-	case SHADOW_MSG_IN_REFRESH_REQUEST_ID:
-		/* Refresh request do not have message to free */
-		break;
+		case SHADOW_MSG_IN_REFRESH_REQUEST_ID:
+			/* Refresh request do not have message to free */
+			break;
 
-	default:
-		WLog_ERR(TAG, "Unknown message id: %" PRIu32 "", message->id);
-		free(message->wParam);
-		break;
+		default:
+			WLog_ERR(TAG, "Unknown message id: %" PRIu32 "", message->id);
+			free(message->wParam);
+			break;
 	}
 }
 
@@ -1503,92 +1503,94 @@ static int shadow_client_subsystem_process_message(rdpShadowClient* client, wMes
 
 	switch (message->id)
 	{
-	case SHADOW_MSG_OUT_POINTER_POSITION_UPDATE_ID:
-	{
-		POINTER_POSITION_UPDATE pointerPosition;
-		SHADOW_MSG_OUT_POINTER_POSITION_UPDATE* msg =
-		    (SHADOW_MSG_OUT_POINTER_POSITION_UPDATE*)message->wParam;
-		pointerPosition.xPos = msg->xPos;
-		pointerPosition.yPos = msg->yPos;
-
-		if (client->server->shareSubRect)
+		case SHADOW_MSG_OUT_POINTER_POSITION_UPDATE_ID:
 		{
-			pointerPosition.xPos -= client->server->subRect.left;
-			pointerPosition.yPos -= client->server->subRect.top;
-		}
+			POINTER_POSITION_UPDATE pointerPosition;
+			SHADOW_MSG_OUT_POINTER_POSITION_UPDATE* msg =
+			    (SHADOW_MSG_OUT_POINTER_POSITION_UPDATE*)message->wParam;
+			pointerPosition.xPos = msg->xPos;
+			pointerPosition.yPos = msg->yPos;
 
-		if (client->activated)
-		{
-			if ((msg->xPos != client->pointerX) || (msg->yPos != client->pointerY))
+			if (client->server->shareSubRect)
 			{
-				IFCALL(update->pointer->PointerPosition, context, &pointerPosition);
-				client->pointerX = msg->xPos;
-				client->pointerY = msg->yPos;
+				pointerPosition.xPos -= client->server->subRect.left;
+				pointerPosition.yPos -= client->server->subRect.top;
 			}
+
+			if (client->activated)
+			{
+				if ((msg->xPos != client->pointerX) || (msg->yPos != client->pointerY))
+				{
+					IFCALL(update->pointer->PointerPosition, context, &pointerPosition);
+					client->pointerX = msg->xPos;
+					client->pointerY = msg->yPos;
+				}
+			}
+
+			break;
 		}
 
-		break;
-	}
-
-	case SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE_ID:
-	{
-		POINTER_NEW_UPDATE pointerNew;
-		POINTER_COLOR_UPDATE* pointerColor;
-		POINTER_CACHED_UPDATE pointerCached;
-		SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE* msg =
-		    (SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE*)message->wParam;
-		ZeroMemory(&pointerNew, sizeof(POINTER_NEW_UPDATE));
-		pointerNew.xorBpp = 24;
-		pointerColor = &(pointerNew.colorPtrAttr);
-		pointerColor->cacheIndex = 0;
-		pointerColor->xPos = msg->xHot;
-		pointerColor->yPos = msg->yHot;
-		pointerColor->width = msg->width;
-		pointerColor->height = msg->height;
-		pointerColor->lengthAndMask = msg->lengthAndMask;
-		pointerColor->lengthXorMask = msg->lengthXorMask;
-		pointerColor->xorMaskData = msg->xorMaskData;
-		pointerColor->andMaskData = msg->andMaskData;
-		pointerCached.cacheIndex = pointerColor->cacheIndex;
-
-		if (client->activated)
+		case SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE_ID:
 		{
-			IFCALL(update->pointer->PointerNew, context, &pointerNew);
-			IFCALL(update->pointer->PointerCached, context, &pointerCached);
+			POINTER_NEW_UPDATE pointerNew;
+			POINTER_COLOR_UPDATE* pointerColor;
+			POINTER_CACHED_UPDATE pointerCached;
+			SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE* msg =
+			    (SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE*)message->wParam;
+			ZeroMemory(&pointerNew, sizeof(POINTER_NEW_UPDATE));
+			pointerNew.xorBpp = 24;
+			pointerColor = &(pointerNew.colorPtrAttr);
+			pointerColor->cacheIndex = 0;
+			pointerColor->xPos = msg->xHot;
+			pointerColor->yPos = msg->yHot;
+			pointerColor->width = msg->width;
+			pointerColor->height = msg->height;
+			pointerColor->lengthAndMask = msg->lengthAndMask;
+			pointerColor->lengthXorMask = msg->lengthXorMask;
+			pointerColor->xorMaskData = msg->xorMaskData;
+			pointerColor->andMaskData = msg->andMaskData;
+			pointerCached.cacheIndex = pointerColor->cacheIndex;
+
+			if (client->activated)
+			{
+				IFCALL(update->pointer->PointerNew, context, &pointerNew);
+				IFCALL(update->pointer->PointerCached, context, &pointerCached);
+			}
+
+			break;
 		}
 
-		break;
-	}
-
-	case SHADOW_MSG_OUT_AUDIO_OUT_SAMPLES_ID:
-	{
-		SHADOW_MSG_OUT_AUDIO_OUT_SAMPLES* msg = (SHADOW_MSG_OUT_AUDIO_OUT_SAMPLES*)message->wParam;
-
-		if (client->activated && client->rdpsnd && client->rdpsnd->Activated)
+		case SHADOW_MSG_OUT_AUDIO_OUT_SAMPLES_ID:
 		{
-			client->rdpsnd->src_format = msg->audio_format;
-			IFCALL(client->rdpsnd->SendSamples, client->rdpsnd, msg->buf, msg->nFrames,
-			       msg->wTimestamp);
+			SHADOW_MSG_OUT_AUDIO_OUT_SAMPLES* msg =
+			    (SHADOW_MSG_OUT_AUDIO_OUT_SAMPLES*)message->wParam;
+
+			if (client->activated && client->rdpsnd && client->rdpsnd->Activated)
+			{
+				client->rdpsnd->src_format = msg->audio_format;
+				IFCALL(client->rdpsnd->SendSamples, client->rdpsnd, msg->buf, msg->nFrames,
+				       msg->wTimestamp);
+			}
+
+			break;
 		}
 
-		break;
-	}
-
-	case SHADOW_MSG_OUT_AUDIO_OUT_VOLUME_ID:
-	{
-		SHADOW_MSG_OUT_AUDIO_OUT_VOLUME* msg = (SHADOW_MSG_OUT_AUDIO_OUT_VOLUME*)message->wParam;
-
-		if (client->activated && client->rdpsnd && client->rdpsnd->Activated)
+		case SHADOW_MSG_OUT_AUDIO_OUT_VOLUME_ID:
 		{
-			IFCALL(client->rdpsnd->SetVolume, client->rdpsnd, msg->left, msg->right);
+			SHADOW_MSG_OUT_AUDIO_OUT_VOLUME* msg =
+			    (SHADOW_MSG_OUT_AUDIO_OUT_VOLUME*)message->wParam;
+
+			if (client->activated && client->rdpsnd && client->rdpsnd->Activated)
+			{
+				IFCALL(client->rdpsnd->SetVolume, client->rdpsnd, msg->left, msg->right);
+			}
+
+			break;
 		}
 
-		break;
-	}
-
-	default:
-		WLog_ERR(TAG, "Unknown message id: %" PRIu32 "", message->id);
-		break;
+		default:
+			WLog_ERR(TAG, "Unknown message id: %" PRIu32 "", message->id);
+			break;
 	}
 
 	shadow_client_free_queued_message(message);
@@ -1728,48 +1730,51 @@ static DWORD WINAPI shadow_client_thread(LPVOID arg)
 			{
 				switch (WTSVirtualChannelManagerGetDrdynvcState(client->vcm))
 				{
-				/* Dynamic channel status may have been changed after processing */
-				case DRDYNVC_STATE_NONE:
+					/* Dynamic channel status may have been changed after processing */
+					case DRDYNVC_STATE_NONE:
 
-					/* Call this routine to Initialize drdynvc channel */
-					if (!WTSVirtualChannelManagerCheckFileDescriptor(client->vcm))
-					{
-						WLog_ERR(TAG, "Failed to initialize drdynvc channel");
-						goto fail;
-					}
-
-					break;
-
-				case DRDYNVC_STATE_READY:
-					if (client->audin && !IFCALLRESULT(TRUE, client->audin->IsOpen, client->audin))
-					{
-						if (!IFCALLRESULT(FALSE, client->audin->Open, client->audin))
+						/* Call this routine to Initialize drdynvc channel */
+						if (!WTSVirtualChannelManagerCheckFileDescriptor(client->vcm))
 						{
-							WLog_ERR(TAG, "Failed to initialize audin channel");
+							WLog_ERR(TAG, "Failed to initialize drdynvc channel");
 							goto fail;
 						}
-					}
 
-					/* Init RDPGFX dynamic channel */
-					if (settings->SupportGraphicsPipeline && client->rdpgfx && !gfxstatus.gfxOpened)
-					{
-						client->rdpgfx->FrameAcknowledge = shadow_client_rdpgfx_frame_acknowledge;
-						client->rdpgfx->CapsAdvertise = shadow_client_rdpgfx_caps_advertise;
+						break;
 
-						if (!client->rdpgfx->Open(client->rdpgfx))
+					case DRDYNVC_STATE_READY:
+						if (client->audin &&
+						    !IFCALLRESULT(TRUE, client->audin->IsOpen, client->audin))
 						{
-							WLog_WARN(TAG, "Failed to open GraphicsPipeline");
-							settings->SupportGraphicsPipeline = FALSE;
+							if (!IFCALLRESULT(FALSE, client->audin->Open, client->audin))
+							{
+								WLog_ERR(TAG, "Failed to initialize audin channel");
+								goto fail;
+							}
 						}
 
-						gfxstatus.gfxOpened = TRUE;
-						WLog_INFO(TAG, "Gfx Pipeline Opened");
-					}
+						/* Init RDPGFX dynamic channel */
+						if (settings->SupportGraphicsPipeline && client->rdpgfx &&
+						    !gfxstatus.gfxOpened)
+						{
+							client->rdpgfx->FrameAcknowledge =
+							    shadow_client_rdpgfx_frame_acknowledge;
+							client->rdpgfx->CapsAdvertise = shadow_client_rdpgfx_caps_advertise;
 
-					break;
+							if (!client->rdpgfx->Open(client->rdpgfx))
+							{
+								WLog_WARN(TAG, "Failed to open GraphicsPipeline");
+								settings->SupportGraphicsPipeline = FALSE;
+							}
 
-				default:
-					break;
+							gfxstatus.gfxOpened = TRUE;
+							WLog_INFO(TAG, "Gfx Pipeline Opened");
+						}
+
+						break;
+
+					default:
+						break;
 				}
 			}
 		}
@@ -1802,27 +1807,27 @@ static DWORD WINAPI shadow_client_thread(LPVOID arg)
 
 				switch (message.id)
 				{
-				case SHADOW_MSG_OUT_POINTER_POSITION_UPDATE_ID:
-					/* Abandon previous message */
-					shadow_client_free_queued_message(&pointerPositionMsg);
-					CopyMemory(&pointerPositionMsg, &message, sizeof(wMessage));
-					break;
+					case SHADOW_MSG_OUT_POINTER_POSITION_UPDATE_ID:
+						/* Abandon previous message */
+						shadow_client_free_queued_message(&pointerPositionMsg);
+						CopyMemory(&pointerPositionMsg, &message, sizeof(wMessage));
+						break;
 
-				case SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE_ID:
-					/* Abandon previous message */
-					shadow_client_free_queued_message(&pointerAlphaMsg);
-					CopyMemory(&pointerAlphaMsg, &message, sizeof(wMessage));
-					break;
+					case SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE_ID:
+						/* Abandon previous message */
+						shadow_client_free_queued_message(&pointerAlphaMsg);
+						CopyMemory(&pointerAlphaMsg, &message, sizeof(wMessage));
+						break;
 
-				case SHADOW_MSG_OUT_AUDIO_OUT_VOLUME_ID:
-					/* Abandon previous message */
-					shadow_client_free_queued_message(&audioVolumeMsg);
-					CopyMemory(&audioVolumeMsg, &message, sizeof(wMessage));
-					break;
+					case SHADOW_MSG_OUT_AUDIO_OUT_VOLUME_ID:
+						/* Abandon previous message */
+						shadow_client_free_queued_message(&audioVolumeMsg);
+						CopyMemory(&audioVolumeMsg, &message, sizeof(wMessage));
+						break;
 
-				default:
-					shadow_client_subsystem_process_message(client, &message);
-					break;
+					default:
+						shadow_client_subsystem_process_message(client, &message);
+						break;
 				}
 			}
 

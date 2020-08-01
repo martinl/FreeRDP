@@ -14,12 +14,14 @@
 
 @implementation NSObject (TSXAdditions)
 
-- (void)setValuesForKeyPathsWithDictionary:(NSDictionary *)keyedValues {
+- (void)setValuesForKeyPathsWithDictionary:(NSDictionary *)keyedValues
+{
 	for (id keyPath in keyedValues)
 		[self setValue:[keyedValues objectForKey:keyPath] forKeyPath:keyPath];
 }
 
-- mutableDeepCopy {
+- mutableDeepCopy
+{
 	if ([self respondsToSelector:@selector(mutableCopyWithZone:)])
 		return [self mutableCopy];
 	else if ([self respondsToSelector:@selector(copyWithZone:)])
@@ -35,7 +37,8 @@
 @implementation NSString (TSXAdditions)
 
 #pragma mark Creation routines
-+ (NSString *)stringWithUUID {
++ (NSString *)stringWithUUID
+{
 	CFUUIDRef uuidObj = CFUUIDCreate(nil);
 	NSString *uuidString = (NSString *)CFUUIDCreateString(nil, uuidObj);
 	CFRelease(uuidObj);
@@ -45,7 +48,8 @@
 /* Code from
  * http://code.google.com/p/google-toolbox-for-mac/source/browse/trunk/Foundation/GTMNSData%2BHex.m?r=344
  */
-- (NSData *)dataFromHexString {
+- (NSData *)dataFromHexString
+{
 	NSData *hexData = [self dataUsingEncoding:NSASCIIStringEncoding];
 	const char *hexBuf = [hexData bytes];
 	NSUInteger hexLen = [hexData length];
@@ -101,7 +105,8 @@
 + (NSString *)hexStringFromData:(const unsigned char *)data
                          ofSize:(unsigned int)size
                   withSeparator:(NSString *)sep
-                   afterNthChar:(int)sepnth {
+                   afterNthChar:(int)sepnth
+{
 	int i;
 	NSMutableString *result;
 	NSString *immutableResult;
@@ -125,7 +130,8 @@
 
 @implementation NSDictionary (TSXAdditions)
 
-- mutableDeepCopy {
+- mutableDeepCopy
+{
 	NSMutableDictionary *newDictionary = [[NSMutableDictionary alloc] init];
 	NSEnumerator *enumerator = [self keyEnumerator];
 	id key;
@@ -142,7 +148,8 @@
 
 @implementation NSArray (TSXAdditions)
 
-- mutableDeepCopy {
+- mutableDeepCopy
+{
 	NSMutableArray *newArray = [[NSMutableArray alloc] init];
 	NSEnumerator *enumerator = [self objectEnumerator];
 	id obj;
@@ -159,7 +166,8 @@
 
 @implementation NSSet (TSXAdditions)
 
-- mutableDeepCopy {
+- mutableDeepCopy
+{
 	NSMutableSet *newSet = [[NSMutableSet alloc] init];
 	NSEnumerator *enumerator = [self objectEnumerator];
 	id obj;
@@ -182,7 +190,8 @@
 @implementation NSData (TSXAdditions)
 
 #pragma mark - String Conversion
-- (NSString *)hexadecimalString {
+- (NSString *)hexadecimalString
+{
 	/* Returns hexadecimal string of NSData. Empty string if data is empty.   */
 
 	const unsigned char *dataBuffer = (const unsigned char *)[self bytes];
@@ -200,7 +209,8 @@
 }
 
 /* Code from http://cocoawithlove.com/2009/06/base64-encoding-options-on-mac-and.html */
-- (NSString *)base64EncodedString {
+- (NSString *)base64EncodedString
+{
 	// Construct an OpenSSL context
 	BIO *context = BIO_new(BIO_s_mem());
 

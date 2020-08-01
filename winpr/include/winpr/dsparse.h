@@ -22,17 +22,17 @@
 
 #if defined(_WIN32) && !defined(_UWP)
 
-#	include <winpr/windows.h>
-#	include <winpr/rpc.h>
+#include <winpr/windows.h>
+#include <winpr/rpc.h>
 
-#	include <ntdsapi.h>
+#include <ntdsapi.h>
 
 #else
 
-#	include <winpr/crt.h>
-#	include <winpr/winpr.h>
-#	include <winpr/wtypes.h>
-#	include <winpr/error.h>
+#include <winpr/crt.h>
+#include <winpr/winpr.h>
+#include <winpr/wtypes.h>
+#include <winpr/error.h>
 
 typedef enum
 {
@@ -93,10 +93,10 @@ typedef struct
 	PDS_NAME_RESULT_ITEM rItems;
 } DS_NAME_RESULT, *PDS_NAME_RESULT;
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-#	endif
+#endif
 
 	WINPR_API DWORD DsCrackSpnW(LPCWSTR pszSpn, DWORD* pcServiceClass, LPWSTR ServiceClass,
 	                            DWORD* pcServiceName, LPWSTR ServiceName, DWORD* pcInstanceName,
@@ -106,11 +106,11 @@ extern "C"
 	                            LPDWORD pcServiceName, LPSTR ServiceName, LPDWORD pcInstanceName,
 	                            LPSTR InstanceName, USHORT* pInstancePort);
 
-#	ifdef UNICODE
-#		define DsCrackSpn DsCrackSpnW
-#	else
-#		define DsCrackSpn DsCrackSpnA
-#	endif
+#ifdef UNICODE
+#define DsCrackSpn DsCrackSpnW
+#else
+#define DsCrackSpn DsCrackSpnA
+#endif
 
 	WINPR_API DWORD DsMakeSpnW(LPCWSTR ServiceClass, LPCWSTR ServiceName, LPCWSTR InstanceName,
 	                           USHORT InstancePort, LPCWSTR Referrer, DWORD* pcSpnLength,
@@ -120,15 +120,15 @@ extern "C"
 	                           USHORT InstancePort, LPCSTR Referrer, DWORD* pcSpnLength,
 	                           LPSTR pszSpn);
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 }
-#	endif
+#endif
 
-#	ifdef UNICODE
-#		define DsMakeSpn DsMakeSpnW
-#	else
-#		define DsMakeSpn DsMakeSpnA
-#	endif
+#ifdef UNICODE
+#define DsMakeSpn DsMakeSpnW
+#else
+#define DsMakeSpn DsMakeSpnA
+#endif
 
 #endif
 

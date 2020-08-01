@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -334,25 +334,25 @@ INLINE BOOL gdi_decode_color(rdpGdi* gdi, const UINT32 srcColor, UINT32* color, 
 
 	switch (ColorDepth)
 	{
-	case 32:
-	case 24:
-		SrcFormat = PIXEL_FORMAT_BGR24;
-		break;
+		case 32:
+		case 24:
+			SrcFormat = PIXEL_FORMAT_BGR24;
+			break;
 
-	case 16:
-		SrcFormat = PIXEL_FORMAT_RGB16;
-		break;
+		case 16:
+			SrcFormat = PIXEL_FORMAT_RGB16;
+			break;
 
-	case 15:
-		SrcFormat = PIXEL_FORMAT_RGB15;
-		break;
+		case 15:
+			SrcFormat = PIXEL_FORMAT_RGB15;
+			break;
 
-	case 8:
-		SrcFormat = PIXEL_FORMAT_RGB8;
-		break;
+		case 8:
+			SrcFormat = PIXEL_FORMAT_RGB8;
+			break;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	if (format)
@@ -393,30 +393,30 @@ UINT32 gdi_get_pixel_format(UINT32 bitsPerPixel)
 
 	switch (bitsPerPixel)
 	{
-	case 32:
-		format = PIXEL_FORMAT_BGRA32;
-		break;
+		case 32:
+			format = PIXEL_FORMAT_BGRA32;
+			break;
 
-	case 24:
-		format = PIXEL_FORMAT_BGR24;
-		break;
+		case 24:
+			format = PIXEL_FORMAT_BGR24;
+			break;
 
-	case 16:
-		format = PIXEL_FORMAT_RGB16;
-		break;
+		case 16:
+			format = PIXEL_FORMAT_RGB16;
+			break;
 
-	case 15:
-		format = PIXEL_FORMAT_RGB15;
-		break;
+		case 15:
+			format = PIXEL_FORMAT_RGB15;
+			break;
 
-	case 8:
-		format = PIXEL_FORMAT_RGB8;
-		break;
+		case 8:
+			format = PIXEL_FORMAT_RGB8;
+			break;
 
-	default:
-		WLog_ERR(TAG, "Unsupported color depth %" PRIu32, bitsPerPixel);
-		format = 0;
-		break;
+		default:
+			WLog_ERR(TAG, "Unsupported color depth %" PRIu32, bitsPerPixel);
+			format = 0;
+			break;
 	}
 
 	return format;
@@ -590,65 +590,65 @@ static BOOL gdi_patblt(rdpContext* context, PATBLT_ORDER* patblt)
 
 	switch (brush->style)
 	{
-	case GDI_BS_SOLID:
-		hbrush = gdi_CreateSolidBrush(foreColor);
-		break;
+		case GDI_BS_SOLID:
+			hbrush = gdi_CreateSolidBrush(foreColor);
+			break;
 
-	case GDI_BS_HATCHED:
-	{
-		const BYTE* hatched;
-		hatched = GDI_BS_HATCHED_PATTERNS + (8 * brush->hatch);
-
-		if (!freerdp_image_copy_from_monochrome(data, gdi->drawing->hdc->format, 0, 0, 0, 8, 8,
-		                                        hatched, backColor, foreColor, &gdi->palette))
-			goto out_error;
-
-		hBmp = gdi_CreateBitmapEx(8, 8, gdi->drawing->hdc->format, 0, data, NULL);
-
-		if (!hBmp)
-			goto out_error;
-
-		hbrush = gdi_CreateHatchBrush(hBmp);
-	}
-	break;
-
-	case GDI_BS_PATTERN:
-	{
-		UINT32 brushFormat;
-
-		if (brush->bpp > 1)
+		case GDI_BS_HATCHED:
 		{
-			UINT32 bpp = brush->bpp;
+			const BYTE* hatched;
+			hatched = GDI_BS_HATCHED_PATTERNS + (8 * brush->hatch);
 
-			if ((bpp == 16) && (context->settings->ColorDepth == 15))
-				bpp = 15;
-
-			brushFormat = gdi_get_pixel_format(bpp);
-
-			if (!freerdp_image_copy(data, gdi->drawing->hdc->format, 0, 0, 0, 8, 8, brush->data,
-			                        brushFormat, 0, 0, 0, &gdi->palette, FREERDP_FLIP_NONE))
-				goto out_error;
-		}
-		else
-		{
 			if (!freerdp_image_copy_from_monochrome(data, gdi->drawing->hdc->format, 0, 0, 0, 8, 8,
-			                                        brush->data, backColor, foreColor,
-			                                        &gdi->palette))
+			                                        hatched, backColor, foreColor, &gdi->palette))
 				goto out_error;
+
+			hBmp = gdi_CreateBitmapEx(8, 8, gdi->drawing->hdc->format, 0, data, NULL);
+
+			if (!hBmp)
+				goto out_error;
+
+			hbrush = gdi_CreateHatchBrush(hBmp);
 		}
-
-		hBmp = gdi_CreateBitmapEx(8, 8, gdi->drawing->hdc->format, 0, data, NULL);
-
-		if (!hBmp)
-			goto out_error;
-
-		hbrush = gdi_CreatePatternBrush(hBmp);
-	}
-	break;
-
-	default:
-		WLog_ERR(TAG, "unimplemented brush style:%" PRIu32 "", brush->style);
 		break;
+
+		case GDI_BS_PATTERN:
+		{
+			UINT32 brushFormat;
+
+			if (brush->bpp > 1)
+			{
+				UINT32 bpp = brush->bpp;
+
+				if ((bpp == 16) && (context->settings->ColorDepth == 15))
+					bpp = 15;
+
+				brushFormat = gdi_get_pixel_format(bpp);
+
+				if (!freerdp_image_copy(data, gdi->drawing->hdc->format, 0, 0, 0, 8, 8, brush->data,
+				                        brushFormat, 0, 0, 0, &gdi->palette, FREERDP_FLIP_NONE))
+					goto out_error;
+			}
+			else
+			{
+				if (!freerdp_image_copy_from_monochrome(data, gdi->drawing->hdc->format, 0, 0, 0, 8,
+				                                        8, brush->data, backColor, foreColor,
+				                                        &gdi->palette))
+					goto out_error;
+			}
+
+			hBmp = gdi_CreateBitmapEx(8, 8, gdi->drawing->hdc->format, 0, data, NULL);
+
+			if (!hBmp)
+				goto out_error;
+
+			hbrush = gdi_CreatePatternBrush(hBmp);
+		}
+		break;
+
+		default:
+			WLog_ERR(TAG, "unimplemented brush style:%" PRIu32 "", brush->style);
+			break;
 	}
 
 	if (hbrush)
@@ -846,97 +846,97 @@ static BOOL gdi_mem3blt(rdpContext* context, MEM3BLT_ORDER* mem3blt)
 
 	switch (brush->style)
 	{
-	case GDI_BS_SOLID:
-		originalBrush = gdi->drawing->hdc->brush;
-		gdi->drawing->hdc->brush = gdi_CreateSolidBrush(foreColor);
+		case GDI_BS_SOLID:
+			originalBrush = gdi->drawing->hdc->brush;
+			gdi->drawing->hdc->brush = gdi_CreateSolidBrush(foreColor);
 
-		if (!gdi->drawing->hdc->brush)
+			if (!gdi->drawing->hdc->brush)
+			{
+				ret = FALSE;
+				goto out_fail;
+			}
+
+			ret = gdi_BitBlt(gdi->drawing->hdc, mem3blt->nLeftRect, mem3blt->nTopRect,
+			                 mem3blt->nWidth, mem3blt->nHeight, bitmap->hdc, mem3blt->nXSrc,
+			                 mem3blt->nYSrc, gdi_rop3_code(mem3blt->bRop), &gdi->palette);
+			gdi_DeleteObject((HGDIOBJECT)gdi->drawing->hdc->brush);
+			gdi->drawing->hdc->brush = originalBrush;
+			break;
+
+		case GDI_BS_PATTERN:
 		{
-			ret = FALSE;
-			goto out_fail;
-		}
+			HGDI_BITMAP hBmp;
+			UINT32 brushFormat;
+			BYTE* data =
+			    (BYTE*)_aligned_malloc(8 * 8 * GetBytesPerPixel(gdi->drawing->hdc->format), 16);
 
-		ret = gdi_BitBlt(gdi->drawing->hdc, mem3blt->nLeftRect, mem3blt->nTopRect, mem3blt->nWidth,
-		                 mem3blt->nHeight, bitmap->hdc, mem3blt->nXSrc, mem3blt->nYSrc,
-		                 gdi_rop3_code(mem3blt->bRop), &gdi->palette);
-		gdi_DeleteObject((HGDIOBJECT)gdi->drawing->hdc->brush);
-		gdi->drawing->hdc->brush = originalBrush;
-		break;
+			if (!data)
+			{
+				ret = FALSE;
+				goto out_fail;
+			}
 
-	case GDI_BS_PATTERN:
-	{
-		HGDI_BITMAP hBmp;
-		UINT32 brushFormat;
-		BYTE* data =
-		    (BYTE*)_aligned_malloc(8 * 8 * GetBytesPerPixel(gdi->drawing->hdc->format), 16);
+			if (brush->bpp > 1)
+			{
+				UINT32 bpp = brush->bpp;
 
-		if (!data)
-		{
-			ret = FALSE;
-			goto out_fail;
-		}
+				if ((bpp == 16) && (context->settings->ColorDepth == 15))
+					bpp = 15;
 
-		if (brush->bpp > 1)
-		{
-			UINT32 bpp = brush->bpp;
+				brushFormat = gdi_get_pixel_format(bpp);
 
-			if ((bpp == 16) && (context->settings->ColorDepth == 15))
-				bpp = 15;
+				if (!freerdp_image_copy(data, gdi->drawing->hdc->format, 0, 0, 0, 8, 8, brush->data,
+				                        brushFormat, 0, 0, 0, &gdi->palette, FREERDP_FLIP_NONE))
+				{
+					ret = FALSE;
+					_aligned_free(data);
+					goto out_fail;
+				}
+			}
+			else
+			{
+				if (!freerdp_image_copy_from_monochrome(data, gdi->drawing->hdc->format, 0, 0, 0, 8,
+				                                        8, brush->data, backColor, foreColor,
+				                                        &gdi->palette))
+				{
+					ret = FALSE;
+					_aligned_free(data);
+					goto out_fail;
+				}
+			}
 
-			brushFormat = gdi_get_pixel_format(bpp);
+			hBmp = gdi_CreateBitmap(8, 8, gdi->drawing->hdc->format, data);
 
-			if (!freerdp_image_copy(data, gdi->drawing->hdc->format, 0, 0, 0, 8, 8, brush->data,
-			                        brushFormat, 0, 0, 0, &gdi->palette, FREERDP_FLIP_NONE))
+			if (!hBmp)
 			{
 				ret = FALSE;
 				_aligned_free(data);
 				goto out_fail;
 			}
-		}
-		else
-		{
-			if (!freerdp_image_copy_from_monochrome(data, gdi->drawing->hdc->format, 0, 0, 0, 8, 8,
-			                                        brush->data, backColor, foreColor,
-			                                        &gdi->palette))
+
+			originalBrush = gdi->drawing->hdc->brush;
+			gdi->drawing->hdc->brush = gdi_CreatePatternBrush(hBmp);
+
+			if (!gdi->drawing->hdc->brush)
 			{
-				ret = FALSE;
-				_aligned_free(data);
+				gdi_DeleteObject((HGDIOBJECT)hBmp);
 				goto out_fail;
 			}
-		}
 
-		hBmp = gdi_CreateBitmap(8, 8, gdi->drawing->hdc->format, data);
-
-		if (!hBmp)
-		{
-			ret = FALSE;
-			_aligned_free(data);
-			goto out_fail;
-		}
-
-		originalBrush = gdi->drawing->hdc->brush;
-		gdi->drawing->hdc->brush = gdi_CreatePatternBrush(hBmp);
-
-		if (!gdi->drawing->hdc->brush)
-		{
+			gdi->drawing->hdc->brush->nXOrg = brush->x;
+			gdi->drawing->hdc->brush->nYOrg = brush->y;
+			ret = gdi_BitBlt(gdi->drawing->hdc, mem3blt->nLeftRect, mem3blt->nTopRect,
+			                 mem3blt->nWidth, mem3blt->nHeight, bitmap->hdc, mem3blt->nXSrc,
+			                 mem3blt->nYSrc, gdi_rop3_code(mem3blt->bRop), &gdi->palette);
+			gdi_DeleteObject((HGDIOBJECT)gdi->drawing->hdc->brush);
 			gdi_DeleteObject((HGDIOBJECT)hBmp);
-			goto out_fail;
+			gdi->drawing->hdc->brush = originalBrush;
 		}
-
-		gdi->drawing->hdc->brush->nXOrg = brush->x;
-		gdi->drawing->hdc->brush->nYOrg = brush->y;
-		ret = gdi_BitBlt(gdi->drawing->hdc, mem3blt->nLeftRect, mem3blt->nTopRect, mem3blt->nWidth,
-		                 mem3blt->nHeight, bitmap->hdc, mem3blt->nXSrc, mem3blt->nYSrc,
-		                 gdi_rop3_code(mem3blt->bRop), &gdi->palette);
-		gdi_DeleteObject((HGDIOBJECT)gdi->drawing->hdc->brush);
-		gdi_DeleteObject((HGDIOBJECT)hBmp);
-		gdi->drawing->hdc->brush = originalBrush;
-	}
-	break;
-
-	default:
-		WLog_ERR(TAG, "Mem3Blt unimplemented brush style:%" PRIu32 "", brush->style);
 		break;
+
+		default:
+			WLog_ERR(TAG, "Mem3Blt unimplemented brush style:%" PRIu32 "", brush->style);
+			break;
 	}
 
 out_fail:
@@ -980,16 +980,17 @@ BOOL gdi_surface_frame_marker(rdpContext* context, const SURFACE_FRAME_MARKER* s
 
 	switch (surfaceFrameMarker->frameAction)
 	{
-	case SURFACECMD_FRAMEACTION_BEGIN:
-		break;
+		case SURFACECMD_FRAMEACTION_BEGIN:
+			break;
 
-	case SURFACECMD_FRAMEACTION_END:
-		if (context->settings->FrameAcknowledge > 0)
-		{
-			IFCALL(context->update->SurfaceFrameAcknowledge, context, surfaceFrameMarker->frameId);
-		}
+		case SURFACECMD_FRAMEACTION_END:
+			if (context->settings->FrameAcknowledge > 0)
+			{
+				IFCALL(context->update->SurfaceFrameAcknowledge, context,
+				       surfaceFrameMarker->frameId);
+			}
 
-		break;
+			break;
 	}
 
 	return TRUE;
@@ -1024,51 +1025,52 @@ static BOOL gdi_surface_bits(rdpContext* context, const SURFACE_BITS_COMMAND* cm
 
 	switch (cmd->bmp.codecID)
 	{
-	case RDP_CODEC_ID_REMOTEFX:
-		if (!rfx_process_message(context->codecs->rfx, cmd->bmp.bitmapData,
-		                         cmd->bmp.bitmapDataLength, cmd->destLeft, cmd->destTop,
-		                         gdi->primary_buffer, gdi->dstFormat, gdi->stride, gdi->height,
-		                         &region))
-		{
-			WLog_ERR(TAG, "Failed to process RemoteFX message");
-			goto out;
-		}
+		case RDP_CODEC_ID_REMOTEFX:
+			if (!rfx_process_message(context->codecs->rfx, cmd->bmp.bitmapData,
+			                         cmd->bmp.bitmapDataLength, cmd->destLeft, cmd->destTop,
+			                         gdi->primary_buffer, gdi->dstFormat, gdi->stride, gdi->height,
+			                         &region))
+			{
+				WLog_ERR(TAG, "Failed to process RemoteFX message");
+				goto out;
+			}
 
-		break;
+			break;
 
-	case RDP_CODEC_ID_NSCODEC:
-		format = gdi->dstFormat;
+		case RDP_CODEC_ID_NSCODEC:
+			format = gdi->dstFormat;
 
-		if (!nsc_process_message(context->codecs->nsc, cmd->bmp.bpp, cmd->bmp.width,
-		                         cmd->bmp.height, cmd->bmp.bitmapData, cmd->bmp.bitmapDataLength,
-		                         gdi->primary_buffer, format, gdi->stride, cmd->destLeft,
-		                         cmd->destTop, cmd->bmp.width, cmd->bmp.height,
-		                         FREERDP_FLIP_VERTICAL))
-		{
-			WLog_ERR(TAG, "Failed to process NSCodec message");
-			goto out;
-		}
+			if (!nsc_process_message(context->codecs->nsc, cmd->bmp.bpp, cmd->bmp.width,
+			                         cmd->bmp.height, cmd->bmp.bitmapData,
+			                         cmd->bmp.bitmapDataLength, gdi->primary_buffer, format,
+			                         gdi->stride, cmd->destLeft, cmd->destTop, cmd->bmp.width,
+			                         cmd->bmp.height, FREERDP_FLIP_VERTICAL))
+			{
+				WLog_ERR(TAG, "Failed to process NSCodec message");
+				goto out;
+			}
 
-		region16_union_rect(&region, &region, &cmdRect);
-		break;
+			region16_union_rect(&region, &region, &cmdRect);
+			break;
 
-	case RDP_CODEC_ID_NONE:
-		format = gdi_get_pixel_format(cmd->bmp.bpp);
+		case RDP_CODEC_ID_NONE:
+			format = gdi_get_pixel_format(cmd->bmp.bpp);
 
-		if (!freerdp_image_copy(gdi->primary_buffer, gdi->dstFormat, gdi->stride, cmd->destLeft,
-		                        cmd->destTop, cmd->bmp.width, cmd->bmp.height, cmd->bmp.bitmapData,
-		                        format, 0, 0, 0, &gdi->palette, FREERDP_FLIP_VERTICAL))
-		{
-			WLog_ERR(TAG, "Failed to process nocodec message");
-			goto out;
-		}
+			if (!freerdp_image_copy(gdi->primary_buffer, gdi->dstFormat, gdi->stride, cmd->destLeft,
+			                        cmd->destTop, cmd->bmp.width, cmd->bmp.height,
+			                        cmd->bmp.bitmapData, format, 0, 0, 0, &gdi->palette,
+			                        FREERDP_FLIP_VERTICAL))
+			{
+				WLog_ERR(TAG, "Failed to process nocodec message");
+				goto out;
+			}
 
-		region16_union_rect(&region, &region, &cmdRect);
-		break;
+			region16_union_rect(&region, &region, &cmdRect);
+			break;
 
-	default:
-		WLog_ERR(TAG, "Unsupported codecID %" PRIu32 "", cmd->bmp.codecID);
-		break;
+		default:
+			WLog_ERR(TAG, "Unsupported codecID %" PRIu32 "", cmd->bmp.codecID);
+			break;
 	}
 
 	if (!(rects = region16_rects(&region, &nbRects)))

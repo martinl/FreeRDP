@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <errno.h>
@@ -1016,25 +1016,25 @@ int freerdp_assistance_parse_file_buffer(rdpAssistanceFile* file, const char* bu
 
 		switch (file->Type)
 		{
-		case 2:
-		{
-			file->EncryptedLHTicket = freerdp_assistance_hex_string_to_bin(
-			    file->LHTicket, &file->EncryptedLHTicketLength);
+			case 2:
+			{
+				file->EncryptedLHTicket = freerdp_assistance_hex_string_to_bin(
+				    file->LHTicket, &file->EncryptedLHTicketLength);
 
-			if (!freerdp_assistance_decrypt2(file, password))
-				status = -1;
-		}
-		break;
+				if (!freerdp_assistance_decrypt2(file, password))
+					status = -1;
+			}
+			break;
 
-		case 1:
-		{
-			if (!freerdp_assistance_parse_connection_string1(file))
-				status = -1;
-		}
-		break;
+			case 1:
+			{
+				if (!freerdp_assistance_parse_connection_string1(file))
+					status = -1;
+			}
+			break;
 
-		default:
-			return -1;
+			default:
+				return -1;
 		}
 
 		if (status < 0)

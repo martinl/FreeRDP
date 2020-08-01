@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/windows.h>
@@ -577,13 +577,13 @@ static void sspi_ContextBufferFree(void* contextBuffer)
 
 			switch (allocatorIndex)
 			{
-			case EnumerateSecurityPackagesIndex:
-				FreeContextBuffer_EnumerateSecurityPackages(contextBuffer);
-				break;
+				case EnumerateSecurityPackagesIndex:
+					FreeContextBuffer_EnumerateSecurityPackages(contextBuffer);
+					break;
 
-			case QuerySecurityPackageInfoIndex:
-				FreeContextBuffer_QuerySecurityPackageInfo(contextBuffer);
-				break;
+				case QuerySecurityPackageInfoIndex:
+					FreeContextBuffer_QuerySecurityPackageInfo(contextBuffer);
+					break;
 			}
 		}
 	}

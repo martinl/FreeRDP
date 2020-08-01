@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -152,23 +152,23 @@ static UINT encomsp_server_receive_pdu(EncomspServerContext* context, wStream* s
 
 		switch (header.Type)
 		{
-		case ODTYPE_PARTICIPANT_CTRL_CHANGED:
-			if ((error = encomsp_recv_change_participant_control_level_pdu(context, s, &header)))
-			{
-				WLog_ERR(
-				    TAG,
-				    "encomsp_recv_change_participant_control_level_pdu failed with error %" PRIu32
-				    "!",
-				    error);
-				return error;
-			}
+			case ODTYPE_PARTICIPANT_CTRL_CHANGED:
+				if ((error =
+				         encomsp_recv_change_participant_control_level_pdu(context, s, &header)))
+				{
+					WLog_ERR(TAG,
+					         "encomsp_recv_change_participant_control_level_pdu failed with error "
+					         "%" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		default:
-			WLog_ERR(TAG, "header.Type unknown %" PRIu16 "!", header.Type);
-			return ERROR_INVALID_DATA;
-			break;
+			default:
+				WLog_ERR(TAG, "header.Type unknown %" PRIu16 "!", header.Type);
+				return ERROR_INVALID_DATA;
+				break;
 		}
 	}
 

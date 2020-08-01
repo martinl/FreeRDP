@@ -1,6 +1,6 @@
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <math.h>
@@ -100,26 +100,26 @@ static const char* get_profiler_name(BOOL encode, UINT16 bpp)
 {
 	switch (bpp)
 	{
-	case 24:
-		if (encode)
-			return "interleaved_compress   24bpp";
-		else
-			return "interleaved_decompress 24bpp";
+		case 24:
+			if (encode)
+				return "interleaved_compress   24bpp";
+			else
+				return "interleaved_decompress 24bpp";
 
-	case 16:
-		if (encode)
-			return "interleaved_compress   16bpp";
-		else
-			return "interleaved_decompress 16bpp";
+		case 16:
+			if (encode)
+				return "interleaved_compress   16bpp";
+			else
+				return "interleaved_decompress 16bpp";
 
-	case 15:
-		if (encode)
-			return "interleaved_compress   15bpp";
-		else
-			return "interleaved_decompress 15bpp";
+		case 15:
+			if (encode)
+				return "interleaved_compress   15bpp";
+			else
+				return "interleaved_decompress 15bpp";
 
-	default:
-		return "configuration error!";
+		default:
+			return "configuration error!";
 	}
 }
 

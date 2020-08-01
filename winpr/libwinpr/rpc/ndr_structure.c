@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -28,9 +28,9 @@
 
 #ifndef _WIN32
 
-#	include "ndr_private.h"
-#	include "ndr_pointer.h"
-#	include "ndr_structure.h"
+#include "ndr_private.h"
+#include "ndr_pointer.h"
+#include "ndr_structure.h"
 
 /* Structures: http://msdn.microsoft.com/en-us/library/windows/desktop/aa378695/ */
 
@@ -110,94 +110,95 @@ ULONG NdrComplexStructMemberSize(PMIDL_STUB_MESSAGE pStubMsg, PFORMAT_STRING pFo
 	{
 		switch (*pFormat)
 		{
-		case FC_BYTE:
-		case FC_CHAR:
-		case FC_SMALL:
-		case FC_USMALL:
-			size += sizeof(BYTE);
-			break;
+			case FC_BYTE:
+			case FC_CHAR:
+			case FC_SMALL:
+			case FC_USMALL:
+				size += sizeof(BYTE);
+				break;
 
-		case FC_WCHAR:
-		case FC_SHORT:
-		case FC_USHORT:
-		case FC_ENUM16:
-			size += sizeof(USHORT);
-			break;
+			case FC_WCHAR:
+			case FC_SHORT:
+			case FC_USHORT:
+			case FC_ENUM16:
+				size += sizeof(USHORT);
+				break;
 
-		case FC_LONG:
-		case FC_ULONG:
-		case FC_ENUM32:
-			size += sizeof(ULONG);
-			break;
+			case FC_LONG:
+			case FC_ULONG:
+			case FC_ENUM32:
+				size += sizeof(ULONG);
+				break;
 
-		case FC_INT3264:
-		case FC_UINT3264:
-			size += sizeof(INT_PTR);
-			break;
+			case FC_INT3264:
+			case FC_UINT3264:
+				size += sizeof(INT_PTR);
+				break;
 
-		case FC_FLOAT:
-			size += sizeof(FLOAT);
-			break;
+			case FC_FLOAT:
+				size += sizeof(FLOAT);
+				break;
 
-		case FC_DOUBLE:
-			size += sizeof(DOUBLE);
-			break;
+			case FC_DOUBLE:
+				size += sizeof(DOUBLE);
+				break;
 
-		case FC_HYPER:
-			size += sizeof(ULONGLONG);
-			break;
+			case FC_HYPER:
+				size += sizeof(ULONGLONG);
+				break;
 
-		case FC_ERROR_STATUS_T:
-			size += sizeof(error_status_t);
-			break;
+			case FC_ERROR_STATUS_T:
+				size += sizeof(error_status_t);
+				break;
 
-		case FC_IGNORE:
-			break;
+			case FC_IGNORE:
+				break;
 
-		case FC_RP:
-		case FC_UP:
-		case FC_OP:
-		case FC_FP:
-		case FC_POINTER:
-			size += sizeof(void*);
+			case FC_RP:
+			case FC_UP:
+			case FC_OP:
+			case FC_FP:
+			case FC_POINTER:
+				size += sizeof(void*);
 
-			if (*pFormat != FC_POINTER)
-				pFormat += 4;
+				if (*pFormat != FC_POINTER)
+					pFormat += 4;
 
-			break;
+				break;
 
-		case FC_ALIGNM2:
-			NdrpAlignLength(&size, 2);
-			break;
+			case FC_ALIGNM2:
+				NdrpAlignLength(&size, 2);
+				break;
 
-		case FC_ALIGNM4:
-			NdrpAlignLength(&size, 4);
-			break;
+			case FC_ALIGNM4:
+				NdrpAlignLength(&size, 4);
+				break;
 
-		case FC_ALIGNM8:
-			NdrpAlignLength(&size, 8);
-			break;
+			case FC_ALIGNM8:
+				NdrpAlignLength(&size, 8);
+				break;
 
-		case FC_STRUCTPAD1:
-		case FC_STRUCTPAD2:
-		case FC_STRUCTPAD3:
-		case FC_STRUCTPAD4:
-		case FC_STRUCTPAD5:
-		case FC_STRUCTPAD6:
-		case FC_STRUCTPAD7:
-			size += *pFormat - FC_STRUCTPAD1 + 1;
-			break;
+			case FC_STRUCTPAD1:
+			case FC_STRUCTPAD2:
+			case FC_STRUCTPAD3:
+			case FC_STRUCTPAD4:
+			case FC_STRUCTPAD5:
+			case FC_STRUCTPAD6:
+			case FC_STRUCTPAD7:
+				size += *pFormat - FC_STRUCTPAD1 + 1;
+				break;
 
-		case FC_PAD:
-			break;
+			case FC_PAD:
+				break;
 
-		case FC_EMBEDDED_COMPLEX:
-			WLog_ERR(TAG, "warning: NdrComplexStructMemberSize FC_EMBEDDED_COMPLEX unimplemented");
-			break;
+			case FC_EMBEDDED_COMPLEX:
+				WLog_ERR(TAG,
+				         "warning: NdrComplexStructMemberSize FC_EMBEDDED_COMPLEX unimplemented");
+				break;
 
-		default:
-			WLog_ERR(TAG, "warning: NdrComplexStructMemberSize 0x%02X unimplemented", *pFormat);
-			break;
+			default:
+				WLog_ERR(TAG, "warning: NdrComplexStructMemberSize 0x%02X unimplemented", *pFormat);
+				break;
 		}
 
 		pFormat++;

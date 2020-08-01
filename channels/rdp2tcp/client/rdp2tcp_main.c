@@ -223,13 +223,13 @@ static void VCAPITYPE VirtualChannelOpenEventEx(LPVOID lpUserParam, DWORD openHa
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_DATA_RECEIVED:
-		dataReceived(plugin, pData, dataLength, totalLength, dataFlags);
-		break;
+		case CHANNEL_EVENT_DATA_RECEIVED:
+			dataReceived(plugin, pData, dataLength, totalLength, dataFlags);
+			break;
 
-	case CHANNEL_EVENT_WRITE_COMPLETE:
-		SetEvent(plugin->writeComplete);
-		break;
+		case CHANNEL_EVENT_WRITE_COMPLETE:
+			SetEvent(plugin->writeComplete);
+			break;
 	}
 }
 
@@ -240,49 +240,49 @@ static VOID VCAPITYPE VirtualChannelInitEventEx(LPVOID lpUserParam, LPVOID pInit
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_CONNECTED:
-		if (debug)
-			puts("rdp2tcp connected");
+		case CHANNEL_EVENT_CONNECTED:
+			if (debug)
+				puts("rdp2tcp connected");
 
-		plugin->writeComplete = CreateEvent(NULL, TRUE, FALSE, NULL);
-		plugin->copyThread = CreateThread(NULL, 0, copyThread, plugin, 0, NULL);
+			plugin->writeComplete = CreateEvent(NULL, TRUE, FALSE, NULL);
+			plugin->copyThread = CreateThread(NULL, 0, copyThread, plugin, 0, NULL);
 
-		if (plugin->channelEntryPoints.pVirtualChannelOpenEx(
-		        pInitHandle, &plugin->openHandle, RDP2TCP_CHAN_NAME, VirtualChannelOpenEventEx) !=
-		    CHANNEL_RC_OK)
-			return;
+			if (plugin->channelEntryPoints.pVirtualChannelOpenEx(
+			        pInitHandle, &plugin->openHandle, RDP2TCP_CHAN_NAME,
+			        VirtualChannelOpenEventEx) != CHANNEL_RC_OK)
+				return;
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_DISCONNECTED:
-		if (debug)
-			puts("rdp2tcp disconnected");
+		case CHANNEL_EVENT_DISCONNECTED:
+			if (debug)
+				puts("rdp2tcp disconnected");
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_TERMINATED:
-		if (debug)
-			puts("rdp2tcp terminated");
+		case CHANNEL_EVENT_TERMINATED:
+			if (debug)
+				puts("rdp2tcp terminated");
 
-		if (plugin->copyThread)
-		{
-			TerminateThread(plugin->copyThread, 0);
-			CloseHandle(plugin->writeComplete);
-		}
+			if (plugin->copyThread)
+			{
+				TerminateThread(plugin->copyThread, 0);
+				CloseHandle(plugin->writeComplete);
+			}
 
-		CloseHandle(plugin->hStdInputWrite);
-		CloseHandle(plugin->hStdOutputRead);
-		TerminateProcess(plugin->hProcess, 0);
-		CloseHandle(plugin->hProcess);
-		free(plugin);
-		break;
+			CloseHandle(plugin->hStdInputWrite);
+			CloseHandle(plugin->hStdOutputRead);
+			TerminateProcess(plugin->hProcess, 0);
+			CloseHandle(plugin->hProcess);
+			free(plugin);
+			break;
 	}
 }
 
 #if 1
-#	define VirtualChannelEntryEx rdp2tcp_VirtualChannelEntryEx
+#define VirtualChannelEntryEx rdp2tcp_VirtualChannelEntryEx
 #else
-#	define VirtualChannelEntryEx FREERDP_API VirtualChannelEntryEx
+#define VirtualChannelEntryEx FREERDP_API VirtualChannelEntryEx
 #endif
 BOOL VCAPITYPE VirtualChannelEntryEx(PCHANNEL_ENTRY_POINTS pEntryPoints, PVOID pInitHandle)
 {

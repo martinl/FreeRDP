@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdlib.h>
@@ -269,22 +269,22 @@ BOOL wlf_cliprdr_handle_event(wfClipboard* clipboard, const UwacClipboardEvent* 
 
 	switch (event->type)
 	{
-	case UWAC_EVENT_CLIPBOARD_AVAILABLE:
-		clipboard->seat = event->seat;
-		return TRUE;
+		case UWAC_EVENT_CLIPBOARD_AVAILABLE:
+			clipboard->seat = event->seat;
+			return TRUE;
 
-	case UWAC_EVENT_CLIPBOARD_OFFER:
-		WLog_Print(clipboard->log, WLOG_INFO, "client announces mime %s", event->mime);
-		wlf_cliprdr_add_client_format(clipboard, event->mime);
-		return TRUE;
+		case UWAC_EVENT_CLIPBOARD_OFFER:
+			WLog_Print(clipboard->log, WLOG_INFO, "client announces mime %s", event->mime);
+			wlf_cliprdr_add_client_format(clipboard, event->mime);
+			return TRUE;
 
-	case UWAC_EVENT_CLIPBOARD_SELECT:
-		WLog_Print(clipboard->log, WLOG_DEBUG, "client announces new data");
-		wlf_cliprdr_free_client_formats(clipboard);
-		return TRUE;
+		case UWAC_EVENT_CLIPBOARD_SELECT:
+			WLog_Print(clipboard->log, WLOG_DEBUG, "client announces new data");
+			wlf_cliprdr_free_client_formats(clipboard);
+			return TRUE;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 }
 
@@ -512,18 +512,18 @@ static UINT wlf_cliprdr_server_format_list(CliprdrClientContext* context,
 		{
 			switch (format->formatId)
 			{
-			case CF_TEXT:
-			case CF_OEMTEXT:
-			case CF_UNICODETEXT:
-				text = TRUE;
-				break;
+				case CF_TEXT:
+				case CF_OEMTEXT:
+				case CF_UNICODETEXT:
+					text = TRUE;
+					break;
 
-			case CF_DIB:
-				image = TRUE;
-				break;
+				case CF_DIB:
+					image = TRUE;
+					break;
 
-			default:
-				break;
+				default:
+					break;
 			}
 		}
 	}
@@ -590,26 +590,26 @@ wlf_cliprdr_server_format_data_request(CliprdrClientContext* context,
 
 	switch (formatId)
 	{
-	case CF_TEXT:
-	case CF_OEMTEXT:
-	case CF_UNICODETEXT:
-		mime = "text/plain;charset=utf-8";
-		break;
+		case CF_TEXT:
+		case CF_OEMTEXT:
+		case CF_UNICODETEXT:
+			mime = "text/plain;charset=utf-8";
+			break;
 
-	case CF_DIB:
-	case CF_DIBV5:
-		mime = "image/bmp";
-		break;
-
-	default:
-		if (formatId == ClipboardGetFormatId(clipboard->system, "HTML Format"))
-			mime = "text/html";
-		else if (formatId == ClipboardGetFormatId(clipboard->system, "image/bmp"))
+		case CF_DIB:
+		case CF_DIBV5:
 			mime = "image/bmp";
-		else
-			mime = ClipboardGetFormatName(clipboard->system, formatId);
+			break;
 
-		break;
+		default:
+			if (formatId == ClipboardGetFormatId(clipboard->system, "HTML Format"))
+				mime = "text/html";
+			else if (formatId == ClipboardGetFormatId(clipboard->system, "image/bmp"))
+				mime = "image/bmp";
+			else
+				mime = ClipboardGetFormatName(clipboard->system, formatId);
+
+			break;
 	}
 
 	data = UwacClipboardDataGet(clipboard->seat, mime, &size);
@@ -619,30 +619,30 @@ wlf_cliprdr_server_format_data_request(CliprdrClientContext* context,
 
 	switch (formatId)
 	{
-	case CF_UNICODETEXT:
-		if (size > INT_MAX)
-			rc = ERROR_INTERNAL_ERROR;
-		else
-		{
-			cnv = ConvertToUnicode(CP_UTF8, 0, (LPCSTR)data, (int)size, &cdata, 0);
-			free(data);
-			data = NULL;
-
-			if (cnv < 0)
+		case CF_UNICODETEXT:
+			if (size > INT_MAX)
 				rc = ERROR_INTERNAL_ERROR;
 			else
 			{
-				size = (size_t)cnv;
-				data = (BYTE*)cdata;
-				size *= sizeof(WCHAR);
+				cnv = ConvertToUnicode(CP_UTF8, 0, (LPCSTR)data, (int)size, &cdata, 0);
+				free(data);
+				data = NULL;
+
+				if (cnv < 0)
+					rc = ERROR_INTERNAL_ERROR;
+				else
+				{
+					size = (size_t)cnv;
+					data = (BYTE*)cdata;
+					size *= sizeof(WCHAR);
+				}
 			}
-		}
 
-		break;
+			break;
 
-	default:
-		// TODO: Image conversions
-		break;
+		default:
+			// TODO: Image conversions
+			break;
 	}
 
 	if (rc != CHANNEL_RC_OK)
@@ -675,20 +675,20 @@ wlf_cliprdr_server_format_data_response(CliprdrClientContext* context,
 
 	switch (clipboard->responseFormat)
 	{
-	case CF_UNICODETEXT:
-		cnv = ConvertFromUnicode(CP_UTF8, 0, wdata, (int)(size / sizeof(WCHAR)), &cdata, 0, NULL,
-		                         NULL);
+		case CF_UNICODETEXT:
+			cnv = ConvertFromUnicode(CP_UTF8, 0, wdata, (int)(size / sizeof(WCHAR)), &cdata, 0,
+			                         NULL, NULL);
 
-		if (cnv < 0)
-			return ERROR_INTERNAL_ERROR;
+			if (cnv < 0)
+				return ERROR_INTERNAL_ERROR;
 
-		size = (size_t)cnv;
-		data = cdata;
-		break;
+			size = (size_t)cnv;
+			data = cdata;
+			break;
 
-	default:
-		// TODO: Image conversions
-		break;
+		default:
+			// TODO: Image conversions
+			break;
 	}
 
 	fwrite(data, 1, size, clipboard->responseFile);

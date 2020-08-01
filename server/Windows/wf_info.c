@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdlib.h>
@@ -48,16 +48,16 @@ BOOL wf_info_lock(wfInfo* wfi)
 
 	switch (dRes)
 	{
-	case WAIT_ABANDONED:
-	case WAIT_OBJECT_0:
-		return TRUE;
+		case WAIT_ABANDONED:
+		case WAIT_OBJECT_0:
+			return TRUE;
 
-	case WAIT_TIMEOUT:
-		return FALSE;
+		case WAIT_TIMEOUT:
+			return FALSE;
 
-	case WAIT_FAILED:
-		WLog_ERR(TAG, "wf_info_lock failed with 0x%08lX", GetLastError());
-		return FALSE;
+		case WAIT_FAILED:
+			WLog_ERR(TAG, "wf_info_lock failed with 0x%08lX", GetLastError());
+			return FALSE;
 	}
 
 	return FALSE;
@@ -70,16 +70,16 @@ BOOL wf_info_try_lock(wfInfo* wfi, DWORD dwMilliseconds)
 
 	switch (dRes)
 	{
-	case WAIT_ABANDONED:
-	case WAIT_OBJECT_0:
-		return TRUE;
+		case WAIT_ABANDONED:
+		case WAIT_OBJECT_0:
+			return TRUE;
 
-	case WAIT_TIMEOUT:
-		return FALSE;
+		case WAIT_TIMEOUT:
+			return FALSE;
 
-	case WAIT_FAILED:
-		WLog_ERR(TAG, "wf_info_try_lock failed with 0x%08lX", GetLastError());
-		return FALSE;
+		case WAIT_FAILED:
+			WLog_ERR(TAG, "wf_info_try_lock failed with 0x%08lX", GetLastError());
+			return FALSE;
 	}
 
 	return FALSE;

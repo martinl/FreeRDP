@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -665,69 +665,69 @@ SSIZE_T rts_command_length(UINT32 CommandType, const BYTE* buffer, size_t length
 
 	switch (CommandType)
 	{
-	case RTS_CMD_RECEIVE_WINDOW_SIZE:
-		CommandLength = RTS_CMD_RECEIVE_WINDOW_SIZE_LENGTH;
-		break;
+		case RTS_CMD_RECEIVE_WINDOW_SIZE:
+			CommandLength = RTS_CMD_RECEIVE_WINDOW_SIZE_LENGTH;
+			break;
 
-	case RTS_CMD_FLOW_CONTROL_ACK:
-		CommandLength = RTS_CMD_FLOW_CONTROL_ACK_LENGTH;
-		break;
+		case RTS_CMD_FLOW_CONTROL_ACK:
+			CommandLength = RTS_CMD_FLOW_CONTROL_ACK_LENGTH;
+			break;
 
-	case RTS_CMD_CONNECTION_TIMEOUT:
-		CommandLength = RTS_CMD_CONNECTION_TIMEOUT_LENGTH;
-		break;
+		case RTS_CMD_CONNECTION_TIMEOUT:
+			CommandLength = RTS_CMD_CONNECTION_TIMEOUT_LENGTH;
+			break;
 
-	case RTS_CMD_COOKIE:
-		CommandLength = RTS_CMD_COOKIE_LENGTH;
-		break;
+		case RTS_CMD_COOKIE:
+			CommandLength = RTS_CMD_COOKIE_LENGTH;
+			break;
 
-	case RTS_CMD_CHANNEL_LIFETIME:
-		CommandLength = RTS_CMD_CHANNEL_LIFETIME_LENGTH;
-		break;
+		case RTS_CMD_CHANNEL_LIFETIME:
+			CommandLength = RTS_CMD_CHANNEL_LIFETIME_LENGTH;
+			break;
 
-	case RTS_CMD_CLIENT_KEEPALIVE:
-		CommandLength = RTS_CMD_CLIENT_KEEPALIVE_LENGTH;
-		break;
+		case RTS_CMD_CLIENT_KEEPALIVE:
+			CommandLength = RTS_CMD_CLIENT_KEEPALIVE_LENGTH;
+			break;
 
-	case RTS_CMD_VERSION:
-		CommandLength = RTS_CMD_VERSION_LENGTH;
-		break;
+		case RTS_CMD_VERSION:
+			CommandLength = RTS_CMD_VERSION_LENGTH;
+			break;
 
-	case RTS_CMD_EMPTY:
-		CommandLength = RTS_CMD_EMPTY_LENGTH;
-		break;
+		case RTS_CMD_EMPTY:
+			CommandLength = RTS_CMD_EMPTY_LENGTH;
+			break;
 
-	case RTS_CMD_PADDING: /* variable-size */
-		CommandLength = rts_padding_command_read(buffer, length);
-		break;
+		case RTS_CMD_PADDING: /* variable-size */
+			CommandLength = rts_padding_command_read(buffer, length);
+			break;
 
-	case RTS_CMD_NEGATIVE_ANCE:
-		CommandLength = RTS_CMD_NEGATIVE_ANCE_LENGTH;
-		break;
+		case RTS_CMD_NEGATIVE_ANCE:
+			CommandLength = RTS_CMD_NEGATIVE_ANCE_LENGTH;
+			break;
 
-	case RTS_CMD_ANCE:
-		CommandLength = RTS_CMD_ANCE_LENGTH;
-		break;
+		case RTS_CMD_ANCE:
+			CommandLength = RTS_CMD_ANCE_LENGTH;
+			break;
 
-	case RTS_CMD_CLIENT_ADDRESS: /* variable-size */
-		CommandLength = rts_client_address_command_read(buffer, length);
-		break;
+		case RTS_CMD_CLIENT_ADDRESS: /* variable-size */
+			CommandLength = rts_client_address_command_read(buffer, length);
+			break;
 
-	case RTS_CMD_ASSOCIATION_GROUP_ID:
-		CommandLength = RTS_CMD_ASSOCIATION_GROUP_ID_LENGTH;
-		break;
+		case RTS_CMD_ASSOCIATION_GROUP_ID:
+			CommandLength = RTS_CMD_ASSOCIATION_GROUP_ID_LENGTH;
+			break;
 
-	case RTS_CMD_DESTINATION:
-		CommandLength = RTS_CMD_DESTINATION_LENGTH;
-		break;
+		case RTS_CMD_DESTINATION:
+			CommandLength = RTS_CMD_DESTINATION_LENGTH;
+			break;
 
-	case RTS_CMD_PING_TRAFFIC_SENT_NOTIFY:
-		CommandLength = RTS_CMD_PING_TRAFFIC_SENT_NOTIFY_LENGTH;
-		break;
+		case RTS_CMD_PING_TRAFFIC_SENT_NOTIFY:
+			CommandLength = RTS_CMD_PING_TRAFFIC_SENT_NOTIFY_LENGTH;
+			break;
 
-	default:
-		WLog_ERR(TAG, "Error: Unknown RTS Command Type: 0x%" PRIx32 "", CommandType);
-		return -1;
+		default:
+			WLog_ERR(TAG, "Error: Unknown RTS Command Type: 0x%" PRIx32 "", CommandType);
+			return -1;
 	}
 
 	return CommandLength;

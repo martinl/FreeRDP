@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -512,7 +512,7 @@ BOOL xf_keyboard_handle_special_keys(xfContext* xfc, KeySym keysym)
 	}
 
 #if 0 /* set to 1 to enable multi touch gesture simulation via keyboard */
-#	ifdef WITH_XRENDER
+#ifdef WITH_XRENDER
 
 	if (!xfc->remote_app && xfc->settings->MultiTouchGestures)
 	{
@@ -589,8 +589,8 @@ BOOL xf_keyboard_handle_special_keys(xfContext* xfc, KeySym keysym)
 		}
 	}
 
-#	endif /* WITH_XRENDER defined */
-#endif     /* pinch/zoom/pan simulation */
+#endif /* WITH_XRENDER defined */
+#endif /* pinch/zoom/pan simulation */
 	return FALSE;
 }
 

@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -367,137 +367,137 @@ static BOOL tsmf_read_format_type(TS_AM_MEDIA_TYPE* mediatype, wStream* s, UINT3
 
 	switch (mediatype->FormatType)
 	{
-	case TSMF_FORMAT_TYPE_MFVIDEOFORMAT:
+		case TSMF_FORMAT_TYPE_MFVIDEOFORMAT:
 
-		/* http://msdn.microsoft.com/en-us/library/aa473808.aspx */
-		if (Stream_GetRemainingLength(s) < 176)
-			return FALSE;
-
-		Stream_Seek(s, 8);                        /* dwSize and ? */
-		Stream_Read_UINT32(s, mediatype->Width);  /* videoInfo.dwWidth */
-		Stream_Read_UINT32(s, mediatype->Height); /* videoInfo.dwHeight */
-		Stream_Seek(s, 32);
-		/* videoInfo.FramesPerSecond */
-		Stream_Read_UINT32(s, mediatype->SamplesPerSecond.Numerator);
-		Stream_Read_UINT32(s, mediatype->SamplesPerSecond.Denominator);
-		Stream_Seek(s, 80);
-		Stream_Read_UINT32(s, mediatype->BitRate); /* compressedInfo.AvgBitrate */
-		Stream_Seek(s, 36);
-
-		if (cbFormat > 176)
-		{
-			mediatype->ExtraDataSize = cbFormat - 176;
-			mediatype->ExtraData = Stream_Pointer(s);
-		}
-
-		break;
-
-	case TSMF_FORMAT_TYPE_WAVEFORMATEX:
-
-		/* http://msdn.microsoft.com/en-us/library/dd757720.aspx */
-		if (Stream_GetRemainingLength(s) < 18)
-			return FALSE;
-
-		Stream_Seek_UINT16(s);
-		Stream_Read_UINT16(s, mediatype->Channels);
-		Stream_Read_UINT32(s, mediatype->SamplesPerSecond.Numerator);
-		mediatype->SamplesPerSecond.Denominator = 1;
-		Stream_Read_UINT32(s, mediatype->BitRate);
-		mediatype->BitRate *= 8;
-		Stream_Read_UINT16(s, mediatype->BlockAlign);
-		Stream_Read_UINT16(s, mediatype->BitsPerSample);
-		Stream_Read_UINT16(s, mediatype->ExtraDataSize);
-
-		if (mediatype->ExtraDataSize > 0)
-		{
-			if (Stream_GetRemainingLength(s) < mediatype->ExtraDataSize)
+			/* http://msdn.microsoft.com/en-us/library/aa473808.aspx */
+			if (Stream_GetRemainingLength(s) < 176)
 				return FALSE;
 
-			mediatype->ExtraData = Stream_Pointer(s);
-		}
+			Stream_Seek(s, 8);                        /* dwSize and ? */
+			Stream_Read_UINT32(s, mediatype->Width);  /* videoInfo.dwWidth */
+			Stream_Read_UINT32(s, mediatype->Height); /* videoInfo.dwHeight */
+			Stream_Seek(s, 32);
+			/* videoInfo.FramesPerSecond */
+			Stream_Read_UINT32(s, mediatype->SamplesPerSecond.Numerator);
+			Stream_Read_UINT32(s, mediatype->SamplesPerSecond.Denominator);
+			Stream_Seek(s, 80);
+			Stream_Read_UINT32(s, mediatype->BitRate); /* compressedInfo.AvgBitrate */
+			Stream_Seek(s, 36);
 
-		break;
+			if (cbFormat > 176)
+			{
+				mediatype->ExtraDataSize = cbFormat - 176;
+				mediatype->ExtraData = Stream_Pointer(s);
+			}
 
-	case TSMF_FORMAT_TYPE_MPEG1VIDEOINFO:
-		/* http://msdn.microsoft.com/en-us/library/dd390700.aspx */
-		i = tsmf_codec_parse_VIDEOINFOHEADER(mediatype, s);
+			break;
 
-		if (!i)
-			return FALSE;
+		case TSMF_FORMAT_TYPE_WAVEFORMATEX:
 
-		j = tsmf_codec_parse_BITMAPINFOHEADER(mediatype, s, TRUE);
-
-		if (!j)
-			return FALSE;
-
-		i += j;
-
-		if (cbFormat > i)
-		{
-			mediatype->ExtraDataSize = cbFormat - i;
-
-			if (Stream_GetRemainingLength(s) < mediatype->ExtraDataSize)
+			/* http://msdn.microsoft.com/en-us/library/dd757720.aspx */
+			if (Stream_GetRemainingLength(s) < 18)
 				return FALSE;
 
-			mediatype->ExtraData = Stream_Pointer(s);
-		}
+			Stream_Seek_UINT16(s);
+			Stream_Read_UINT16(s, mediatype->Channels);
+			Stream_Read_UINT32(s, mediatype->SamplesPerSecond.Numerator);
+			mediatype->SamplesPerSecond.Denominator = 1;
+			Stream_Read_UINT32(s, mediatype->BitRate);
+			mediatype->BitRate *= 8;
+			Stream_Read_UINT16(s, mediatype->BlockAlign);
+			Stream_Read_UINT16(s, mediatype->BitsPerSample);
+			Stream_Read_UINT16(s, mediatype->ExtraDataSize);
 
-		break;
+			if (mediatype->ExtraDataSize > 0)
+			{
+				if (Stream_GetRemainingLength(s) < mediatype->ExtraDataSize)
+					return FALSE;
 
-	case TSMF_FORMAT_TYPE_MPEG2VIDEOINFO:
-		/* http://msdn.microsoft.com/en-us/library/dd390707.aspx */
-		i = tsmf_codec_parse_VIDEOINFOHEADER2(mediatype, s);
+				mediatype->ExtraData = Stream_Pointer(s);
+			}
 
-		if (!i)
-			return FALSE;
+			break;
 
-		j = tsmf_codec_parse_BITMAPINFOHEADER(mediatype, s, TRUE);
+		case TSMF_FORMAT_TYPE_MPEG1VIDEOINFO:
+			/* http://msdn.microsoft.com/en-us/library/dd390700.aspx */
+			i = tsmf_codec_parse_VIDEOINFOHEADER(mediatype, s);
 
-		if (!j)
-			return FALSE;
-
-		i += j;
-
-		if (cbFormat > i)
-		{
-			mediatype->ExtraDataSize = cbFormat - i;
-
-			if (Stream_GetRemainingLength(s) < mediatype->ExtraDataSize)
+			if (!i)
 				return FALSE;
 
-			mediatype->ExtraData = Stream_Pointer(s);
-		}
+			j = tsmf_codec_parse_BITMAPINFOHEADER(mediatype, s, TRUE);
 
-		break;
-
-	case TSMF_FORMAT_TYPE_VIDEOINFO2:
-		i = tsmf_codec_parse_VIDEOINFOHEADER2(mediatype, s);
-
-		if (!i)
-			return FALSE;
-
-		j = tsmf_codec_parse_BITMAPINFOHEADER(mediatype, s, FALSE);
-
-		if (!j)
-			return FALSE;
-
-		i += j;
-
-		if (cbFormat > i)
-		{
-			mediatype->ExtraDataSize = cbFormat - i;
-
-			if (Stream_GetRemainingLength(s) < mediatype->ExtraDataSize)
+			if (!j)
 				return FALSE;
 
-			mediatype->ExtraData = Stream_Pointer(s);
-		}
+			i += j;
 
-		break;
+			if (cbFormat > i)
+			{
+				mediatype->ExtraDataSize = cbFormat - i;
 
-	default:
-		WLog_INFO(TAG, "unhandled format type 0x%x", mediatype->FormatType);
-		break;
+				if (Stream_GetRemainingLength(s) < mediatype->ExtraDataSize)
+					return FALSE;
+
+				mediatype->ExtraData = Stream_Pointer(s);
+			}
+
+			break;
+
+		case TSMF_FORMAT_TYPE_MPEG2VIDEOINFO:
+			/* http://msdn.microsoft.com/en-us/library/dd390707.aspx */
+			i = tsmf_codec_parse_VIDEOINFOHEADER2(mediatype, s);
+
+			if (!i)
+				return FALSE;
+
+			j = tsmf_codec_parse_BITMAPINFOHEADER(mediatype, s, TRUE);
+
+			if (!j)
+				return FALSE;
+
+			i += j;
+
+			if (cbFormat > i)
+			{
+				mediatype->ExtraDataSize = cbFormat - i;
+
+				if (Stream_GetRemainingLength(s) < mediatype->ExtraDataSize)
+					return FALSE;
+
+				mediatype->ExtraData = Stream_Pointer(s);
+			}
+
+			break;
+
+		case TSMF_FORMAT_TYPE_VIDEOINFO2:
+			i = tsmf_codec_parse_VIDEOINFOHEADER2(mediatype, s);
+
+			if (!i)
+				return FALSE;
+
+			j = tsmf_codec_parse_BITMAPINFOHEADER(mediatype, s, FALSE);
+
+			if (!j)
+				return FALSE;
+
+			i += j;
+
+			if (cbFormat > i)
+			{
+				mediatype->ExtraDataSize = cbFormat - i;
+
+				if (Stream_GetRemainingLength(s) < mediatype->ExtraDataSize)
+					return FALSE;
+
+				mediatype->ExtraData = Stream_Pointer(s);
+			}
+
+			break;
+
+		default:
+			WLog_INFO(TAG, "unhandled format type 0x%x", mediatype->FormatType);
+			break;
 	}
 
 	return TRUE;

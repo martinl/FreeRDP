@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -27,11 +27,11 @@
 #include <winpr/file.h>
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 #ifdef HAVE_FCNTL_H
-#	include <fcntl.h>
+#include <fcntl.h>
 #endif
 
 #include "../log.h"

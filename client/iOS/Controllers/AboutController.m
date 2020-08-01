@@ -16,7 +16,8 @@
 
 // The designated initializer.  Override if you create the controller programmatically and want to
 // perform customization that is not appropriate for viewDidLoad.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
 	if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]))
 	{
 
@@ -35,13 +36,15 @@
 	return self;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[super dealloc];
 	[last_link_clicked release];
 }
 
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
-- (void)loadView {
+- (void)loadView
+{
 	webView = [[[UIWebView alloc] initWithFrame:CGRectZero] autorelease];
 	[webView
 	    setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight)];
@@ -52,7 +55,8 @@
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
 	[super viewDidLoad];
 
 	NSString *filename = (IsPhone() ? @"about_phone" : @"about");
@@ -73,7 +77,8 @@
 }
 
 // Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
 	return YES;
 }
 
@@ -81,7 +86,8 @@
 #pragma mark UIWebView callbacks
 - (BOOL)webView:(UIWebView *)webView
     shouldStartLoadWithRequest:(NSURLRequest *)request
-                navigationType:(UIWebViewNavigationType)navigationType {
+                navigationType:(UIWebViewNavigationType)navigationType
+{
 	if ([[request URL] isFileURL])
 		return YES;
 

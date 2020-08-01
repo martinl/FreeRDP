@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -29,7 +29,7 @@
 
 #ifdef WINPR_THREAD_POOL
 
-#	ifdef _WIN32
+#ifdef _WIN32
 static INIT_ONCE init_once_module = INIT_ONCE_STATIC_INIT;
 static VOID(WINAPI* pSetEventWhenCallbackReturns)(PTP_CALLBACK_INSTANCE pci, HANDLE evt);
 static VOID(WINAPI* pReleaseSemaphoreWhenCallbackReturns)(PTP_CALLBACK_INSTANCE pci, HANDLE sem,
@@ -62,11 +62,11 @@ static BOOL CALLBACK init_module(PINIT_ONCE once, PVOID param, PVOID* context)
 
 	return TRUE;
 }
-#	endif
+#endif
 
 VOID SetEventWhenCallbackReturns(PTP_CALLBACK_INSTANCE pci, HANDLE evt)
 {
-#	ifdef _WIN32
+#ifdef _WIN32
 	InitOnceExecuteOnce(&init_once_module, init_module, NULL, NULL);
 
 	if (pSetEventWhenCallbackReturns)
@@ -75,13 +75,13 @@ VOID SetEventWhenCallbackReturns(PTP_CALLBACK_INSTANCE pci, HANDLE evt)
 		return;
 	}
 
-#	endif
+#endif
 	/* No default implementation */
 }
 
 VOID ReleaseSemaphoreWhenCallbackReturns(PTP_CALLBACK_INSTANCE pci, HANDLE sem, DWORD crel)
 {
-#	ifdef _WIN32
+#ifdef _WIN32
 	InitOnceExecuteOnce(&init_once_module, init_module, NULL, NULL);
 
 	if (pReleaseSemaphoreWhenCallbackReturns)
@@ -90,13 +90,13 @@ VOID ReleaseSemaphoreWhenCallbackReturns(PTP_CALLBACK_INSTANCE pci, HANDLE sem, 
 		return;
 	}
 
-#	endif
+#endif
 	/* No default implementation */
 }
 
 VOID ReleaseMutexWhenCallbackReturns(PTP_CALLBACK_INSTANCE pci, HANDLE mut)
 {
-#	ifdef _WIN32
+#ifdef _WIN32
 	InitOnceExecuteOnce(&init_once_module, init_module, NULL, NULL);
 
 	if (pReleaseMutexWhenCallbackReturns)
@@ -105,13 +105,13 @@ VOID ReleaseMutexWhenCallbackReturns(PTP_CALLBACK_INSTANCE pci, HANDLE mut)
 		return;
 	}
 
-#	endif
+#endif
 	/* No default implementation */
 }
 
 VOID LeaveCriticalSectionWhenCallbackReturns(PTP_CALLBACK_INSTANCE pci, PCRITICAL_SECTION pcs)
 {
-#	ifdef _WIN32
+#ifdef _WIN32
 	InitOnceExecuteOnce(&init_once_module, init_module, NULL, NULL);
 
 	if (pLeaveCriticalSectionWhenCallbackReturns)
@@ -119,13 +119,13 @@ VOID LeaveCriticalSectionWhenCallbackReturns(PTP_CALLBACK_INSTANCE pci, PCRITICA
 		pLeaveCriticalSectionWhenCallbackReturns(pci, pcs);
 	}
 
-#	endif
+#endif
 	/* No default implementation */
 }
 
 VOID FreeLibraryWhenCallbackReturns(PTP_CALLBACK_INSTANCE pci, HMODULE mod)
 {
-#	ifdef _WIN32
+#ifdef _WIN32
 	InitOnceExecuteOnce(&init_once_module, init_module, NULL, NULL);
 
 	if (pFreeLibraryWhenCallbackReturns)
@@ -134,13 +134,13 @@ VOID FreeLibraryWhenCallbackReturns(PTP_CALLBACK_INSTANCE pci, HMODULE mod)
 		return;
 	}
 
-#	endif
+#endif
 	/* No default implementation */
 }
 
 VOID DisassociateCurrentThreadFromCallback(PTP_CALLBACK_INSTANCE pci)
 {
-#	ifdef _WIN32
+#ifdef _WIN32
 	InitOnceExecuteOnce(&init_once_module, init_module, NULL, NULL);
 
 	if (pDisassociateCurrentThreadFromCallback)
@@ -149,7 +149,7 @@ VOID DisassociateCurrentThreadFromCallback(PTP_CALLBACK_INSTANCE pci)
 		return;
 	}
 
-#	endif
+#endif
 	/* No default implementation */
 }
 

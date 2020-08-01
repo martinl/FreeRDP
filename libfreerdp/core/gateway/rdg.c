@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -801,25 +801,25 @@ static BOOL rdg_process_packet(rdpRdg* rdg, wStream* s)
 
 	switch (type)
 	{
-	case PKT_TYPE_HANDSHAKE_RESPONSE:
-		status = rdg_process_handshake_response(rdg, s);
-		break;
+		case PKT_TYPE_HANDSHAKE_RESPONSE:
+			status = rdg_process_handshake_response(rdg, s);
+			break;
 
-	case PKT_TYPE_TUNNEL_RESPONSE:
-		status = rdg_process_tunnel_response(rdg, s);
-		break;
+		case PKT_TYPE_TUNNEL_RESPONSE:
+			status = rdg_process_tunnel_response(rdg, s);
+			break;
 
-	case PKT_TYPE_TUNNEL_AUTH_RESPONSE:
-		status = rdg_process_tunnel_authorization_response(rdg, s);
-		break;
+		case PKT_TYPE_TUNNEL_AUTH_RESPONSE:
+			status = rdg_process_tunnel_authorization_response(rdg, s);
+			break;
 
-	case PKT_TYPE_CHANNEL_RESPONSE:
-		status = rdg_process_channel_response(rdg, s);
-		break;
+		case PKT_TYPE_CHANNEL_RESPONSE:
+			status = rdg_process_channel_response(rdg, s);
+			break;
 
-	case PKT_TYPE_DATA:
-		WLog_ERR(TAG, "[%s] Unexpected packet type DATA", __FUNCTION__);
-		return FALSE;
+		case PKT_TYPE_DATA:
+			WLog_ERR(TAG, "[%s] Unexpected packet type DATA", __FUNCTION__);
+			return FALSE;
 	}
 
 	return status;
@@ -1072,19 +1072,19 @@ static BOOL rdg_establish_data_connection(rdpRdg* rdg, rdpTls* tls, const char* 
 
 		switch (StatusCode)
 		{
-		case HTTP_STATUS_NOT_FOUND:
-		{
-			WLog_INFO(TAG, "RD Gateway does not support HTTP transport.");
+			case HTTP_STATUS_NOT_FOUND:
+			{
+				WLog_INFO(TAG, "RD Gateway does not support HTTP transport.");
 
-			if (rpcFallback)
-				*rpcFallback = TRUE;
+				if (rpcFallback)
+					*rpcFallback = TRUE;
 
-			http_response_free(response);
-			return FALSE;
-		}
+				http_response_free(response);
+				return FALSE;
+			}
 
-		default:
-			break;
+			default:
+				break;
 		}
 
 		if (!rdg_handle_ntlm_challenge(rdg->ntlm, response))
@@ -1113,15 +1113,15 @@ static BOOL rdg_establish_data_connection(rdpRdg* rdg, rdpTls* tls, const char* 
 
 	switch (statusCode)
 	{
-	case HTTP_STATUS_OK:
-		break;
+		case HTTP_STATUS_OK:
+			break;
 
-	case HTTP_STATUS_DENIED:
-		freerdp_set_last_error(rdg->context, FREERDP_ERROR_CONNECT_ACCESS_DENIED);
-		return FALSE;
+		case HTTP_STATUS_DENIED:
+			freerdp_set_last_error(rdg->context, FREERDP_ERROR_CONNECT_ACCESS_DENIED);
+			return FALSE;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	if (strcmp(method, "RDG_OUT_DATA") == 0)
@@ -1364,21 +1364,21 @@ static BOOL rdg_process_control_packet(rdpRdg* rdg, int type, size_t packetLengt
 
 	switch (type)
 	{
-	case PKT_TYPE_CLOSE_CHANNEL:
-		EnterCriticalSection(&rdg->writeSection);
-		status = rdg_process_close_packet(rdg);
-		LeaveCriticalSection(&rdg->writeSection);
-		break;
+		case PKT_TYPE_CLOSE_CHANNEL:
+			EnterCriticalSection(&rdg->writeSection);
+			status = rdg_process_close_packet(rdg);
+			LeaveCriticalSection(&rdg->writeSection);
+			break;
 
-	case PKT_TYPE_KEEPALIVE:
-		EnterCriticalSection(&rdg->writeSection);
-		status = rdg_process_keep_alive_packet(rdg);
-		LeaveCriticalSection(&rdg->writeSection);
-		break;
+		case PKT_TYPE_KEEPALIVE:
+			EnterCriticalSection(&rdg->writeSection);
+			status = rdg_process_keep_alive_packet(rdg);
+			LeaveCriticalSection(&rdg->writeSection);
+			break;
 
-	default:
-		status = rdg_process_unknown_packet(rdg, type);
-		break;
+		default:
+			status = rdg_process_unknown_packet(rdg, type);
+			break;
 	}
 
 	Stream_Free(s, TRUE);
@@ -1695,14 +1695,15 @@ rdpRdg* rdg_new(rdpContext* context)
 		{
 			switch (rdg->extAuth)
 			{
-			case HTTP_EXTENDED_AUTH_PAA:
-				if (!http_context_set_rdg_auth_scheme(rdg->http, "PAA"))
-					goto rdg_alloc_error;
+				case HTTP_EXTENDED_AUTH_PAA:
+					if (!http_context_set_rdg_auth_scheme(rdg->http, "PAA"))
+						goto rdg_alloc_error;
 
-				break;
+					break;
 
-			default:
-				WLog_DBG(TAG, "RDG extended authentication method %d not supported", rdg->extAuth);
+				default:
+					WLog_DBG(TAG, "RDG extended authentication method %d not supported",
+					         rdg->extAuth);
 			}
 		}
 

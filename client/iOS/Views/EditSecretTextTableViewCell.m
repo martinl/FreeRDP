@@ -14,7 +14,8 @@
 
 @synthesize label = _label, textfield = _textfield;
 
-- (void)awakeFromNib {
+- (void)awakeFromNib
+{
 	[super awakeFromNib];
 	[_unhide_button setTitle:NSLocalizedString(@"Unhide", @"Button title 'Unhide'")
 	                forState:UIControlStateNormal];
@@ -23,14 +24,16 @@
 	         forControlEvents:UIControlEventTouchUpInside];
 }
 
-- (void)setEnabled:(BOOL)enabled {
+- (void)setEnabled:(BOOL)enabled
+{
 	[_label setEnabled:enabled];
 	[_textfield setEnabled:enabled];
 	[_unhide_button setEnabled:enabled];
 }
 
 #pragma mark - action handlers
-- (void)togglePasswordMode:(id)sender {
+- (void)togglePasswordMode:(id)sender
+{
 	BOOL isSecure = [_textfield isSecureTextEntry];
 
 	if (isSecure)

@@ -26,9 +26,9 @@
 FREERDP_LOCAL void rfx_init_sse2(RFX_CONTEXT* context);
 
 #ifdef WITH_SSE2
-#	ifndef RFX_INIT_SIMD
-#		define RFX_INIT_SIMD(_rfx_context) rfx_init_sse2(_rfx_context)
-#	endif
+#ifndef RFX_INIT_SIMD
+#define RFX_INIT_SIMD(_rfx_context) rfx_init_sse2(_rfx_context)
+#endif
 #endif
 
 #endif /* FREERDP_LIB_CODEC_RFX_SSE2_H */

@@ -25,40 +25,40 @@
 
 #ifndef _WIN32
 
-#	define CRED_SESSION_WILDCARD_NAME_W L"*Session"
-#	define CRED_SESSION_WILDCARD_NAME_A "*Session"
-#	define CRED_SESSION_WILDCARD_NAME_LENGTH (sizeof(CRED_SESSION_WILDCARD_NAME_A) - 1)
+#define CRED_SESSION_WILDCARD_NAME_W L"*Session"
+#define CRED_SESSION_WILDCARD_NAME_A "*Session"
+#define CRED_SESSION_WILDCARD_NAME_LENGTH (sizeof(CRED_SESSION_WILDCARD_NAME_A) - 1)
 
-#	define CRED_MAX_STRING_LENGTH 256
-#	define CRED_MAX_USERNAME_LENGTH (256 + 1 + 256)
-#	define CRED_MAX_GENERIC_TARGET_NAME_LENGTH 32767
-#	define CRED_MAX_DOMAIN_TARGET_NAME_LENGTH (256 + 1 + 80)
-#	define CRED_MAX_VALUE_SIZE 256
-#	define CRED_MAX_ATTRIBUTES 64
+#define CRED_MAX_STRING_LENGTH 256
+#define CRED_MAX_USERNAME_LENGTH (256 + 1 + 256)
+#define CRED_MAX_GENERIC_TARGET_NAME_LENGTH 32767
+#define CRED_MAX_DOMAIN_TARGET_NAME_LENGTH (256 + 1 + 80)
+#define CRED_MAX_VALUE_SIZE 256
+#define CRED_MAX_ATTRIBUTES 64
 
-#	define CRED_FLAGS_PASSWORD_FOR_CERT 0x0001
-#	define CRED_FLAGS_PROMPT_NOW 0x0002
-#	define CRED_FLAGS_USERNAME_TARGET 0x0004
-#	define CRED_FLAGS_OWF_CRED_BLOB 0x0008
-#	define CRED_FLAGS_VALID_FLAGS 0x000F
+#define CRED_FLAGS_PASSWORD_FOR_CERT 0x0001
+#define CRED_FLAGS_PROMPT_NOW 0x0002
+#define CRED_FLAGS_USERNAME_TARGET 0x0004
+#define CRED_FLAGS_OWF_CRED_BLOB 0x0008
+#define CRED_FLAGS_VALID_FLAGS 0x000F
 
-#	define CRED_TYPE_GENERIC 1
-#	define CRED_TYPE_DOMAIN_PASSWORD 2
-#	define CRED_TYPE_DOMAIN_CERTIFICATE 3
-#	define CRED_TYPE_DOMAIN_VISIBLE_PASSWORD 4
-#	define CRED_TYPE_MAXIMUM 5
-#	define CRED_TYPE_MAXIMUM_EX (CRED_TYPE_MAXIMUM + 1000)
+#define CRED_TYPE_GENERIC 1
+#define CRED_TYPE_DOMAIN_PASSWORD 2
+#define CRED_TYPE_DOMAIN_CERTIFICATE 3
+#define CRED_TYPE_DOMAIN_VISIBLE_PASSWORD 4
+#define CRED_TYPE_MAXIMUM 5
+#define CRED_TYPE_MAXIMUM_EX (CRED_TYPE_MAXIMUM + 1000)
 
-#	define CRED_MAX_CREDENTIAL_BLOB_SIZE 512
+#define CRED_MAX_CREDENTIAL_BLOB_SIZE 512
 
-#	define CRED_PERSIST_NONE 0
-#	define CRED_PERSIST_SESSION 1
-#	define CRED_PERSIST_LOCAL_MACHINE 2
-#	define CRED_PERSIST_ENTERPRISE 3
+#define CRED_PERSIST_NONE 0
+#define CRED_PERSIST_SESSION 1
+#define CRED_PERSIST_LOCAL_MACHINE 2
+#define CRED_PERSIST_ENTERPRISE 3
 
-#	define CRED_PRESERVE_CREDENTIAL_BLOB 0x1
-#	define CRED_CACHE_TARGET_INFORMATION 0x1
-#	define CRED_ALLOW_NAME_RESOLUTION 0x1
+#define CRED_PRESERVE_CREDENTIAL_BLOB 0x1
+#define CRED_CACHE_TARGET_INFORMATION 0x1
+#define CRED_ALLOW_NAME_RESOLUTION 0x1
 
 typedef struct _CREDENTIAL_ATTRIBUTEA
 {
@@ -151,28 +151,28 @@ typedef enum _CRED_PROTECTION_TYPE
 } CRED_PROTECTION_TYPE,
     *PCRED_PROTECTION_TYPE;
 
-#	ifdef UNICODE
-#		define CRED_SESSION_WILDCARD_NAME CRED_SESSION_WILDCARD_NAME_W
-#		define CREDENTIAL_ATTRIBUTE CREDENTIAL_ATTRIBUTEW
-#		define PCREDENTIAL_ATTRIBUTE PCREDENTIAL_ATTRIBUTEW
-#		define CREDENTIAL CREDENTIALW
-#		define PCREDENTIAL PCREDENTIALW
-#		define CREDENTIAL_TARGET_INFORMATION CREDENTIAL_TARGET_INFORMATIONW
-#		define PCREDENTIAL_TARGET_INFORMATION PCREDENTIAL_TARGET_INFORMATIONW
-#	else
-#		define CRED_SESSION_WILDCARD_NAME CRED_SESSION_WILDCARD_NAME_A
-#		define CREDENTIAL_ATTRIBUTE CREDENTIAL_ATTRIBUTEA
-#		define PCREDENTIAL_ATTRIBUTE PCREDENTIAL_ATTRIBUTEA
-#		define CREDENTIAL CREDENTIALA
-#		define PCREDENTIAL PCREDENTIALA
-#		define CREDENTIAL_TARGET_INFORMATION CREDENTIAL_TARGET_INFORMATIONA
-#		define PCREDENTIAL_TARGET_INFORMATION PCREDENTIAL_TARGET_INFORMATIONA
-#	endif
+#ifdef UNICODE
+#define CRED_SESSION_WILDCARD_NAME CRED_SESSION_WILDCARD_NAME_W
+#define CREDENTIAL_ATTRIBUTE CREDENTIAL_ATTRIBUTEW
+#define PCREDENTIAL_ATTRIBUTE PCREDENTIAL_ATTRIBUTEW
+#define CREDENTIAL CREDENTIALW
+#define PCREDENTIAL PCREDENTIALW
+#define CREDENTIAL_TARGET_INFORMATION CREDENTIAL_TARGET_INFORMATIONW
+#define PCREDENTIAL_TARGET_INFORMATION PCREDENTIAL_TARGET_INFORMATIONW
+#else
+#define CRED_SESSION_WILDCARD_NAME CRED_SESSION_WILDCARD_NAME_A
+#define CREDENTIAL_ATTRIBUTE CREDENTIAL_ATTRIBUTEA
+#define PCREDENTIAL_ATTRIBUTE PCREDENTIAL_ATTRIBUTEA
+#define CREDENTIAL CREDENTIALA
+#define PCREDENTIAL PCREDENTIALA
+#define CREDENTIAL_TARGET_INFORMATION CREDENTIAL_TARGET_INFORMATIONA
+#define PCREDENTIAL_TARGET_INFORMATION PCREDENTIAL_TARGET_INFORMATIONA
+#endif
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-#	endif
+#endif
 
 	WINPR_API BOOL CredWriteW(PCREDENTIALW Credential, DWORD Flags);
 	WINPR_API BOOL CredWriteA(PCREDENTIALA Credential, DWORD Flags);
@@ -246,43 +246,43 @@ extern "C"
 
 	WINPR_API VOID CredFree(PVOID Buffer);
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 }
-#	endif
+#endif
 
-#	ifdef UNICODE
-#		define CredWrite CredWriteW
-#		define CredRead CredReadW
-#		define CredEnumerate CredEnumerateW
-#		define CredWriteDomainCredentials CredWriteDomainCredentialsW
-#		define CredReadDomainCredentials CredReadDomainCredentialsW
-#		define CredDelete CredDeleteW
-#		define CredRename CredRenameW
-#		define CredGetTargetInfo CredGetTargetInfoW
-#		define CredMarshalCredential CredMarshalCredentialW
-#		define CredUnmarshalCredential CredUnmarshalCredentialW
-#		define CredIsMarshaledCredential CredIsMarshaledCredentialW
-#		define CredProtect CredProtectW
-#		define CredUnprotect CredUnprotectW
-#		define CredIsProtected CredIsProtectedW
-#		define CredFindBestCredential CredFindBestCredentialW
-#	else
-#		define CredWrite CredWriteA
-#		define CredRead CredReadA
-#		define CredEnumerate CredEnumerateA
-#		define CredWriteDomainCredentials CredWriteDomainCredentialsA
-#		define CredReadDomainCredentials CredReadDomainCredentialsA
-#		define CredDelete CredDeleteA
-#		define CredRename CredRenameA
-#		define CredGetTargetInfo CredGetTargetInfoA
-#		define CredMarshalCredential CredMarshalCredentialA
-#		define CredUnmarshalCredential CredUnmarshalCredentialA
-#		define CredIsMarshaledCredential CredIsMarshaledCredentialA
-#		define CredProtect CredProtectA
-#		define CredUnprotect CredUnprotectA
-#		define CredIsProtected CredIsProtectedA
-#		define CredFindBestCredential CredFindBestCredentialA
-#	endif
+#ifdef UNICODE
+#define CredWrite CredWriteW
+#define CredRead CredReadW
+#define CredEnumerate CredEnumerateW
+#define CredWriteDomainCredentials CredWriteDomainCredentialsW
+#define CredReadDomainCredentials CredReadDomainCredentialsW
+#define CredDelete CredDeleteW
+#define CredRename CredRenameW
+#define CredGetTargetInfo CredGetTargetInfoW
+#define CredMarshalCredential CredMarshalCredentialW
+#define CredUnmarshalCredential CredUnmarshalCredentialW
+#define CredIsMarshaledCredential CredIsMarshaledCredentialW
+#define CredProtect CredProtectW
+#define CredUnprotect CredUnprotectW
+#define CredIsProtected CredIsProtectedW
+#define CredFindBestCredential CredFindBestCredentialW
+#else
+#define CredWrite CredWriteA
+#define CredRead CredReadA
+#define CredEnumerate CredEnumerateA
+#define CredWriteDomainCredentials CredWriteDomainCredentialsA
+#define CredReadDomainCredentials CredReadDomainCredentialsA
+#define CredDelete CredDeleteA
+#define CredRename CredRenameA
+#define CredGetTargetInfo CredGetTargetInfoA
+#define CredMarshalCredential CredMarshalCredentialA
+#define CredUnmarshalCredential CredUnmarshalCredentialA
+#define CredIsMarshaledCredential CredIsMarshaledCredentialA
+#define CredProtect CredProtectA
+#define CredUnprotect CredUnprotectA
+#define CredIsProtected CredIsProtectedA
+#define CredFindBestCredential CredFindBestCredentialA
+#endif
 
 #endif
 

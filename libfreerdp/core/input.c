@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -556,41 +556,41 @@ static BOOL input_recv_event(rdpInput* input, wStream* s)
 
 	switch (messageType)
 	{
-	case INPUT_EVENT_SYNC:
-		if (!input_recv_sync_event(input, s))
-			return FALSE;
+		case INPUT_EVENT_SYNC:
+			if (!input_recv_sync_event(input, s))
+				return FALSE;
 
-		break;
+			break;
 
-	case INPUT_EVENT_SCANCODE:
-		if (!input_recv_keyboard_event(input, s))
-			return FALSE;
+		case INPUT_EVENT_SCANCODE:
+			if (!input_recv_keyboard_event(input, s))
+				return FALSE;
 
-		break;
+			break;
 
-	case INPUT_EVENT_UNICODE:
-		if (!input_recv_unicode_keyboard_event(input, s))
-			return FALSE;
+		case INPUT_EVENT_UNICODE:
+			if (!input_recv_unicode_keyboard_event(input, s))
+				return FALSE;
 
-		break;
+			break;
 
-	case INPUT_EVENT_MOUSE:
-		if (!input_recv_mouse_event(input, s))
-			return FALSE;
+		case INPUT_EVENT_MOUSE:
+			if (!input_recv_mouse_event(input, s))
+				return FALSE;
 
-		break;
+			break;
 
-	case INPUT_EVENT_MOUSEX:
-		if (!input_recv_extended_mouse_event(input, s))
-			return FALSE;
+		case INPUT_EVENT_MOUSEX:
+			if (!input_recv_extended_mouse_event(input, s))
+				return FALSE;
 
-		break;
+			break;
 
-	default:
-		WLog_ERR(TAG, "Unknown messageType %" PRIu16 "", messageType);
-		/* Each input event uses 6 bytes. */
-		Stream_Seek(s, 6);
-		break;
+		default:
+			WLog_ERR(TAG, "Unknown messageType %" PRIu16 "", messageType);
+			/* Each input event uses 6 bytes. */
+			Stream_Seek(s, 6);
+			break;
 	}
 
 	return TRUE;

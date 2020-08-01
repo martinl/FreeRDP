@@ -23,7 +23,7 @@
 #include <string.h>
 #include <unistd.h>
 #if defined(__linux__)
-#	include <libudev.h>
+#include <libudev.h>
 #endif
 
 #include <errno.h>
@@ -268,76 +268,76 @@ static int func_set_usbd_status(UDEVICE* pdev, UINT32* status, int err_result)
 {
 	switch (err_result)
 	{
-	case LIBUSB_SUCCESS:
-		*status = USBD_STATUS_SUCCESS;
-		break;
+		case LIBUSB_SUCCESS:
+			*status = USBD_STATUS_SUCCESS;
+			break;
 
-	case LIBUSB_ERROR_IO:
-		*status = USBD_STATUS_STALL_PID;
-		WLog_ERR(TAG, "LIBUSB_ERROR_IO!!");
-		break;
+		case LIBUSB_ERROR_IO:
+			*status = USBD_STATUS_STALL_PID;
+			WLog_ERR(TAG, "LIBUSB_ERROR_IO!!");
+			break;
 
-	case LIBUSB_ERROR_INVALID_PARAM:
-		*status = USBD_STATUS_INVALID_PARAMETER;
-		break;
+		case LIBUSB_ERROR_INVALID_PARAM:
+			*status = USBD_STATUS_INVALID_PARAMETER;
+			break;
 
-	case LIBUSB_ERROR_ACCESS:
-		*status = USBD_STATUS_NOT_ACCESSED;
-		break;
+		case LIBUSB_ERROR_ACCESS:
+			*status = USBD_STATUS_NOT_ACCESSED;
+			break;
 
-	case LIBUSB_ERROR_NO_DEVICE:
-		*status = USBD_STATUS_DEVICE_GONE;
+		case LIBUSB_ERROR_NO_DEVICE:
+			*status = USBD_STATUS_DEVICE_GONE;
 
-		if (pdev)
-		{
-			if (!(pdev->status & URBDRC_DEVICE_NOT_FOUND))
+			if (pdev)
 			{
-				pdev->status |= URBDRC_DEVICE_NOT_FOUND;
-				WLog_WARN(TAG, "LIBUSB_ERROR_NO_DEVICE!!");
+				if (!(pdev->status & URBDRC_DEVICE_NOT_FOUND))
+				{
+					pdev->status |= URBDRC_DEVICE_NOT_FOUND;
+					WLog_WARN(TAG, "LIBUSB_ERROR_NO_DEVICE!!");
+				}
 			}
-		}
 
-		break;
+			break;
 
-	case LIBUSB_ERROR_NOT_FOUND:
-		*status = USBD_STATUS_STALL_PID;
-		break;
+		case LIBUSB_ERROR_NOT_FOUND:
+			*status = USBD_STATUS_STALL_PID;
+			break;
 
-	case LIBUSB_ERROR_BUSY:
-		*status = USBD_STATUS_STALL_PID;
-		break;
+		case LIBUSB_ERROR_BUSY:
+			*status = USBD_STATUS_STALL_PID;
+			break;
 
-	case LIBUSB_ERROR_TIMEOUT:
-		*status = USBD_STATUS_TIMEOUT;
-		break;
+		case LIBUSB_ERROR_TIMEOUT:
+			*status = USBD_STATUS_TIMEOUT;
+			break;
 
-	case LIBUSB_ERROR_OVERFLOW:
-		*status = USBD_STATUS_STALL_PID;
-		break;
+		case LIBUSB_ERROR_OVERFLOW:
+			*status = USBD_STATUS_STALL_PID;
+			break;
 
-	case LIBUSB_ERROR_PIPE:
-		*status = USBD_STATUS_STALL_PID;
-		break;
+		case LIBUSB_ERROR_PIPE:
+			*status = USBD_STATUS_STALL_PID;
+			break;
 
-	case LIBUSB_ERROR_INTERRUPTED:
-		*status = USBD_STATUS_STALL_PID;
-		break;
+		case LIBUSB_ERROR_INTERRUPTED:
+			*status = USBD_STATUS_STALL_PID;
+			break;
 
-	case LIBUSB_ERROR_NO_MEM:
-		*status = USBD_STATUS_NO_MEMORY;
-		break;
+		case LIBUSB_ERROR_NO_MEM:
+			*status = USBD_STATUS_NO_MEMORY;
+			break;
 
-	case LIBUSB_ERROR_NOT_SUPPORTED:
-		*status = USBD_STATUS_NOT_SUPPORTED;
-		break;
+		case LIBUSB_ERROR_NOT_SUPPORTED:
+			*status = USBD_STATUS_NOT_SUPPORTED;
+			break;
 
-	case LIBUSB_ERROR_OTHER:
-		*status = USBD_STATUS_STALL_PID;
-		break;
+		case LIBUSB_ERROR_OTHER:
+			*status = USBD_STATUS_STALL_PID;
+			break;
 
-	default:
-		*status = USBD_STATUS_SUCCESS;
-		break;
+		default:
+			*status = USBD_STATUS_SUCCESS;
+			break;
 	}
 
 	return 0;
@@ -945,25 +945,25 @@ static int libusb_udev_control_pipe_request(IUDEVICE* idev, UINT32 RequestId,
 	*/
 	switch (command)
 	{
-	case PIPE_CANCEL:
-		/** cancel bulk or int transfer */
-		idev->cancel_all_transfer_request(idev);
-		// dummy_wait_s_obj(1);
-		/** set feature to ep (set halt)*/
-		error = libusb_control_transfer(
-		    pdev->libusb_handle, LIBUSB_ENDPOINT_OUT | LIBUSB_RECIPIENT_ENDPOINT,
-		    LIBUSB_REQUEST_SET_FEATURE, ENDPOINT_HALT, EndpointAddress, NULL, 0, 1000);
-		break;
+		case PIPE_CANCEL:
+			/** cancel bulk or int transfer */
+			idev->cancel_all_transfer_request(idev);
+			// dummy_wait_s_obj(1);
+			/** set feature to ep (set halt)*/
+			error = libusb_control_transfer(
+			    pdev->libusb_handle, LIBUSB_ENDPOINT_OUT | LIBUSB_RECIPIENT_ENDPOINT,
+			    LIBUSB_REQUEST_SET_FEATURE, ENDPOINT_HALT, EndpointAddress, NULL, 0, 1000);
+			break;
 
-	case PIPE_RESET:
-		idev->cancel_all_transfer_request(idev);
-		error = libusb_clear_halt(pdev->libusb_handle, EndpointAddress);
-		// func_set_usbd_status(pdev, UsbdStatus, error);
-		break;
+		case PIPE_RESET:
+			idev->cancel_all_transfer_request(idev);
+			error = libusb_clear_halt(pdev->libusb_handle, EndpointAddress);
+			// func_set_usbd_status(pdev, UsbdStatus, error);
+			break;
 
-	default:
-		error = -0xff;
-		break;
+		default:
+			error = -0xff;
+			break;
 	}
 
 	*UsbdStatus = 0;
@@ -988,58 +988,58 @@ static int libusb_udev_control_query_device_text(IUDEVICE* idev, UINT32 TextType
 
 	switch (TextType)
 	{
-	case DeviceTextDescription:
-		ret = libusb_get_string_descriptor(pdev->libusb_handle, devDescriptor->iProduct, LocaleId,
-		                                   Buffer, *BufferSize);
+		case DeviceTextDescription:
+			ret = libusb_get_string_descriptor(pdev->libusb_handle, devDescriptor->iProduct,
+			                                   LocaleId, Buffer, *BufferSize);
 
-		for (i = 0; (ret > 0) && (i < (size_t)ret); i++)
-		{
-			Buffer[i] = Buffer[i + 2];
-		}
-
-		ret -= 2;
-
-		if (ret <= 0 || ret < 4)
-		{
-			WLog_DBG(TAG,
-			         "libusb_get_string_descriptor: "
-			         "ERROR num %d, iProduct: %" PRIu8 "!",
-			         ret, devDescriptor->iProduct);
-			memcpy(Buffer, strDesc, strlen(strDesc));
-			Buffer[strlen(strDesc)] = '\0';
-			*BufferSize = (strlen((char*)Buffer)) * 2;
-
-			for (i = strlen((char*)Buffer); i > 0; i--)
+			for (i = 0; (ret > 0) && (i < (size_t)ret); i++)
 			{
-				Buffer[i * 2] = Buffer[i];
-				Buffer[(i * 2) - 1] = 0;
+				Buffer[i] = Buffer[i + 2];
 			}
-		}
-		else
-		{
-			*BufferSize = ret;
-		}
 
-		break;
+			ret -= 2;
 
-	case DeviceTextLocationInformation:
-		bus_number = libusb_get_bus_number(pdev->libusb_dev);
-		device_address = libusb_get_device_address(pdev->libusb_dev);
-		sprintf_s(deviceLocation, ARRAYSIZE(deviceLocation), "Port_#%04" PRIu8 ".Hub_#%04" PRIu8 "",
-		          device_address, bus_number);
+			if (ret <= 0 || ret < 4)
+			{
+				WLog_DBG(TAG,
+				         "libusb_get_string_descriptor: "
+				         "ERROR num %d, iProduct: %" PRIu8 "!",
+				         ret, devDescriptor->iProduct);
+				memcpy(Buffer, strDesc, strlen(strDesc));
+				Buffer[strlen(strDesc)] = '\0';
+				*BufferSize = (strlen((char*)Buffer)) * 2;
 
-		for (i = 0; i < strlen(deviceLocation); i++)
-		{
-			Buffer[i * 2] = (BYTE)deviceLocation[i];
-			Buffer[(i * 2) + 1] = 0;
-		}
+				for (i = strlen((char*)Buffer); i > 0; i--)
+				{
+					Buffer[i * 2] = Buffer[i];
+					Buffer[(i * 2) - 1] = 0;
+				}
+			}
+			else
+			{
+				*BufferSize = ret;
+			}
 
-		*BufferSize = (i * 2);
-		break;
+			break;
 
-	default:
-		WLog_DBG(TAG, "Query Text: unknown TextType %" PRIu32 "", TextType);
-		break;
+		case DeviceTextLocationInformation:
+			bus_number = libusb_get_bus_number(pdev->libusb_dev);
+			device_address = libusb_get_device_address(pdev->libusb_dev);
+			sprintf_s(deviceLocation, ARRAYSIZE(deviceLocation),
+			          "Port_#%04" PRIu8 ".Hub_#%04" PRIu8 "", device_address, bus_number);
+
+			for (i = 0; i < strlen(deviceLocation); i++)
+			{
+				Buffer[i * 2] = (BYTE)deviceLocation[i];
+				Buffer[(i * 2) + 1] = 0;
+			}
+
+			*BufferSize = (i * 2);
+			break;
+
+		default:
+			WLog_DBG(TAG, "Query Text: unknown TextType %" PRIu32 "", TextType);
+			break;
 	}
 
 	return 0;
@@ -1094,50 +1094,50 @@ static int libusb_udev_query_device_descriptor(IUDEVICE* idev, int offset)
 
 	switch (offset)
 	{
-	case B_LENGTH:
-		return pdev->devDescriptor->bLength;
+		case B_LENGTH:
+			return pdev->devDescriptor->bLength;
 
-	case B_DESCRIPTOR_TYPE:
-		return pdev->devDescriptor->bDescriptorType;
+		case B_DESCRIPTOR_TYPE:
+			return pdev->devDescriptor->bDescriptorType;
 
-	case BCD_USB:
-		return pdev->devDescriptor->bcdUSB;
+		case BCD_USB:
+			return pdev->devDescriptor->bcdUSB;
 
-	case B_DEVICE_CLASS:
-		return pdev->devDescriptor->bDeviceClass;
+		case B_DEVICE_CLASS:
+			return pdev->devDescriptor->bDeviceClass;
 
-	case B_DEVICE_SUBCLASS:
-		return pdev->devDescriptor->bDeviceSubClass;
+		case B_DEVICE_SUBCLASS:
+			return pdev->devDescriptor->bDeviceSubClass;
 
-	case B_DEVICE_PROTOCOL:
-		return pdev->devDescriptor->bDeviceProtocol;
+		case B_DEVICE_PROTOCOL:
+			return pdev->devDescriptor->bDeviceProtocol;
 
-	case B_MAX_PACKET_SIZE0:
-		return pdev->devDescriptor->bMaxPacketSize0;
+		case B_MAX_PACKET_SIZE0:
+			return pdev->devDescriptor->bMaxPacketSize0;
 
-	case ID_VENDOR:
-		return pdev->devDescriptor->idVendor;
+		case ID_VENDOR:
+			return pdev->devDescriptor->idVendor;
 
-	case ID_PRODUCT:
-		return pdev->devDescriptor->idProduct;
+		case ID_PRODUCT:
+			return pdev->devDescriptor->idProduct;
 
-	case BCD_DEVICE:
-		return pdev->devDescriptor->bcdDevice;
+		case BCD_DEVICE:
+			return pdev->devDescriptor->bcdDevice;
 
-	case I_MANUFACTURER:
-		return pdev->devDescriptor->iManufacturer;
+		case I_MANUFACTURER:
+			return pdev->devDescriptor->iManufacturer;
 
-	case I_PRODUCT:
-		return pdev->devDescriptor->iProduct;
+		case I_PRODUCT:
+			return pdev->devDescriptor->iProduct;
 
-	case I_SERIAL_NUMBER:
-		return pdev->devDescriptor->iSerialNumber;
+		case I_SERIAL_NUMBER:
+			return pdev->devDescriptor->iSerialNumber;
 
-	case B_NUM_CONFIGURATIONS:
-		return pdev->devDescriptor->bNumConfigurations;
+		case B_NUM_CONFIGURATIONS:
+			return pdev->devDescriptor->bNumConfigurations;
 
-	default:
-		return 0;
+		default:
+			return 0;
 	}
 
 	return 0;
@@ -1481,39 +1481,39 @@ static int libusb_udev_bulk_or_interrupt_transfer(IUDEVICE* idev, UINT32 Request
 
 	switch (transfer_type)
 	{
-	case BULK_TRANSFER:
-		/** Bulk Transfer */
-		// Timeout = 10000;
-		break;
+		case BULK_TRANSFER:
+			/** Bulk Transfer */
+			// Timeout = 10000;
+			break;
 
-	case INTERRUPT_TRANSFER:
+		case INTERRUPT_TRANSFER:
 
-		/**  Interrupt Transfer */
-		/** Sometime, we may have receive a oversized transfer request,
-		 * it make submit urb return error, so we set the length of
-		 * request to wMaxPacketSize */
-		if (*BufferSize != (ep_desc->wMaxPacketSize))
-		{
+			/**  Interrupt Transfer */
+			/** Sometime, we may have receive a oversized transfer request,
+			 * it make submit urb return error, so we set the length of
+			 * request to wMaxPacketSize */
+			if (*BufferSize != (ep_desc->wMaxPacketSize))
+			{
+				WLog_DBG(TAG,
+				         "Interrupt Transfer(%s): "
+				         "BufferSize is different than maxPacketsize(0x%x)",
+				         ((transferDir) ? "IN" : "OUT"), ep_desc->wMaxPacketSize);
+
+				if ((*BufferSize) > (ep_desc->wMaxPacketSize) &&
+				    transferDir == USBD_TRANSFER_DIRECTION_IN)
+					(*BufferSize) = ep_desc->wMaxPacketSize;
+			}
+
+			Timeout = 0;
+			break;
+
+		default:
 			WLog_DBG(TAG,
-			         "Interrupt Transfer(%s): "
-			         "BufferSize is different than maxPacketsize(0x%x)",
-			         ((transferDir) ? "IN" : "OUT"), ep_desc->wMaxPacketSize);
-
-			if ((*BufferSize) > (ep_desc->wMaxPacketSize) &&
-			    transferDir == USBD_TRANSFER_DIRECTION_IN)
-				(*BufferSize) = ep_desc->wMaxPacketSize;
-		}
-
-		Timeout = 0;
-		break;
-
-	default:
-		WLog_DBG(TAG,
-		         "urb_bulk_or_interrupt_transfer:"
-		         " other transfer type 0x%" PRIX32 "",
-		         transfer_type);
-		return -1;
-		break;
+			         "urb_bulk_or_interrupt_transfer:"
+			         " other transfer type 0x%" PRIX32 "",
+			         transfer_type);
+			return -1;
+			break;
 	}
 
 	libusb_fill_bulk_transfer(transfer, pdev->libusb_handle, EndpointAddress, Buffer, *BufferSize,
@@ -1575,29 +1575,29 @@ static int libusb_udev_bulk_or_interrupt_transfer(IUDEVICE* idev, UINT32 Request
 
 		switch (transfer->status)
 		{
-		case LIBUSB_TRANSFER_COMPLETED:
-			func_set_usbd_status(pdev, UsbdStatus, 0);
-			break;
+			case LIBUSB_TRANSFER_COMPLETED:
+				func_set_usbd_status(pdev, UsbdStatus, 0);
+				break;
 
-		case LIBUSB_TRANSFER_TIMED_OUT:
-			func_set_usbd_status(pdev, UsbdStatus, LIBUSB_ERROR_TIMEOUT);
-			break;
+			case LIBUSB_TRANSFER_TIMED_OUT:
+				func_set_usbd_status(pdev, UsbdStatus, LIBUSB_ERROR_TIMEOUT);
+				break;
 
-		case LIBUSB_TRANSFER_STALL:
-			func_set_usbd_status(pdev, UsbdStatus, LIBUSB_ERROR_PIPE);
-			break;
+			case LIBUSB_TRANSFER_STALL:
+				func_set_usbd_status(pdev, UsbdStatus, LIBUSB_ERROR_PIPE);
+				break;
 
-		case LIBUSB_TRANSFER_OVERFLOW:
-			func_set_usbd_status(pdev, UsbdStatus, LIBUSB_ERROR_OVERFLOW);
-			break;
+			case LIBUSB_TRANSFER_OVERFLOW:
+				func_set_usbd_status(pdev, UsbdStatus, LIBUSB_ERROR_OVERFLOW);
+				break;
 
-		case LIBUSB_TRANSFER_NO_DEVICE:
-			func_set_usbd_status(pdev, UsbdStatus, LIBUSB_ERROR_NO_DEVICE);
-			break;
+			case LIBUSB_TRANSFER_NO_DEVICE:
+				func_set_usbd_status(pdev, UsbdStatus, LIBUSB_ERROR_NO_DEVICE);
+				break;
 
-		default:
-			func_set_usbd_status(pdev, UsbdStatus, LIBUSB_ERROR_OTHER);
-			break;
+			default:
+				func_set_usbd_status(pdev, UsbdStatus, LIBUSB_ERROR_OTHER);
+				break;
 		}
 
 		*BufferSize = transfer->actual_length;
@@ -1843,25 +1843,25 @@ static IUDEVICE* udev_init(UDEVICE* pdev, UINT16 bus_number, UINT16 dev_number)
 	/* Denied list */
 	switch (interface_temp.bInterfaceClass)
 	{
-	case CLASS_RESERVE:
+		case CLASS_RESERVE:
 
-	// case CLASS_COMMUNICATION_IF:
-	// case CLASS_HID:
-	// case CLASS_PHYSICAL:
-	case CLASS_MASS_STORAGE:
-	case CLASS_HUB:
+		// case CLASS_COMMUNICATION_IF:
+		// case CLASS_HID:
+		// case CLASS_PHYSICAL:
+		case CLASS_MASS_STORAGE:
+		case CLASS_HUB:
 
-	// case CLASS_COMMUNICATION_DATA_IF:
-	case CLASS_SMART_CARD:
-	case CLASS_CONTENT_SECURITY:
-		// case CLASS_WIRELESS_CONTROLLER:
-		// case CLASS_ELSE_DEVICE:
-		WLog_ERR(TAG, "    Device is not supported!!");
-		zfree(pdev);
-		return NULL;
+		// case CLASS_COMMUNICATION_DATA_IF:
+		case CLASS_SMART_CARD:
+		case CLASS_CONTENT_SECURITY:
+			// case CLASS_WIRELESS_CONTROLLER:
+			// case CLASS_ELSE_DEVICE:
+			WLog_ERR(TAG, "    Device is not supported!!");
+			zfree(pdev);
+			return NULL;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	/* Check composite device */

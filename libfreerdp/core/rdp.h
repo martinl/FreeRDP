@@ -22,7 +22,7 @@
 #define FREERDP_LIB_CORE_RDP_H
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "nla.h"
@@ -226,13 +226,13 @@ FREERDP_LOCAL void rdp_free(rdpRdp* rdp);
 
 #define RDP_TAG FREERDP_TAG("core.rdp")
 #ifdef WITH_DEBUG_RDP
-#	define DEBUG_RDP(...) WLog_DBG(RDP_TAG, __VA_ARGS__)
+#define DEBUG_RDP(...) WLog_DBG(RDP_TAG, __VA_ARGS__)
 extern const char* DATA_PDU_TYPE_STRINGS[80];
 #else
-#	define DEBUG_RDP(...) \
-		do                 \
-		{                  \
-		} while (0)
+#define DEBUG_RDP(...) \
+	do                 \
+	{                  \
+	} while (0)
 #endif
 
 BOOL rdp_decrypt(rdpRdp* rdp, wStream* s, INT32 length, UINT16 securityFlags);

@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -103,28 +103,28 @@ UINT tsmf_ifman_exchange_capability_request(TSMF_IFMAN* ifman)
 
 		switch (CapabilityType)
 		{
-		case 1: /* Protocol version request */
-			if (Stream_GetRemainingLength(ifman->output) < 4)
-				return ERROR_INVALID_DATA;
+			case 1: /* Protocol version request */
+				if (Stream_GetRemainingLength(ifman->output) < 4)
+					return ERROR_INVALID_DATA;
 
-			Stream_Read_UINT32(ifman->output, v);
-			DEBUG_TSMF("server protocol version %" PRIu32 "", v);
-			break;
+				Stream_Read_UINT32(ifman->output, v);
+				DEBUG_TSMF("server protocol version %" PRIu32 "", v);
+				break;
 
-		case 2: /* Supported platform */
-			if (Stream_GetRemainingLength(ifman->output) < 4)
-				return ERROR_INVALID_DATA;
+			case 2: /* Supported platform */
+				if (Stream_GetRemainingLength(ifman->output) < 4)
+					return ERROR_INVALID_DATA;
 
-			Stream_Peek_UINT32(ifman->output, v);
-			DEBUG_TSMF("server supported platform %" PRIu32 "", v);
-			/* Claim that we support both MF and DShow platforms. */
-			Stream_Write_UINT32(ifman->output,
-			                    MMREDIR_CAPABILITY_PLATFORM_MF | MMREDIR_CAPABILITY_PLATFORM_DSHOW);
-			break;
+				Stream_Peek_UINT32(ifman->output, v);
+				DEBUG_TSMF("server supported platform %" PRIu32 "", v);
+				/* Claim that we support both MF and DShow platforms. */
+				Stream_Write_UINT32(ifman->output, MMREDIR_CAPABILITY_PLATFORM_MF |
+				                                       MMREDIR_CAPABILITY_PLATFORM_DSHOW);
+				break;
 
-		default:
-			WLog_ERR(TAG, "skipping unknown capability type %" PRIu32 "", CapabilityType);
-			break;
+			default:
+				WLog_ERR(TAG, "skipping unknown capability type %" PRIu32 "", CapabilityType);
+				break;
 		}
 
 		Stream_SetPosition(ifman->output, pos + cbCapabilityLength);

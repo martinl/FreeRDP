@@ -27,9 +27,9 @@
 #include <stdbool.h>
 
 #if __GNUC__ >= 4
-#	define UWAC_API __attribute__((visibility("default")))
+#define UWAC_API __attribute__((visibility("default")))
 #else
-#	define UWAC_API
+#define UWAC_API
 #endif
 
 typedef struct uwac_size UwacSize;
@@ -257,7 +257,8 @@ struct uwac_output_geometry_event
 typedef struct uwac_output_geometry_event UwacOutputGeometryEvent;
 
 /** @brief */
-union uwac_event {
+union uwac_event
+{
 	int type;
 	UwacOutputNewEvent output_new;
 	UwacOutputGeometryEvent output_geometry;

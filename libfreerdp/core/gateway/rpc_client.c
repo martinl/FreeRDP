@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/log.h>
@@ -132,37 +132,37 @@ static int rpc_client_transition_to_state(rdpRpc* rpc, RPC_CLIENT_STATE state)
 
 	switch (state)
 	{
-	case RPC_CLIENT_STATE_INITIAL:
-		str = "RPC_CLIENT_STATE_INITIAL";
-		break;
+		case RPC_CLIENT_STATE_INITIAL:
+			str = "RPC_CLIENT_STATE_INITIAL";
+			break;
 
-	case RPC_CLIENT_STATE_ESTABLISHED:
-		str = "RPC_CLIENT_STATE_ESTABLISHED";
-		break;
+		case RPC_CLIENT_STATE_ESTABLISHED:
+			str = "RPC_CLIENT_STATE_ESTABLISHED";
+			break;
 
-	case RPC_CLIENT_STATE_WAIT_SECURE_BIND_ACK:
-		str = "RPC_CLIENT_STATE_WAIT_SECURE_BIND_ACK";
-		break;
+		case RPC_CLIENT_STATE_WAIT_SECURE_BIND_ACK:
+			str = "RPC_CLIENT_STATE_WAIT_SECURE_BIND_ACK";
+			break;
 
-	case RPC_CLIENT_STATE_WAIT_UNSECURE_BIND_ACK:
-		str = "RPC_CLIENT_STATE_WAIT_UNSECURE_BIND_ACK";
-		break;
+		case RPC_CLIENT_STATE_WAIT_UNSECURE_BIND_ACK:
+			str = "RPC_CLIENT_STATE_WAIT_UNSECURE_BIND_ACK";
+			break;
 
-	case RPC_CLIENT_STATE_WAIT_SECURE_ALTER_CONTEXT_RESPONSE:
-		str = "RPC_CLIENT_STATE_WAIT_SECURE_ALTER_CONTEXT_RESPONSE";
-		break;
+		case RPC_CLIENT_STATE_WAIT_SECURE_ALTER_CONTEXT_RESPONSE:
+			str = "RPC_CLIENT_STATE_WAIT_SECURE_ALTER_CONTEXT_RESPONSE";
+			break;
 
-	case RPC_CLIENT_STATE_CONTEXT_NEGOTIATED:
-		str = "RPC_CLIENT_STATE_CONTEXT_NEGOTIATED";
-		break;
+		case RPC_CLIENT_STATE_CONTEXT_NEGOTIATED:
+			str = "RPC_CLIENT_STATE_CONTEXT_NEGOTIATED";
+			break;
 
-	case RPC_CLIENT_STATE_WAIT_RESPONSE:
-		str = "RPC_CLIENT_STATE_WAIT_RESPONSE";
-		break;
+		case RPC_CLIENT_STATE_WAIT_RESPONSE:
+			str = "RPC_CLIENT_STATE_WAIT_RESPONSE";
+			break;
 
-	case RPC_CLIENT_STATE_FINAL:
-		str = "RPC_CLIENT_STATE_FINAL";
-		break;
+		case RPC_CLIENT_STATE_FINAL:
+			str = "RPC_CLIENT_STATE_FINAL";
+			break;
 	}
 
 	rpc->State = state;
@@ -180,70 +180,70 @@ static int rpc_client_recv_pdu(rdpRpc* rpc, RPC_PDU* pdu)
 	{
 		switch (rpc->VirtualConnection->State)
 		{
-		case VIRTUAL_CONNECTION_STATE_INITIAL:
-			break;
+			case VIRTUAL_CONNECTION_STATE_INITIAL:
+				break;
 
-		case VIRTUAL_CONNECTION_STATE_OUT_CHANNEL_WAIT:
-			break;
+			case VIRTUAL_CONNECTION_STATE_OUT_CHANNEL_WAIT:
+				break;
 
-		case VIRTUAL_CONNECTION_STATE_WAIT_A3W:
-			rts = (rpcconn_rts_hdr_t*)Stream_Buffer(pdu->s);
+			case VIRTUAL_CONNECTION_STATE_WAIT_A3W:
+				rts = (rpcconn_rts_hdr_t*)Stream_Buffer(pdu->s);
 
-			if (!rts_match_pdu_signature(&RTS_PDU_CONN_A3_SIGNATURE, rts))
-			{
-				WLog_ERR(TAG, "unexpected RTS PDU: Expected CONN/A3");
-				return -1;
-			}
+				if (!rts_match_pdu_signature(&RTS_PDU_CONN_A3_SIGNATURE, rts))
+				{
+					WLog_ERR(TAG, "unexpected RTS PDU: Expected CONN/A3");
+					return -1;
+				}
 
-			status = rts_recv_CONN_A3_pdu(rpc, Stream_Buffer(pdu->s), Stream_Length(pdu->s));
+				status = rts_recv_CONN_A3_pdu(rpc, Stream_Buffer(pdu->s), Stream_Length(pdu->s));
 
-			if (status < 0)
-			{
-				WLog_ERR(TAG, "rts_recv_CONN_A3_pdu failure");
-				return -1;
-			}
+				if (status < 0)
+				{
+					WLog_ERR(TAG, "rts_recv_CONN_A3_pdu failure");
+					return -1;
+				}
 
-			rpc_virtual_connection_transition_to_state(rpc, rpc->VirtualConnection,
-			                                           VIRTUAL_CONNECTION_STATE_WAIT_C2);
-			status = 1;
-			break;
+				rpc_virtual_connection_transition_to_state(rpc, rpc->VirtualConnection,
+				                                           VIRTUAL_CONNECTION_STATE_WAIT_C2);
+				status = 1;
+				break;
 
-		case VIRTUAL_CONNECTION_STATE_WAIT_C2:
-			rts = (rpcconn_rts_hdr_t*)Stream_Buffer(pdu->s);
+			case VIRTUAL_CONNECTION_STATE_WAIT_C2:
+				rts = (rpcconn_rts_hdr_t*)Stream_Buffer(pdu->s);
 
-			if (!rts_match_pdu_signature(&RTS_PDU_CONN_C2_SIGNATURE, rts))
-			{
-				WLog_ERR(TAG, "unexpected RTS PDU: Expected CONN/C2");
-				return -1;
-			}
+				if (!rts_match_pdu_signature(&RTS_PDU_CONN_C2_SIGNATURE, rts))
+				{
+					WLog_ERR(TAG, "unexpected RTS PDU: Expected CONN/C2");
+					return -1;
+				}
 
-			status = rts_recv_CONN_C2_pdu(rpc, Stream_Buffer(pdu->s), Stream_Length(pdu->s));
+				status = rts_recv_CONN_C2_pdu(rpc, Stream_Buffer(pdu->s), Stream_Length(pdu->s));
 
-			if (status < 0)
-			{
-				WLog_ERR(TAG, "rts_recv_CONN_C2_pdu failure");
-				return -1;
-			}
+				if (status < 0)
+				{
+					WLog_ERR(TAG, "rts_recv_CONN_C2_pdu failure");
+					return -1;
+				}
 
-			rpc_virtual_connection_transition_to_state(rpc, rpc->VirtualConnection,
-			                                           VIRTUAL_CONNECTION_STATE_OPENED);
-			rpc_client_transition_to_state(rpc, RPC_CLIENT_STATE_ESTABLISHED);
+				rpc_virtual_connection_transition_to_state(rpc, rpc->VirtualConnection,
+				                                           VIRTUAL_CONNECTION_STATE_OPENED);
+				rpc_client_transition_to_state(rpc, RPC_CLIENT_STATE_ESTABLISHED);
 
-			if (rpc_send_bind_pdu(rpc) < 0)
-			{
-				WLog_ERR(TAG, "rpc_send_bind_pdu failure");
-				return -1;
-			}
+				if (rpc_send_bind_pdu(rpc) < 0)
+				{
+					WLog_ERR(TAG, "rpc_send_bind_pdu failure");
+					return -1;
+				}
 
-			rpc_client_transition_to_state(rpc, RPC_CLIENT_STATE_WAIT_SECURE_BIND_ACK);
-			status = 1;
-			break;
+				rpc_client_transition_to_state(rpc, RPC_CLIENT_STATE_WAIT_SECURE_BIND_ACK);
+				status = 1;
+				break;
 
-		case VIRTUAL_CONNECTION_STATE_OPENED:
-			break;
+			case VIRTUAL_CONNECTION_STATE_OPENED:
+				break;
 
-		case VIRTUAL_CONNECTION_STATE_FINAL:
-			break;
+			case VIRTUAL_CONNECTION_STATE_FINAL:
+				break;
 		}
 	}
 	else if (rpc->State < RPC_CLIENT_STATE_CONTEXT_NEGOTIATED)
@@ -658,40 +658,41 @@ static int rpc_client_nondefault_out_channel_recv(rdpRpc* rpc)
 	{
 		switch (nextOutChannel->State)
 		{
-		case CLIENT_OUT_CHANNEL_STATE_SECURITY:
-			if (rpc_ncacn_http_recv_out_channel_response(&nextOutChannel->common, response))
-			{
-				if (rpc_ncacn_http_send_out_channel_request(&nextOutChannel->common, TRUE))
+			case CLIENT_OUT_CHANNEL_STATE_SECURITY:
+				if (rpc_ncacn_http_recv_out_channel_response(&nextOutChannel->common, response))
 				{
-					rpc_ncacn_http_ntlm_uninit(&nextOutChannel->common);
-					status = rts_send_OUT_R1_A3_pdu(rpc);
-
-					if (status >= 0)
+					if (rpc_ncacn_http_send_out_channel_request(&nextOutChannel->common, TRUE))
 					{
-						rpc_out_channel_transition_to_state(nextOutChannel,
-						                                    CLIENT_OUT_CHANNEL_STATE_OPENED_A6W);
+						rpc_ncacn_http_ntlm_uninit(&nextOutChannel->common);
+						status = rts_send_OUT_R1_A3_pdu(rpc);
+
+						if (status >= 0)
+						{
+							rpc_out_channel_transition_to_state(
+							    nextOutChannel, CLIENT_OUT_CHANNEL_STATE_OPENED_A6W);
+						}
+						else
+						{
+							WLog_ERR(TAG, "rts_send_OUT_R1/A3_pdu failure");
+						}
 					}
 					else
 					{
-						WLog_ERR(TAG, "rts_send_OUT_R1/A3_pdu failure");
+						WLog_ERR(TAG, "rpc_ncacn_http_send_out_channel_request failure");
 					}
 				}
 				else
 				{
-					WLog_ERR(TAG, "rpc_ncacn_http_send_out_channel_request failure");
+					WLog_ERR(TAG, "rpc_ncacn_http_recv_out_channel_response failure");
 				}
-			}
-			else
-			{
-				WLog_ERR(TAG, "rpc_ncacn_http_recv_out_channel_response failure");
-			}
 
-			break;
+				break;
 
-		default:
-			WLog_ERR(TAG, "rpc_client_nondefault_out_channel_recv: Unexpected message %08" PRIx32,
-			         nextOutChannel->State);
-			return -1;
+			default:
+				WLog_ERR(TAG,
+				         "rpc_client_nondefault_out_channel_recv: Unexpected message %08" PRIx32,
+				         nextOutChannel->State);
+				return -1;
 		}
 
 		http_response_free(response);

@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -25,15 +25,15 @@
 #include <winpr/crypto.h>
 
 #ifdef WITH_OPENSSL
-#	include <openssl/crypto.h>
-#	include <openssl/rand.h>
+#include <openssl/crypto.h>
+#include <openssl/rand.h>
 #endif
 
 #ifdef WITH_MBEDTLS
-#	include <mbedtls/md.h>
-#	include <mbedtls/entropy.h>
-#	include <mbedtls/havege.h>
-#	include <mbedtls/hmac_drbg.h>
+#include <mbedtls/md.h>
+#include <mbedtls/entropy.h>
+#include <mbedtls/havege.h>
+#include <mbedtls/hmac_drbg.h>
 #endif
 
 int winpr_RAND(BYTE* output, size_t len)

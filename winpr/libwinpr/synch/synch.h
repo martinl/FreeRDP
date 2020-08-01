@@ -21,7 +21,7 @@
 #define WINPR_SYNCH_PRIVATE_H
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/platform.h>
@@ -32,21 +32,21 @@
 
 #ifndef _WIN32
 
-#	define WINPR_PIPE_SEMAPHORE 1
+#define WINPR_PIPE_SEMAPHORE 1
 
-#	if defined __APPLE__
-#		include <pthread.h>
-#		include <sys/time.h>
-#		include <semaphore.h>
-#		include <mach/mach.h>
-#		include <mach/semaphore.h>
-#		include <mach/task.h>
-#		define winpr_sem_t semaphore_t
-#	else
-#		include <pthread.h>
-#		include <semaphore.h>
-#		define winpr_sem_t sem_t
-#	endif
+#if defined __APPLE__
+#include <pthread.h>
+#include <sys/time.h>
+#include <semaphore.h>
+#include <mach/mach.h>
+#include <mach/semaphore.h>
+#include <mach/task.h>
+#define winpr_sem_t semaphore_t
+#else
+#include <pthread.h>
+#include <semaphore.h>
+#define winpr_sem_t sem_t
+#endif
 
 struct winpr_mutex
 {
@@ -76,16 +76,16 @@ struct winpr_event
 };
 typedef struct winpr_event WINPR_EVENT;
 
-#	ifdef HAVE_SYS_TIMERFD_H
-#		include <stdio.h>
-#		include <unistd.h>
-#		include <fcntl.h>
-#		include <sys/timerfd.h>
-#	endif
+#ifdef HAVE_SYS_TIMERFD_H
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/timerfd.h>
+#endif
 
-#	if defined(__APPLE__)
-#		include <dispatch/dispatch.h>
-#	endif
+#if defined(__APPLE__)
+#include <dispatch/dispatch.h>
+#endif
 
 struct winpr_timer
 {
@@ -99,16 +99,16 @@ struct winpr_timer
 	LPVOID lpArgToCompletionRoutine;
 	char* name;
 
-#	ifdef WITH_POSIX_TIMER
+#ifdef WITH_POSIX_TIMER
 	timer_t tid;
 	struct itimerspec timeout;
-#	endif
-#	if defined(__APPLE__)
+#endif
+#if defined(__APPLE__)
 	dispatch_queue_t queue;
 	dispatch_source_t source;
 	int pipe[2];
 	BOOL running;
-#	endif
+#endif
 };
 typedef struct winpr_timer WINPR_TIMER;
 

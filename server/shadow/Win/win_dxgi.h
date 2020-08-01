@@ -25,12 +25,12 @@
 
 #ifdef WITH_DXGI_1_2
 
-#	ifndef CINTERFACE
-#		define CINTERFACE
-#	endif
+#ifndef CINTERFACE
+#define CINTERFACE
+#endif
 
-#	include <D3D11.h>
-#	include <dxgi1_2.h>
+#include <D3D11.h>
+#include <dxgi1_2.h>
 
 #endif
 

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -63,27 +63,27 @@ static snd_pcm_format_t audin_alsa_format(UINT32 wFormatTag, UINT32 bitPerChanne
 {
 	switch (wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		switch (bitPerChannel)
-		{
-		case 16:
-			return SND_PCM_FORMAT_S16_LE;
+		case WAVE_FORMAT_PCM:
+			switch (bitPerChannel)
+			{
+				case 16:
+					return SND_PCM_FORMAT_S16_LE;
 
-		case 8:
-			return SND_PCM_FORMAT_S8;
+				case 8:
+					return SND_PCM_FORMAT_S8;
+
+				default:
+					return SND_PCM_FORMAT_UNKNOWN;
+			}
+
+		case WAVE_FORMAT_ALAW:
+			return SND_PCM_FORMAT_A_LAW;
+
+		case WAVE_FORMAT_MULAW:
+			return SND_PCM_FORMAT_MU_LAW;
 
 		default:
 			return SND_PCM_FORMAT_UNKNOWN;
-		}
-
-	case WAVE_FORMAT_ALAW:
-		return SND_PCM_FORMAT_A_LAW;
-
-	case WAVE_FORMAT_MULAW:
-		return SND_PCM_FORMAT_MU_LAW;
-
-	default:
-		return SND_PCM_FORMAT_UNKNOWN;
 	}
 }
 
@@ -226,22 +226,22 @@ static BOOL audin_alsa_format_supported(IAudinDevice* device, const AUDIO_FORMAT
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		if (format->cbSize == 0 && (format->nSamplesPerSec <= 48000) &&
-		    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
-		    (format->nChannels == 1 || format->nChannels == 2))
-		{
+		case WAVE_FORMAT_PCM:
+			if (format->cbSize == 0 && (format->nSamplesPerSec <= 48000) &&
+			    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
+			    (format->nChannels == 1 || format->nChannels == 2))
+			{
+				return TRUE;
+			}
+
+			break;
+
+		case WAVE_FORMAT_ALAW:
+		case WAVE_FORMAT_MULAW:
 			return TRUE;
-		}
 
-		break;
-
-	case WAVE_FORMAT_ALAW:
-	case WAVE_FORMAT_MULAW:
-		return TRUE;
-
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	return FALSE;
@@ -387,9 +387,9 @@ static UINT audin_alsa_parse_addin_args(AudinALSADevice* device, ADDIN_ARGV* arg
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_audin_client_subsystem_entry alsa_freerdp_audin_client_subsystem_entry
+#define freerdp_audin_client_subsystem_entry alsa_freerdp_audin_client_subsystem_entry
 #else
-#	define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
+#define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
 #endif
 
 /**

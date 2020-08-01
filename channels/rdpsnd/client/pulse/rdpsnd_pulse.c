@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -77,16 +77,16 @@ static void rdpsnd_pulse_get_sink_info(pa_context* c, const pa_sink_info* i, int
 
 		switch (x)
 		{
-		case 0:
-			dwVolumeLeft = (UINT16)volume;
-			break;
+			case 0:
+				dwVolumeLeft = (UINT16)volume;
+				break;
 
-		case 1:
-			dwVolumeRight = (UINT16)volume;
-			break;
+			case 1:
+				dwVolumeRight = (UINT16)volume;
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -101,17 +101,17 @@ static void rdpsnd_pulse_context_state_callback(pa_context* context, void* userd
 
 	switch (state)
 	{
-	case PA_CONTEXT_READY:
-		pa_threaded_mainloop_signal(pulse->mainloop, 0);
-		break;
+		case PA_CONTEXT_READY:
+			pa_threaded_mainloop_signal(pulse->mainloop, 0);
+			break;
 
-	case PA_CONTEXT_FAILED:
-	case PA_CONTEXT_TERMINATED:
-		pa_threaded_mainloop_signal(pulse->mainloop, 0);
-		break;
+		case PA_CONTEXT_FAILED:
+		case PA_CONTEXT_TERMINATED:
+			pa_threaded_mainloop_signal(pulse->mainloop, 0);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 }
 
@@ -197,17 +197,17 @@ static void rdpsnd_pulse_stream_state_callback(pa_stream* stream, void* userdata
 
 	switch (state)
 	{
-	case PA_STREAM_READY:
-		pa_threaded_mainloop_signal(pulse->mainloop, 0);
-		break;
+		case PA_STREAM_READY:
+			pa_threaded_mainloop_signal(pulse->mainloop, 0);
+			break;
 
-	case PA_STREAM_FAILED:
-	case PA_STREAM_TERMINATED:
-		pa_threaded_mainloop_signal(pulse->mainloop, 0);
-		break;
+		case PA_STREAM_FAILED:
+		case PA_STREAM_TERMINATED:
+			pa_threaded_mainloop_signal(pulse->mainloop, 0);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 }
 
@@ -248,33 +248,33 @@ static BOOL rdpsnd_pulse_set_format_spec(rdpsndPulsePlugin* pulse, const AUDIO_F
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		switch (format->wBitsPerSample)
-		{
-		case 8:
-			sample_spec.format = PA_SAMPLE_U8;
+		case WAVE_FORMAT_PCM:
+			switch (format->wBitsPerSample)
+			{
+				case 8:
+					sample_spec.format = PA_SAMPLE_U8;
+					break;
+
+				case 16:
+					sample_spec.format = PA_SAMPLE_S16LE;
+					break;
+
+				default:
+					return FALSE;
+			}
+
 			break;
 
-		case 16:
-			sample_spec.format = PA_SAMPLE_S16LE;
+		case WAVE_FORMAT_ALAW:
+			sample_spec.format = PA_SAMPLE_ALAW;
+			break;
+
+		case WAVE_FORMAT_MULAW:
+			sample_spec.format = PA_SAMPLE_ULAW;
 			break;
 
 		default:
 			return FALSE;
-		}
-
-		break;
-
-	case WAVE_FORMAT_ALAW:
-		sample_spec.format = PA_SAMPLE_ALAW;
-		break;
-
-	case WAVE_FORMAT_MULAW:
-		sample_spec.format = PA_SAMPLE_ULAW;
-		break;
-
-	default:
-		return FALSE;
 	}
 
 	pulse->sample_spec = sample_spec;
@@ -394,26 +394,26 @@ BOOL rdpsnd_pulse_format_supported(rdpsndDevicePlugin* device, const AUDIO_FORMA
 {
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		if (format->cbSize == 0 && (format->nSamplesPerSec <= PA_RATE_MAX) &&
-		    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
-		    (format->nChannels >= 1 && format->nChannels <= PA_CHANNELS_MAX))
-		{
-			return TRUE;
-		}
+		case WAVE_FORMAT_PCM:
+			if (format->cbSize == 0 && (format->nSamplesPerSec <= PA_RATE_MAX) &&
+			    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
+			    (format->nChannels >= 1 && format->nChannels <= PA_CHANNELS_MAX))
+			{
+				return TRUE;
+			}
 
-		break;
+			break;
 
-	case WAVE_FORMAT_ALAW:
-	case WAVE_FORMAT_MULAW:
-		if (format->cbSize == 0 && (format->nSamplesPerSec <= PA_RATE_MAX) &&
-		    (format->wBitsPerSample == 8) &&
-		    (format->nChannels >= 1 && format->nChannels <= PA_CHANNELS_MAX))
-		{
-			return TRUE;
-		}
+		case WAVE_FORMAT_ALAW:
+		case WAVE_FORMAT_MULAW:
+			if (format->cbSize == 0 && (format->nSamplesPerSec <= PA_RATE_MAX) &&
+			    (format->wBitsPerSample == 8) &&
+			    (format->nChannels >= 1 && format->nChannels <= PA_CHANNELS_MAX))
+			{
+				return TRUE;
+			}
 
-		break;
+			break;
 	}
 
 	return FALSE;
@@ -564,9 +564,9 @@ static UINT rdpsnd_pulse_parse_addin_args(rdpsndDevicePlugin* device, ADDIN_ARGV
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_rdpsnd_client_subsystem_entry pulse_freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry pulse_freerdp_rdpsnd_client_subsystem_entry
 #else
-#	define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
 #endif
 
 /**

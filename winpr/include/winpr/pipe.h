@@ -28,39 +28,39 @@
 
 #ifndef _WIN32
 
-#	define PIPE_UNLIMITED_INSTANCES 0xFF
+#define PIPE_UNLIMITED_INSTANCES 0xFF
 
-#	define PIPE_ACCESS_INBOUND 0x00000001
-#	define PIPE_ACCESS_OUTBOUND 0x00000002
-#	define PIPE_ACCESS_DUPLEX 0x00000003
+#define PIPE_ACCESS_INBOUND 0x00000001
+#define PIPE_ACCESS_OUTBOUND 0x00000002
+#define PIPE_ACCESS_DUPLEX 0x00000003
 
-#	define FILE_FLAG_FIRST_PIPE_INSTANCE 0x00080000
-#	define FILE_FLAG_WRITE_THROUGH 0x80000000
-#	define FILE_FLAG_OVERLAPPED 0x40000000
+#define FILE_FLAG_FIRST_PIPE_INSTANCE 0x00080000
+#define FILE_FLAG_WRITE_THROUGH 0x80000000
+#define FILE_FLAG_OVERLAPPED 0x40000000
 
-#	define PIPE_CLIENT_END 0x00000000
-#	define PIPE_SERVER_END 0x00000001
+#define PIPE_CLIENT_END 0x00000000
+#define PIPE_SERVER_END 0x00000001
 
-#	define PIPE_TYPE_BYTE 0x00000000
-#	define PIPE_TYPE_MESSAGE 0x00000004
+#define PIPE_TYPE_BYTE 0x00000000
+#define PIPE_TYPE_MESSAGE 0x00000004
 
-#	define PIPE_READMODE_BYTE 0x00000000
-#	define PIPE_READMODE_MESSAGE 0x00000002
+#define PIPE_READMODE_BYTE 0x00000000
+#define PIPE_READMODE_MESSAGE 0x00000002
 
-#	define PIPE_WAIT 0x00000000
-#	define PIPE_NOWAIT 0x00000001
+#define PIPE_WAIT 0x00000000
+#define PIPE_NOWAIT 0x00000001
 
-#	define PIPE_ACCEPT_REMOTE_CLIENTS 0x00000000
-#	define PIPE_REJECT_REMOTE_CLIENTS 0x00000008
+#define PIPE_ACCEPT_REMOTE_CLIENTS 0x00000000
+#define PIPE_REJECT_REMOTE_CLIENTS 0x00000008
 
-#	define NMPWAIT_USE_DEFAULT_WAIT 0x00000000
-#	define NMPWAIT_NOWAIT 0x00000001
-#	define NMPWAIT_WAIT_FOREVER 0xFFFFFFFF
+#define NMPWAIT_USE_DEFAULT_WAIT 0x00000000
+#define NMPWAIT_NOWAIT 0x00000001
+#define NMPWAIT_WAIT_FOREVER 0xFFFFFFFF
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-#	endif
+#endif
 
 	/**
 	 * Unnamed pipe
@@ -108,19 +108,19 @@ extern "C"
 	WINPR_API BOOL GetNamedPipeClientComputerNameW(HANDLE Pipe, LPCWSTR ClientComputerName,
 	                                               ULONG ClientComputerNameLength);
 
-#	ifdef UNICODE
-#		define CreateNamedPipe CreateNamedPipeW
-#		define WaitNamedPipe WaitNamedPipeW
-#		define GetNamedPipeClientComputerName GetNamedPipeClientComputerNameW
-#	else
-#		define CreateNamedPipe CreateNamedPipeA
-#		define WaitNamedPipe WaitNamedPipeA
-#		define GetNamedPipeClientComputerName GetNamedPipeClientComputerNameA
-#	endif
+#ifdef UNICODE
+#define CreateNamedPipe CreateNamedPipeW
+#define WaitNamedPipe WaitNamedPipeW
+#define GetNamedPipeClientComputerName GetNamedPipeClientComputerNameW
+#else
+#define CreateNamedPipe CreateNamedPipeA
+#define WaitNamedPipe WaitNamedPipeA
+#define GetNamedPipeClientComputerName GetNamedPipeClientComputerNameA
+#endif
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 }
-#	endif
+#endif
 
 #endif
 

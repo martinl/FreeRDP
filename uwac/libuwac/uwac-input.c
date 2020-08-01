@@ -93,41 +93,41 @@ static UwacReturnCode set_cursor_image(UwacSeat* seat, uint32_t serial)
 
 	switch (seat->pointer_type)
 	{
-	case 2: /* Custom poiner */
-		image = seat->pointer_image;
-		buffer = create_pointer_buffer(seat, seat->pointer_data, seat->pointer_size);
+		case 2: /* Custom poiner */
+			image = seat->pointer_image;
+			buffer = create_pointer_buffer(seat, seat->pointer_data, seat->pointer_size);
 
-		if (!buffer)
-			return UWAC_ERROR_INTERNAL;
+			if (!buffer)
+				return UWAC_ERROR_INTERNAL;
 
-		surface = seat->pointer_surface;
-		x = image->hotspot_x;
-		y = image->hotspot_y;
-		break;
+			surface = seat->pointer_surface;
+			x = image->hotspot_x;
+			y = image->hotspot_y;
+			break;
 
-	case 1: /* NULL pointer */
-		break;
+		case 1: /* NULL pointer */
+			break;
 
-	default: /* Default system pointer */
-		cursor = seat->default_cursor;
+		default: /* Default system pointer */
+			cursor = seat->default_cursor;
 
-		if (!cursor)
-			return UWAC_ERROR_INTERNAL;
+			if (!cursor)
+				return UWAC_ERROR_INTERNAL;
 
-		image = cursor->images[0];
+			image = cursor->images[0];
 
-		if (!image)
-			return UWAC_ERROR_INTERNAL;
+			if (!image)
+				return UWAC_ERROR_INTERNAL;
 
-		x = image->hotspot_x;
-		y = image->hotspot_y;
-		buffer = wl_cursor_image_get_buffer(image);
+			x = image->hotspot_x;
+			y = image->hotspot_y;
+			buffer = wl_cursor_image_get_buffer(image);
 
-		if (!buffer)
-			return UWAC_ERROR_INTERNAL;
+			if (!buffer)
+				return UWAC_ERROR_INTERNAL;
 
-		surface = seat->pointer_surface;
-		break;
+			surface = seat->pointer_surface;
+			break;
 	}
 
 	if (buffer)

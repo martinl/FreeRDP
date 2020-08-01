@@ -18,19 +18,19 @@
 */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #if defined(__ARM_NEON__)
 
-#	include <stdio.h>
-#	include <stdlib.h>
-#	include <string.h>
-#	include <arm_neon.h>
-#	include <winpr/sysinfo.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <arm_neon.h>
+#include <winpr/sysinfo.h>
 
-#	include "rfx_types.h"
-#	include "rfx_neon.h"
+#include "rfx_types.h"
+#include "rfx_neon.h"
 
 /* rfx_decode_YCbCr_to_RGB_NEON code now resides in the primitives library. */
 

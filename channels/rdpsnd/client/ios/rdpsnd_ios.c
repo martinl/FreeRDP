@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/wtypes.h>
@@ -266,9 +266,9 @@ static void rdpsnd_ios_free(rdpsndDevicePlugin* device)
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_rdpsnd_client_subsystem_entry ios_freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry ios_freerdp_rdpsnd_client_subsystem_entry
 #else
-#	define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
 #endif
 
 /**

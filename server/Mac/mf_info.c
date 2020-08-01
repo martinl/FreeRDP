@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdlib.h>
@@ -38,13 +38,13 @@ int mf_info_lock(mfInfo* mfi)
 
 	switch (status)
 	{
-	case 0:
-		return TRUE;
-		break;
+		case 0:
+			return TRUE;
+			break;
 
-	default:
-		return -1;
-		break;
+		default:
+			return -1;
+			break;
 	}
 
 	return 1;
@@ -56,17 +56,17 @@ int mf_info_try_lock(mfInfo* mfi, UINT32 ms)
 
 	switch (status)
 	{
-	case 0:
-		return TRUE;
-		break;
+		case 0:
+			return TRUE;
+			break;
 
-	case EBUSY:
-		return FALSE;
-		break;
+		case EBUSY:
+			return FALSE;
+			break;
 
-	default:
-		return -1;
-		break;
+		default:
+			return -1;
+			break;
 	}
 
 	return 1;
@@ -78,13 +78,13 @@ int mf_info_unlock(mfInfo* mfi)
 
 	switch (status)
 	{
-	case 0:
-		return TRUE;
-		break;
+		case 0:
+			return TRUE;
+			break;
 
-	default:
-		return -1;
-		break;
+		default:
+			return -1;
+			break;
 	}
 
 	return 1;

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "../core/update.h"
@@ -867,46 +867,46 @@ static UINT gdi_SurfaceCommand(RdpgfxClientContext* context, const RDPGFX_SURFAC
 
 	switch (cmd->codecId)
 	{
-	case RDPGFX_CODECID_UNCOMPRESSED:
-		status = gdi_SurfaceCommand_Uncompressed(gdi, context, cmd);
-		break;
+		case RDPGFX_CODECID_UNCOMPRESSED:
+			status = gdi_SurfaceCommand_Uncompressed(gdi, context, cmd);
+			break;
 
-	case RDPGFX_CODECID_CAVIDEO:
-		status = gdi_SurfaceCommand_RemoteFX(gdi, context, cmd);
-		break;
+		case RDPGFX_CODECID_CAVIDEO:
+			status = gdi_SurfaceCommand_RemoteFX(gdi, context, cmd);
+			break;
 
-	case RDPGFX_CODECID_CLEARCODEC:
-		status = gdi_SurfaceCommand_ClearCodec(gdi, context, cmd);
-		break;
+		case RDPGFX_CODECID_CLEARCODEC:
+			status = gdi_SurfaceCommand_ClearCodec(gdi, context, cmd);
+			break;
 
-	case RDPGFX_CODECID_PLANAR:
-		status = gdi_SurfaceCommand_Planar(gdi, context, cmd);
-		break;
+		case RDPGFX_CODECID_PLANAR:
+			status = gdi_SurfaceCommand_Planar(gdi, context, cmd);
+			break;
 
-	case RDPGFX_CODECID_AVC420:
-		status = gdi_SurfaceCommand_AVC420(gdi, context, cmd);
-		break;
+		case RDPGFX_CODECID_AVC420:
+			status = gdi_SurfaceCommand_AVC420(gdi, context, cmd);
+			break;
 
-	case RDPGFX_CODECID_AVC444v2:
-	case RDPGFX_CODECID_AVC444:
-		status = gdi_SurfaceCommand_AVC444(gdi, context, cmd);
-		break;
+		case RDPGFX_CODECID_AVC444v2:
+		case RDPGFX_CODECID_AVC444:
+			status = gdi_SurfaceCommand_AVC444(gdi, context, cmd);
+			break;
 
-	case RDPGFX_CODECID_ALPHA:
-		status = gdi_SurfaceCommand_Alpha(gdi, context, cmd);
-		break;
+		case RDPGFX_CODECID_ALPHA:
+			status = gdi_SurfaceCommand_Alpha(gdi, context, cmd);
+			break;
 
-	case RDPGFX_CODECID_CAPROGRESSIVE:
-		status = gdi_SurfaceCommand_Progressive(gdi, context, cmd);
-		break;
+		case RDPGFX_CODECID_CAPROGRESSIVE:
+			status = gdi_SurfaceCommand_Progressive(gdi, context, cmd);
+			break;
 
-	case RDPGFX_CODECID_CAPROGRESSIVE_V2:
-		WLog_WARN(TAG, "SurfaceCommand 0x%08" PRIX32 " not implemented", cmd->codecId);
-		break;
+		case RDPGFX_CODECID_CAPROGRESSIVE_V2:
+			WLog_WARN(TAG, "SurfaceCommand 0x%08" PRIX32 " not implemented", cmd->codecId);
+			break;
 
-	default:
-		WLog_WARN(TAG, "Invalid SurfaceCommand 0x%08" PRIX32 "", cmd->codecId);
-		break;
+		default:
+			WLog_WARN(TAG, "Invalid SurfaceCommand 0x%08" PRIX32 "", cmd->codecId);
+			break;
 	}
 
 	LeaveCriticalSection(&context->mux);
@@ -960,17 +960,17 @@ static UINT gdi_CreateSurface(RdpgfxClientContext* context,
 
 	switch (createSurface->pixelFormat)
 	{
-	case GFX_PIXEL_FORMAT_ARGB_8888:
-		surface->format = PIXEL_FORMAT_BGRA32;
-		break;
+		case GFX_PIXEL_FORMAT_ARGB_8888:
+			surface->format = PIXEL_FORMAT_BGRA32;
+			break;
 
-	case GFX_PIXEL_FORMAT_XRGB_8888:
-		surface->format = PIXEL_FORMAT_BGRX32;
-		break;
+		case GFX_PIXEL_FORMAT_XRGB_8888:
+			surface->format = PIXEL_FORMAT_BGRX32;
+			break;
 
-	default:
-		free(surface);
-		return ERROR_INTERNAL_ERROR;
+		default:
+			free(surface);
+			return ERROR_INTERNAL_ERROR;
 	}
 
 	surface->scanline = gfx_align_scanline(surface->width * 4, 16);

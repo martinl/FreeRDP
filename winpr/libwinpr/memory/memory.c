@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -26,7 +26,7 @@
 #include <winpr/memory.h>
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 /**
@@ -76,7 +76,7 @@
 
 #ifndef _WIN32
 
-#	include "memory.h"
+#include "memory.h"
 
 HANDLE CreateFileMappingA(HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes, DWORD flProtect,
                           DWORD dwMaximumSizeHigh, DWORD dwMaximumSizeLow, LPCSTR lpName)

@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -97,20 +97,20 @@ static BOOL rdpsnd_mac_set_format(rdpsndDevicePlugin* device, const AUDIO_FORMAT
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_ALAW:
-		mac->audioFormat.mFormatID = kAudioFormatALaw;
-		break;
+		case WAVE_FORMAT_ALAW:
+			mac->audioFormat.mFormatID = kAudioFormatALaw;
+			break;
 
-	case WAVE_FORMAT_MULAW:
-		mac->audioFormat.mFormatID = kAudioFormatULaw;
-		break;
+		case WAVE_FORMAT_MULAW:
+			mac->audioFormat.mFormatID = kAudioFormatULaw;
+			break;
 
-	case WAVE_FORMAT_PCM:
-		mac->audioFormat.mFormatID = kAudioFormatLinearPCM;
-		break;
+		case WAVE_FORMAT_PCM:
+			mac->audioFormat.mFormatID = kAudioFormatLinearPCM;
+			break;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	audio_format_print(WLog_Get(TAG), WLOG_DEBUG, format);
@@ -121,56 +121,56 @@ static char* FormatError(OSStatus st)
 {
 	switch (st)
 	{
-	case kAudioFileUnspecifiedError:
-		return "kAudioFileUnspecifiedError";
+		case kAudioFileUnspecifiedError:
+			return "kAudioFileUnspecifiedError";
 
-	case kAudioFileUnsupportedFileTypeError:
-		return "kAudioFileUnsupportedFileTypeError";
+		case kAudioFileUnsupportedFileTypeError:
+			return "kAudioFileUnsupportedFileTypeError";
 
-	case kAudioFileUnsupportedDataFormatError:
-		return "kAudioFileUnsupportedDataFormatError";
+		case kAudioFileUnsupportedDataFormatError:
+			return "kAudioFileUnsupportedDataFormatError";
 
-	case kAudioFileUnsupportedPropertyError:
-		return "kAudioFileUnsupportedPropertyError";
+		case kAudioFileUnsupportedPropertyError:
+			return "kAudioFileUnsupportedPropertyError";
 
-	case kAudioFileBadPropertySizeError:
-		return "kAudioFileBadPropertySizeError";
+		case kAudioFileBadPropertySizeError:
+			return "kAudioFileBadPropertySizeError";
 
-	case kAudioFilePermissionsError:
-		return "kAudioFilePermissionsError";
+		case kAudioFilePermissionsError:
+			return "kAudioFilePermissionsError";
 
-	case kAudioFileNotOptimizedError:
-		return "kAudioFileNotOptimizedError";
+		case kAudioFileNotOptimizedError:
+			return "kAudioFileNotOptimizedError";
 
-	case kAudioFileInvalidChunkError:
-		return "kAudioFileInvalidChunkError";
+		case kAudioFileInvalidChunkError:
+			return "kAudioFileInvalidChunkError";
 
-	case kAudioFileDoesNotAllow64BitDataSizeError:
-		return "kAudioFileDoesNotAllow64BitDataSizeError";
+		case kAudioFileDoesNotAllow64BitDataSizeError:
+			return "kAudioFileDoesNotAllow64BitDataSizeError";
 
-	case kAudioFileInvalidPacketOffsetError:
-		return "kAudioFileInvalidPacketOffsetError";
+		case kAudioFileInvalidPacketOffsetError:
+			return "kAudioFileInvalidPacketOffsetError";
 
-	case kAudioFileInvalidFileError:
-		return "kAudioFileInvalidFileError";
+		case kAudioFileInvalidFileError:
+			return "kAudioFileInvalidFileError";
 
-	case kAudioFileOperationNotSupportedError:
-		return "kAudioFileOperationNotSupportedError";
+		case kAudioFileOperationNotSupportedError:
+			return "kAudioFileOperationNotSupportedError";
 
-	case kAudioFileNotOpenError:
-		return "kAudioFileNotOpenError";
+		case kAudioFileNotOpenError:
+			return "kAudioFileNotOpenError";
 
-	case kAudioFileEndOfFileError:
-		return "kAudioFileEndOfFileError";
+		case kAudioFileEndOfFileError:
+			return "kAudioFileEndOfFileError";
 
-	case kAudioFilePositionError:
-		return "kAudioFilePositionError";
+		case kAudioFilePositionError:
+			return "kAudioFilePositionError";
 
-	case kAudioFileFileNotFoundError:
-		return "kAudioFileFileNotFoundError";
+		case kAudioFileFileNotFoundError:
+			return "kAudioFileFileNotFoundError";
 
-	default:
-		return "unknown error";
+		default:
+			return "unknown error";
 	}
 }
 
@@ -258,13 +258,13 @@ static BOOL rdpsnd_mac_format_supported(rdpsndDevicePlugin* device, const AUDIO_
 {
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-	case WAVE_FORMAT_ALAW:
-	case WAVE_FORMAT_MULAW:
-		return TRUE;
+		case WAVE_FORMAT_PCM:
+		case WAVE_FORMAT_ALAW:
+		case WAVE_FORMAT_MULAW:
+			return TRUE;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 }
 
@@ -341,9 +341,9 @@ static UINT rdpsnd_mac_play(rdpsndDevicePlugin* device, const BYTE* data, size_t
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_rdpsnd_client_subsystem_entry mac_freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry mac_freerdp_rdpsnd_client_subsystem_entry
 #else
-#	define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
 #endif
 
 /**

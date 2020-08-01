@@ -38,7 +38,8 @@
 
 - (id)initWithNibName:(NSString *)nibNameOrNil
                bundle:(NSBundle *)nibBundleOrNil
-              session:(RDPSession *)session {
+              session:(RDPSession *)session
+{
 	self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
 	if (self)
 	{
@@ -70,7 +71,8 @@
 }
 
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
-- (void)loadView {
+- (void)loadView
+{
 	// load default view and set background color and resizing mask
 	[super loadView];
 
@@ -90,33 +92,39 @@
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
 	[super viewDidLoad];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
 	return YES;
 }
 
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
 	if (![_touchpointer_view isHidden])
 		[_touchpointer_view ensurePointerIsVisible];
 }
 
-- (void)didReceiveMemoryWarning {
+- (void)didReceiveMemoryWarning
+{
 	// Releases the view if it doesn't have a superview.
 	[super didReceiveMemoryWarning];
 
 	// Release any cached data, images, etc. that aren't in use.
 }
 
-- (void)viewDidUnload {
+- (void)viewDidUnload
+{
 	[super viewDidUnload];
 	// Release any retained subviews of the main view.
 	// e.g. self.myOutlet = nil;
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
 	[super viewWillAppear:animated];
 
 	// hide navigation bar and (if enabled) the status bar
@@ -139,7 +147,8 @@
 	[[RDPKeyboard getSharedRDPKeyboard] initWithSession:_session delegate:self];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
+- (void)viewDidAppear:(BOOL)animated
+{
 	[super viewDidAppear:animated];
 
 	if (!_session_initilized)
@@ -157,7 +166,8 @@
 	}
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
 	[super viewWillDisappear:animated];
 
 	// show navigation and status bar again
@@ -177,7 +187,8 @@
 	[_dummy_textfield resignFirstResponder];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	// remove any observers
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
@@ -193,26 +204,30 @@
 #pragma mark -
 #pragma mark ScrollView delegate methods
 
-- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
+{
 	return _session_view;
 }
 
 - (void)scrollViewDidEndZooming:(UIScrollView *)scrollView
                        withView:(UIView *)view
-                        atScale:(float)scale {
+                        atScale:(float)scale
+{
 	NSLog(@"New zoom scale: %f", scale);
 	[_session_view setNeedsDisplay];
 }
 
 #pragma mark -
 #pragma mark TextField delegate methods
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
 	_keyboard_visible = YES;
 	_advanced_keyboard_visible = NO;
 	return YES;
 }
 
-- (BOOL)textFieldShouldEndEditing:(UITextField *)textField {
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField
+{
 	_keyboard_visible = NO;
 	_advanced_keyboard_visible = NO;
 	return YES;
@@ -220,7 +235,8 @@
 
 - (BOOL)textField:(UITextField *)textField
     shouldChangeCharactersInRange:(NSRange)range
-                replacementString:(NSString *)string {
+                replacementString:(NSString *)string
+{
 	if ([string length] > 0)
 	{
 		for (int i = 0; i < [string length]; i++)
@@ -244,17 +260,20 @@
 
 #pragma mark -
 #pragma mark AdvancedKeyboardDelegate functions
-- (void)advancedKeyPressedVKey:(int)key {
+- (void)advancedKeyPressedVKey:(int)key
+{
 	[[RDPKeyboard getSharedRDPKeyboard] sendVirtualKeyCode:key];
 }
 
-- (void)advancedKeyPressedUnicode:(int)key {
+- (void)advancedKeyPressedUnicode:(int)key
+{
 	[[RDPKeyboard getSharedRDPKeyboard] sendUnicode:key];
 }
 
 #pragma mark - RDP keyboard handler
 
-- (void)modifiersChangedForKeyboard:(RDPKeyboard *)keyboard {
+- (void)modifiersChangedForKeyboard:(RDPKeyboard *)keyboard
+{
 	UIBarButtonItem *curItem;
 
 	// shift button (only on iPad)
@@ -289,7 +308,8 @@
 #pragma mark -
 #pragma mark RDPSessionDelegate functions
 
-- (void)session:(RDPSession *)session didFailToConnect:(int)reason {
+- (void)session:(RDPSession *)session didFailToConnect:(int)reason
+{
 	// remove and release connecting view
 	[_connecting_indicator_view stopAnimating];
 	[_connecting_view removeFromSuperview];
@@ -299,7 +319,8 @@
 	[[self navigationController] popViewControllerAnimated:YES];
 }
 
-- (void)sessionWillConnect:(RDPSession *)session {
+- (void)sessionWillConnect:(RDPSession *)session
+{
 	// load connecting view
 	[[NSBundle mainBundle] loadNibNamed:@"RDPConnectingView" owner:self options:nil];
 
@@ -317,7 +338,8 @@
 	[_connecting_indicator_view startAnimating];
 }
 
-- (void)sessionDidConnect:(RDPSession *)session {
+- (void)sessionDidConnect:(RDPSession *)session
+{
 	// register keyboard notification handlers
 	[[NSNotificationCenter defaultCenter] addObserver:self
 	                                         selector:@selector(keyboardWillShow:)
@@ -363,15 +385,18 @@
 	}
 }
 
-- (void)sessionWillDisconnect:(RDPSession *)session {
+- (void)sessionWillDisconnect:(RDPSession *)session
+{
 }
 
-- (void)sessionDidDisconnect:(RDPSession *)session {
+- (void)sessionDidDisconnect:(RDPSession *)session
+{
 	// return to bookmark list
 	[[self navigationController] popViewControllerAnimated:YES];
 }
 
-- (void)sessionBitmapContextWillChange:(RDPSession *)session {
+- (void)sessionBitmapContextWillChange:(RDPSession *)session
+{
 	// calc new view frame
 	rdpSettings *sess_params = [session getSessionParams];
 	CGRect view_rect = CGRectMake(0, 0, sess_params->DesktopWidth, sess_params->DesktopHeight);
@@ -389,7 +414,8 @@
 	[self showSessionToolbar:[_session toolbarVisible]];
 }
 
-- (void)sessionBitmapContextDidChange:(RDPSession *)session {
+- (void)sessionBitmapContextDidChange:(RDPSession *)session
+{
 	// associate view with session
 	[_session_view setSession:session];
 
@@ -397,12 +423,13 @@
 	[_session_view setNeedsDisplay];
 }
 
-- (void)session:(RDPSession *)session needsRedrawInRect:(CGRect)rect {
+- (void)session:(RDPSession *)session needsRedrawInRect:(CGRect)rect
+{
 	[_session_view setNeedsDisplayInRect:rect];
 }
 
-- (void)session:(RDPSession *)session
-    requestsAuthenticationWithParams:(NSMutableDictionary *)params {
+- (void)session:(RDPSession *)session requestsAuthenticationWithParams:(NSMutableDictionary *)params
+{
 	CredentialsInputController *view_controller =
 	    [[[CredentialsInputController alloc] initWithNibName:@"CredentialsInputView"
 	                                                  bundle:nil
@@ -411,7 +438,8 @@
 	[self presentModalViewController:view_controller animated:YES];
 }
 
-- (void)session:(RDPSession *)session verifyCertificateWithParams:(NSMutableDictionary *)params {
+- (void)session:(RDPSession *)session verifyCertificateWithParams:(NSMutableDictionary *)params
+{
 	VerifyCertificateController *view_controller =
 	    [[[VerifyCertificateController alloc] initWithNibName:@"VerifyCertificateView"
 	                                                   bundle:nil
@@ -420,7 +448,8 @@
 	[self presentModalViewController:view_controller animated:YES];
 }
 
-- (CGSize)sizeForFitScreenForSession:(RDPSession *)session {
+- (CGSize)sizeForFitScreenForSession:(RDPSession *)session
+{
 	if (IsPad())
 		return [self view].bounds.size;
 	else
@@ -434,7 +463,8 @@
 
 #pragma mark - Keyboard Toolbar Handlers
 
-- (void)showAdvancedKeyboardAnimated {
+- (void)showAdvancedKeyboardAnimated
+{
 	// calc initial and final rect of the advanced keyboard view
 	CGRect rect = [[_keyboard_toolbar superview] bounds];
 	rect.origin.y = [_keyboard_toolbar bounds].size.height;
@@ -456,7 +486,8 @@
 	[UIView commitAnimations];
 }
 
-- (IBAction)toggleKeyboardWhenOtherVisible:(id)sender {
+- (IBAction)toggleKeyboardWhenOtherVisible:(id)sender
+{
 	if (_advanced_keyboard_visible == NO)
 	{
 		[self showAdvancedKeyboardAnimated];
@@ -477,23 +508,28 @@
 	_advanced_keyboard_visible = !_advanced_keyboard_visible;
 }
 
-- (IBAction)toggleWinKey:(id)sender {
+- (IBAction)toggleWinKey:(id)sender
+{
 	[[RDPKeyboard getSharedRDPKeyboard] toggleWinKey];
 }
 
-- (IBAction)toggleShiftKey:(id)sender {
+- (IBAction)toggleShiftKey:(id)sender
+{
 	[[RDPKeyboard getSharedRDPKeyboard] toggleShiftKey];
 }
 
-- (IBAction)toggleCtrlKey:(id)sender {
+- (IBAction)toggleCtrlKey:(id)sender
+{
 	[[RDPKeyboard getSharedRDPKeyboard] toggleCtrlKey];
 }
 
-- (IBAction)toggleAltKey:(id)sender {
+- (IBAction)toggleAltKey:(id)sender
+{
 	[[RDPKeyboard getSharedRDPKeyboard] toggleAltKey];
 }
 
-- (IBAction)pressEscKey:(id)sender {
+- (IBAction)pressEscKey:(id)sender
+{
 	[[RDPKeyboard getSharedRDPKeyboard] sendEscapeKeyStroke];
 }
 
@@ -502,7 +538,8 @@
 
 - (void)animationStopped:(NSString *)animationID
                 finished:(NSNumber *)finished
-                 context:(void *)context {
+                 context:(void *)context
+{
 	if ([animationID isEqualToString:@"hide_advanced_keyboard_view"])
 	{
 		// cleanup advanced keyboard view
@@ -512,18 +549,21 @@
 	}
 }
 
-- (IBAction)switchSession:(id)sender {
+- (IBAction)switchSession:(id)sender
+{
 	[self suspendSession];
 }
 
-- (IBAction)toggleKeyboard:(id)sender {
+- (IBAction)toggleKeyboard:(id)sender
+{
 	if (!_keyboard_visible)
 		[_dummy_textfield becomeFirstResponder];
 	else
 		[_dummy_textfield resignFirstResponder];
 }
 
-- (IBAction)toggleExtKeyboard:(id)sender {
+- (IBAction)toggleExtKeyboard:(id)sender
+{
 	// if the sys kb is shown but not the advanced kb then toggle the advanced kb
 	if (_keyboard_visible && !_advanced_keyboard_visible)
 		[self toggleKeyboardWhenOtherVisible:nil];
@@ -536,7 +576,8 @@
 	}
 }
 
-- (IBAction)toggleTouchPointer:(id)sender {
+- (IBAction)toggleTouchPointer:(id)sender
+{
 	BOOL toggle_visibilty = ![_touchpointer_view isHidden];
 	[_touchpointer_view setHidden:toggle_visibilty];
 	if (toggle_visibilty)
@@ -545,11 +586,13 @@
 		[_session_scrollview setContentInset:[_touchpointer_view getEdgeInsets]];
 }
 
-- (IBAction)disconnectSession:(id)sender {
+- (IBAction)disconnectSession:(id)sender
+{
 	[_session disconnect];
 }
 
-- (IBAction)cancelButtonPressed:(id)sender {
+- (IBAction)cancelButtonPressed:(id)sender
+{
 	[_session disconnect];
 }
 
@@ -557,14 +600,16 @@
 #pragma mark iOS Keyboard Notification Handlers
 
 // the keyboard is given in a portrait frame of reference
-- (BOOL)isLandscape {
+- (BOOL)isLandscape
+{
 
 	UIInterfaceOrientation ori = [[UIApplication sharedApplication] statusBarOrientation];
 	return (ori == UIInterfaceOrientationLandscapeLeft ||
 	        ori == UIInterfaceOrientationLandscapeRight);
 }
 
-- (void)shiftKeyboard:(NSNotification *)notification {
+- (void)shiftKeyboard:(NSNotification *)notification
+{
 
 	CGRect keyboardEndFrame =
 	    [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
@@ -598,13 +643,15 @@
 	[UIView commitAnimations];
 }
 
-- (void)keyboardWillShow:(NSNotification *)notification {
+- (void)keyboardWillShow:(NSNotification *)notification
+{
 	[self shiftKeyboard:notification];
 
 	[_touchpointer_view ensurePointerIsVisible];
 }
 
-- (void)keyboardDidShow:(NSNotification *)notification {
+- (void)keyboardDidShow:(NSNotification *)notification
+{
 	if (_requesting_advanced_keyboard)
 	{
 		[self showAdvancedKeyboardAnimated];
@@ -613,12 +660,14 @@
 	}
 }
 
-- (void)keyboardWillHide:(NSNotification *)notification {
+- (void)keyboardWillHide:(NSNotification *)notification
+{
 
 	[self shiftKeyboard:notification];
 }
 
-- (void)keyboardDidHide:(NSNotification *)notification {
+- (void)keyboardDidHide:(NSNotification *)notification
+{
 	// release adanced keyboard view
 	if (_advanced_keyboard_visible == YES)
 	{
@@ -632,7 +681,8 @@
 #pragma mark -
 #pragma mark Gesture handlers
 
-- (void)handleSingleTap:(UITapGestureRecognizer *)gesture {
+- (void)handleSingleTap:(UITapGestureRecognizer *)gesture
+{
 	CGPoint pos = [gesture locationInView:_session_view];
 	if (_toggle_mouse_button)
 	{
@@ -655,7 +705,8 @@
 	_toggle_mouse_button = NO;
 }
 
-- (void)handleDoubleTap:(UITapGestureRecognizer *)gesture {
+- (void)handleDoubleTap:(UITapGestureRecognizer *)gesture
+{
 	CGPoint pos = [gesture locationInView:_session_view];
 	[_session sendInputEvent:[self eventDescriptorForMouseEvent:GetLeftMouseButtonClickEvent(YES)
 	                                                   position:pos]];
@@ -668,7 +719,8 @@
 	_toggle_mouse_button = NO;
 }
 
-- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture
+{
 	CGPoint pos = [gesture locationInView:_session_view];
 
 	if ([gesture state] == UIGestureRecognizerStateBegan)
@@ -682,7 +734,8 @@
 		                                                   position:pos]];
 }
 
-- (void)handleDoubleLongPress:(UILongPressGestureRecognizer *)gesture {
+- (void)handleDoubleLongPress:(UILongPressGestureRecognizer *)gesture
+{
 	// this point is mapped against the scroll view because we want to have relative movement to the
 	// screen/scrollview
 	CGPoint pos = [gesture locationInView:_session_scrollview];
@@ -708,11 +761,13 @@
 	}
 }
 
-- (void)handleSingle2FingersTap:(UITapGestureRecognizer *)gesture {
+- (void)handleSingle2FingersTap:(UITapGestureRecognizer *)gesture
+{
 	_toggle_mouse_button = !_toggle_mouse_button;
 }
 
-- (void)handleSingle3FingersTap:(UITapGestureRecognizer *)gesture {
+- (void)handleSingle3FingersTap:(UITapGestureRecognizer *)gesture
+{
 	[_session setToolbarVisible:![_session toolbarVisible]];
 	[self showSessionToolbar:[_session toolbarVisible]];
 }
@@ -720,25 +775,29 @@
 #pragma mark -
 #pragma mark Touch Pointer delegates
 // callback if touch pointer should be closed
-- (void)touchPointerClose {
+- (void)touchPointerClose
+{
 	[self toggleTouchPointer:nil];
 }
 
 // callback for a left click action
-- (void)touchPointerLeftClick:(CGPoint)pos down:(BOOL)down {
+- (void)touchPointerLeftClick:(CGPoint)pos down:(BOOL)down
+{
 	CGPoint session_view_pos = [_touchpointer_view convertPoint:pos toView:_session_view];
 	[_session sendInputEvent:[self eventDescriptorForMouseEvent:GetLeftMouseButtonClickEvent(down)
 	                                                   position:session_view_pos]];
 }
 
 // callback for a right click action
-- (void)touchPointerRightClick:(CGPoint)pos down:(BOOL)down {
+- (void)touchPointerRightClick:(CGPoint)pos down:(BOOL)down
+{
 	CGPoint session_view_pos = [_touchpointer_view convertPoint:pos toView:_session_view];
 	[_session sendInputEvent:[self eventDescriptorForMouseEvent:GetRightMouseButtonClickEvent(down)
 	                                                   position:session_view_pos]];
 }
 
-- (void)doAutoScrolling {
+- (void)doAutoScrolling
+{
 	int scrollX = 0;
 	int scrollY = 0;
 	CGPoint curPointerPos = [_touchpointer_view getPointerPosition];
@@ -802,7 +861,8 @@
 }
 
 // callback for a right click action
-- (void)touchPointerMove:(CGPoint)pos {
+- (void)touchPointerMove:(CGPoint)pos
+{
 	CGPoint session_view_pos = [_touchpointer_view convertPoint:pos toView:_session_view];
 	[self handleMouseMoveForPosition:session_view_pos];
 
@@ -816,13 +876,15 @@
 }
 
 // callback if scrolling is performed
-- (void)touchPointerScrollDown:(BOOL)down {
+- (void)touchPointerScrollDown:(BOOL)down
+{
 	[_session sendInputEvent:[self eventDescriptorForMouseEvent:GetMouseWheelEvent(down)
 	                                                   position:CGPointZero]];
 }
 
 // callback for toggling the standard keyboard
-- (void)touchPointerToggleKeyboard {
+- (void)touchPointerToggleKeyboard
+{
 	if (_advanced_keyboard_visible)
 		[self toggleKeyboardWhenOtherVisible:nil];
 	else
@@ -830,12 +892,14 @@
 }
 
 // callback for toggling the extended keyboard
-- (void)touchPointerToggleExtendedKeyboard {
+- (void)touchPointerToggleExtendedKeyboard
+{
 	[self toggleExtKeyboard:nil];
 }
 
 // callback for reset view
-- (void)touchPointerResetSessionView {
+- (void)touchPointerResetSessionView
+{
 	[_session_scrollview setZoomScale:1.0 animated:YES];
 }
 
@@ -846,7 +910,8 @@
 #pragma mark -
 #pragma mark Helper functions
 
-- (void)showSessionToolbar:(BOOL)show {
+- (void)showSessionToolbar:(BOOL)show
+{
 	// already shown or hidden?
 	if (_session_toolbar_visible == show)
 		return;
@@ -873,7 +938,8 @@
 	}
 }
 
-- (UIToolbar *)keyboardToolbar {
+- (UIToolbar *)keyboardToolbar
+{
 	UIToolbar *keyboard_toolbar = [[[UIToolbar alloc] initWithFrame:CGRectNull] autorelease];
 	[keyboard_toolbar setBarStyle:UIBarStyleBlackOpaque];
 
@@ -939,7 +1005,8 @@
 	return keyboard_toolbar;
 }
 
-- (void)initGestureRecognizers {
+- (void)initGestureRecognizers
+{
 	// single and double tap recognizer
 	UITapGestureRecognizer *doubleTapRecognizer =
 	    [[[UITapGestureRecognizer alloc] initWithTarget:self
@@ -990,7 +1057,8 @@
 	[_session_scrollview addGestureRecognizer:single3FingersTapRecognizer];
 }
 
-- (void)suspendSession {
+- (void)suspendSession
+{
 	// suspend session and pop navigation controller
 	[_session suspend];
 
@@ -998,7 +1066,8 @@
 	[[self navigationController] popViewControllerAnimated:YES];
 }
 
-- (NSDictionary *)eventDescriptorForMouseEvent:(int)event position:(CGPoint)position {
+- (NSDictionary *)eventDescriptorForMouseEvent:(int)event position:(CGPoint)position
+{
 	return [NSDictionary
 	    dictionaryWithObjectsAndKeys:@"mouse", @"type", [NSNumber numberWithUnsignedShort:event],
 	                                 @"flags",
@@ -1008,14 +1077,16 @@
 	                                 @"coord_y", nil];
 }
 
-- (void)sendDelayedMouseEventWithTimer:(NSTimer *)timer {
+- (void)sendDelayedMouseEventWithTimer:(NSTimer *)timer
+{
 	_mouse_move_event_timer = nil;
 	NSDictionary *event = [timer userInfo];
 	[_session sendInputEvent:event];
 	[timer autorelease];
 }
 
-- (void)handleMouseMoveForPosition:(CGPoint)position {
+- (void)handleMouseMoveForPosition:(CGPoint)position
+{
 	NSDictionary *event = [self eventDescriptorForMouseEvent:PTR_FLAGS_MOVE position:position];
 
 	// cancel pending mouse move events

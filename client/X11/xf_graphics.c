@@ -20,14 +20,14 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
 #ifdef WITH_XCURSOR
-#	include <X11/Xcursor/Xcursor.h>
+#include <X11/Xcursor/Xcursor.h>
 #endif
 
 #include <winpr/crt.h>
@@ -63,25 +63,25 @@ BOOL xf_decode_color(xfContext* xfc, const UINT32 srcColor, XColor* color)
 
 	switch (settings->ColorDepth)
 	{
-	case 32:
-	case 24:
-		SrcFormat = PIXEL_FORMAT_BGR24;
-		break;
+		case 32:
+		case 24:
+			SrcFormat = PIXEL_FORMAT_BGR24;
+			break;
 
-	case 16:
-		SrcFormat = PIXEL_FORMAT_RGB16;
-		break;
+		case 16:
+			SrcFormat = PIXEL_FORMAT_RGB16;
+			break;
 
-	case 15:
-		SrcFormat = PIXEL_FORMAT_RGB15;
-		break;
+		case 15:
+			SrcFormat = PIXEL_FORMAT_RGB15;
+			break;
 
-	case 8:
-		SrcFormat = PIXEL_FORMAT_RGB8;
-		break;
+		case 8:
+			SrcFormat = PIXEL_FORMAT_RGB8;
+			break;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	SplitColor(srcColor, SrcFormat, &r, &g, &b, &a, &gdi->palette);

@@ -22,8 +22,8 @@
 
 #ifndef _WIN32
 
-#	include <winpr/crt.h>
-#	include <winpr/memory.h>
+#include <winpr/crt.h>
+#include <winpr/memory.h>
 
 #endif
 

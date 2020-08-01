@@ -29,9 +29,9 @@
 #include <openssl/x509v3.h>
 
 #if OPENSSL_VERSION_NUMBER >= 0x0090800f
-#	define D2I_X509_CONST const
+#define D2I_X509_CONST const
 #else
-#	define D2I_X509_CONST
+#define D2I_X509_CONST
 #endif
 
 #define EXPONENT_MAX_SIZE 4

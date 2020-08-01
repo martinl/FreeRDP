@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <X11/Xlib.h>
@@ -49,120 +49,120 @@ static const char* x11_event_string(int event)
 {
 	switch (event)
 	{
-	case KeyPress:
-		return "KeyPress";
+		case KeyPress:
+			return "KeyPress";
 
-	case KeyRelease:
-		return "KeyRelease";
+		case KeyRelease:
+			return "KeyRelease";
 
-	case ButtonPress:
-		return "ButtonPress";
+		case ButtonPress:
+			return "ButtonPress";
 
-	case ButtonRelease:
-		return "ButtonRelease";
+		case ButtonRelease:
+			return "ButtonRelease";
 
-	case MotionNotify:
-		return "MotionNotify";
+		case MotionNotify:
+			return "MotionNotify";
 
-	case EnterNotify:
-		return "EnterNotify";
+		case EnterNotify:
+			return "EnterNotify";
 
-	case LeaveNotify:
-		return "LeaveNotify";
+		case LeaveNotify:
+			return "LeaveNotify";
 
-	case FocusIn:
-		return "FocusIn";
+		case FocusIn:
+			return "FocusIn";
 
-	case FocusOut:
-		return "FocusOut";
+		case FocusOut:
+			return "FocusOut";
 
-	case KeymapNotify:
-		return "KeymapNotify";
+		case KeymapNotify:
+			return "KeymapNotify";
 
-	case Expose:
-		return "Expose";
+		case Expose:
+			return "Expose";
 
-	case GraphicsExpose:
-		return "GraphicsExpose";
+		case GraphicsExpose:
+			return "GraphicsExpose";
 
-	case NoExpose:
-		return "NoExpose";
+		case NoExpose:
+			return "NoExpose";
 
-	case VisibilityNotify:
-		return "VisibilityNotify";
+		case VisibilityNotify:
+			return "VisibilityNotify";
 
-	case CreateNotify:
-		return "CreateNotify";
+		case CreateNotify:
+			return "CreateNotify";
 
-	case DestroyNotify:
-		return "DestroyNotify";
+		case DestroyNotify:
+			return "DestroyNotify";
 
-	case UnmapNotify:
-		return "UnmapNotify";
+		case UnmapNotify:
+			return "UnmapNotify";
 
-	case MapNotify:
-		return "MapNotify";
+		case MapNotify:
+			return "MapNotify";
 
-	case MapRequest:
-		return "MapRequest";
+		case MapRequest:
+			return "MapRequest";
 
-	case ReparentNotify:
-		return "ReparentNotify";
+		case ReparentNotify:
+			return "ReparentNotify";
 
-	case ConfigureNotify:
-		return "ConfigureNotify";
+		case ConfigureNotify:
+			return "ConfigureNotify";
 
-	case ConfigureRequest:
-		return "ConfigureRequest";
+		case ConfigureRequest:
+			return "ConfigureRequest";
 
-	case GravityNotify:
-		return "GravityNotify";
+		case GravityNotify:
+			return "GravityNotify";
 
-	case ResizeRequest:
-		return "ResizeRequest";
+		case ResizeRequest:
+			return "ResizeRequest";
 
-	case CirculateNotify:
-		return "CirculateNotify";
+		case CirculateNotify:
+			return "CirculateNotify";
 
-	case CirculateRequest:
-		return "CirculateRequest";
+		case CirculateRequest:
+			return "CirculateRequest";
 
-	case PropertyNotify:
-		return "PropertyNotify";
+		case PropertyNotify:
+			return "PropertyNotify";
 
-	case SelectionClear:
-		return "SelectionClear";
+		case SelectionClear:
+			return "SelectionClear";
 
-	case SelectionRequest:
-		return "SelectionRequest";
+		case SelectionRequest:
+			return "SelectionRequest";
 
-	case SelectionNotify:
-		return "SelectionNotify";
+		case SelectionNotify:
+			return "SelectionNotify";
 
-	case ColormapNotify:
-		return "ColormapNotify";
+		case ColormapNotify:
+			return "ColormapNotify";
 
-	case ClientMessage:
-		return "ClientMessage";
+		case ClientMessage:
+			return "ClientMessage";
 
-	case MappingNotify:
-		return "MappingNotify";
+		case MappingNotify:
+			return "MappingNotify";
 
-	case GenericEvent:
-		return "GenericEvent";
+		case GenericEvent:
+			return "GenericEvent";
 
-	default:
-		return "UNKNOWN";
+		default:
+			return "UNKNOWN";
 	};
 }
 
 #ifdef WITH_DEBUG_X11
-#	define DEBUG_X11(...) WLog_DBG(TAG, __VA_ARGS__)
+#define DEBUG_X11(...) WLog_DBG(TAG, __VA_ARGS__)
 #else
-#	define DEBUG_X11(...) \
-		do                 \
-		{                  \
-		} while (0)
+#define DEBUG_X11(...) \
+	do                 \
+	{                  \
+	} while (0)
 #endif
 
 BOOL xf_event_action_script_init(xfContext* xfc)
@@ -854,80 +854,83 @@ static BOOL xf_event_suppress_events(xfContext* xfc, xfAppWindow* appWindow, XEv
 
 	switch (appWindow->local_move.state)
 	{
-	case LMS_NOT_ACTIVE:
+		case LMS_NOT_ACTIVE:
 
-		/* No local move in progress, nothing to do */
+			/* No local move in progress, nothing to do */
 
-		/* Prevent Configure from happening during indeterminant state of Horz or Vert Max only */
-		if ((event->type == ConfigureNotify) && appWindow->rail_ignore_configure)
-		{
-			appWindow->rail_ignore_configure = FALSE;
-			return TRUE;
-		}
-
-		break;
-
-	case LMS_STARTING:
-
-		/* Local move initiated by RDP server, but we have not yet seen any updates from the X
-		 * server */
-		switch (event->type)
-		{
-		case ConfigureNotify:
-			/* Starting to see move events from the X server. Local move is now in progress. */
-			appWindow->local_move.state = LMS_ACTIVE;
-			/* Allow these events to be processed during move to keep our state up to date. */
-			break;
-
-		case ButtonPress:
-		case ButtonRelease:
-		case KeyPress:
-		case KeyRelease:
-		case UnmapNotify:
-			/*
-			 * A button release event means the X window server did not grab the
-			 * mouse before the user released it. In this case we must cancel the
-			 * local move. The event will be processed below as normal, below.
+			/* Prevent Configure from happening during indeterminant state of Horz or Vert Max only
 			 */
+			if ((event->type == ConfigureNotify) && appWindow->rail_ignore_configure)
+			{
+				appWindow->rail_ignore_configure = FALSE;
+				return TRUE;
+			}
+
 			break;
 
-		case VisibilityNotify:
-		case PropertyNotify:
-		case Expose:
-			/* Allow these events to pass */
+		case LMS_STARTING:
+
+			/* Local move initiated by RDP server, but we have not yet seen any updates from the X
+			 * server */
+			switch (event->type)
+			{
+				case ConfigureNotify:
+					/* Starting to see move events from the X server. Local move is now in progress.
+					 */
+					appWindow->local_move.state = LMS_ACTIVE;
+					/* Allow these events to be processed during move to keep our state up to date.
+					 */
+					break;
+
+				case ButtonPress:
+				case ButtonRelease:
+				case KeyPress:
+				case KeyRelease:
+				case UnmapNotify:
+					/*
+					 * A button release event means the X window server did not grab the
+					 * mouse before the user released it. In this case we must cancel the
+					 * local move. The event will be processed below as normal, below.
+					 */
+					break;
+
+				case VisibilityNotify:
+				case PropertyNotify:
+				case Expose:
+					/* Allow these events to pass */
+					break;
+
+				default:
+					/* Eat any other events */
+					return TRUE;
+			}
+
 			break;
 
-		default:
-			/* Eat any other events */
-			return TRUE;
-		}
+		case LMS_ACTIVE:
 
-		break;
+			/* Local move is in progress */
+			switch (event->type)
+			{
+				case ConfigureNotify:
+				case VisibilityNotify:
+				case PropertyNotify:
+				case Expose:
+				case GravityNotify:
+					/* Keep us up to date on position */
+					break;
 
-	case LMS_ACTIVE:
+				default:
+					/* Any other event terminates move */
+					xf_rail_end_local_move(xfc, appWindow);
+					break;
+			}
 
-		/* Local move is in progress */
-		switch (event->type)
-		{
-		case ConfigureNotify:
-		case VisibilityNotify:
-		case PropertyNotify:
-		case Expose:
-		case GravityNotify:
-			/* Keep us up to date on position */
 			break;
 
-		default:
-			/* Any other event terminates move */
-			xf_rail_end_local_move(xfc, appWindow);
+		case LMS_TERMINATING:
+			/* Already sent RDP end move to server. Allow events to pass. */
 			break;
-		}
-
-		break;
-
-	case LMS_TERMINATING:
-		/* Already sent RDP end move to server. Allow events to pass. */
-		break;
 	}
 
 	return FALSE;
@@ -973,88 +976,88 @@ BOOL xf_event_process(freerdp* instance, XEvent* event)
 
 	switch (event->type)
 	{
-	case Expose:
-		status = xf_event_Expose(xfc, event, xfc->remote_app);
-		break;
+		case Expose:
+			status = xf_event_Expose(xfc, event, xfc->remote_app);
+			break;
 
-	case VisibilityNotify:
-		status = xf_event_VisibilityNotify(xfc, event, xfc->remote_app);
-		break;
+		case VisibilityNotify:
+			status = xf_event_VisibilityNotify(xfc, event, xfc->remote_app);
+			break;
 
-	case MotionNotify:
-		status = xf_event_MotionNotify(xfc, event, xfc->remote_app);
-		break;
+		case MotionNotify:
+			status = xf_event_MotionNotify(xfc, event, xfc->remote_app);
+			break;
 
-	case ButtonPress:
-		status = xf_event_ButtonPress(xfc, event, xfc->remote_app);
-		break;
+		case ButtonPress:
+			status = xf_event_ButtonPress(xfc, event, xfc->remote_app);
+			break;
 
-	case ButtonRelease:
-		status = xf_event_ButtonRelease(xfc, event, xfc->remote_app);
-		break;
+		case ButtonRelease:
+			status = xf_event_ButtonRelease(xfc, event, xfc->remote_app);
+			break;
 
-	case KeyPress:
-		status = xf_event_KeyPress(xfc, event, xfc->remote_app);
-		break;
+		case KeyPress:
+			status = xf_event_KeyPress(xfc, event, xfc->remote_app);
+			break;
 
-	case KeyRelease:
-		status = xf_event_KeyRelease(xfc, event, xfc->remote_app);
-		break;
+		case KeyRelease:
+			status = xf_event_KeyRelease(xfc, event, xfc->remote_app);
+			break;
 
-	case FocusIn:
-		status = xf_event_FocusIn(xfc, event, xfc->remote_app);
-		break;
+		case FocusIn:
+			status = xf_event_FocusIn(xfc, event, xfc->remote_app);
+			break;
 
-	case FocusOut:
-		status = xf_event_FocusOut(xfc, event, xfc->remote_app);
-		break;
+		case FocusOut:
+			status = xf_event_FocusOut(xfc, event, xfc->remote_app);
+			break;
 
-	case EnterNotify:
-		status = xf_event_EnterNotify(xfc, event, xfc->remote_app);
-		break;
+		case EnterNotify:
+			status = xf_event_EnterNotify(xfc, event, xfc->remote_app);
+			break;
 
-	case LeaveNotify:
-		status = xf_event_LeaveNotify(xfc, event, xfc->remote_app);
-		break;
+		case LeaveNotify:
+			status = xf_event_LeaveNotify(xfc, event, xfc->remote_app);
+			break;
 
-	case NoExpose:
-		break;
+		case NoExpose:
+			break;
 
-	case GraphicsExpose:
-		break;
+		case GraphicsExpose:
+			break;
 
-	case ConfigureNotify:
-		status = xf_event_ConfigureNotify(xfc, event, xfc->remote_app);
-		break;
+		case ConfigureNotify:
+			status = xf_event_ConfigureNotify(xfc, event, xfc->remote_app);
+			break;
 
-	case MapNotify:
-		status = xf_event_MapNotify(xfc, event, xfc->remote_app);
-		break;
+		case MapNotify:
+			status = xf_event_MapNotify(xfc, event, xfc->remote_app);
+			break;
 
-	case UnmapNotify:
-		status = xf_event_UnmapNotify(xfc, event, xfc->remote_app);
-		break;
+		case UnmapNotify:
+			status = xf_event_UnmapNotify(xfc, event, xfc->remote_app);
+			break;
 
-	case ReparentNotify:
-		break;
+		case ReparentNotify:
+			break;
 
-	case MappingNotify:
-		status = xf_event_MappingNotify(xfc, event, xfc->remote_app);
-		break;
+		case MappingNotify:
+			status = xf_event_MappingNotify(xfc, event, xfc->remote_app);
+			break;
 
-	case ClientMessage:
-		status = xf_event_ClientMessage(xfc, event, xfc->remote_app);
-		break;
+		case ClientMessage:
+			status = xf_event_ClientMessage(xfc, event, xfc->remote_app);
+			break;
 
-	case PropertyNotify:
-		status = xf_event_PropertyNotify(xfc, event, xfc->remote_app);
-		break;
+		case PropertyNotify:
+			status = xf_event_PropertyNotify(xfc, event, xfc->remote_app);
+			break;
 
-	default:
-		if (settings->SupportDisplayControl)
-			xf_disp_handle_xevent(xfc, event);
+		default:
+			if (settings->SupportDisplayControl)
+				xf_disp_handle_xevent(xfc, event);
 
-		break;
+			break;
 	}
 
 	xf_cliprdr_handle_xevent(xfc, event);

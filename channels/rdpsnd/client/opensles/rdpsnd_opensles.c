@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -188,18 +188,18 @@ static BOOL rdpsnd_opensles_format_supported(rdpsndDevicePlugin* device, const A
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		if (format->cbSize == 0 && format->nSamplesPerSec <= 48000 &&
-		    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
-		    (format->nChannels == 1 || format->nChannels == 2))
-		{
-			return TRUE;
-		}
+		case WAVE_FORMAT_PCM:
+			if (format->cbSize == 0 && format->nSamplesPerSec <= 48000 &&
+			    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
+			    (format->nChannels == 1 || format->nChannels == 2))
+			{
+				return TRUE;
+			}
 
-		break;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return FALSE;
@@ -257,7 +257,8 @@ static BOOL rdpsnd_opensles_set_volume(rdpsndDevicePlugin* device, UINT32 value)
 
 static UINT rdpsnd_opensles_play(rdpsndDevicePlugin* device, const BYTE* data, size_t size)
 {
-	union {
+	union
+	{
 		const BYTE* b;
 		const short* s;
 	} src;
@@ -331,9 +332,9 @@ static int rdpsnd_opensles_parse_addin_args(rdpsndDevicePlugin* device, ADDIN_AR
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_rdpsnd_client_subsystem_entry opensles_freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry opensles_freerdp_rdpsnd_client_subsystem_entry
 #else
-#	define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
 #endif
 
 /**

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -109,20 +109,20 @@ static BOOL audin_opensles_format_supported(IAudinDevice* device, const AUDIO_FO
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM: /* PCM */
-		if (format->cbSize == 0 && (format->nSamplesPerSec <= 48000) &&
-		    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
-		    (format->nChannels >= 1 && format->nChannels <= 2))
-		{
-			return TRUE;
-		}
+		case WAVE_FORMAT_PCM: /* PCM */
+			if (format->cbSize == 0 && (format->nSamplesPerSec <= 48000) &&
+			    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
+			    (format->nChannels >= 1 && format->nChannels <= 2))
+			{
+				return TRUE;
+			}
 
-		break;
+			break;
 
-	default:
-		WLog_Print(opensles->log, WLOG_DEBUG, "Encoding '%s' [0x%04X" PRIX16 "] not supported",
-		           audio_format_get_tag_string(format->wFormatTag), format->wFormatTag);
-		break;
+		default:
+			WLog_Print(opensles->log, WLOG_DEBUG, "Encoding '%s' [0x%04X" PRIX16 "] not supported",
+			           audio_format_get_tag_string(format->wFormatTag), format->wFormatTag);
+			break;
 	}
 
 	return FALSE;
@@ -148,34 +148,34 @@ static UINT audin_opensles_set_format(IAudinDevice* device, const AUDIO_FORMAT* 
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		opensles->frames_per_packet = FramesPerPacket;
+		case WAVE_FORMAT_PCM:
+			opensles->frames_per_packet = FramesPerPacket;
 
-		switch (format->wBitsPerSample)
-		{
-		case 4:
-			opensles->bytes_per_channel = 1;
-			break;
+			switch (format->wBitsPerSample)
+			{
+				case 4:
+					opensles->bytes_per_channel = 1;
+					break;
 
-		case 8:
-			opensles->bytes_per_channel = 1;
-			break;
+				case 8:
+					opensles->bytes_per_channel = 1;
+					break;
 
-		case 16:
-			opensles->bytes_per_channel = 2;
+				case 16:
+					opensles->bytes_per_channel = 2;
+					break;
+
+				default:
+					return ERROR_UNSUPPORTED_TYPE;
+			}
+
 			break;
 
 		default:
+			WLog_Print(opensles->log, WLOG_ERROR,
+			           "Encoding '%" PRIu16 "' [%04" PRIX16 "] not supported", format->wFormatTag,
+			           format->wFormatTag);
 			return ERROR_UNSUPPORTED_TYPE;
-		}
-
-		break;
-
-	default:
-		WLog_Print(opensles->log, WLOG_ERROR,
-		           "Encoding '%" PRIu16 "' [%04" PRIX16 "] not supported", format->wFormatTag,
-		           format->wFormatTag);
-		return ERROR_UNSUPPORTED_TYPE;
 	}
 
 	WLog_Print(opensles->log, WLOG_DEBUG, "frames_per_packet=%" PRIu32,
@@ -286,9 +286,9 @@ static UINT audin_opensles_parse_addin_args(AudinOpenSLESDevice* device, ADDIN_A
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_audin_client_subsystem_entry opensles_freerdp_audin_client_subsystem_entry
+#define freerdp_audin_client_subsystem_entry opensles_freerdp_audin_client_subsystem_entry
 #else
-#	define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
+#define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
 #endif
 
 /**

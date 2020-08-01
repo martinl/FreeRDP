@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -40,9 +40,9 @@
 #include <limits.h>
 #include <unistd.h>
 #if defined(__OpenBSD__)
-#	include <soundcard.h>
+#include <soundcard.h>
 #else
-#	include <sys/soundcard.h>
+#include <sys/soundcard.h>
 #endif
 #include <sys/ioctl.h>
 
@@ -77,23 +77,23 @@ static int rdpsnd_oss_get_format(const AUDIO_FORMAT* format)
 {
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		switch (format->wBitsPerSample)
-		{
-		case 8:
-			return AFMT_S8;
+		case WAVE_FORMAT_PCM:
+			switch (format->wBitsPerSample)
+			{
+				case 8:
+					return AFMT_S8;
 
-		case 16:
-			return AFMT_S16_LE;
-		}
+				case 16:
+					return AFMT_S16_LE;
+			}
 
-		break;
+			break;
 
-	case WAVE_FORMAT_ALAW:
-		return AFMT_A_LAW;
+		case WAVE_FORMAT_ALAW:
+			return AFMT_A_LAW;
 
-	case WAVE_FORMAT_MULAW:
-		return AFMT_MU_LAW;
+		case WAVE_FORMAT_MULAW:
+			return AFMT_MU_LAW;
 	}
 
 	return 0;
@@ -109,20 +109,20 @@ static BOOL rdpsnd_oss_format_supported(rdpsndDevicePlugin* device, const AUDIO_
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		if (format->cbSize != 0 || format->nSamplesPerSec > 48000 ||
-		    (format->wBitsPerSample != 8 && format->wBitsPerSample != 16) ||
-		    (format->nChannels != 1 && format->nChannels != 2))
+		case WAVE_FORMAT_PCM:
+			if (format->cbSize != 0 || format->nSamplesPerSec > 48000 ||
+			    (format->wBitsPerSample != 8 && format->wBitsPerSample != 16) ||
+			    (format->nChannels != 1 && format->nChannels != 2))
+				return FALSE;
+
+			break;
+
+		case WAVE_FORMAT_MULAW:
+		case WAVE_FORMAT_ALAW:
+			break;
+
+		default:
 			return FALSE;
-
-		break;
-
-	case WAVE_FORMAT_MULAW:
-	case WAVE_FORMAT_ALAW:
-		break;
-
-	default:
-		return FALSE;
 	}
 
 	req_fmt = rdpsnd_oss_get_format(format);
@@ -445,9 +445,9 @@ static int rdpsnd_oss_parse_addin_args(rdpsndDevicePlugin* device, ADDIN_ARGV* a
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_rdpsnd_client_subsystem_entry oss_freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry oss_freerdp_rdpsnd_client_subsystem_entry
 #else
-#	define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
 #endif
 
 /**

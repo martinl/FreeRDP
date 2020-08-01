@@ -33,16 +33,16 @@
 #include "server-decoration-client-protocol.h"
 
 #ifdef BUILD_IVI
-#	include "ivi-application-client-protocol.h"
+#include "ivi-application-client-protocol.h"
 #endif
 #ifdef BUILD_FULLSCREEN_SHELL
-#	include "fullscreen-shell-unstable-v1-client-protocol.h"
+#include "fullscreen-shell-unstable-v1-client-protocol.h"
 #endif
 
 #ifdef HAVE_PIXMAN_REGION
-#	include <pixman-1/pixman.h>
+#include <pixman-1/pixman.h>
 #else
-#	include <freerdp/codec/region.h>
+#include <freerdp/codec/region.h>
 #endif
 
 #include <xkbcommon/xkbcommon.h>

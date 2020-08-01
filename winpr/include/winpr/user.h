@@ -29,72 +29,72 @@
 
 #ifndef _WIN32
 
-#	define MB_OK 0x00000000L
-#	define MB_OKCANCEL 0x00000001L
-#	define MB_ABORTRETRYIGNORE 0x00000002L
-#	define MB_YESNOCANCEL 0x00000003L
-#	define MB_YESNO 0x00000004L
-#	define MB_RETRYCANCEL 0x00000005L
-#	define MB_CANCELTRYCONTINUE 0x00000006L
+#define MB_OK 0x00000000L
+#define MB_OKCANCEL 0x00000001L
+#define MB_ABORTRETRYIGNORE 0x00000002L
+#define MB_YESNOCANCEL 0x00000003L
+#define MB_YESNO 0x00000004L
+#define MB_RETRYCANCEL 0x00000005L
+#define MB_CANCELTRYCONTINUE 0x00000006L
 
-#	define IDOK 1
-#	define IDCANCEL 2
-#	define IDABORT 3
-#	define IDRETRY 4
-#	define IDIGNORE 5
-#	define IDYES 6
-#	define IDNO 7
-#	define IDTRYAGAIN 10
-#	define IDCONTINUE 11
-#	define IDTIMEOUT 32000
-#	define IDASYNC 32001
+#define IDOK 1
+#define IDCANCEL 2
+#define IDABORT 3
+#define IDRETRY 4
+#define IDIGNORE 5
+#define IDYES 6
+#define IDNO 7
+#define IDTRYAGAIN 10
+#define IDCONTINUE 11
+#define IDTIMEOUT 32000
+#define IDASYNC 32001
 
-#	define CF_RAW 0
-#	define CF_TEXT 1
-#	define CF_BITMAP 2
-#	define CF_METAFILEPICT 3
-#	define CF_SYLK 4
-#	define CF_DIF 5
-#	define CF_TIFF 6
-#	define CF_OEMTEXT 7
-#	define CF_DIB 8
-#	define CF_PALETTE 9
-#	define CF_PENDATA 10
-#	define CF_RIFF 11
-#	define CF_WAVE 12
-#	define CF_UNICODETEXT 13
-#	define CF_ENHMETAFILE 14
-#	define CF_HDROP 15
-#	define CF_LOCALE 16
-#	define CF_DIBV5 17
-#	define CF_MAX 18
+#define CF_RAW 0
+#define CF_TEXT 1
+#define CF_BITMAP 2
+#define CF_METAFILEPICT 3
+#define CF_SYLK 4
+#define CF_DIF 5
+#define CF_TIFF 6
+#define CF_OEMTEXT 7
+#define CF_DIB 8
+#define CF_PALETTE 9
+#define CF_PENDATA 10
+#define CF_RIFF 11
+#define CF_WAVE 12
+#define CF_UNICODETEXT 13
+#define CF_ENHMETAFILE 14
+#define CF_HDROP 15
+#define CF_LOCALE 16
+#define CF_DIBV5 17
+#define CF_MAX 18
 
-#	define CF_OWNERDISPLAY 0x0080
-#	define CF_DSPTEXT 0x0081
-#	define CF_DSPBITMAP 0x0082
-#	define CF_DSPMETAFILEPICT 0x0083
-#	define CF_DSPENHMETAFILE 0x008E
+#define CF_OWNERDISPLAY 0x0080
+#define CF_DSPTEXT 0x0081
+#define CF_DSPBITMAP 0x0082
+#define CF_DSPMETAFILEPICT 0x0083
+#define CF_DSPENHMETAFILE 0x008E
 
-#	define CF_PRIVATEFIRST 0x0200
-#	define CF_PRIVATELAST 0x02FF
+#define CF_PRIVATEFIRST 0x0200
+#define CF_PRIVATELAST 0x02FF
 
-#	define CF_GDIOBJFIRST 0x0300
-#	define CF_GDIOBJLAST 0x03FF
+#define CF_GDIOBJFIRST 0x0300
+#define CF_GDIOBJLAST 0x03FF
 
 /* Windows Metafile Picture Format */
 
-#	define MM_TEXT 1
-#	define MM_LOMETRIC 2
-#	define MM_HIMETRIC 3
-#	define MM_LOENGLISH 4
-#	define MM_HIENGLISH 5
-#	define MM_TWIPS 6
-#	define MM_ISOTROPIC 7
-#	define MM_ANISOTROPIC 8
+#define MM_TEXT 1
+#define MM_LOMETRIC 2
+#define MM_HIMETRIC 3
+#define MM_LOENGLISH 4
+#define MM_HIENGLISH 5
+#define MM_TWIPS 6
+#define MM_ISOTROPIC 7
+#define MM_ANISOTROPIC 8
 
-#	define MM_MIN MM_TEXT
-#	define MM_MAX MM_ANISOTROPIC
-#	define MM_MAX_FIXEDSCALE MM_TWIPS
+#define MM_MIN MM_TEXT
+#define MM_MAX MM_ANISOTROPIC
+#define MM_MAX_FIXEDSCALE MM_TWIPS
 
 #endif
 
@@ -104,7 +104,7 @@
 
 #if !defined(_WIN32)
 
-#	pragma pack(push, 1)
+#pragma pack(push, 1)
 
 typedef LONG FXPT16DOT16, FAR *LPFXPT16DOT16;
 typedef LONG FXPT2DOT30, FAR *LPFXPT2DOT30;
@@ -155,15 +155,15 @@ typedef struct tagRGBQUAD
 
 typedef RGBQUAD FAR* LPRGBQUAD;
 
-#	define BI_RGB 0
-#	define BI_RLE8 1
-#	define BI_RLE4 2
-#	define BI_BITFIELDS 3
-#	define BI_JPEG 4
-#	define BI_PNG 5
+#define BI_RGB 0
+#define BI_RLE8 1
+#define BI_RLE4 2
+#define BI_BITFIELDS 3
+#define BI_JPEG 4
+#define BI_PNG 5
 
-#	define PROFILE_LINKED 'LINK'
-#	define PROFILE_EMBEDDED 'MBED'
+#define PROFILE_LINKED 'LINK'
+#define PROFILE_EMBEDDED 'MBED'
 
 typedef struct tagBITMAPINFOHEADER
 {
@@ -196,13 +196,13 @@ typedef enum _ORIENTATION_PREFERENCE
 	ORIENTATION_PREFERENCE_PORTRAIT_FLIPPED = 0x8
 } ORIENTATION_PREFERENCE;
 
-#	pragma pack(pop)
+#pragma pack(pop)
 
 #endif
 
 #if !defined(_WIN32) || defined(_UWP)
 
-#	pragma pack(push, 1)
+#pragma pack(push, 1)
 
 typedef struct tagBITMAPCOREHEADER
 {
@@ -280,7 +280,7 @@ typedef struct tagBITMAPFILEHEADER
 	DWORD bfOffBits;
 } BITMAPFILEHEADER, FAR *LPBITMAPFILEHEADER, *PBITMAPFILEHEADER;
 
-#	pragma pack(pop)
+#pragma pack(pop)
 
 #endif
 

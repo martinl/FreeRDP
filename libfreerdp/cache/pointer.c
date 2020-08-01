@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -84,14 +84,14 @@ static BOOL update_pointer_system(rdpContext* context, const POINTER_SYSTEM_UPDA
 
 	switch (pointer_system->type)
 	{
-	case SYSPTR_NULL:
-		return IFCALLRESULT(TRUE, pointer->SetNull, context);
+		case SYSPTR_NULL:
+			return IFCALLRESULT(TRUE, pointer->SetNull, context);
 
-	case SYSPTR_DEFAULT:
-		return IFCALLRESULT(TRUE, pointer->SetDefault, context);
+		case SYSPTR_DEFAULT:
+			return IFCALLRESULT(TRUE, pointer->SetDefault, context);
 
-	default:
-		WLog_ERR(TAG, "Unknown system pointer type (0x%08" PRIX32 ")", pointer_system->type);
+		default:
+			WLog_ERR(TAG, "Unknown system pointer type (0x%08" PRIX32 ")", pointer_system->type);
 	}
 
 	return TRUE;

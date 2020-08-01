@@ -359,39 +359,39 @@ ConversionResult ConvertUTF16toUTF8(const WCHAR** sourceStart, const WCHAR* sour
 		{
 			switch (bytesToWrite)
 			{
-			/* note: everything falls through. */
-			case 4:
-				*--target = (BYTE)((ch | byteMark) & byteMask);
-				ch >>= 6;
+				/* note: everything falls through. */
+				case 4:
+					*--target = (BYTE)((ch | byteMark) & byteMask);
+					ch >>= 6;
 
-			case 3:
-				*--target = (BYTE)((ch | byteMark) & byteMask);
-				ch >>= 6;
+				case 3:
+					*--target = (BYTE)((ch | byteMark) & byteMask);
+					ch >>= 6;
 
-			case 2:
-				*--target = (BYTE)((ch | byteMark) & byteMask);
-				ch >>= 6;
+				case 2:
+					*--target = (BYTE)((ch | byteMark) & byteMask);
+					ch >>= 6;
 
-			case 1:
-				*--target = (BYTE)(ch | firstByteMark[bytesToWrite]);
+				case 1:
+					*--target = (BYTE)(ch | firstByteMark[bytesToWrite]);
 			}
 		}
 		else
 		{
 			switch (bytesToWrite)
 			{
-			/* note: everything falls through. */
-			case 4:
-				--target;
+				/* note: everything falls through. */
+				case 4:
+					--target;
 
-			case 3:
-				--target;
+				case 3:
+					--target;
 
-			case 2:
-				--target;
+				case 2:
+					--target;
 
-			case 1:
-				--target;
+				case 1:
+					--target;
 			}
 		}
 
@@ -423,57 +423,57 @@ static BOOL isLegalUTF8(const BYTE* source, int length)
 
 	switch (length)
 	{
-	default:
-		return FALSE;
-
-	/* Everything else falls through when "TRUE"... */
-	case 4:
-		if ((a = (*--srcptr)) < 0x80 || a > 0xBF)
-			return FALSE;
-
-	case 3:
-		if ((a = (*--srcptr)) < 0x80 || a > 0xBF)
-			return FALSE;
-
-	case 2:
-		if ((a = (*--srcptr)) > 0xBF)
-			return FALSE;
-
-		switch (*source)
-		{
-		/* no fall-through in this inner switch */
-		case 0xE0:
-			if (a < 0xA0)
-				return FALSE;
-
-			break;
-
-		case 0xED:
-			if (a > 0x9F)
-				return FALSE;
-
-			break;
-
-		case 0xF0:
-			if (a < 0x90)
-				return FALSE;
-
-			break;
-
-		case 0xF4:
-			if (a > 0x8F)
-				return FALSE;
-
-			break;
-
 		default:
-			if (a < 0x80)
-				return FALSE;
-		}
-
-	case 1:
-		if (*source >= 0x80 && *source < 0xC2)
 			return FALSE;
+
+		/* Everything else falls through when "TRUE"... */
+		case 4:
+			if ((a = (*--srcptr)) < 0x80 || a > 0xBF)
+				return FALSE;
+
+		case 3:
+			if ((a = (*--srcptr)) < 0x80 || a > 0xBF)
+				return FALSE;
+
+		case 2:
+			if ((a = (*--srcptr)) > 0xBF)
+				return FALSE;
+
+			switch (*source)
+			{
+				/* no fall-through in this inner switch */
+				case 0xE0:
+					if (a < 0xA0)
+						return FALSE;
+
+					break;
+
+				case 0xED:
+					if (a > 0x9F)
+						return FALSE;
+
+					break;
+
+				case 0xF0:
+					if (a < 0x90)
+						return FALSE;
+
+					break;
+
+				case 0xF4:
+					if (a > 0x8F)
+						return FALSE;
+
+					break;
+
+				default:
+					if (a < 0x80)
+						return FALSE;
+			}
+
+		case 1:
+			if (*source >= 0x80 && *source < 0xC2)
+				return FALSE;
 	}
 
 	if (*source > 0xF4)
@@ -535,28 +535,28 @@ ConversionResult ConvertUTF8toUTF16(const BYTE** sourceStart, const BYTE* source
 		 */
 		switch (extraBytesToRead)
 		{
-		case 5:
-			ch += *source++;
-			ch <<= 6; /* remember, illegal UTF-8 */
+			case 5:
+				ch += *source++;
+				ch <<= 6; /* remember, illegal UTF-8 */
 
-		case 4:
-			ch += *source++;
-			ch <<= 6; /* remember, illegal UTF-8 */
+			case 4:
+				ch += *source++;
+				ch <<= 6; /* remember, illegal UTF-8 */
 
-		case 3:
-			ch += *source++;
-			ch <<= 6;
+			case 3:
+				ch += *source++;
+				ch <<= 6;
 
-		case 2:
-			ch += *source++;
-			ch <<= 6;
+			case 2:
+				ch += *source++;
+				ch <<= 6;
 
-		case 1:
-			ch += *source++;
-			ch <<= 6;
+			case 1:
+				ch += *source++;
+				ch <<= 6;
 
-		case 0:
-			ch += *source++;
+			case 0:
+				ch += *source++;
 		}
 
 		ch -= offsetsFromUTF8[extraBytesToRead];
@@ -723,20 +723,20 @@ ConversionResult ConvertUTF32toUTF8(const DWORD** sourceStart, const DWORD* sour
 
 		switch (bytesToWrite) /* note: everything falls through. */
 		{
-		case 4:
-			*--target = (BYTE)((ch | byteMark) & byteMask);
-			ch >>= 6;
+			case 4:
+				*--target = (BYTE)((ch | byteMark) & byteMask);
+				ch >>= 6;
 
-		case 3:
-			*--target = (BYTE)((ch | byteMark) & byteMask);
-			ch >>= 6;
+			case 3:
+				*--target = (BYTE)((ch | byteMark) & byteMask);
+				ch >>= 6;
 
-		case 2:
-			*--target = (BYTE)((ch | byteMark) & byteMask);
-			ch >>= 6;
+			case 2:
+				*--target = (BYTE)((ch | byteMark) & byteMask);
+				ch >>= 6;
 
-		case 1:
-			*--target = (BYTE)(ch | firstByteMark[bytesToWrite]);
+			case 1:
+				*--target = (BYTE)(ch | firstByteMark[bytesToWrite]);
 		}
 
 		target += bytesToWrite;
@@ -779,28 +779,28 @@ ConversionResult ConvertUTF8toUTF32(const BYTE** sourceStart, const BYTE* source
 		 */
 		switch (extraBytesToRead)
 		{
-		case 5:
-			ch += *source++;
-			ch <<= 6;
+			case 5:
+				ch += *source++;
+				ch <<= 6;
 
-		case 4:
-			ch += *source++;
-			ch <<= 6;
+			case 4:
+				ch += *source++;
+				ch <<= 6;
 
-		case 3:
-			ch += *source++;
-			ch <<= 6;
+			case 3:
+				ch += *source++;
+				ch <<= 6;
 
-		case 2:
-			ch += *source++;
-			ch <<= 6;
+			case 2:
+				ch += *source++;
+				ch <<= 6;
 
-		case 1:
-			ch += *source++;
-			ch <<= 6;
+			case 1:
+				ch += *source++;
+				ch <<= 6;
 
-		case 0:
-			ch += *source++;
+			case 0:
+				ch += *source++;
 		}
 
 		ch -= offsetsFromUTF8[extraBytesToRead];

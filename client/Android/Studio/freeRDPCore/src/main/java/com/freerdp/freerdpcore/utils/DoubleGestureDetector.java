@@ -107,129 +107,130 @@ public class DoubleGestureDetector
 
 		switch (action & MotionEvent.ACTION_MASK)
 		{
-		case MotionEvent.ACTION_DOWN:
-			if (mCurrentDownEvent != null)
-				mCurrentDownEvent.recycle();
+			case MotionEvent.ACTION_DOWN:
+				if (mCurrentDownEvent != null)
+					mCurrentDownEvent.recycle();
 
-			mCurrentMode = MODE_UNKNOWN;
-			mCurrentDownEvent = MotionEvent.obtain(ev);
-			mCancelDetection = false;
-			mDoubleInProgress = false;
-			mScrollDetectionScore = 0;
-			handled = true;
-			break;
-
-		case MotionEvent.ACTION_POINTER_UP:
-			if (mPreviousPointerUpEvent != null)
-				mPreviousPointerUpEvent.recycle();
-			mPreviousPointerUpEvent = MotionEvent.obtain(ev);
-			break;
-
-		case MotionEvent.ACTION_POINTER_DOWN:
-			// more than 2 fingers down? cancel
-			// 2nd finger touched too late? cancel
-			if (ev.getPointerCount() > 2 ||
-			    (ev.getEventTime() - mCurrentDownEvent.getEventTime()) > DOUBLE_TOUCH_TIMEOUT)
-			{
-				cancel();
-				break;
-			}
-
-			// detection cancelled?
-			if (mCancelDetection)
-				break;
-
-			// double touch gesture in progress
-			mDoubleInProgress = true;
-			if (mCurrentDoubleDownEvent != null)
-				mCurrentDoubleDownEvent.recycle();
-			mCurrentDoubleDownEvent = MotionEvent.obtain(ev);
-
-			// set detection mode to unkown and send a TOUCH timeout event to detect single taps
-			mCurrentMode = MODE_UNKNOWN;
-			mHandler.sendEmptyMessageDelayed(TAP, SINGLE_DOUBLE_TOUCH_TIMEOUT);
-
-			handled |= mListener.onDoubleTouchDown(ev);
-			break;
-
-		case MotionEvent.ACTION_MOVE:
-
-			// detection cancelled or not active?
-			if (mCancelDetection || !mDoubleInProgress || ev.getPointerCount() != 2)
-				break;
-
-			// determine mode
-			if (mCurrentMode == MODE_UNKNOWN)
-			{
-				// did the pointer distance change?
-				if (pointerDistanceChanged(mCurrentDoubleDownEvent, ev))
-				{
-					handled |= scaleGestureDetector.onTouchEvent(mCurrentDownEvent);
-					MotionEvent e = MotionEvent.obtain(ev);
-					e.setAction(mCurrentDoubleDownEvent.getAction());
-					handled |= scaleGestureDetector.onTouchEvent(e);
-					mCurrentMode = MODE_PINCH_ZOOM;
-					break;
-				}
-				else
-				{
-					mScrollDetectionScore++;
-					if (mScrollDetectionScore >= SCROLL_SCORE_TO_REACH)
-						mCurrentMode = MODE_SCROLL;
-				}
-			}
-
-			switch (mCurrentMode)
-			{
-			case MODE_PINCH_ZOOM:
-				if (scaleGestureDetector != null)
-					handled |= scaleGestureDetector.onTouchEvent(ev);
-				break;
-
-			case MODE_SCROLL:
-				handled = mListener.onDoubleTouchScroll(mCurrentDownEvent, ev);
-				break;
-
-			default:
+				mCurrentMode = MODE_UNKNOWN;
+				mCurrentDownEvent = MotionEvent.obtain(ev);
+				mCancelDetection = false;
+				mDoubleInProgress = false;
+				mScrollDetectionScore = 0;
 				handled = true;
 				break;
-			}
 
-			break;
+			case MotionEvent.ACTION_POINTER_UP:
+				if (mPreviousPointerUpEvent != null)
+					mPreviousPointerUpEvent.recycle();
+				mPreviousPointerUpEvent = MotionEvent.obtain(ev);
+				break;
 
-		case MotionEvent.ACTION_UP:
-			// fingers were not removed equally? cancel
-			if (mPreviousPointerUpEvent != null &&
-			    (ev.getEventTime() - mPreviousPointerUpEvent.getEventTime()) > DOUBLE_TOUCH_TIMEOUT)
-			{
-				mPreviousPointerUpEvent.recycle();
-				mPreviousPointerUpEvent = null;
+			case MotionEvent.ACTION_POINTER_DOWN:
+				// more than 2 fingers down? cancel
+				// 2nd finger touched too late? cancel
+				if (ev.getPointerCount() > 2 ||
+				    (ev.getEventTime() - mCurrentDownEvent.getEventTime()) > DOUBLE_TOUCH_TIMEOUT)
+				{
+					cancel();
+					break;
+				}
+
+				// detection cancelled?
+				if (mCancelDetection)
+					break;
+
+				// double touch gesture in progress
+				mDoubleInProgress = true;
+				if (mCurrentDoubleDownEvent != null)
+					mCurrentDoubleDownEvent.recycle();
+				mCurrentDoubleDownEvent = MotionEvent.obtain(ev);
+
+				// set detection mode to unkown and send a TOUCH timeout event to detect single taps
+				mCurrentMode = MODE_UNKNOWN;
+				mHandler.sendEmptyMessageDelayed(TAP, SINGLE_DOUBLE_TOUCH_TIMEOUT);
+
+				handled |= mListener.onDoubleTouchDown(ev);
+				break;
+
+			case MotionEvent.ACTION_MOVE:
+
+				// detection cancelled or not active?
+				if (mCancelDetection || !mDoubleInProgress || ev.getPointerCount() != 2)
+					break;
+
+				// determine mode
+				if (mCurrentMode == MODE_UNKNOWN)
+				{
+					// did the pointer distance change?
+					if (pointerDistanceChanged(mCurrentDoubleDownEvent, ev))
+					{
+						handled |= scaleGestureDetector.onTouchEvent(mCurrentDownEvent);
+						MotionEvent e = MotionEvent.obtain(ev);
+						e.setAction(mCurrentDoubleDownEvent.getAction());
+						handled |= scaleGestureDetector.onTouchEvent(e);
+						mCurrentMode = MODE_PINCH_ZOOM;
+						break;
+					}
+					else
+					{
+						mScrollDetectionScore++;
+						if (mScrollDetectionScore >= SCROLL_SCORE_TO_REACH)
+							mCurrentMode = MODE_SCROLL;
+					}
+				}
+
+				switch (mCurrentMode)
+				{
+					case MODE_PINCH_ZOOM:
+						if (scaleGestureDetector != null)
+							handled |= scaleGestureDetector.onTouchEvent(ev);
+						break;
+
+					case MODE_SCROLL:
+						handled = mListener.onDoubleTouchScroll(mCurrentDownEvent, ev);
+						break;
+
+					default:
+						handled = true;
+						break;
+				}
+
+				break;
+
+			case MotionEvent.ACTION_UP:
+				// fingers were not removed equally? cancel
+				if (mPreviousPointerUpEvent != null &&
+				    (ev.getEventTime() - mPreviousPointerUpEvent.getEventTime()) >
+				        DOUBLE_TOUCH_TIMEOUT)
+				{
+					mPreviousPointerUpEvent.recycle();
+					mPreviousPointerUpEvent = null;
+					cancel();
+					break;
+				}
+
+				// detection cancelled or not active?
+				if (mCancelDetection || !mDoubleInProgress)
+					break;
+
+				boolean hasTapEvent = mHandler.hasMessages(TAP);
+				MotionEvent currentUpEvent = MotionEvent.obtain(ev);
+				if (mCurrentMode == MODE_UNKNOWN && hasTapEvent)
+					handled = mListener.onDoubleTouchSingleTap(mCurrentDoubleDownEvent);
+				else if (mCurrentMode == MODE_PINCH_ZOOM)
+					handled = scaleGestureDetector.onTouchEvent(ev);
+
+				if (mPreviousUpEvent != null)
+					mPreviousUpEvent.recycle();
+
+				// Hold the event we obtained above - listeners may have changed the original.
+				mPreviousUpEvent = currentUpEvent;
+				handled |= mListener.onDoubleTouchUp(ev);
+				break;
+
+			case MotionEvent.ACTION_CANCEL:
 				cancel();
 				break;
-			}
-
-			// detection cancelled or not active?
-			if (mCancelDetection || !mDoubleInProgress)
-				break;
-
-			boolean hasTapEvent = mHandler.hasMessages(TAP);
-			MotionEvent currentUpEvent = MotionEvent.obtain(ev);
-			if (mCurrentMode == MODE_UNKNOWN && hasTapEvent)
-				handled = mListener.onDoubleTouchSingleTap(mCurrentDoubleDownEvent);
-			else if (mCurrentMode == MODE_PINCH_ZOOM)
-				handled = scaleGestureDetector.onTouchEvent(ev);
-
-			if (mPreviousUpEvent != null)
-				mPreviousUpEvent.recycle();
-
-			// Hold the event we obtained above - listeners may have changed the original.
-			mPreviousUpEvent = currentUpEvent;
-			handled |= mListener.onDoubleTouchUp(ev);
-			break;
-
-		case MotionEvent.ACTION_CANCEL:
-			cancel();
-			break;
 		}
 
 		if ((action == MotionEvent.ACTION_MOVE) && handled == false)

@@ -20,7 +20,7 @@
  */
 
 #if defined(HAVE_CONFIG_H)
-#	include <config.h>
+#include <config.h>
 #endif
 #include <assert.h>
 #include <stdlib.h>
@@ -29,10 +29,10 @@
 #include "triodef.h"
 #include "triostr.h"
 #if defined(TRIO_FUNC_TO_LONG_DOUBLE)
-#	define USE_MATH
+#define USE_MATH
 #endif
 #if defined(USE_MATH)
-#	include <math.h>
+#include <math.h>
 #endif
 
 /*************************************************************************
@@ -40,104 +40,104 @@
  */
 
 #if !defined(TRIO_PUBLIC_STRING)
-#	define TRIO_PUBLIC_STRING TRIO_PUBLIC
+#define TRIO_PUBLIC_STRING TRIO_PUBLIC
 #endif
 #if !defined(TRIO_PRIVATE_STRING)
-#	define TRIO_PRIVATE_STRING TRIO_PRIVATE
+#define TRIO_PRIVATE_STRING TRIO_PRIVATE
 #endif
 
 #if !defined(NULL)
-#	define NULL 0
+#define NULL 0
 #endif
 #if !defined(NIL)
-#	define NIL ((char)0)
+#define NIL ((char)0)
 #endif
 #if !defined(FALSE)
-#	define FALSE (1 == 0)
-#	define TRUE (!FALSE)
+#define FALSE (1 == 0)
+#define TRUE (!FALSE)
 #endif
 #if !defined(BOOLEAN_T)
-#	define BOOLEAN_T int
+#define BOOLEAN_T int
 #endif
 
 #if defined(USE_MATH)
-#	if defined(PREDEF_STANDARD_C99)
-#		if defined(TRIO_COMPILER_DECC)
-#			if (TRIO_COMPILER_DECC - 0 > 80000000)
+#if defined(PREDEF_STANDARD_C99)
+#if defined(TRIO_COMPILER_DECC)
+#if (TRIO_COMPILER_DECC - 0 > 80000000)
 /*
  * The OSF/1 runtime that comes with the DECC compiler does not support
  * hexfloats conversion.
  */
-#				define USE_STRTOD
-#				define USE_STRTOF
-#			endif
-#		else
-#			define USE_STRTOD
-#			define USE_STRTOF
-#		endif
-#	else
-#		if defined(TRIO_COMPILER_VISUALC)
-#			define USE_STRTOD
-#		endif
-#	endif
+#define USE_STRTOD
+#define USE_STRTOF
+#endif
+#else
+#define USE_STRTOD
+#define USE_STRTOF
+#endif
+#else
+#if defined(TRIO_COMPILER_VISUALC)
+#define USE_STRTOD
+#endif
+#endif
 #endif
 
 #if defined(TRIO_PLATFORM_UNIX)
-#	if defined(PREDEF_STANDARD_UNIX95)
-#		define USE_STRCASECMP
-#		define USE_STRNCASECMP
-#	endif
-#	if defined(TRIO_PLATFORM_SUNOS)
-#		define USE_SYS_ERRLIST
-#	else
-#		define USE_STRERROR
-#	endif
-#	if defined(TRIO_PLATFORM_QNX)
-#		define strcasecmp(x, y) stricmp(x, y)
-#		define strncasecmp(x, y, n) strnicmp(x, y, n)
-#	endif
+#if defined(PREDEF_STANDARD_UNIX95)
+#define USE_STRCASECMP
+#define USE_STRNCASECMP
+#endif
+#if defined(TRIO_PLATFORM_SUNOS)
+#define USE_SYS_ERRLIST
+#else
+#define USE_STRERROR
+#endif
+#if defined(TRIO_PLATFORM_QNX)
+#define strcasecmp(x, y) stricmp(x, y)
+#define strncasecmp(x, y, n) strnicmp(x, y, n)
+#endif
 #endif
 
 #if defined(TRIO_PLATFORM_WIN32)
-#	define USE_STRCASECMP
-#	if defined(TRIO_PLATFORM_WINCE)
-#		define strcasecmp(x, y) _stricmp(x, y)
-#	else
-#		define strcasecmp(x, y) _stricmp(x, y)
-#	endif
+#define USE_STRCASECMP
+#if defined(TRIO_PLATFORM_WINCE)
+#define strcasecmp(x, y) _stricmp(x, y)
+#else
+#define strcasecmp(x, y) _stricmp(x, y)
+#endif
 #endif
 
 #if !defined(HAVE_CONFIG_H)
-#	if !(defined(TRIO_PLATFORM_SUNOS))
-#		define HAVE_TOLOWER
-#		define HAVE_TOUPPER
-#	endif
+#if !(defined(TRIO_PLATFORM_SUNOS))
+#define HAVE_TOLOWER
+#define HAVE_TOUPPER
+#endif
 #endif
 
 #if defined(USE_MATH) && !defined(TRIO_NO_POWL)
-#	if !defined(HAVE_POWL)
-#		if defined(PREDEF_STANDARD_C99) || defined(PREDEF_STANDARD_UNIX03)
-#			define HAVE_POWL
-#		else
-#			if defined(TRIO_COMPILER_VISUALC)
-#				if defined(powl)
-#					define HAVE_POWL
-#				endif
-#			endif
-#		endif
-#	endif
+#if !defined(HAVE_POWL)
+#if defined(PREDEF_STANDARD_C99) || defined(PREDEF_STANDARD_UNIX03)
+#define HAVE_POWL
+#else
+#if defined(TRIO_COMPILER_VISUALC)
+#if defined(powl)
+#define HAVE_POWL
+#endif
+#endif
+#endif
+#endif
 #endif
 
 #if defined(HAVE_POWL)
-#	define trio_powl(x, y) powl((x), (y))
+#define trio_powl(x, y) powl((x), (y))
 #else
-#	define trio_powl(x, y) pow((double)(x), (double)(y))
+#define trio_powl(x, y) pow((double)(x), (double)(y))
 #endif
 
 #if defined(TRIO_FUNC_TO_UPPER) || (defined(TRIO_FUNC_EQUAL) && !defined(USE_STRCASECMP)) ||   \
     (defined(TRIO_FUNC_EQUAL_MAX) && !defined(USE_STRNCASECMP)) || defined(TRIO_FUNC_MATCH) || \
     defined(TRIO_FUNC_TO_LONG_DOUBLE) || defined(TRIO_FUNC_UPPER)
-#	define TRIO_FUNC_INTERNAL_TO_UPPER
+#define TRIO_FUNC_INTERNAL_TO_UPPER
 #endif
 
 /*************************************************************************
@@ -165,7 +165,7 @@ struct _trio_string_t
  */
 
 #if defined(TRIO_DOCUMENTATION)
-#	include "doc/doc_static.h"
+#include "doc/doc_static.h"
 #endif
 /** @addtogroup StaticStrings
     @{
@@ -273,12 +273,12 @@ TRIO_PRIVATE_STRING BOOLEAN_T internal_string_grow_to TRIO_ARGS2((self, length),
 
 TRIO_PRIVATE_STRING TRIO_INLINE int internal_to_upper TRIO_ARGS1((source), int source)
 {
-#	if defined(HAVE_TOUPPER)
+#if defined(HAVE_TOUPPER)
 	return toupper(source);
-#	else
+#else
 	/* Does not handle locales or non-contiguous alphabetic characters */
 	return ((source >= (int)'a') && (source <= (int)'z')) ? source - 'a' + 'A' : source;
-#	endif
+#endif
 }
 
 #endif
@@ -557,9 +557,9 @@ TRIO_PUBLIC_STRING int trio_equal TRIO_ARGS2((first, second), TRIO_CONST char* f
 
 	if ((first != NULL) && (second != NULL))
 	{
-#	if defined(USE_STRCASECMP)
+#if defined(USE_STRCASECMP)
 		return (0 == strcasecmp(first, second));
-#	else
+#else
 
 		while ((*first != NIL) && (*second != NIL))
 		{
@@ -573,7 +573,7 @@ TRIO_PUBLIC_STRING int trio_equal TRIO_ARGS2((first, second), TRIO_CONST char* f
 		}
 
 		return ((*first == NIL) && (*second == NIL));
-#	endif
+#endif
 	}
 
 	return FALSE;
@@ -652,11 +652,11 @@ TRIO_PUBLIC_STRING int trio_equal_locale TRIO_ARGS2((first, second), TRIO_CONST 
 {
 	assert(first);
 	assert(second);
-#	if defined(LC_COLLATE)
+#if defined(LC_COLLATE)
 	return (strcoll(first, second) == 0);
-#	else
+#else
 	return trio_equal(first, second);
-#	endif
+#endif
 }
 
 #endif
@@ -681,9 +681,9 @@ TRIO_PUBLIC_STRING int trio_equal_max TRIO_ARGS3((first, max, second), TRIO_CONS
 
 	if ((first != NULL) && (second != NULL))
 	{
-#	if defined(USE_STRNCASECMP)
+#if defined(USE_STRNCASECMP)
 		return (0 == strncasecmp(first, second, max));
-#	else
+#else
 		/* Not adequately tested yet */
 		size_t cnt = 0;
 
@@ -700,7 +700,7 @@ TRIO_PUBLIC_STRING int trio_equal_max TRIO_ARGS3((first, max, second), TRIO_CONS
 		}
 
 		return ((cnt == max) || ((*first == NIL) && (*second == NIL)));
-#	endif
+#endif
 	}
 
 	return FALSE;
@@ -718,18 +718,18 @@ TRIO_PUBLIC_STRING int trio_equal_max TRIO_ARGS3((first, max, second), TRIO_CONS
 
 TRIO_PUBLIC_STRING TRIO_CONST char* trio_error TRIO_ARGS1((error_number), int error_number)
 {
-#	if defined(USE_STRERROR)
+#if defined(USE_STRERROR)
 	return strerror(error_number);
-#	else
-#		if defined(USE_SYS_ERRLIST)
+#else
+#if defined(USE_SYS_ERRLIST)
 	extern char* sys_errlist[];
 	extern int sys_nerr;
 	return ((error_number < 0) || (error_number >= sys_nerr)) ? "unknown"
 	                                                          : sys_errlist[error_number];
-#		else
+#else
 	return "unknown";
-#		endif
-#	endif
+#endif
+#endif
 }
 
 #endif
@@ -783,18 +783,18 @@ TRIO_PUBLIC_STRING unsigned long trio_hash TRIO_ARGS2((string, type), TRIO_CONST
 
 	switch (type)
 	{
-	case TRIO_HASH_PLAIN:
-		while ((ch = *string++) != NIL)
-		{
-			value *= 31;
-			value += (unsigned long)ch;
-		}
+		case TRIO_HASH_PLAIN:
+			while ((ch = *string++) != NIL)
+			{
+				value *= 31;
+				value += (unsigned long)ch;
+			}
 
-		break;
+			break;
 
-	default:
-		assert(FALSE);
-		break;
+		default:
+			assert(FALSE);
+			break;
 	}
 
 	return value;
@@ -1094,9 +1094,9 @@ TRIO_PUBLIC_STRING trio_long_double_t trio_to_long_double TRIO_ARGS2((source, en
                                                                      TRIO_CONST char* source,
                                                                      char** endp)
 {
-#	if defined(USE_STRTOLD)
+#if defined(USE_STRTOLD)
 	return strtold(source, endp);
-#	else
+#else
 	int isNegative = FALSE;
 	int isExponentNegative = FALSE;
 	trio_long_double_t integer = 0.0;
@@ -1185,9 +1185,9 @@ TRIO_PUBLIC_STRING trio_long_double_t trio_to_long_double TRIO_ARGS2((source, en
 		}
 
 		if ((*source == 'e') || (*source == 'E')
-#		if TRIO_MICROSOFT
+#if TRIO_MICROSOFT
 		    || (*source == 'd') || (*source == 'D')
-#		endif
+#endif
 		)
 		{
 			source++; /* Skip exponential indicator */
@@ -1222,7 +1222,7 @@ TRIO_PUBLIC_STRING trio_long_double_t trio_to_long_double TRIO_ARGS2((source, en
 		*endp = (char*)source;
 
 	return value;
-#	endif
+#endif
 }
 
 #endif
@@ -1241,11 +1241,11 @@ TRIO_PUBLIC_STRING trio_long_double_t trio_to_long_double TRIO_ARGS2((source, en
 TRIO_PUBLIC_STRING double trio_to_double TRIO_ARGS2((source, endp), TRIO_CONST char* source,
                                                     char** endp)
 {
-#	if defined(USE_STRTOD)
+#if defined(USE_STRTOD)
 	return strtod(source, endp);
-#	else
+#else
 	return (double)trio_to_long_double(source, endp);
-#	endif
+#endif
 }
 
 #endif
@@ -1264,11 +1264,11 @@ TRIO_PUBLIC_STRING double trio_to_double TRIO_ARGS2((source, endp), TRIO_CONST c
 TRIO_PUBLIC_STRING float trio_to_float TRIO_ARGS2((source, endp), TRIO_CONST char* source,
                                                   char** endp)
 {
-#	if defined(USE_STRTOF)
+#if defined(USE_STRTOF)
 	return strtof(source, endp);
-#	else
+#else
 	return (float)trio_to_long_double(source, endp);
-#	endif
+#endif
 }
 
 #endif
@@ -1302,12 +1302,12 @@ TRIO_PUBLIC_STRING long trio_to_long TRIO_ARGS3((string, endp, base), TRIO_CONST
 
 TRIO_PUBLIC_STRING int trio_to_lower TRIO_ARGS1((source), int source)
 {
-#	if defined(HAVE_TOLOWER)
+#if defined(HAVE_TOLOWER)
 	return tolower(source);
-#	else
+#else
 	/* Does not handle locales or non-contiguous alphabetic characters */
 	return ((source >= (int)'A') && (source <= (int)'Z')) ? source - 'A' + 'a' : source;
-#	endif
+#endif
 }
 
 #endif
@@ -1370,7 +1370,7 @@ TRIO_PUBLIC_STRING int trio_upper TRIO_ARGS1((target), char* target)
  */
 
 #if defined(TRIO_DOCUMENTATION)
-#	include "doc/doc_dynamic.h"
+#include "doc/doc_dynamic.h"
 #endif
 /** @addtogroup DynamicStrings
     @{

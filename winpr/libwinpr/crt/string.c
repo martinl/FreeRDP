@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <errno.h>
@@ -57,15 +57,15 @@ WCHAR* _wcsdup(const WCHAR* strSource)
 	if (strSource == NULL)
 		return NULL;
 
-#	if defined(__APPLE__) && defined(__MACH__) || defined(ANDROID) || defined(sun)
+#if defined(__APPLE__) && defined(__MACH__) || defined(ANDROID) || defined(sun)
 	strDestination = malloc(wcslen((wchar_t*)strSource));
 
 	if (strDestination != NULL)
 		wcscpy((wchar_t*)strDestination, (const wchar_t*)strSource);
 
-#	else
+#else
 	strDestination = (WCHAR*)wcsdup((wchar_t*)strSource);
-#	endif
+#endif
 
 	if (strDestination == NULL)
 		WLog_ERR(TAG, "wcsdup");
@@ -212,7 +212,7 @@ WCHAR* wcstok_s(WCHAR* strToken, const WCHAR* strDelimit, WCHAR** context)
  * http://msdn.microsoft.com/en-us/library/hh802935/
  */
 
-#	include "casing.c"
+#include "casing.c"
 
 LPSTR CharUpperA(LPSTR lpsz)
 {

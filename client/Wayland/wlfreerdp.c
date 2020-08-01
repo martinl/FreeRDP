@@ -308,79 +308,79 @@ static BOOL handle_uwac_events(freerdp* instance, UwacDisplay* display)
 		/*printf("UWAC event type %d\n", event.type);*/
 		switch (event.type)
 		{
-		case UWAC_EVENT_NEW_SEAT:
-			context->seat = event.seat_new.seat;
-			break;
+			case UWAC_EVENT_NEW_SEAT:
+				context->seat = event.seat_new.seat;
+				break;
 
-		case UWAC_EVENT_REMOVED_SEAT:
-			context->seat = NULL;
-			break;
+			case UWAC_EVENT_REMOVED_SEAT:
+				context->seat = NULL;
+				break;
 
-		case UWAC_EVENT_FRAME_DONE:
-			if (UwacWindowSubmitBuffer(context->window, true) != UWAC_SUCCESS)
-				return FALSE;
+			case UWAC_EVENT_FRAME_DONE:
+				if (UwacWindowSubmitBuffer(context->window, true) != UWAC_SUCCESS)
+					return FALSE;
 
-			break;
+				break;
 
-		case UWAC_EVENT_POINTER_ENTER:
-			if (!wlf_handle_pointer_enter(instance, &event.mouse_enter_leave))
-				return FALSE;
+			case UWAC_EVENT_POINTER_ENTER:
+				if (!wlf_handle_pointer_enter(instance, &event.mouse_enter_leave))
+					return FALSE;
 
-			break;
+				break;
 
-		case UWAC_EVENT_POINTER_MOTION:
-			if (!wlf_handle_pointer_motion(instance, &event.mouse_motion))
-				return FALSE;
+			case UWAC_EVENT_POINTER_MOTION:
+				if (!wlf_handle_pointer_motion(instance, &event.mouse_motion))
+					return FALSE;
 
-			break;
+				break;
 
-		case UWAC_EVENT_POINTER_BUTTONS:
-			if (!wlf_handle_pointer_buttons(instance, &event.mouse_button))
-				return FALSE;
+			case UWAC_EVENT_POINTER_BUTTONS:
+				if (!wlf_handle_pointer_buttons(instance, &event.mouse_button))
+					return FALSE;
 
-			break;
+				break;
 
-		case UWAC_EVENT_POINTER_AXIS:
-			if (!wlf_handle_pointer_axis(instance, &event.mouse_axis))
-				return FALSE;
+			case UWAC_EVENT_POINTER_AXIS:
+				if (!wlf_handle_pointer_axis(instance, &event.mouse_axis))
+					return FALSE;
 
-			break;
+				break;
 
-		case UWAC_EVENT_KEY:
-			if (!wlf_handle_key(instance, &event.key))
-				return FALSE;
+			case UWAC_EVENT_KEY:
+				if (!wlf_handle_key(instance, &event.key))
+					return FALSE;
 
-			break;
+				break;
 
-		case UWAC_EVENT_KEYBOARD_ENTER:
-			if (instance->context->settings->GrabKeyboard)
-				UwacSeatInhibitShortcuts(event.keyboard_enter_leave.seat, true);
+			case UWAC_EVENT_KEYBOARD_ENTER:
+				if (instance->context->settings->GrabKeyboard)
+					UwacSeatInhibitShortcuts(event.keyboard_enter_leave.seat, true);
 
-			if (!wlf_keyboard_enter(instance, &event.keyboard_enter_leave))
-				return FALSE;
+				if (!wlf_keyboard_enter(instance, &event.keyboard_enter_leave))
+					return FALSE;
 
-			break;
+				break;
 
-		case UWAC_EVENT_CONFIGURE:
-			if (!wlf_disp_handle_configure(context->disp, event.configure.width,
-			                               event.configure.height))
-				return FALSE;
+			case UWAC_EVENT_CONFIGURE:
+				if (!wlf_disp_handle_configure(context->disp, event.configure.width,
+				                               event.configure.height))
+					return FALSE;
 
-			if (!wl_refresh_display(context))
-				return FALSE;
+				if (!wl_refresh_display(context))
+					return FALSE;
 
-			break;
+				break;
 
-		case UWAC_EVENT_CLIPBOARD_AVAILABLE:
-		case UWAC_EVENT_CLIPBOARD_OFFER:
-		case UWAC_EVENT_CLIPBOARD_SELECT:
-			if (!wlf_cliprdr_handle_event(context->clipboard, &event.clipboard))
-				return FALSE;
+			case UWAC_EVENT_CLIPBOARD_AVAILABLE:
+			case UWAC_EVENT_CLIPBOARD_OFFER:
+			case UWAC_EVENT_CLIPBOARD_SELECT:
+				if (!wlf_cliprdr_handle_event(context->clipboard, &event.clipboard))
+					return FALSE;
 
-			break;
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 

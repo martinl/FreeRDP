@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -222,44 +222,44 @@ static UINT32 process_rop(UINT32 src, UINT32 dst, UINT32 pat, const char* rop, U
 
 		switch (op)
 		{
-		case '0':
-			stack[stackp++] = FreeRDPGetColor(format, 0, 0, 0, 0xFF);
-			break;
+			case '0':
+				stack[stackp++] = FreeRDPGetColor(format, 0, 0, 0, 0xFF);
+				break;
 
-		case '1':
-			stack[stackp++] = FreeRDPGetColor(format, 0xFF, 0xFF, 0xFF, 0xFF);
-			break;
+			case '1':
+				stack[stackp++] = FreeRDPGetColor(format, 0xFF, 0xFF, 0xFF, 0xFF);
+				break;
 
-		case 'D':
-			stack[stackp++] = dst;
-			break;
+			case 'D':
+				stack[stackp++] = dst;
+				break;
 
-		case 'S':
-			stack[stackp++] = src;
-			break;
+			case 'S':
+				stack[stackp++] = src;
+				break;
 
-		case 'P':
-			stack[stackp++] = pat;
-			break;
+			case 'P':
+				stack[stackp++] = pat;
+				break;
 
-		case 'x':
-			op_xor(stack, &stackp);
-			break;
+			case 'x':
+				op_xor(stack, &stackp);
+				break;
 
-		case 'a':
-			op_and(stack, &stackp);
-			break;
+			case 'a':
+				op_and(stack, &stackp);
+				break;
 
-		case 'o':
-			op_or(stack, &stackp);
-			break;
+			case 'o':
+				op_or(stack, &stackp);
+				break;
 
-		case 'n':
-			op_not(stack, &stackp);
-			break;
+			case 'n':
+				op_not(stack, &stackp);
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -305,27 +305,27 @@ static INLINE BOOL BitBlt_write(HGDI_DC hdcDest, HGDI_DC hdcSrc, INT32 nXDest, I
 	{
 		switch (style)
 		{
-		case GDI_BS_SOLID:
-			colorB = hdcDest->brush->color;
-			break;
+			case GDI_BS_SOLID:
+				colorB = hdcDest->brush->color;
+				break;
 
-		case GDI_BS_HATCHED:
-		case GDI_BS_PATTERN:
-		{
-			const BYTE* patp = gdi_get_brush_pointer(hdcDest, nXDest + x, nYDest + y);
-
-			if (!patp)
+			case GDI_BS_HATCHED:
+			case GDI_BS_PATTERN:
 			{
-				WLog_ERR(TAG, "patp=%p", (void*)patp);
-				return FALSE;
+				const BYTE* patp = gdi_get_brush_pointer(hdcDest, nXDest + x, nYDest + y);
+
+				if (!patp)
+				{
+					WLog_ERR(TAG, "patp=%p", (void*)patp);
+					return FALSE;
+				}
+
+				colorB = ReadColor(patp, hdcDest->format);
 			}
-
-			colorB = ReadColor(patp, hdcDest->format);
-		}
-		break;
-
-		default:
 			break;
+
+			default:
+				break;
 		}
 	}
 
@@ -452,16 +452,16 @@ static BOOL BitBlt_process(HGDI_DC hdcDest, INT32 nXDest, INT32 nYDest, INT32 nW
 	{
 		switch (*iter++)
 		{
-		case 'P':
-			usePat = TRUE;
-			break;
+			case 'P':
+				usePat = TRUE;
+				break;
 
-		case 'S':
-			useSrc = TRUE;
-			break;
+			case 'S':
+				useSrc = TRUE;
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -486,14 +486,14 @@ static BOOL BitBlt_process(HGDI_DC hdcDest, INT32 nXDest, INT32 nYDest, INT32 nW
 
 		switch (style)
 		{
-		case GDI_BS_SOLID:
-		case GDI_BS_HATCHED:
-		case GDI_BS_PATTERN:
-			break;
+			case GDI_BS_SOLID:
+			case GDI_BS_HATCHED:
+			case GDI_BS_PATTERN:
+				break;
 
-		default:
-			WLog_ERR(TAG, "Invalid brush!!");
-			return FALSE;
+			default:
+				WLog_ERR(TAG, "Invalid brush!!");
+				return FALSE;
 		}
 	}
 
@@ -582,57 +582,57 @@ BOOL gdi_BitBlt(HGDI_DC hdcDest, INT32 nXDest, INT32 nYDest, INT32 nWidth, INT32
 	 */
 	switch (rop)
 	{
-	case GDI_SRCCOPY:
-		if (!hdcSrc)
-			return FALSE;
+		case GDI_SRCCOPY:
+			if (!hdcSrc)
+				return FALSE;
 
-		if (!adjust_src_dst_coordinates(hdcDest, &nXSrc, &nYSrc, &nXDest, &nYDest, &nWidth,
-		                                &nHeight))
-			return FALSE;
+			if (!adjust_src_dst_coordinates(hdcDest, &nXSrc, &nYSrc, &nXDest, &nYDest, &nWidth,
+			                                &nHeight))
+				return FALSE;
 
-		if (!adjust_src_coordinates(hdcSrc, nWidth, nHeight, &nXSrc, &nYSrc))
-			return FALSE;
+			if (!adjust_src_coordinates(hdcSrc, nWidth, nHeight, &nXSrc, &nYSrc))
+				return FALSE;
 
-		hSrcBmp = (HGDI_BITMAP)hdcSrc->selectedObject;
-		hDstBmp = (HGDI_BITMAP)hdcDest->selectedObject;
+			hSrcBmp = (HGDI_BITMAP)hdcSrc->selectedObject;
+			hDstBmp = (HGDI_BITMAP)hdcDest->selectedObject;
 
-		if (!hSrcBmp || !hDstBmp)
-			return FALSE;
+			if (!hSrcBmp || !hDstBmp)
+				return FALSE;
 
-		if (!freerdp_image_copy(hDstBmp->data, hDstBmp->format, hDstBmp->scanline, nXDest, nYDest,
-		                        nWidth, nHeight, hSrcBmp->data, hSrcBmp->format, hSrcBmp->scanline,
-		                        nXSrc, nYSrc, palette, FREERDP_FLIP_NONE))
-			return FALSE;
+			if (!freerdp_image_copy(hDstBmp->data, hDstBmp->format, hDstBmp->scanline, nXDest,
+			                        nYDest, nWidth, nHeight, hSrcBmp->data, hSrcBmp->format,
+			                        hSrcBmp->scanline, nXSrc, nYSrc, palette, FREERDP_FLIP_NONE))
+				return FALSE;
 
-		break;
+			break;
 
-	case GDI_DSTCOPY:
-		hSrcBmp = (HGDI_BITMAP)hdcDest->selectedObject;
-		hDstBmp = (HGDI_BITMAP)hdcDest->selectedObject;
+		case GDI_DSTCOPY:
+			hSrcBmp = (HGDI_BITMAP)hdcDest->selectedObject;
+			hDstBmp = (HGDI_BITMAP)hdcDest->selectedObject;
 
-		if (!adjust_src_dst_coordinates(hdcDest, &nXSrc, &nYSrc, &nXDest, &nYDest, &nWidth,
-		                                &nHeight))
-			return FALSE;
+			if (!adjust_src_dst_coordinates(hdcDest, &nXSrc, &nYSrc, &nXDest, &nYDest, &nWidth,
+			                                &nHeight))
+				return FALSE;
 
-		if (!adjust_src_coordinates(hdcDest, nWidth, nHeight, &nXSrc, &nYSrc))
-			return FALSE;
+			if (!adjust_src_coordinates(hdcDest, nWidth, nHeight, &nXSrc, &nYSrc))
+				return FALSE;
 
-		if (!hSrcBmp || !hDstBmp)
-			return FALSE;
+			if (!hSrcBmp || !hDstBmp)
+				return FALSE;
 
-		if (!freerdp_image_copy(hDstBmp->data, hDstBmp->format, hDstBmp->scanline, nXDest, nYDest,
-		                        nWidth, nHeight, hSrcBmp->data, hSrcBmp->format, hSrcBmp->scanline,
-		                        nXSrc, nYSrc, palette, FREERDP_FLIP_NONE))
-			return FALSE;
+			if (!freerdp_image_copy(hDstBmp->data, hDstBmp->format, hDstBmp->scanline, nXDest,
+			                        nYDest, nWidth, nHeight, hSrcBmp->data, hSrcBmp->format,
+			                        hSrcBmp->scanline, nXSrc, nYSrc, palette, FREERDP_FLIP_NONE))
+				return FALSE;
 
-		break;
+			break;
 
-	default:
-		if (!BitBlt_process(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc,
-		                    gdi_rop_to_string(rop), palette))
-			return FALSE;
+		default:
+			if (!BitBlt_process(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc,
+			                    gdi_rop_to_string(rop), palette))
+				return FALSE;
 
-		break;
+			break;
 	}
 
 	if (!gdi_InvalidateRegion(hdcDest, nXDest, nYDest, nWidth, nHeight))

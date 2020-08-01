@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -31,32 +31,32 @@
 #include <winpr/pipe.h>
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 #ifndef _WIN32
 
-#	include "../handle/handle.h"
+#include "../handle/handle.h"
 
-#	include <fcntl.h>
-#	include <errno.h>
-#	include <sys/un.h>
-#	include <sys/socket.h>
-#	include <assert.h>
-#	include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/un.h>
+#include <sys/socket.h>
+#include <assert.h>
+#include <unistd.h>
 
-#	ifdef HAVE_SYS_AIO_H
-#		undef HAVE_SYS_AIO_H /* disable for now, incomplete */
-#	endif
+#ifdef HAVE_SYS_AIO_H
+#undef HAVE_SYS_AIO_H /* disable for now, incomplete */
+#endif
 
-#	ifdef HAVE_SYS_AIO_H
-#		include <aio.h>
-#	endif
+#ifdef HAVE_SYS_AIO_H
+#include <aio.h>
+#endif
 
-#	include "pipe.h"
+#include "pipe.h"
 
-#	include "../log.h"
-#	define TAG WINPR_TAG("pipe")
+#include "../log.h"
+#define TAG WINPR_TAG("pipe")
 
 /*
  * Since the WinPR implementation of named pipes makes use of UNIX domain
@@ -147,9 +147,9 @@ static BOOL PipeRead(PVOID Object, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 
 		switch (errno)
 		{
-		case EWOULDBLOCK:
-			SetLastError(ERROR_NO_DATA);
-			break;
+			case EWOULDBLOCK:
+				SetLastError(ERROR_NO_DATA);
+				break;
 		}
 	}
 
@@ -237,12 +237,12 @@ static BOOL NamedPipeCloseHandle(HANDLE handle)
 	/* This check confuses the analyzer. Since not all handle
 	 * types are handled here, it guesses that the memory of a
 	 * NamedPipeHandle may leak. */
-#	ifndef __clang_analyzer__
+#ifndef __clang_analyzer__
 
 	if (!NamedPipeIsHandled(handle))
 		return FALSE;
 
-#	endif
+#endif
 
 	if (pNamedPipe->pfnUnrefNamedPipe)
 		pNamedPipe->pfnUnrefNamedPipe(pNamedPipe);
@@ -298,13 +298,13 @@ BOOL NamedPipeRead(PVOID Object, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 
 			switch (errno)
 			{
-			case EWOULDBLOCK:
-				SetLastError(ERROR_NO_DATA);
-				break;
+				case EWOULDBLOCK:
+					SetLastError(ERROR_NO_DATA);
+					break;
 
-			default:
-				SetLastError(ERROR_BROKEN_PIPE);
-				break;
+				default:
+					SetLastError(ERROR_BROKEN_PIPE);
+					break;
 			}
 		}
 
@@ -321,7 +321,7 @@ BOOL NamedPipeRead(PVOID Object, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 			return FALSE;
 
 		pipe->lpOverlapped = lpOverlapped;
-#	ifdef HAVE_SYS_AIO_H
+#ifdef HAVE_SYS_AIO_H
 		{
 			int aio_status;
 			struct aiocb cb;
@@ -342,13 +342,13 @@ BOOL NamedPipeRead(PVOID Object, LPVOID lpBuffer, DWORD nNumberOfBytesToRead,
 
 			return status;
 		}
-#	else
+#else
 		/* synchronous behavior */
 		lpOverlapped->Internal = 0;
 		lpOverlapped->InternalHigh = (ULONG_PTR)nNumberOfBytesToRead;
 		lpOverlapped->Pointer = (PVOID)lpBuffer;
 		SetEvent(lpOverlapped->hEvent);
-#	endif
+#endif
 	}
 
 	return status;
@@ -386,13 +386,13 @@ BOOL NamedPipeWrite(PVOID Object, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
 
 			switch (errno)
 			{
-			case EWOULDBLOCK:
-				io_status = 0;
-				status = TRUE;
-				break;
+				case EWOULDBLOCK:
+					io_status = 0;
+					status = TRUE;
+					break;
 
-			default:
-				status = FALSE;
+				default:
+					status = FALSE;
 			}
 		}
 
@@ -409,7 +409,7 @@ BOOL NamedPipeWrite(PVOID Object, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
 			return FALSE;
 
 		pipe->lpOverlapped = lpOverlapped;
-#	ifdef HAVE_SYS_AIO_H
+#ifdef HAVE_SYS_AIO_H
 		{
 			struct aiocb cb;
 			ZeroMemory(&cb, sizeof(struct aiocb));
@@ -429,13 +429,13 @@ BOOL NamedPipeWrite(PVOID Object, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite,
 
 			return status;
 		}
-#	else
+#else
 		/* synchronous behavior */
 		lpOverlapped->Internal = 1;
 		lpOverlapped->InternalHigh = (ULONG_PTR)nNumberOfBytesToWrite;
 		lpOverlapped->Pointer = (PVOID)lpBuffer;
 		SetEvent(lpOverlapped->hEvent);
-#	endif
+#endif
 	}
 
 	return TRUE;
@@ -701,13 +701,13 @@ HANDLE CreateNamedPipeA(LPCSTR lpName, DWORD dwOpenMode, DWORD dwPipeMode, DWORD
 
 	if (dwOpenMode & FILE_FLAG_OVERLAPPED)
 	{
-#	if 0
+#if 0
 		int flags = fcntl(pNamedPipe->serverfd, F_GETFL);
 
 		if (flags != -1)
 			fcntl(pNamedPipe->serverfd, F_SETFL, flags | O_NONBLOCK);
 
-#	endif
+#endif
 	}
 
 	ArrayList_Unlock(g_NamedPipeServerSockets);

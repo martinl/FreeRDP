@@ -22,7 +22,7 @@
 #define SSHAGENT_MAIN_H
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/stream.h>
@@ -33,12 +33,12 @@
 
 #define DVC_TAG CHANNELS_TAG("sshagent.client")
 #ifdef WITH_DEBUG_SSHAGENT
-#	define DEBUG_SSHAGENT(...) WLog_DBG(DVC_TAG, __VA_ARGS__)
+#define DEBUG_SSHAGENT(...) WLog_DBG(DVC_TAG, __VA_ARGS__)
 #else
-#	define DEBUG_SSHAGENT(...) \
-		do                      \
-		{                       \
-		} while (0)
+#define DEBUG_SSHAGENT(...) \
+	do                      \
+	{                       \
+	} while (0)
 #endif
 
 #endif /* SSHAGENT_MAIN_H */

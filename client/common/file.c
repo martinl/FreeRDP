@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <errno.h>
@@ -39,7 +39,7 @@
 #include <string.h>
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include <winpr/wtypes.h>
@@ -736,15 +736,15 @@ BOOL freerdp_client_parse_rdp_file_ex(rdpFile* file, const char* name, rdp_file_
 #define SETTING_MODIFIED(_settings, _field) \
 	(WRITE_ALL_SETTINGS || _settings->SettingsModified[FreeRDP_##_field])
 #define SETTING_MODIFIED_SET(_target, _settings, _field) \
-	if                                                   \
-	SETTING_MODIFIED(_settings, _field) _target = _settings->_field
-#define SETTING_MODIFIED_SET_STRING(_target, _settings, _field)                       \
-	do                                                                                \
-	{                                                                                 \
-		if                                                                            \
-			SETTING_MODIFIED(_settings, _field) _target = _strdup(_settings->_field); \
-		if (!_target && _settings->_field)                                            \
-			return FALSE;                                                             \
+	if SETTING_MODIFIED (_settings, _field)              \
+	_target = _settings->_field
+#define SETTING_MODIFIED_SET_STRING(_target, _settings, _field) \
+	do                                                          \
+	{                                                           \
+		if SETTING_MODIFIED (_settings, _field)                 \
+			_target = _strdup(_settings->_field);               \
+		if (!_target && _settings->_field)                      \
+			return FALSE;                                       \
 	} while (0)
 
 BOOL freerdp_client_populate_rdp_file_from_settings(rdpFile* file, const rdpSettings* settings)

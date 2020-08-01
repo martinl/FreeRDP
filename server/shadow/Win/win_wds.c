@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -74,109 +74,109 @@ const char* GetRDPSessionEventString(DISPID id)
 {
 	switch (id)
 	{
-	case DISPID_RDPSRAPI_EVENT_ON_ATTENDEE_CONNECTED:
-		return "OnAttendeeConnected";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_ATTENDEE_CONNECTED:
+			return "OnAttendeeConnected";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_ATTENDEE_DISCONNECTED:
-		return "OnAttendeeDisconnected";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_ATTENDEE_DISCONNECTED:
+			return "OnAttendeeDisconnected";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_ATTENDEE_UPDATE:
-		return "OnAttendeeUpdate";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_ATTENDEE_UPDATE:
+			return "OnAttendeeUpdate";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_ERROR:
-		return "OnError";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_ERROR:
+			return "OnError";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_VIEWER_CONNECTED:
-		return "OnConnectionEstablished";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_VIEWER_CONNECTED:
+			return "OnConnectionEstablished";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_VIEWER_DISCONNECTED:
-		return "OnConnectionTerminated";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_VIEWER_DISCONNECTED:
+			return "OnConnectionTerminated";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_VIEWER_AUTHENTICATED:
-		return "OnConnectionAuthenticated";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_VIEWER_AUTHENTICATED:
+			return "OnConnectionAuthenticated";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_VIEWER_CONNECTFAILED:
-		return "OnConnectionFailed";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_VIEWER_CONNECTFAILED:
+			return "OnConnectionFailed";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_CTRLLEVEL_CHANGE_REQUEST:
-		return "OnControlLevelChangeRequest";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_CTRLLEVEL_CHANGE_REQUEST:
+			return "OnControlLevelChangeRequest";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_GRAPHICS_STREAM_PAUSED:
-		return "OnGraphicsStreamPaused";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_GRAPHICS_STREAM_PAUSED:
+			return "OnGraphicsStreamPaused";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_GRAPHICS_STREAM_RESUMED:
-		return "OnGraphicsStreamResumed";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_GRAPHICS_STREAM_RESUMED:
+			return "OnGraphicsStreamResumed";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_JOIN:
-		return "OnChannelJoin";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_JOIN:
+			return "OnChannelJoin";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_LEAVE:
-		return "OnChannelLeave";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_LEAVE:
+			return "OnChannelLeave";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_DATARECEIVED:
-		return "OnChannelDataReceived";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_DATARECEIVED:
+			return "OnChannelDataReceived";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_SENDCOMPLETED:
-		return "OnChannelDataSent";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_SENDCOMPLETED:
+			return "OnChannelDataSent";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_APPLICATION_OPEN:
-		return "OnApplicationOpen";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_APPLICATION_OPEN:
+			return "OnApplicationOpen";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_APPLICATION_CLOSE:
-		return "OnApplicationClose";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_APPLICATION_CLOSE:
+			return "OnApplicationClose";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_APPLICATION_UPDATE:
-		return "OnApplicationUpdate";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_APPLICATION_UPDATE:
+			return "OnApplicationUpdate";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_WINDOW_OPEN:
-		return "OnWindowOpen";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_WINDOW_OPEN:
+			return "OnWindowOpen";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_WINDOW_CLOSE:
-		return "OnWindowClose";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_WINDOW_CLOSE:
+			return "OnWindowClose";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_WINDOW_UPDATE:
-		return "OnWindowUpdate";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_WINDOW_UPDATE:
+			return "OnWindowUpdate";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_APPFILTER_UPDATE:
-		return "OnAppFilterUpdate";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_APPFILTER_UPDATE:
+			return "OnAppFilterUpdate";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_SHARED_RECT_CHANGED:
-		return "OnSharedRectChanged";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_SHARED_RECT_CHANGED:
+			return "OnSharedRectChanged";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_FOCUSRELEASED:
-		return "OnFocusReleased";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_FOCUSRELEASED:
+			return "OnFocusReleased";
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_SHARED_DESKTOP_SETTINGS_CHANGED:
-		return "OnSharedDesktopSettingsChanged";
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_SHARED_DESKTOP_SETTINGS_CHANGED:
+			return "OnSharedDesktopSettingsChanged";
+			break;
 
-	case DISPID_RDPAPI_EVENT_ON_BOUNDING_RECT_CHANGED:
-		return "OnViewingSizeChanged";
-		break;
+		case DISPID_RDPAPI_EVENT_ON_BOUNDING_RECT_CHANGED:
+			return "OnViewingSizeChanged";
+			break;
 	}
 
 	return "OnUnknown";
@@ -274,171 +274,171 @@ static HRESULT STDMETHODCALLTYPE Shadow_IRDPSessionEvents_Invoke(_IRDPSessionEve
 
 	switch (dispIdMember)
 	{
-	case DISPID_RDPSRAPI_EVENT_ON_ATTENDEE_CONNECTED:
-	{
-		int level;
-		IDispatch* pDispatch;
-		IRDPSRAPIAttendee* pAttendee;
-		vr.vt = VT_DISPATCH;
-		vr.pdispVal = NULL;
-		hr = DispGetParam(pDispParams, 0, VT_DISPATCH, &vr, &uArgErr);
-
-		if (FAILED(hr))
+		case DISPID_RDPSRAPI_EVENT_ON_ATTENDEE_CONNECTED:
 		{
-			WLog_ERR(TAG, "%s DispGetParam(0, VT_DISPATCH) failure: 0x%08lX",
-			         GetRDPSessionEventString(dispIdMember), hr);
-			return hr;
+			int level;
+			IDispatch* pDispatch;
+			IRDPSRAPIAttendee* pAttendee;
+			vr.vt = VT_DISPATCH;
+			vr.pdispVal = NULL;
+			hr = DispGetParam(pDispParams, 0, VT_DISPATCH, &vr, &uArgErr);
+
+			if (FAILED(hr))
+			{
+				WLog_ERR(TAG, "%s DispGetParam(0, VT_DISPATCH) failure: 0x%08lX",
+				         GetRDPSessionEventString(dispIdMember), hr);
+				return hr;
+			}
+
+			pDispatch = vr.pdispVal;
+			hr = pDispatch->lpVtbl->QueryInterface(pDispatch, &IID_IRDPSRAPIAttendee,
+			                                       (void**)&pAttendee);
+
+			if (FAILED(hr))
+			{
+				WLog_INFO(TAG, "%s IDispatch::QueryInterface(IRDPSRAPIAttendee) failure: 0x%08lX",
+				          GetRDPSessionEventString(dispIdMember), hr);
+				return hr;
+			}
+
+			level = CTRL_LEVEL_VIEW;
+			// level = CTRL_LEVEL_INTERACTIVE;
+			hr = pAttendee->lpVtbl->put_ControlLevel(pAttendee, level);
+
+			if (FAILED(hr))
+			{
+				WLog_INFO(TAG, "%s IRDPSRAPIAttendee::put_ControlLevel() failure: 0x%08lX",
+				          GetRDPSessionEventString(dispIdMember), hr);
+				return hr;
+			}
+
+			pAttendee->lpVtbl->Release(pAttendee);
 		}
+		break;
 
-		pDispatch = vr.pdispVal;
-		hr = pDispatch->lpVtbl->QueryInterface(pDispatch, &IID_IRDPSRAPIAttendee,
-		                                       (void**)&pAttendee);
+		case DISPID_RDPSRAPI_EVENT_ON_ATTENDEE_DISCONNECTED:
+			break;
 
-		if (FAILED(hr))
+		case DISPID_RDPSRAPI_EVENT_ON_ATTENDEE_UPDATE:
+			break;
+
+		case DISPID_RDPSRAPI_EVENT_ON_ERROR:
+			break;
+
+		case DISPID_RDPSRAPI_EVENT_ON_VIEWER_CONNECTED:
+			break;
+
+		case DISPID_RDPSRAPI_EVENT_ON_VIEWER_DISCONNECTED:
+			break;
+
+		case DISPID_RDPSRAPI_EVENT_ON_VIEWER_AUTHENTICATED:
+			break;
+
+		case DISPID_RDPSRAPI_EVENT_ON_VIEWER_CONNECTFAILED:
+			break;
+
+		case DISPID_RDPSRAPI_EVENT_ON_CTRLLEVEL_CHANGE_REQUEST:
 		{
-			WLog_INFO(TAG, "%s IDispatch::QueryInterface(IRDPSRAPIAttendee) failure: 0x%08lX",
-			          GetRDPSessionEventString(dispIdMember), hr);
-			return hr;
+			int level;
+			IDispatch* pDispatch;
+			IRDPSRAPIAttendee* pAttendee;
+			vr.vt = VT_INT;
+			vr.pdispVal = NULL;
+			hr = DispGetParam(pDispParams, 1, VT_INT, &vr, &uArgErr);
+
+			if (FAILED(hr))
+			{
+				WLog_INFO(TAG, "%s DispGetParam(1, VT_INT) failure: 0x%08lX",
+				          GetRDPSessionEventString(dispIdMember), hr);
+				return hr;
+			}
+
+			level = vr.intVal;
+			vr.vt = VT_DISPATCH;
+			vr.pdispVal = NULL;
+			hr = DispGetParam(pDispParams, 0, VT_DISPATCH, &vr, &uArgErr);
+
+			if (FAILED(hr))
+			{
+				WLog_ERR(TAG, "%s DispGetParam(0, VT_DISPATCH) failure: 0x%08lX",
+				         GetRDPSessionEventString(dispIdMember), hr);
+				return hr;
+			}
+
+			pDispatch = vr.pdispVal;
+			hr = pDispatch->lpVtbl->QueryInterface(pDispatch, &IID_IRDPSRAPIAttendee,
+			                                       (void**)&pAttendee);
+
+			if (FAILED(hr))
+			{
+				WLog_INFO(TAG, "%s IDispatch::QueryInterface(IRDPSRAPIAttendee) failure: 0x%08lX",
+				          GetRDPSessionEventString(dispIdMember), hr);
+				return hr;
+			}
+
+			hr = pAttendee->lpVtbl->put_ControlLevel(pAttendee, level);
+
+			if (FAILED(hr))
+			{
+				WLog_INFO(TAG, "%s IRDPSRAPIAttendee::put_ControlLevel() failure: 0x%08lX",
+				          GetRDPSessionEventString(dispIdMember), hr);
+				return hr;
+			}
+
+			pAttendee->lpVtbl->Release(pAttendee);
 		}
-
-		level = CTRL_LEVEL_VIEW;
-		// level = CTRL_LEVEL_INTERACTIVE;
-		hr = pAttendee->lpVtbl->put_ControlLevel(pAttendee, level);
-
-		if (FAILED(hr))
-		{
-			WLog_INFO(TAG, "%s IRDPSRAPIAttendee::put_ControlLevel() failure: 0x%08lX",
-			          GetRDPSessionEventString(dispIdMember), hr);
-			return hr;
-		}
-
-		pAttendee->lpVtbl->Release(pAttendee);
-	}
-	break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_ATTENDEE_DISCONNECTED:
 		break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_ATTENDEE_UPDATE:
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_GRAPHICS_STREAM_PAUSED:
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_ERROR:
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_GRAPHICS_STREAM_RESUMED:
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_VIEWER_CONNECTED:
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_JOIN:
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_VIEWER_DISCONNECTED:
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_LEAVE:
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_VIEWER_AUTHENTICATED:
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_DATARECEIVED:
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_VIEWER_CONNECTFAILED:
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_SENDCOMPLETED:
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_CTRLLEVEL_CHANGE_REQUEST:
-	{
-		int level;
-		IDispatch* pDispatch;
-		IRDPSRAPIAttendee* pAttendee;
-		vr.vt = VT_INT;
-		vr.pdispVal = NULL;
-		hr = DispGetParam(pDispParams, 1, VT_INT, &vr, &uArgErr);
+		case DISPID_RDPSRAPI_EVENT_ON_APPLICATION_OPEN:
+			break;
 
-		if (FAILED(hr))
-		{
-			WLog_INFO(TAG, "%s DispGetParam(1, VT_INT) failure: 0x%08lX",
-			          GetRDPSessionEventString(dispIdMember), hr);
-			return hr;
-		}
+		case DISPID_RDPSRAPI_EVENT_ON_APPLICATION_CLOSE:
+			break;
 
-		level = vr.intVal;
-		vr.vt = VT_DISPATCH;
-		vr.pdispVal = NULL;
-		hr = DispGetParam(pDispParams, 0, VT_DISPATCH, &vr, &uArgErr);
+		case DISPID_RDPSRAPI_EVENT_ON_APPLICATION_UPDATE:
+			break;
 
-		if (FAILED(hr))
-		{
-			WLog_ERR(TAG, "%s DispGetParam(0, VT_DISPATCH) failure: 0x%08lX",
-			         GetRDPSessionEventString(dispIdMember), hr);
-			return hr;
-		}
+		case DISPID_RDPSRAPI_EVENT_ON_WINDOW_OPEN:
+			break;
 
-		pDispatch = vr.pdispVal;
-		hr = pDispatch->lpVtbl->QueryInterface(pDispatch, &IID_IRDPSRAPIAttendee,
-		                                       (void**)&pAttendee);
+		case DISPID_RDPSRAPI_EVENT_ON_WINDOW_CLOSE:
+			break;
 
-		if (FAILED(hr))
-		{
-			WLog_INFO(TAG, "%s IDispatch::QueryInterface(IRDPSRAPIAttendee) failure: 0x%08lX",
-			          GetRDPSessionEventString(dispIdMember), hr);
-			return hr;
-		}
+		case DISPID_RDPSRAPI_EVENT_ON_WINDOW_UPDATE:
+			break;
 
-		hr = pAttendee->lpVtbl->put_ControlLevel(pAttendee, level);
+		case DISPID_RDPSRAPI_EVENT_ON_APPFILTER_UPDATE:
+			break;
 
-		if (FAILED(hr))
-		{
-			WLog_INFO(TAG, "%s IRDPSRAPIAttendee::put_ControlLevel() failure: 0x%08lX",
-			          GetRDPSessionEventString(dispIdMember), hr);
-			return hr;
-		}
+		case DISPID_RDPSRAPI_EVENT_ON_SHARED_RECT_CHANGED:
+			break;
 
-		pAttendee->lpVtbl->Release(pAttendee);
-	}
-	break;
+		case DISPID_RDPSRAPI_EVENT_ON_FOCUSRELEASED:
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_GRAPHICS_STREAM_PAUSED:
-		break;
+		case DISPID_RDPSRAPI_EVENT_ON_SHARED_DESKTOP_SETTINGS_CHANGED:
+			break;
 
-	case DISPID_RDPSRAPI_EVENT_ON_GRAPHICS_STREAM_RESUMED:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_JOIN:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_LEAVE:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_DATARECEIVED:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_VIRTUAL_CHANNEL_SENDCOMPLETED:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_APPLICATION_OPEN:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_APPLICATION_CLOSE:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_APPLICATION_UPDATE:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_WINDOW_OPEN:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_WINDOW_CLOSE:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_WINDOW_UPDATE:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_APPFILTER_UPDATE:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_SHARED_RECT_CHANGED:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_FOCUSRELEASED:
-		break;
-
-	case DISPID_RDPSRAPI_EVENT_ON_SHARED_DESKTOP_SETTINGS_CHANGED:
-		break;
-
-	case DISPID_RDPAPI_EVENT_ON_BOUNDING_RECT_CHANGED:
-		break;
+		case DISPID_RDPAPI_EVENT_ON_BOUNDING_RECT_CHANGED:
+			break;
 	}
 
 	return S_OK;
@@ -460,17 +460,17 @@ static LRESULT CALLBACK ShadowWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 {
 	switch (uMsg)
 	{
-	case WM_CLOSE:
-		DestroyWindow(hwnd);
-		break;
+		case WM_CLOSE:
+			DestroyWindow(hwnd);
+			break;
 
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			break;
 
-	default:
-		return DefWindowProc(hwnd, uMsg, wParam, lParam);
-		break;
+		default:
+			return DefWindowProc(hwnd, uMsg, wParam, lParam);
+			break;
 	}
 
 	return 0;

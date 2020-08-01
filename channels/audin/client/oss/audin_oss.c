@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -40,9 +40,9 @@
 #include <limits.h>
 #include <unistd.h>
 #if defined(__OpenBSD__)
-#	include <soundcard.h>
+#include <soundcard.h>
 #else
-#	include <sys/soundcard.h>
+#include <sys/soundcard.h>
 #endif
 #include <sys/ioctl.h>
 
@@ -76,23 +76,23 @@ static UINT32 audin_oss_get_format(const AUDIO_FORMAT* format)
 {
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		switch (format->wBitsPerSample)
-		{
-		case 8:
-			return AFMT_S8;
+		case WAVE_FORMAT_PCM:
+			switch (format->wBitsPerSample)
+			{
+				case 8:
+					return AFMT_S8;
 
-		case 16:
-			return AFMT_S16_LE;
-		}
+				case 16:
+					return AFMT_S16_LE;
+			}
 
-		break;
+			break;
 
-	case WAVE_FORMAT_ALAW:
-		return AFMT_A_LAW;
+		case WAVE_FORMAT_ALAW:
+			return AFMT_A_LAW;
 
-	case WAVE_FORMAT_MULAW:
-		return AFMT_MU_LAW;
+		case WAVE_FORMAT_MULAW:
+			return AFMT_MU_LAW;
 	}
 
 	return 0;
@@ -105,20 +105,20 @@ static BOOL audin_oss_format_supported(IAudinDevice* device, const AUDIO_FORMAT*
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		if (format->cbSize != 0 || format->nSamplesPerSec > 48000 ||
-		    (format->wBitsPerSample != 8 && format->wBitsPerSample != 16) ||
-		    (format->nChannels != 1 && format->nChannels != 2))
+		case WAVE_FORMAT_PCM:
+			if (format->cbSize != 0 || format->nSamplesPerSec > 48000 ||
+			    (format->wBitsPerSample != 8 && format->wBitsPerSample != 16) ||
+			    (format->nChannels != 1 && format->nChannels != 2))
+				return FALSE;
+
+			break;
+
+		case WAVE_FORMAT_ALAW:
+		case WAVE_FORMAT_MULAW:
+			return TRUE;
+
+		default:
 			return FALSE;
-
-		break;
-
-	case WAVE_FORMAT_ALAW:
-	case WAVE_FORMAT_MULAW:
-		return TRUE;
-
-	default:
-		return FALSE;
 	}
 
 	return TRUE;
@@ -442,9 +442,9 @@ static UINT audin_oss_parse_addin_args(AudinOSSDevice* device, ADDIN_ARGV* args)
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_audin_client_subsystem_entry oss_freerdp_audin_client_subsystem_entry
+#define freerdp_audin_client_subsystem_entry oss_freerdp_audin_client_subsystem_entry
 #else
-#	define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
+#define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
 #endif
 
 /**

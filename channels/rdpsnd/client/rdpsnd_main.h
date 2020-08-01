@@ -30,12 +30,12 @@
 #define TAG CHANNELS_TAG("rdpsnd.client")
 
 #if defined(WITH_DEBUG_SND)
-#	define DEBUG_SND(...) WLog_DBG(TAG, __VA_ARGS__)
+#define DEBUG_SND(...) WLog_DBG(TAG, __VA_ARGS__)
 #else
-#	define DEBUG_SND(...) \
-		do                 \
-		{                  \
-		} while (0)
+#define DEBUG_SND(...) \
+	do                 \
+	{                  \
+	} while (0)
 #endif
 
 #endif /* FREERDP_CHANNEL_RDPSND_CLIENT_MAIN_H */

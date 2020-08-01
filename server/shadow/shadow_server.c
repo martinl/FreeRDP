@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <errno.h>
@@ -37,8 +37,8 @@
 #include <winpr/tools/makecert.h>
 
 #ifndef _WIN32
-#	include <sys/select.h>
-#	include <signal.h>
+#include <sys/select.h>
+#include <signal.h>
 #endif
 
 #include "shadow.h"
@@ -430,26 +430,26 @@ static DWORD WINAPI shadow_server_thread(LPVOID arg)
 
 		switch (status)
 		{
-		case WAIT_FAILED:
-		case WAIT_OBJECT_0:
-			running = FALSE;
-			break;
-
-		default:
-		{
-			if (!listener->CheckFileDescriptor(listener))
-			{
-				WLog_ERR(TAG, "Failed to check FreeRDP file descriptor");
+			case WAIT_FAILED:
+			case WAIT_OBJECT_0:
 				running = FALSE;
-			}
-			else
+				break;
+
+			default:
 			{
+				if (!listener->CheckFileDescriptor(listener))
+				{
+					WLog_ERR(TAG, "Failed to check FreeRDP file descriptor");
+					running = FALSE;
+				}
+				else
+				{
 #ifdef _WIN32
-				Sleep(100); /* FIXME: listener event handles */
+					Sleep(100); /* FIXME: listener event handles */
 #endif
+				}
 			}
-		}
-		break;
+			break;
 		}
 	}
 

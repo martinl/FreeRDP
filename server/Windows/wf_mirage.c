@@ -143,41 +143,41 @@ void wf_mirror_driver_print_display_change_status(LONG status)
 
 	switch (status)
 	{
-	case DISP_CHANGE_SUCCESSFUL:
-		_tcscpy(disp_change, _T("DISP_CHANGE_SUCCESSFUL"));
-		break;
+		case DISP_CHANGE_SUCCESSFUL:
+			_tcscpy(disp_change, _T("DISP_CHANGE_SUCCESSFUL"));
+			break;
 
-	case DISP_CHANGE_BADDUALVIEW:
-		_tcscpy(disp_change, _T("DISP_CHANGE_BADDUALVIEW"));
-		break;
+		case DISP_CHANGE_BADDUALVIEW:
+			_tcscpy(disp_change, _T("DISP_CHANGE_BADDUALVIEW"));
+			break;
 
-	case DISP_CHANGE_BADFLAGS:
-		_tcscpy(disp_change, _T("DISP_CHANGE_BADFLAGS"));
-		break;
+		case DISP_CHANGE_BADFLAGS:
+			_tcscpy(disp_change, _T("DISP_CHANGE_BADFLAGS"));
+			break;
 
-	case DISP_CHANGE_BADMODE:
-		_tcscpy(disp_change, _T("DISP_CHANGE_BADMODE"));
-		break;
+		case DISP_CHANGE_BADMODE:
+			_tcscpy(disp_change, _T("DISP_CHANGE_BADMODE"));
+			break;
 
-	case DISP_CHANGE_BADPARAM:
-		_tcscpy(disp_change, _T("DISP_CHANGE_BADPARAM"));
-		break;
+		case DISP_CHANGE_BADPARAM:
+			_tcscpy(disp_change, _T("DISP_CHANGE_BADPARAM"));
+			break;
 
-	case DISP_CHANGE_FAILED:
-		_tcscpy(disp_change, _T("DISP_CHANGE_FAILED"));
-		break;
+		case DISP_CHANGE_FAILED:
+			_tcscpy(disp_change, _T("DISP_CHANGE_FAILED"));
+			break;
 
-	case DISP_CHANGE_NOTUPDATED:
-		_tcscpy(disp_change, _T("DISP_CHANGE_NOTUPDATED"));
-		break;
+		case DISP_CHANGE_NOTUPDATED:
+			_tcscpy(disp_change, _T("DISP_CHANGE_NOTUPDATED"));
+			break;
 
-	case DISP_CHANGE_RESTART:
-		_tcscpy(disp_change, _T("DISP_CHANGE_RESTART"));
-		break;
+		case DISP_CHANGE_RESTART:
+			_tcscpy(disp_change, _T("DISP_CHANGE_RESTART"));
+			break;
 
-	default:
-		_tcscpy(disp_change, _T("DISP_CHANGE_UNKNOWN"));
-		break;
+		default:
+			_tcscpy(disp_change, _T("DISP_CHANGE_UNKNOWN"));
+			break;
 	}
 
 	if (status != DISP_CHANGE_SUCCESSFUL)

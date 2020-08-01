@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -628,68 +628,75 @@ static UINT rdpdr_server_receive_core_capability_response(RdpdrServerContext* co
 
 		switch (capabilityHeader.CapabilityType)
 		{
-		case CAP_GENERAL_TYPE:
-			if ((status = rdpdr_server_read_general_capability_set(context, s, &capabilityHeader)))
-			{
-				WLog_ERR(TAG,
-				         "rdpdr_server_read_general_capability_set failed with error %" PRIu32 "!",
-				         status);
-				return status;
-			}
+			case CAP_GENERAL_TYPE:
+				if ((status =
+				         rdpdr_server_read_general_capability_set(context, s, &capabilityHeader)))
+				{
+					WLog_ERR(TAG,
+					         "rdpdr_server_read_general_capability_set failed with error %" PRIu32
+					         "!",
+					         status);
+					return status;
+				}
 
-			break;
+				break;
 
-		case CAP_PRINTER_TYPE:
-			if ((status = rdpdr_server_read_printer_capability_set(context, s, &capabilityHeader)))
-			{
-				WLog_ERR(TAG,
-				         "rdpdr_server_read_printer_capability_set failed with error %" PRIu32 "!",
-				         status);
-				return status;
-			}
+			case CAP_PRINTER_TYPE:
+				if ((status =
+				         rdpdr_server_read_printer_capability_set(context, s, &capabilityHeader)))
+				{
+					WLog_ERR(TAG,
+					         "rdpdr_server_read_printer_capability_set failed with error %" PRIu32
+					         "!",
+					         status);
+					return status;
+				}
 
-			break;
+				break;
 
-		case CAP_PORT_TYPE:
-			if ((status = rdpdr_server_read_port_capability_set(context, s, &capabilityHeader)))
-			{
-				WLog_ERR(TAG,
-				         "rdpdr_server_read_port_capability_set failed with error %" PRIu32 "!",
-				         status);
-				return status;
-			}
+			case CAP_PORT_TYPE:
+				if ((status = rdpdr_server_read_port_capability_set(context, s, &capabilityHeader)))
+				{
+					WLog_ERR(TAG,
+					         "rdpdr_server_read_port_capability_set failed with error %" PRIu32 "!",
+					         status);
+					return status;
+				}
 
-			break;
+				break;
 
-		case CAP_DRIVE_TYPE:
-			if ((status = rdpdr_server_read_drive_capability_set(context, s, &capabilityHeader)))
-			{
-				WLog_ERR(TAG,
-				         "rdpdr_server_read_drive_capability_set failed with error %" PRIu32 "!",
-				         status);
-				return status;
-			}
+			case CAP_DRIVE_TYPE:
+				if ((status =
+				         rdpdr_server_read_drive_capability_set(context, s, &capabilityHeader)))
+				{
+					WLog_ERR(TAG,
+					         "rdpdr_server_read_drive_capability_set failed with error %" PRIu32
+					         "!",
+					         status);
+					return status;
+				}
 
-			break;
+				break;
 
-		case CAP_SMARTCARD_TYPE:
-			if ((status =
-			         rdpdr_server_read_smartcard_capability_set(context, s, &capabilityHeader)))
-			{
-				WLog_ERR(TAG,
-				         "rdpdr_server_read_smartcard_capability_set failed with error %" PRIu32
-				         "!",
-				         status);
-				return status;
-			}
+			case CAP_SMARTCARD_TYPE:
+				if ((status =
+				         rdpdr_server_read_smartcard_capability_set(context, s, &capabilityHeader)))
+				{
+					WLog_ERR(TAG,
+					         "rdpdr_server_read_smartcard_capability_set failed with error %" PRIu32
+					         "!",
+					         status);
+					return status;
+				}
 
-			break;
+				break;
 
-		default:
-			WLog_DBG(TAG, "Unknown capabilityType %" PRIu16 "", capabilityHeader.CapabilityType);
-			Stream_Seek(s, capabilityHeader.CapabilityLength - RDPDR_CAPABILITY_HEADER_LENGTH);
-			return ERROR_INVALID_DATA;
-			break;
+			default:
+				WLog_DBG(TAG, "Unknown capabilityType %" PRIu16 "",
+				         capabilityHeader.CapabilityType);
+				Stream_Seek(s, capabilityHeader.CapabilityLength - RDPDR_CAPABILITY_HEADER_LENGTH);
+				return ERROR_INVALID_DATA;
+				break;
 		}
 	}
 
@@ -781,41 +788,41 @@ static UINT rdpdr_server_receive_device_list_announce_request(RdpdrServerContext
 
 		switch (DeviceType)
 		{
-		case RDPDR_DTYP_FILESYSTEM:
-			if (context->supportsDrives)
-			{
-				IFCALL(context->OnDriveCreate, context, DeviceId, PreferredDosName);
-			}
+			case RDPDR_DTYP_FILESYSTEM:
+				if (context->supportsDrives)
+				{
+					IFCALL(context->OnDriveCreate, context, DeviceId, PreferredDosName);
+				}
 
-			break;
+				break;
 
-		case RDPDR_DTYP_PRINT:
-			if (context->supportsPrinters)
-			{
-				IFCALL(context->OnPrinterCreate, context, DeviceId, PreferredDosName);
-			}
+			case RDPDR_DTYP_PRINT:
+				if (context->supportsPrinters)
+				{
+					IFCALL(context->OnPrinterCreate, context, DeviceId, PreferredDosName);
+				}
 
-			break;
+				break;
 
-		case RDPDR_DTYP_SERIAL:
-		case RDPDR_DTYP_PARALLEL:
-			if (context->supportsPorts)
-			{
-				IFCALL(context->OnPortCreate, context, DeviceId, PreferredDosName);
-			}
+			case RDPDR_DTYP_SERIAL:
+			case RDPDR_DTYP_PARALLEL:
+				if (context->supportsPorts)
+				{
+					IFCALL(context->OnPortCreate, context, DeviceId, PreferredDosName);
+				}
 
-			break;
+				break;
 
-		case RDPDR_DTYP_SMARTCARD:
-			if (context->supportsSmartcards)
-			{
-				IFCALL(context->OnSmartcardCreate, context, DeviceId, PreferredDosName);
-			}
+			case RDPDR_DTYP_SMARTCARD:
+				if (context->supportsSmartcards)
+				{
+					IFCALL(context->OnSmartcardCreate, context, DeviceId, PreferredDosName);
+				}
 
-			break;
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 
 		Stream_Seek(s, DeviceDataLength);
@@ -860,41 +867,41 @@ static UINT rdpdr_server_receive_device_list_remove_request(RdpdrServerContext* 
 
 		switch (DeviceType)
 		{
-		case RDPDR_DTYP_FILESYSTEM:
-			if (context->supportsDrives)
-			{
-				IFCALL(context->OnDriveDelete, context, DeviceId);
-			}
+			case RDPDR_DTYP_FILESYSTEM:
+				if (context->supportsDrives)
+				{
+					IFCALL(context->OnDriveDelete, context, DeviceId);
+				}
 
-			break;
+				break;
 
-		case RDPDR_DTYP_PRINT:
-			if (context->supportsPrinters)
-			{
-				IFCALL(context->OnPrinterDelete, context, DeviceId);
-			}
+			case RDPDR_DTYP_PRINT:
+				if (context->supportsPrinters)
+				{
+					IFCALL(context->OnPrinterDelete, context, DeviceId);
+				}
 
-			break;
+				break;
 
-		case RDPDR_DTYP_SERIAL:
-		case RDPDR_DTYP_PARALLEL:
-			if (context->supportsPorts)
-			{
-				IFCALL(context->OnPortDelete, context, DeviceId);
-			}
+			case RDPDR_DTYP_SERIAL:
+			case RDPDR_DTYP_PARALLEL:
+				if (context->supportsPorts)
+				{
+					IFCALL(context->OnPortDelete, context, DeviceId);
+				}
 
-			break;
+				break;
 
-		case RDPDR_DTYP_SMARTCARD:
-			if (context->supportsSmartcards)
-			{
-				IFCALL(context->OnSmartcardDelete, context, DeviceId);
-			}
+			case RDPDR_DTYP_SMARTCARD:
+				if (context->supportsSmartcards)
+				{
+					IFCALL(context->OnSmartcardDelete, context, DeviceId);
+				}
 
-			break;
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -991,120 +998,127 @@ static UINT rdpdr_server_receive_pdu(RdpdrServerContext* context, wStream* s, RD
 	{
 		switch (header->PacketId)
 		{
-		case PAKID_CORE_CLIENTID_CONFIRM:
-			if ((error = rdpdr_server_receive_announce_response(context, s, header)))
-			{
-				WLog_ERR(TAG,
-				         "rdpdr_server_receive_announce_response failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
-
-			break;
-
-		case PAKID_CORE_CLIENT_NAME:
-			if ((error = rdpdr_server_receive_client_name_request(context, s, header)))
-			{
-				WLog_ERR(TAG,
-				         "rdpdr_server_receive_client_name_request failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
-
-			if ((error = rdpdr_server_send_core_capability_request(context)))
-			{
-				WLog_ERR(TAG,
-				         "rdpdr_server_send_core_capability_request failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
-
-			if ((error = rdpdr_server_send_client_id_confirm(context)))
-			{
-				WLog_ERR(TAG, "rdpdr_server_send_client_id_confirm failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
-
-			break;
-
-		case PAKID_CORE_CLIENT_CAPABILITY:
-			if ((error = rdpdr_server_receive_core_capability_response(context, s, header)))
-			{
-				WLog_ERR(TAG,
-				         "rdpdr_server_receive_core_capability_response failed with error %" PRIu32
-				         "!",
-				         error);
-				return error;
-			}
-
-			if (context->priv->UserLoggedOnPdu)
-				if ((error = rdpdr_server_send_user_logged_on(context)))
+			case PAKID_CORE_CLIENTID_CONFIRM:
+				if ((error = rdpdr_server_receive_announce_response(context, s, header)))
 				{
-					WLog_ERR(TAG, "rdpdr_server_send_user_logged_on failed with error %" PRIu32 "!",
+					WLog_ERR(TAG,
+					         "rdpdr_server_receive_announce_response failed with error %" PRIu32
+					         "!",
 					         error);
 					return error;
 				}
 
-			break;
+				break;
 
-		case PAKID_CORE_DEVICELIST_ANNOUNCE:
-			if ((error = rdpdr_server_receive_device_list_announce_request(context, s, header)))
-			{
-				WLog_ERR(
-				    TAG,
-				    "rdpdr_server_receive_device_list_announce_request failed with error %" PRIu32
-				    "!",
-				    error);
-				return error;
-			}
+			case PAKID_CORE_CLIENT_NAME:
+				if ((error = rdpdr_server_receive_client_name_request(context, s, header)))
+				{
+					WLog_ERR(TAG,
+					         "rdpdr_server_receive_client_name_request failed with error %" PRIu32
+					         "!",
+					         error);
+					return error;
+				}
 
-			break;
+				if ((error = rdpdr_server_send_core_capability_request(context)))
+				{
+					WLog_ERR(TAG,
+					         "rdpdr_server_send_core_capability_request failed with error %" PRIu32
+					         "!",
+					         error);
+					return error;
+				}
 
-		case PAKID_CORE_DEVICE_REPLY:
-			break;
+				if ((error = rdpdr_server_send_client_id_confirm(context)))
+				{
+					WLog_ERR(TAG,
+					         "rdpdr_server_send_client_id_confirm failed with error %" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-		case PAKID_CORE_DEVICE_IOREQUEST:
-			break;
+				break;
 
-		case PAKID_CORE_DEVICE_IOCOMPLETION:
-			if ((error = rdpdr_server_receive_device_io_completion(context, s, header)))
-			{
-				WLog_ERR(TAG,
-				         "rdpdr_server_receive_device_io_completion failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
+			case PAKID_CORE_CLIENT_CAPABILITY:
+				if ((error = rdpdr_server_receive_core_capability_response(context, s, header)))
+				{
+					WLog_ERR(
+					    TAG,
+					    "rdpdr_server_receive_core_capability_response failed with error %" PRIu32
+					    "!",
+					    error);
+					return error;
+				}
 
-			break;
+				if (context->priv->UserLoggedOnPdu)
+					if ((error = rdpdr_server_send_user_logged_on(context)))
+					{
+						WLog_ERR(TAG,
+						         "rdpdr_server_send_user_logged_on failed with error %" PRIu32 "!",
+						         error);
+						return error;
+					}
 
-		case PAKID_CORE_DEVICELIST_REMOVE:
-			if ((error = rdpdr_server_receive_device_list_remove_request(context, s, header)))
-			{
-				WLog_ERR(TAG,
-				         "rdpdr_server_receive_device_io_completion failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
+				break;
 
-			break;
+			case PAKID_CORE_DEVICELIST_ANNOUNCE:
+				if ((error = rdpdr_server_receive_device_list_announce_request(context, s, header)))
+				{
+					WLog_ERR(TAG,
+					         "rdpdr_server_receive_device_list_announce_request failed with error "
+					         "%" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-		default:
-			break;
+				break;
+
+			case PAKID_CORE_DEVICE_REPLY:
+				break;
+
+			case PAKID_CORE_DEVICE_IOREQUEST:
+				break;
+
+			case PAKID_CORE_DEVICE_IOCOMPLETION:
+				if ((error = rdpdr_server_receive_device_io_completion(context, s, header)))
+				{
+					WLog_ERR(TAG,
+					         "rdpdr_server_receive_device_io_completion failed with error %" PRIu32
+					         "!",
+					         error);
+					return error;
+				}
+
+				break;
+
+			case PAKID_CORE_DEVICELIST_REMOVE:
+				if ((error = rdpdr_server_receive_device_list_remove_request(context, s, header)))
+				{
+					WLog_ERR(TAG,
+					         "rdpdr_server_receive_device_io_completion failed with error %" PRIu32
+					         "!",
+					         error);
+					return error;
+				}
+
+				break;
+
+			default:
+				break;
 		}
 	}
 	else if (header->Component == RDPDR_CTYP_PRN)
 	{
 		switch (header->PacketId)
 		{
-		case PAKID_PRN_CACHE_DATA:
-			break;
+			case PAKID_PRN_CACHE_DATA:
+				break;
 
-		case PAKID_PRN_USING_XPS:
-			break;
+			case PAKID_PRN_USING_XPS:
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 	else

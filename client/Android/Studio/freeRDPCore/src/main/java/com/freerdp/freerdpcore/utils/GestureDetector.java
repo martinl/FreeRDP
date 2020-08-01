@@ -221,149 +221,151 @@ public class GestureDetector
 
 		switch (action & MotionEvent.ACTION_MASK)
 		{
-		case MotionEvent.ACTION_POINTER_DOWN:
-			if (mIgnoreMultitouch)
-			{
-				// Multitouch event - abort.
-				cancel();
-			}
-			break;
-
-		case MotionEvent.ACTION_POINTER_UP:
-			// Ending a multitouch gesture and going back to 1 finger
-			if (mIgnoreMultitouch && ev.getPointerCount() == 2)
-			{
-				int index = (((action & MotionEvent.ACTION_POINTER_INDEX_MASK) >>
-				              MotionEvent.ACTION_POINTER_INDEX_SHIFT) == 0)
-				                ? 1
-				                : 0;
-				mLastMotionX = ev.getX(index);
-				mLastMotionY = ev.getY(index);
-			}
-			break;
-
-		case MotionEvent.ACTION_DOWN:
-			if (mDoubleTapListener != null)
-			{
-				boolean hadTapMessage = mHandler.hasMessages(TAP);
-				if (hadTapMessage)
-					mHandler.removeMessages(TAP);
-				if ((mCurrentDownEvent != null) && (mPreviousUpEvent != null) && hadTapMessage &&
-				    isConsideredDoubleTap(mCurrentDownEvent, mPreviousUpEvent, ev))
+			case MotionEvent.ACTION_POINTER_DOWN:
+				if (mIgnoreMultitouch)
 				{
-					// This is a second tap
-					mIsDoubleTapping = true;
-					// Give a callback with the first tap of the double-tap
-					handled |= mDoubleTapListener.onDoubleTap(mCurrentDownEvent);
-					// Give a callback with down event of the double-tap
+					// Multitouch event - abort.
+					cancel();
+				}
+				break;
+
+			case MotionEvent.ACTION_POINTER_UP:
+				// Ending a multitouch gesture and going back to 1 finger
+				if (mIgnoreMultitouch && ev.getPointerCount() == 2)
+				{
+					int index = (((action & MotionEvent.ACTION_POINTER_INDEX_MASK) >>
+					              MotionEvent.ACTION_POINTER_INDEX_SHIFT) == 0)
+					                ? 1
+					                : 0;
+					mLastMotionX = ev.getX(index);
+					mLastMotionY = ev.getY(index);
+				}
+				break;
+
+			case MotionEvent.ACTION_DOWN:
+				if (mDoubleTapListener != null)
+				{
+					boolean hadTapMessage = mHandler.hasMessages(TAP);
+					if (hadTapMessage)
+						mHandler.removeMessages(TAP);
+					if ((mCurrentDownEvent != null) && (mPreviousUpEvent != null) &&
+					    hadTapMessage &&
+					    isConsideredDoubleTap(mCurrentDownEvent, mPreviousUpEvent, ev))
+					{
+						// This is a second tap
+						mIsDoubleTapping = true;
+						// Give a callback with the first tap of the double-tap
+						handled |= mDoubleTapListener.onDoubleTap(mCurrentDownEvent);
+						// Give a callback with down event of the double-tap
+						handled |= mDoubleTapListener.onDoubleTapEvent(ev);
+					}
+					else
+					{
+						// This is a first tap
+						mHandler.sendEmptyMessageDelayed(TAP, DOUBLE_TAP_TIMEOUT);
+					}
+				}
+
+				mLastMotionX = x;
+				mLastMotionY = y;
+				if (mCurrentDownEvent != null)
+				{
+					mCurrentDownEvent.recycle();
+				}
+				mCurrentDownEvent = MotionEvent.obtain(ev);
+				mAlwaysInTapRegion = true;
+				mAlwaysInBiggerTapRegion = true;
+				mStillDown = true;
+				mInLongPress = false;
+
+				if (mIsLongpressEnabled)
+				{
+					mHandler.removeMessages(LONG_PRESS);
+					mHandler.sendEmptyMessageAtTime(LONG_PRESS, mCurrentDownEvent.getDownTime() +
+					                                                TAP_TIMEOUT +
+					                                                mLongpressTimeout);
+				}
+				mHandler.sendEmptyMessageAtTime(SHOW_PRESS,
+				                                mCurrentDownEvent.getDownTime() + TAP_TIMEOUT);
+				handled |= mListener.onDown(ev);
+				break;
+
+			case MotionEvent.ACTION_MOVE:
+				if (mIgnoreMultitouch && ev.getPointerCount() > 1)
+				{
+					break;
+				}
+				final float scrollX = mLastMotionX - x;
+				final float scrollY = mLastMotionY - y;
+				if (mIsDoubleTapping)
+				{
+					// Give the move events of the double-tap
 					handled |= mDoubleTapListener.onDoubleTapEvent(ev);
+				}
+				else if (mAlwaysInTapRegion)
+				{
+					final int deltaX = (int)(x - mCurrentDownEvent.getX());
+					final int deltaY = (int)(y - mCurrentDownEvent.getY());
+					int distance = (deltaX * deltaX) + (deltaY * deltaY);
+					if (distance > mTouchSlopSquare)
+					{
+						mLastMotionX = x;
+						mLastMotionY = y;
+						mAlwaysInTapRegion = false;
+						mHandler.removeMessages(TAP);
+						mHandler.removeMessages(SHOW_PRESS);
+						mHandler.removeMessages(LONG_PRESS);
+					}
+					if (distance > mLargeTouchSlopSquare)
+					{
+						mAlwaysInBiggerTapRegion = false;
+					}
+					handled = mListener.onScroll(mCurrentDownEvent, ev, scrollX, scrollY);
+				}
+				else if ((Math.abs(scrollX) >= 1) || (Math.abs(scrollY) >= 1))
+				{
+					handled = mListener.onScroll(mCurrentDownEvent, ev, scrollX, scrollY);
+					mLastMotionX = x;
+					mLastMotionY = y;
+				}
+				break;
+
+			case MotionEvent.ACTION_UP:
+				mStillDown = false;
+				MotionEvent currentUpEvent = MotionEvent.obtain(ev);
+				if (mIsDoubleTapping)
+				{
+					// Finally, give the up event of the double-tap
+					handled |= mDoubleTapListener.onDoubleTapEvent(ev);
+				}
+				else if (mInLongPress)
+				{
+					mHandler.removeMessages(TAP);
+					mListener.onLongPressUp(ev);
+					mInLongPress = false;
+				}
+				else if (mAlwaysInTapRegion)
+				{
+					handled = mListener.onSingleTapUp(mCurrentDownEvent);
 				}
 				else
 				{
-					// This is a first tap
-					mHandler.sendEmptyMessageDelayed(TAP, DOUBLE_TAP_TIMEOUT);
+					// A fling must travel the minimum tap distance
 				}
-			}
-
-			mLastMotionX = x;
-			mLastMotionY = y;
-			if (mCurrentDownEvent != null)
-			{
-				mCurrentDownEvent.recycle();
-			}
-			mCurrentDownEvent = MotionEvent.obtain(ev);
-			mAlwaysInTapRegion = true;
-			mAlwaysInBiggerTapRegion = true;
-			mStillDown = true;
-			mInLongPress = false;
-
-			if (mIsLongpressEnabled)
-			{
+				if (mPreviousUpEvent != null)
+				{
+					mPreviousUpEvent.recycle();
+				}
+				// Hold the event we obtained above - listeners may have changed the original.
+				mPreviousUpEvent = currentUpEvent;
+				mIsDoubleTapping = false;
+				mHandler.removeMessages(SHOW_PRESS);
 				mHandler.removeMessages(LONG_PRESS);
-				mHandler.sendEmptyMessageAtTime(LONG_PRESS, mCurrentDownEvent.getDownTime() +
-				                                                TAP_TIMEOUT + mLongpressTimeout);
-			}
-			mHandler.sendEmptyMessageAtTime(SHOW_PRESS,
-			                                mCurrentDownEvent.getDownTime() + TAP_TIMEOUT);
-			handled |= mListener.onDown(ev);
-			break;
-
-		case MotionEvent.ACTION_MOVE:
-			if (mIgnoreMultitouch && ev.getPointerCount() > 1)
-			{
+				handled |= mListener.onUp(ev);
 				break;
-			}
-			final float scrollX = mLastMotionX - x;
-			final float scrollY = mLastMotionY - y;
-			if (mIsDoubleTapping)
-			{
-				// Give the move events of the double-tap
-				handled |= mDoubleTapListener.onDoubleTapEvent(ev);
-			}
-			else if (mAlwaysInTapRegion)
-			{
-				final int deltaX = (int)(x - mCurrentDownEvent.getX());
-				final int deltaY = (int)(y - mCurrentDownEvent.getY());
-				int distance = (deltaX * deltaX) + (deltaY * deltaY);
-				if (distance > mTouchSlopSquare)
-				{
-					mLastMotionX = x;
-					mLastMotionY = y;
-					mAlwaysInTapRegion = false;
-					mHandler.removeMessages(TAP);
-					mHandler.removeMessages(SHOW_PRESS);
-					mHandler.removeMessages(LONG_PRESS);
-				}
-				if (distance > mLargeTouchSlopSquare)
-				{
-					mAlwaysInBiggerTapRegion = false;
-				}
-				handled = mListener.onScroll(mCurrentDownEvent, ev, scrollX, scrollY);
-			}
-			else if ((Math.abs(scrollX) >= 1) || (Math.abs(scrollY) >= 1))
-			{
-				handled = mListener.onScroll(mCurrentDownEvent, ev, scrollX, scrollY);
-				mLastMotionX = x;
-				mLastMotionY = y;
-			}
-			break;
-
-		case MotionEvent.ACTION_UP:
-			mStillDown = false;
-			MotionEvent currentUpEvent = MotionEvent.obtain(ev);
-			if (mIsDoubleTapping)
-			{
-				// Finally, give the up event of the double-tap
-				handled |= mDoubleTapListener.onDoubleTapEvent(ev);
-			}
-			else if (mInLongPress)
-			{
-				mHandler.removeMessages(TAP);
-				mListener.onLongPressUp(ev);
-				mInLongPress = false;
-			}
-			else if (mAlwaysInTapRegion)
-			{
-				handled = mListener.onSingleTapUp(mCurrentDownEvent);
-			}
-			else
-			{
-				// A fling must travel the minimum tap distance
-			}
-			if (mPreviousUpEvent != null)
-			{
-				mPreviousUpEvent.recycle();
-			}
-			// Hold the event we obtained above - listeners may have changed the original.
-			mPreviousUpEvent = currentUpEvent;
-			mIsDoubleTapping = false;
-			mHandler.removeMessages(SHOW_PRESS);
-			mHandler.removeMessages(LONG_PRESS);
-			handled |= mListener.onUp(ev);
-			break;
-		case MotionEvent.ACTION_CANCEL:
-			cancel();
-			break;
+			case MotionEvent.ACTION_CANCEL:
+				cancel();
+				break;
 		}
 		return handled;
 	}
@@ -594,24 +596,24 @@ public class GestureDetector
 		{
 			switch (msg.what)
 			{
-			case SHOW_PRESS:
-				mListener.onShowPress(mCurrentDownEvent);
-				break;
+				case SHOW_PRESS:
+					mListener.onShowPress(mCurrentDownEvent);
+					break;
 
-			case LONG_PRESS:
-				dispatchLongPress();
-				break;
+				case LONG_PRESS:
+					dispatchLongPress();
+					break;
 
-			case TAP:
-				// If the user's finger is still down, do not count it as a tap
-				if (mDoubleTapListener != null && !mStillDown)
-				{
-					mDoubleTapListener.onSingleTapConfirmed(mCurrentDownEvent);
-				}
-				break;
+				case TAP:
+					// If the user's finger is still down, do not count it as a tap
+					if (mDoubleTapListener != null && !mStillDown)
+					{
+						mDoubleTapListener.onSingleTapConfirmed(mCurrentDownEvent);
+					}
+					break;
 
-			default:
-				throw new RuntimeException("Unknown message " + msg); // never
+				default:
+					throw new RuntimeException("Unknown message " + msg); // never
 			}
 		}
 	}

@@ -21,7 +21,7 @@
 #define FREERDP_CHANNEL_TSMF_CLIENT_TYPES_H
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/dvc.h>
@@ -31,12 +31,12 @@
 #define TAG CHANNELS_TAG("tsmf.client")
 
 #ifdef WITH_DEBUG_TSMF
-#	define DEBUG_TSMF(...) WLog_DBG(TAG, __VA_ARGS__)
+#define DEBUG_TSMF(...) WLog_DBG(TAG, __VA_ARGS__)
 #else
-#	define DEBUG_TSMF(...) \
-		do                  \
-		{                   \
-		} while (0)
+#define DEBUG_TSMF(...) \
+	do                  \
+	{                   \
+	} while (0)
 #endif
 
 typedef struct _TS_AM_MEDIA_TYPE

@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -221,28 +221,28 @@ UINT rdpdr_process_capability_request(rdpdrPlugin* rdpdr, wStream* s)
 
 		switch (capabilityType)
 		{
-		case CAP_GENERAL_TYPE:
-			status = rdpdr_process_general_capset(rdpdr, s);
-			break;
+			case CAP_GENERAL_TYPE:
+				status = rdpdr_process_general_capset(rdpdr, s);
+				break;
 
-		case CAP_PRINTER_TYPE:
-			status = rdpdr_process_printer_capset(rdpdr, s);
-			break;
+			case CAP_PRINTER_TYPE:
+				status = rdpdr_process_printer_capset(rdpdr, s);
+				break;
 
-		case CAP_PORT_TYPE:
-			status = rdpdr_process_port_capset(rdpdr, s);
-			break;
+			case CAP_PORT_TYPE:
+				status = rdpdr_process_port_capset(rdpdr, s);
+				break;
 
-		case CAP_DRIVE_TYPE:
-			status = rdpdr_process_drive_capset(rdpdr, s);
-			break;
+			case CAP_DRIVE_TYPE:
+				status = rdpdr_process_drive_capset(rdpdr, s);
+				break;
 
-		case CAP_SMARTCARD_TYPE:
-			status = rdpdr_process_smartcard_capset(rdpdr, s);
-			break;
+			case CAP_SMARTCARD_TYPE:
+				status = rdpdr_process_smartcard_capset(rdpdr, s);
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 
 		if (status != CHANNEL_RC_OK)

@@ -124,71 +124,71 @@ extern "C"
 	{
 		switch (format)
 		{
-		/* 32bpp formats */
-		case PIXEL_FORMAT_ARGB32:
-			return "PIXEL_FORMAT_ARGB32";
+			/* 32bpp formats */
+			case PIXEL_FORMAT_ARGB32:
+				return "PIXEL_FORMAT_ARGB32";
 
-		case PIXEL_FORMAT_XRGB32:
-			return "PIXEL_FORMAT_XRGB32";
+			case PIXEL_FORMAT_XRGB32:
+				return "PIXEL_FORMAT_XRGB32";
 
-		case PIXEL_FORMAT_ABGR32:
-			return "PIXEL_FORMAT_ABGR32";
+			case PIXEL_FORMAT_ABGR32:
+				return "PIXEL_FORMAT_ABGR32";
 
-		case PIXEL_FORMAT_XBGR32:
-			return "PIXEL_FORMAT_XBGR32";
+			case PIXEL_FORMAT_XBGR32:
+				return "PIXEL_FORMAT_XBGR32";
 
-		case PIXEL_FORMAT_BGRA32:
-			return "PIXEL_FORMAT_BGRA32";
+			case PIXEL_FORMAT_BGRA32:
+				return "PIXEL_FORMAT_BGRA32";
 
-		case PIXEL_FORMAT_BGRX32:
-			return "PIXEL_FORMAT_BGRX32";
+			case PIXEL_FORMAT_BGRX32:
+				return "PIXEL_FORMAT_BGRX32";
 
-		case PIXEL_FORMAT_RGBA32:
-			return "PIXEL_FORMAT_RGBA32";
+			case PIXEL_FORMAT_RGBA32:
+				return "PIXEL_FORMAT_RGBA32";
 
-		case PIXEL_FORMAT_RGBX32:
-			return "PIXEL_FORMAT_RGBX32";
+			case PIXEL_FORMAT_RGBX32:
+				return "PIXEL_FORMAT_RGBX32";
 
-		/* 24bpp formats */
-		case PIXEL_FORMAT_RGB24:
-			return "PIXEL_FORMAT_RGB24";
+			/* 24bpp formats */
+			case PIXEL_FORMAT_RGB24:
+				return "PIXEL_FORMAT_RGB24";
 
-		case PIXEL_FORMAT_BGR24:
-			return "PIXEL_FORMAT_BGR24";
+			case PIXEL_FORMAT_BGR24:
+				return "PIXEL_FORMAT_BGR24";
 
-		/* 16bpp formats */
-		case PIXEL_FORMAT_RGB16:
-			return "PIXEL_FORMAT_RGB16";
+			/* 16bpp formats */
+			case PIXEL_FORMAT_RGB16:
+				return "PIXEL_FORMAT_RGB16";
 
-		case PIXEL_FORMAT_BGR16:
-			return "PIXEL_FORMAT_BGR16";
+			case PIXEL_FORMAT_BGR16:
+				return "PIXEL_FORMAT_BGR16";
 
-		case PIXEL_FORMAT_ARGB15:
-			return "PIXEL_FORMAT_ARGB15";
+			case PIXEL_FORMAT_ARGB15:
+				return "PIXEL_FORMAT_ARGB15";
 
-		case PIXEL_FORMAT_RGB15:
-			return "PIXEL_FORMAT_RGB15";
+			case PIXEL_FORMAT_RGB15:
+				return "PIXEL_FORMAT_RGB15";
 
-		case PIXEL_FORMAT_ABGR15:
-			return "PIXEL_FORMAT_ABGR15";
+			case PIXEL_FORMAT_ABGR15:
+				return "PIXEL_FORMAT_ABGR15";
 
-		case PIXEL_FORMAT_BGR15:
-			return "PIXEL_FORMAT_BGR15";
+			case PIXEL_FORMAT_BGR15:
+				return "PIXEL_FORMAT_BGR15";
 
-		/* 8bpp formats */
-		case PIXEL_FORMAT_RGB8:
-			return "PIXEL_FORMAT_RGB8";
+			/* 8bpp formats */
+			case PIXEL_FORMAT_RGB8:
+				return "PIXEL_FORMAT_RGB8";
 
-		/* 4 bpp formats */
-		case PIXEL_FORMAT_A4:
-			return "PIXEL_FORMAT_A4";
+			/* 4 bpp formats */
+			case PIXEL_FORMAT_A4:
+				return "PIXEL_FORMAT_A4";
 
-		/* 1bpp formats */
-		case PIXEL_FORMAT_MONO:
-			return "PIXEL_FORMAT_MONO";
+			/* 1bpp formats */
+			case PIXEL_FORMAT_MONO:
+				return "PIXEL_FORMAT_MONO";
 
-		default:
-			return "UNKNOWN";
+			default:
+				return "UNKNOWN";
 		}
 	}
 
@@ -212,259 +212,293 @@ extern "C"
 
 		switch (format)
 		{
-		/* 32bpp formats */
-		case PIXEL_FORMAT_ARGB32:
-			if (_a)
-				*_a = (BYTE)(color >> 24);
+			/* 32bpp formats */
+			case PIXEL_FORMAT_ARGB32:
+				if (_a)
+					*_a = (BYTE)(color >> 24);
 
-			if (_r)
-				*_r = (BYTE)(color >> 16);
+				if (_r)
+					*_r = (BYTE)(color >> 16);
 
-			if (_g)
-				*_g = (BYTE)(color >> 8);
+				if (_g)
+					*_g = (BYTE)(color >> 8);
 
-			if (_b)
-				*_b = (BYTE)color;
+				if (_b)
+					*_b = (BYTE)color;
 
-			break;
+				break;
 
-		case PIXEL_FORMAT_XRGB32:
-			if (_r)
-				*_r = (BYTE)(color >> 16);
+			case PIXEL_FORMAT_XRGB32:
+				if (_r)
+					*_r = (BYTE)(color >> 16);
 
-			if (_g)
-				*_g = (BYTE)(color >> 8);
+				if (_g)
+					*_g = (BYTE)(color >> 8);
 
-			if (_b)
-				*_b = (BYTE)color;
+				if (_b)
+					*_b = (BYTE)color;
 
-			if (_a)
-				*_a = 0xFF;
+				if (_a)
+					*_a = 0xFF;
 
-			break;
+				break;
 
-		case PIXEL_FORMAT_ABGR32:
-			if (_a)
-				*_a = (BYTE)(color >> 24);
+			case PIXEL_FORMAT_ABGR32:
+				if (_a)
+					*_a = (BYTE)(color >> 24);
 
-			if (_b)
-				*_b = (BYTE)(color >> 16);
+				if (_b)
+					*_b = (BYTE)(color >> 16);
 
-			if (_g)
-				*_g = (BYTE)(color >> 8);
+				if (_g)
+					*_g = (BYTE)(color >> 8);
 
-			if (_r)
-				*_r = (BYTE)color;
+				if (_r)
+					*_r = (BYTE)color;
 
-			break;
+				break;
 
-		case PIXEL_FORMAT_XBGR32:
-			if (_b)
-				*_b = (BYTE)(color >> 16);
+			case PIXEL_FORMAT_XBGR32:
+				if (_b)
+					*_b = (BYTE)(color >> 16);
 
-			if (_g)
-				*_g = (BYTE)(color >> 8);
+				if (_g)
+					*_g = (BYTE)(color >> 8);
 
-			if (_r)
-				*_r = (BYTE)color;
+				if (_r)
+					*_r = (BYTE)color;
 
-			if (_a)
-				*_a = 0xFF;
+				if (_a)
+					*_a = 0xFF;
 
-			break;
+				break;
 
-		case PIXEL_FORMAT_RGBA32:
-			if (_r)
-				*_r = (BYTE)(color >> 24);
+			case PIXEL_FORMAT_RGBA32:
+				if (_r)
+					*_r = (BYTE)(color >> 24);
 
-			if (_g)
-				*_g = (BYTE)(color >> 16);
+				if (_g)
+					*_g = (BYTE)(color >> 16);
 
-			if (_b)
-				*_b = (BYTE)(color >> 8);
+				if (_b)
+					*_b = (BYTE)(color >> 8);
 
-			if (_a)
-				*_a = (BYTE)color;
+				if (_a)
+					*_a = (BYTE)color;
 
-			break;
+				break;
 
-		case PIXEL_FORMAT_RGBX32:
-			if (_r)
-				*_r = (BYTE)(color >> 24);
+			case PIXEL_FORMAT_RGBX32:
+				if (_r)
+					*_r = (BYTE)(color >> 24);
 
-			if (_g)
-				*_g = (BYTE)(color >> 16);
+				if (_g)
+					*_g = (BYTE)(color >> 16);
 
-			if (_b)
-				*_b = (BYTE)(color >> 8);
+				if (_b)
+					*_b = (BYTE)(color >> 8);
 
-			if (_a)
-				*_a = 0xFF;
+				if (_a)
+					*_a = 0xFF;
 
-			break;
+				break;
 
-		case PIXEL_FORMAT_BGRA32:
-			if (_b)
-				*_b = (BYTE)(color >> 24);
+			case PIXEL_FORMAT_BGRA32:
+				if (_b)
+					*_b = (BYTE)(color >> 24);
 
-			if (_g)
-				*_g = (BYTE)(color >> 16);
+				if (_g)
+					*_g = (BYTE)(color >> 16);
 
-			if (_r)
-				*_r = (BYTE)(color >> 8);
+				if (_r)
+					*_r = (BYTE)(color >> 8);
 
-			if (_a)
-				*_a = (BYTE)color;
+				if (_a)
+					*_a = (BYTE)color;
 
-			break;
+				break;
 
-		case PIXEL_FORMAT_BGRX32:
-			if (_b)
-				*_b = (BYTE)(color >> 24);
+			case PIXEL_FORMAT_BGRX32:
+				if (_b)
+					*_b = (BYTE)(color >> 24);
 
-			if (_g)
-				*_g = (BYTE)(color >> 16);
+				if (_g)
+					*_g = (BYTE)(color >> 16);
 
-			if (_r)
-				*_r = (BYTE)(color >> 8);
+				if (_r)
+					*_r = (BYTE)(color >> 8);
 
-			if (_a)
-				*_a = 0xFF;
+				if (_a)
+					*_a = 0xFF;
 
-			break;
+				break;
 
-		/* 24bpp formats */
-		case PIXEL_FORMAT_RGB24:
-			if (_r)
-				*_r = (BYTE)(color >> 16);
+			/* 24bpp formats */
+			case PIXEL_FORMAT_RGB24:
+				if (_r)
+					*_r = (BYTE)(color >> 16);
 
-			if (_g)
-				*_g = (BYTE)(color >> 8);
+				if (_g)
+					*_g = (BYTE)(color >> 8);
 
-			if (_b)
-				*_b = (BYTE)color;
+				if (_b)
+					*_b = (BYTE)color;
 
-			if (_a)
-				*_a = 0xFF;
+				if (_a)
+					*_a = 0xFF;
 
-			break;
+				break;
 
-		case PIXEL_FORMAT_BGR24:
-			if (_b)
-				*_b = (BYTE)(color >> 16);
+			case PIXEL_FORMAT_BGR24:
+				if (_b)
+					*_b = (BYTE)(color >> 16);
 
-			if (_g)
-				*_g = (BYTE)(color >> 8);
+				if (_g)
+					*_g = (BYTE)(color >> 8);
 
-			if (_r)
-				*_r = (BYTE)color;
+				if (_r)
+					*_r = (BYTE)color;
 
-			if (_a)
-				*_a = 0xFF;
+				if (_a)
+					*_a = 0xFF;
 
-			break;
+				break;
 
-		/* 16bpp formats */
-		case PIXEL_FORMAT_RGB16:
-			if (_r)
-				*_r = (BYTE)(((color >> 11) & 0x1F) << 3);
+			/* 16bpp formats */
+			case PIXEL_FORMAT_RGB16:
+				if (_r)
+					*_r = (BYTE)(((color >> 11) & 0x1F) << 3);
 
-			if (_g)
-				*_g = (BYTE)(((color >> 5) & 0x3F) << 2);
+				if (_g)
+					*_g = (BYTE)(((color >> 5) & 0x3F) << 2);
 
-			if (_b)
-				*_b = (BYTE)((color & 0x1F) << 3);
+				if (_b)
+					*_b = (BYTE)((color & 0x1F) << 3);
 
-			if (_a)
-				*_a = 0xFF;
+				if (_a)
+					*_a = 0xFF;
 
-			break;
+				break;
 
-		case PIXEL_FORMAT_BGR16:
-			if (_b)
-				*_b = (BYTE)(((color >> 11) & 0x1F) << 3);
+			case PIXEL_FORMAT_BGR16:
+				if (_b)
+					*_b = (BYTE)(((color >> 11) & 0x1F) << 3);
 
-			if (_g)
-				*_g = (BYTE)(((color >> 5) & 0x3F) << 2);
+				if (_g)
+					*_g = (BYTE)(((color >> 5) & 0x3F) << 2);
 
-			if (_r)
-				*_r = (BYTE)((color & 0x1F) << 3);
+				if (_r)
+					*_r = (BYTE)((color & 0x1F) << 3);
 
-			if (_a)
-				*_a = 0xFF;
+				if (_a)
+					*_a = 0xFF;
 
-			break;
+				break;
 
-		case PIXEL_FORMAT_ARGB15:
-			if (_r)
-				*_r = (BYTE)(((color >> 10) & 0x1F) << 3);
+			case PIXEL_FORMAT_ARGB15:
+				if (_r)
+					*_r = (BYTE)(((color >> 10) & 0x1F) << 3);
 
-			if (_g)
-				*_g = (BYTE)(((color >> 5) & 0x1F) << 3);
+				if (_g)
+					*_g = (BYTE)(((color >> 5) & 0x1F) << 3);
 
-			if (_b)
-				*_b = (BYTE)((color & 0x1F) << 3);
+				if (_b)
+					*_b = (BYTE)((color & 0x1F) << 3);
 
-			if (_a)
-				*_a = color & 0x8000 ? 0xFF : 0x00;
+				if (_a)
+					*_a = color & 0x8000 ? 0xFF : 0x00;
 
-			break;
+				break;
 
-		case PIXEL_FORMAT_ABGR15:
-			if (_b)
-				*_b = (BYTE)(((color >> 10) & 0x1F) << 3);
+			case PIXEL_FORMAT_ABGR15:
+				if (_b)
+					*_b = (BYTE)(((color >> 10) & 0x1F) << 3);
 
-			if (_g)
-				*_g = (BYTE)(((color >> 5) & 0x1F) << 3);
+				if (_g)
+					*_g = (BYTE)(((color >> 5) & 0x1F) << 3);
 
-			if (_r)
-				*_r = (BYTE)((color & 0x1F) << 3);
+				if (_r)
+					*_r = (BYTE)((color & 0x1F) << 3);
 
-			if (_a)
-				*_a = color & 0x8000 ? 0xFF : 0x00;
+				if (_a)
+					*_a = color & 0x8000 ? 0xFF : 0x00;
 
-			break;
+				break;
 
-		/* 15bpp formats */
-		case PIXEL_FORMAT_RGB15:
-			if (_r)
-				*_r = (BYTE)(((color >> 10) & 0x1F) << 3);
+			/* 15bpp formats */
+			case PIXEL_FORMAT_RGB15:
+				if (_r)
+					*_r = (BYTE)(((color >> 10) & 0x1F) << 3);
 
-			if (_g)
-				*_g = (BYTE)(((color >> 5) & 0x1F) << 3);
+				if (_g)
+					*_g = (BYTE)(((color >> 5) & 0x1F) << 3);
 
-			if (_b)
-				*_b = (BYTE)((color & 0x1F) << 3);
+				if (_b)
+					*_b = (BYTE)((color & 0x1F) << 3);
 
-			if (_a)
-				*_a = 0xFF;
+				if (_a)
+					*_a = 0xFF;
 
-			break;
+				break;
 
-		case PIXEL_FORMAT_BGR15:
-			if (_b)
-				*_b = (BYTE)(((color >> 10) & 0x1F) << 3);
+			case PIXEL_FORMAT_BGR15:
+				if (_b)
+					*_b = (BYTE)(((color >> 10) & 0x1F) << 3);
 
-			if (_g)
-				*_g = (BYTE)(((color >> 5) & 0x1F) << 3);
+				if (_g)
+					*_g = (BYTE)(((color >> 5) & 0x1F) << 3);
 
-			if (_r)
-				*_r = (BYTE)((color & 0x1F) << 3);
+				if (_r)
+					*_r = (BYTE)((color & 0x1F) << 3);
 
-			if (_a)
-				*_a = 0xFF;
+				if (_a)
+					*_a = 0xFF;
 
-			break;
+				break;
 
-		/* 8bpp formats */
-		case PIXEL_FORMAT_RGB8:
-			if (color <= 0xFF)
-			{
-				tmp = palette->palette[color];
-				SplitColor(tmp, palette->format, _r, _g, _b, _a, NULL);
-			}
-			else
-			{
+			/* 8bpp formats */
+			case PIXEL_FORMAT_RGB8:
+				if (color <= 0xFF)
+				{
+					tmp = palette->palette[color];
+					SplitColor(tmp, palette->format, _r, _g, _b, _a, NULL);
+				}
+				else
+				{
+					if (_r)
+						*_r = 0x00;
+
+					if (_g)
+						*_g = 0x00;
+
+					if (_b)
+						*_b = 0x00;
+
+					if (_a)
+						*_a = 0x00;
+				}
+
+				break;
+
+			/* 1bpp formats */
+			case PIXEL_FORMAT_MONO:
+				if (_r)
+					*_r = (color) ? 0xFF : 0x00;
+
+				if (_g)
+					*_g = (color) ? 0xFF : 0x00;
+
+				if (_b)
+					*_b = (color) ? 0xFF : 0x00;
+
+				if (_a)
+					*_a = (color) ? 0xFF : 0x00;
+
+				break;
+
+			/* 4 bpp formats */
+			case PIXEL_FORMAT_A4:
+			default:
 				if (_r)
 					*_r = 0x00;
 
@@ -476,43 +510,9 @@ extern "C"
 
 				if (_a)
 					*_a = 0x00;
-			}
 
-			break;
-
-		/* 1bpp formats */
-		case PIXEL_FORMAT_MONO:
-			if (_r)
-				*_r = (color) ? 0xFF : 0x00;
-
-			if (_g)
-				*_g = (color) ? 0xFF : 0x00;
-
-			if (_b)
-				*_b = (color) ? 0xFF : 0x00;
-
-			if (_a)
-				*_a = (color) ? 0xFF : 0x00;
-
-			break;
-
-		/* 4 bpp formats */
-		case PIXEL_FORMAT_A4:
-		default:
-			if (_r)
-				*_r = 0x00;
-
-			if (_g)
-				*_g = 0x00;
-
-			if (_b)
-				*_b = 0x00;
-
-			if (_a)
-				*_a = 0x00;
-
-			WLog_ERR(CTAG, "Unsupported format %s", FreeRDPGetColorFormatName(format));
-			break;
+				WLog_ERR(CTAG, "Unsupported format %s", FreeRDPGetColorFormatName(format));
+				break;
 		}
 	}
 
@@ -538,71 +538,71 @@ extern "C"
 
 		switch (format)
 		{
-		/* 32bpp formats */
-		case PIXEL_FORMAT_ARGB32:
-			return (_a << 24) | (_r << 16) | (_g << 8) | _b;
+			/* 32bpp formats */
+			case PIXEL_FORMAT_ARGB32:
+				return (_a << 24) | (_r << 16) | (_g << 8) | _b;
 
-		case PIXEL_FORMAT_XRGB32:
-			return (_r << 16) | (_g << 8) | _b;
+			case PIXEL_FORMAT_XRGB32:
+				return (_r << 16) | (_g << 8) | _b;
 
-		case PIXEL_FORMAT_ABGR32:
-			return (_a << 24) | (_b << 16) | (_g << 8) | _r;
+			case PIXEL_FORMAT_ABGR32:
+				return (_a << 24) | (_b << 16) | (_g << 8) | _r;
 
-		case PIXEL_FORMAT_XBGR32:
-			return (_b << 16) | (_g << 8) | _r;
+			case PIXEL_FORMAT_XBGR32:
+				return (_b << 16) | (_g << 8) | _r;
 
-		case PIXEL_FORMAT_RGBA32:
-			return (_r << 24) | (_g << 16) | (_b << 8) | _a;
+			case PIXEL_FORMAT_RGBA32:
+				return (_r << 24) | (_g << 16) | (_b << 8) | _a;
 
-		case PIXEL_FORMAT_RGBX32:
-			return (_r << 24) | (_g << 16) | (_b << 8) | _a;
+			case PIXEL_FORMAT_RGBX32:
+				return (_r << 24) | (_g << 16) | (_b << 8) | _a;
 
-		case PIXEL_FORMAT_BGRA32:
-			return (_b << 24) | (_g << 16) | (_r << 8) | _a;
+			case PIXEL_FORMAT_BGRA32:
+				return (_b << 24) | (_g << 16) | (_r << 8) | _a;
 
-		case PIXEL_FORMAT_BGRX32:
-			return (_b << 24) | (_g << 16) | (_r << 8) | _a;
+			case PIXEL_FORMAT_BGRX32:
+				return (_b << 24) | (_g << 16) | (_r << 8) | _a;
 
-		/* 24bpp formats */
-		case PIXEL_FORMAT_RGB24:
-			return (_r << 16) | (_g << 8) | _b;
+			/* 24bpp formats */
+			case PIXEL_FORMAT_RGB24:
+				return (_r << 16) | (_g << 8) | _b;
 
-		case PIXEL_FORMAT_BGR24:
-			return (_b << 16) | (_g << 8) | _r;
+			case PIXEL_FORMAT_BGR24:
+				return (_b << 16) | (_g << 8) | _r;
 
-		/* 16bpp formats */
-		case PIXEL_FORMAT_RGB16:
-			return (((_r >> 3) & 0x1F) << 11) | (((_g >> 2) & 0x3F) << 5) | ((_b >> 3) & 0x1F);
+			/* 16bpp formats */
+			case PIXEL_FORMAT_RGB16:
+				return (((_r >> 3) & 0x1F) << 11) | (((_g >> 2) & 0x3F) << 5) | ((_b >> 3) & 0x1F);
 
-		case PIXEL_FORMAT_BGR16:
-			return (((_b >> 3) & 0x1F) << 11) | (((_g >> 2) & 0x3F) << 5) | ((_r >> 3) & 0x1F);
+			case PIXEL_FORMAT_BGR16:
+				return (((_b >> 3) & 0x1F) << 11) | (((_g >> 2) & 0x3F) << 5) | ((_r >> 3) & 0x1F);
 
-		case PIXEL_FORMAT_ARGB15:
-			return (((_r >> 3) & 0x1F) << 10) | (((_g >> 3) & 0x1F) << 5) | ((_b >> 3) & 0x1F) |
-			       (_a ? 0x8000 : 0x0000);
+			case PIXEL_FORMAT_ARGB15:
+				return (((_r >> 3) & 0x1F) << 10) | (((_g >> 3) & 0x1F) << 5) | ((_b >> 3) & 0x1F) |
+				       (_a ? 0x8000 : 0x0000);
 
-		case PIXEL_FORMAT_ABGR15:
-			return (((_b >> 3) & 0x1F) << 10) | (((_g >> 3) & 0x1F) << 5) | ((_r >> 3) & 0x1F) |
-			       (_a ? 0x8000 : 0x0000);
+			case PIXEL_FORMAT_ABGR15:
+				return (((_b >> 3) & 0x1F) << 10) | (((_g >> 3) & 0x1F) << 5) | ((_r >> 3) & 0x1F) |
+				       (_a ? 0x8000 : 0x0000);
 
-		/* 15bpp formats */
-		case PIXEL_FORMAT_RGB15:
-			return (((_r >> 3) & 0x1F) << 10) | (((_g >> 3) & 0x1F) << 5) | ((_b >> 3) & 0x1F);
+			/* 15bpp formats */
+			case PIXEL_FORMAT_RGB15:
+				return (((_r >> 3) & 0x1F) << 10) | (((_g >> 3) & 0x1F) << 5) | ((_b >> 3) & 0x1F);
 
-		case PIXEL_FORMAT_BGR15:
-			return (((_b >> 3) & 0x1F) << 10) | (((_g >> 3) & 0x1F) << 5) | ((_r >> 3) & 0x1F);
+			case PIXEL_FORMAT_BGR15:
+				return (((_b >> 3) & 0x1F) << 10) | (((_g >> 3) & 0x1F) << 5) | ((_r >> 3) & 0x1F);
 
-		/* 8bpp formats */
-		case PIXEL_FORMAT_RGB8:
+			/* 8bpp formats */
+			case PIXEL_FORMAT_RGB8:
 
-		/* 4 bpp formats */
-		case PIXEL_FORMAT_A4:
+			/* 4 bpp formats */
+			case PIXEL_FORMAT_A4:
 
-		/* 1bpp formats */
-		case PIXEL_FORMAT_MONO:
-		default:
-			WLog_ERR(CTAG, "Unsupported format %s", FreeRDPGetColorFormatName(format));
-			return 0;
+			/* 1bpp formats */
+			case PIXEL_FORMAT_MONO:
+			default:
+				WLog_ERR(CTAG, "Unsupported format %s", FreeRDPGetColorFormatName(format));
+				return 0;
 		}
 	}
 
@@ -649,37 +649,37 @@ extern "C"
 
 		switch (GetBitsPerPixel(format))
 		{
-		case 32:
-			color =
-			    ((UINT32)src[0] << 24) | ((UINT32)src[1] << 16) | ((UINT32)src[2] << 8) | src[3];
-			break;
+			case 32:
+				color = ((UINT32)src[0] << 24) | ((UINT32)src[1] << 16) | ((UINT32)src[2] << 8) |
+				        src[3];
+				break;
 
-		case 24:
-			color = ((UINT32)src[0] << 16) | ((UINT32)src[1] << 8) | src[2];
-			break;
+			case 24:
+				color = ((UINT32)src[0] << 16) | ((UINT32)src[1] << 8) | src[2];
+				break;
 
-		case 16:
-			color = ((UINT32)src[1] << 8) | src[0];
-			break;
+			case 16:
+				color = ((UINT32)src[1] << 8) | src[0];
+				break;
 
-		case 15:
-			color = ((UINT32)src[1] << 8) | src[0];
+			case 15:
+				color = ((UINT32)src[1] << 8) | src[0];
 
-			if (!ColorHasAlpha(format))
-				color = color & 0x7FFF;
+				if (!ColorHasAlpha(format))
+					color = color & 0x7FFF;
 
-			break;
+				break;
 
-		case 8:
-		case 4:
-		case 1:
-			color = *src;
-			break;
+			case 8:
+			case 4:
+			case 1:
+				color = *src;
+				break;
 
-		default:
-			WLog_ERR(CTAG, "Unsupported format %s", FreeRDPGetColorFormatName(format));
-			color = 0;
-			break;
+			default:
+				WLog_ERR(CTAG, "Unsupported format %s", FreeRDPGetColorFormatName(format));
+				color = 0;
+				break;
 		}
 
 		return color;
@@ -699,39 +699,39 @@ extern "C"
 	{
 		switch (GetBitsPerPixel(format))
 		{
-		case 32:
-			dst[0] = (BYTE)(color >> 24);
-			dst[1] = (BYTE)(color >> 16);
-			dst[2] = (BYTE)(color >> 8);
-			dst[3] = (BYTE)color;
-			break;
+			case 32:
+				dst[0] = (BYTE)(color >> 24);
+				dst[1] = (BYTE)(color >> 16);
+				dst[2] = (BYTE)(color >> 8);
+				dst[3] = (BYTE)color;
+				break;
 
-		case 24:
-			dst[0] = (BYTE)(color >> 16);
-			dst[1] = (BYTE)(color >> 8);
-			dst[2] = (BYTE)color;
-			break;
+			case 24:
+				dst[0] = (BYTE)(color >> 16);
+				dst[1] = (BYTE)(color >> 8);
+				dst[2] = (BYTE)color;
+				break;
 
-		case 16:
-			dst[1] = (BYTE)(color >> 8);
-			dst[0] = (BYTE)color;
-			break;
+			case 16:
+				dst[1] = (BYTE)(color >> 8);
+				dst[0] = (BYTE)color;
+				break;
 
-		case 15:
-			if (!ColorHasAlpha(format))
-				color = color & 0x7FFF;
+			case 15:
+				if (!ColorHasAlpha(format))
+					color = color & 0x7FFF;
 
-			dst[1] = (BYTE)(color >> 8);
-			dst[0] = (BYTE)color;
-			break;
+				dst[1] = (BYTE)(color >> 8);
+				dst[0] = (BYTE)color;
+				break;
 
-		case 8:
-			dst[0] = (BYTE)color;
-			break;
+			case 8:
+				dst[0] = (BYTE)color;
+				break;
 
-		default:
-			WLog_ERR(CTAG, "Unsupported format %s", FreeRDPGetColorFormatName(format));
-			return FALSE;
+			default:
+				WLog_ERR(CTAG, "Unsupported format %s", FreeRDPGetColorFormatName(format));
+				return FALSE;
 		}
 
 		return TRUE;
@@ -926,9 +926,9 @@ extern "C"
 	                                    UINT32 color);
 
 #if !defined(__APPLE__)
-#	define GetColorFormatName FreeRDPGetColorFormatName
-#	define GetColor FreeRDPGetColor
-#	define ConvertColor FreeRDPConvertColor
+#define GetColorFormatName FreeRDPGetColorFormatName
+#define GetColor FreeRDPGetColor
+#define ConvertColor FreeRDPConvertColor
 #endif
 
 #ifdef __cplusplus

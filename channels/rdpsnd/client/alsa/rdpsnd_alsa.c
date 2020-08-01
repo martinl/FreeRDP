@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -196,29 +196,29 @@ static BOOL rdpsnd_alsa_set_format(rdpsndDevicePlugin* device, const AUDIO_FORMA
 
 		switch (format->wFormatTag)
 		{
-		case WAVE_FORMAT_PCM:
-			switch (format->wBitsPerSample)
-			{
-			case 8:
-				alsa->format = SND_PCM_FORMAT_S8;
+			case WAVE_FORMAT_PCM:
+				switch (format->wBitsPerSample)
+				{
+					case 8:
+						alsa->format = SND_PCM_FORMAT_S8;
+						break;
+
+					case 16:
+						alsa->format = SND_PCM_FORMAT_S16_LE;
+						break;
+
+					default:
+						return FALSE;
+				}
+
 				break;
 
-			case 16:
-				alsa->format = SND_PCM_FORMAT_S16_LE;
+			case WAVE_FORMAT_ALAW:
+			case WAVE_FORMAT_MULAW:
 				break;
 
 			default:
 				return FALSE;
-			}
-
-			break;
-
-		case WAVE_FORMAT_ALAW:
-		case WAVE_FORMAT_MULAW:
-			break;
-
-		default:
-			return FALSE;
 		}
 	}
 
@@ -335,15 +335,15 @@ static BOOL rdpsnd_alsa_format_supported(rdpsndDevicePlugin* device, const AUDIO
 {
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		if (format->cbSize == 0 && format->nSamplesPerSec <= 48000 &&
-		    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
-		    (format->nChannels == 1 || format->nChannels == 2))
-		{
-			return TRUE;
-		}
+		case WAVE_FORMAT_PCM:
+			if (format->cbSize == 0 && format->nSamplesPerSec <= 48000 &&
+			    (format->wBitsPerSample == 8 || format->wBitsPerSample == 16) &&
+			    (format->nChannels == 1 || format->nChannels == 2))
+			{
+				return TRUE;
+			}
 
-		break;
+			break;
 	}
 
 	return FALSE;
@@ -515,9 +515,9 @@ static UINT rdpsnd_alsa_parse_addin_args(rdpsndDevicePlugin* device, ADDIN_ARGV*
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_rdpsnd_client_subsystem_entry alsa_freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry alsa_freerdp_rdpsnd_client_subsystem_entry
 #else
-#	define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
 #endif
 
 /**

@@ -123,9 +123,9 @@ struct _COMMAND_LINE_ARGUMENT_W
 };
 
 #ifdef UNICODE
-#	define COMMAND_LINE_ARGUMENT COMMAND_LINE_ARGUMENT_W
+#define COMMAND_LINE_ARGUMENT COMMAND_LINE_ARGUMENT_W
 #else
-#	define COMMAND_LINE_ARGUMENT COMMAND_LINE_ARGUMENT_A
+#define COMMAND_LINE_ARGUMENT COMMAND_LINE_ARGUMENT_A
 #endif
 
 typedef int (*COMMAND_LINE_PRE_FILTER_FN_A)(void* context, int index, int argc, LPSTR* argv);
@@ -164,13 +164,13 @@ extern "C"
 #endif
 
 #ifdef UNICODE
-#	define CommandLineClearArguments CommandLineClearArgumentsW
-#	define CommandLineParseArguments CommandLineParseArgumentsW
-#	define CommandLineFindArgument CommandLineFindArgumentW
+#define CommandLineClearArguments CommandLineClearArgumentsW
+#define CommandLineParseArguments CommandLineParseArgumentsW
+#define CommandLineFindArgument CommandLineFindArgumentW
 #else
-#	define CommandLineClearArguments CommandLineClearArgumentsA
-#	define CommandLineParseArguments CommandLineParseArgumentsA
-#	define CommandLineFindArgument CommandLineFindArgumentA
+#define CommandLineClearArguments CommandLineClearArgumentsA
+#define CommandLineParseArguments CommandLineParseArgumentsA
+#define CommandLineFindArgument CommandLineFindArgumentA
 #endif
 
 #endif /* WINPR_CMDLINE_H */

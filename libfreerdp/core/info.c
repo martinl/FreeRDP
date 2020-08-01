@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -1248,49 +1248,49 @@ BOOL rdp_recv_save_session_info(rdpRdp* rdp, wStream* s)
 
 	switch (infoType)
 	{
-	case INFO_TYPE_LOGON:
-		ZeroMemory(&logonInfo, sizeof(logonInfo));
-		status = rdp_recv_logon_info_v1(rdp, s, &logonInfo);
+		case INFO_TYPE_LOGON:
+			ZeroMemory(&logonInfo, sizeof(logonInfo));
+			status = rdp_recv_logon_info_v1(rdp, s, &logonInfo);
 
-		if (status && update->SaveSessionInfo)
-			status = update->SaveSessionInfo(context, infoType, &logonInfo);
+			if (status && update->SaveSessionInfo)
+				status = update->SaveSessionInfo(context, infoType, &logonInfo);
 
-		free(logonInfo.domain);
-		free(logonInfo.username);
-		break;
+			free(logonInfo.domain);
+			free(logonInfo.username);
+			break;
 
-	case INFO_TYPE_LOGON_LONG:
-		ZeroMemory(&logonInfo, sizeof(logonInfo));
-		status = rdp_recv_logon_info_v2(rdp, s, &logonInfo);
+		case INFO_TYPE_LOGON_LONG:
+			ZeroMemory(&logonInfo, sizeof(logonInfo));
+			status = rdp_recv_logon_info_v2(rdp, s, &logonInfo);
 
-		if (status && update->SaveSessionInfo)
-			status = update->SaveSessionInfo(context, infoType, &logonInfo);
+			if (status && update->SaveSessionInfo)
+				status = update->SaveSessionInfo(context, infoType, &logonInfo);
 
-		free(logonInfo.domain);
-		free(logonInfo.username);
-		break;
+			free(logonInfo.domain);
+			free(logonInfo.username);
+			break;
 
-	case INFO_TYPE_LOGON_PLAIN_NOTIFY:
-		status = rdp_recv_logon_plain_notify(rdp, s);
+		case INFO_TYPE_LOGON_PLAIN_NOTIFY:
+			status = rdp_recv_logon_plain_notify(rdp, s);
 
-		if (status && update->SaveSessionInfo)
-			status = update->SaveSessionInfo(context, infoType, NULL);
+			if (status && update->SaveSessionInfo)
+				status = update->SaveSessionInfo(context, infoType, NULL);
 
-		break;
+			break;
 
-	case INFO_TYPE_LOGON_EXTENDED_INF:
-		ZeroMemory(&logonInfoEx, sizeof(logonInfoEx));
-		status = rdp_recv_logon_info_extended(rdp, s, &logonInfoEx);
+		case INFO_TYPE_LOGON_EXTENDED_INF:
+			ZeroMemory(&logonInfoEx, sizeof(logonInfoEx));
+			status = rdp_recv_logon_info_extended(rdp, s, &logonInfoEx);
 
-		if (status && update->SaveSessionInfo)
-			status = update->SaveSessionInfo(context, infoType, &logonInfoEx);
+			if (status && update->SaveSessionInfo)
+				status = update->SaveSessionInfo(context, infoType, &logonInfoEx);
 
-		break;
+			break;
 
-	default:
-		WLog_ERR(TAG, "Unhandled saveSessionInfo type 0x%" PRIx32 "", infoType);
-		status = TRUE;
-		break;
+		default:
+			WLog_ERR(TAG, "Unhandled saveSessionInfo type 0x%" PRIx32 "", infoType);
+			status = TRUE;
+			break;
 	}
 
 	if (!status)
@@ -1454,26 +1454,26 @@ BOOL rdp_send_save_session_info(rdpContext* context, UINT32 type, void* data)
 
 	switch (type)
 	{
-	case INFO_TYPE_LOGON:
-		status = rdp_write_logon_info_v1(s, (logon_info*)data);
-		break;
+		case INFO_TYPE_LOGON:
+			status = rdp_write_logon_info_v1(s, (logon_info*)data);
+			break;
 
-	case INFO_TYPE_LOGON_LONG:
-		status = rdp_write_logon_info_v2(s, (logon_info*)data);
-		break;
+		case INFO_TYPE_LOGON_LONG:
+			status = rdp_write_logon_info_v2(s, (logon_info*)data);
+			break;
 
-	case INFO_TYPE_LOGON_PLAIN_NOTIFY:
-		status = rdp_write_logon_info_plain(s);
-		break;
+		case INFO_TYPE_LOGON_PLAIN_NOTIFY:
+			status = rdp_write_logon_info_plain(s);
+			break;
 
-	case INFO_TYPE_LOGON_EXTENDED_INF:
-		status = rdp_write_logon_info_ex(s, (logon_info_ex*)data);
-		break;
+		case INFO_TYPE_LOGON_EXTENDED_INF:
+			status = rdp_write_logon_info_ex(s, (logon_info_ex*)data);
+			break;
 
-	default:
-		WLog_ERR(TAG, "saveSessionInfo type 0x%" PRIx32 " not handled", type);
-		status = FALSE;
-		break;
+		default:
+			WLog_ERR(TAG, "saveSessionInfo type 0x%" PRIx32 " not handled", type);
+			status = FALSE;
+			break;
 	}
 
 	if (status)

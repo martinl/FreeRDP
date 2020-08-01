@@ -140,64 +140,64 @@ jstring jniNewStringUTF(JNIEnv* env, const char* in, int len)
 
 		switch (one >> 4)
 		{
-		case 0x00:
-		case 0x01:
-		case 0x02:
-		case 0x03:
-		case 0x04:
-		case 0x05:
-		case 0x06:
-		case 0x07:
-			unicode[result_size++] = one;
-			break;
+			case 0x00:
+			case 0x01:
+			case 0x02:
+			case 0x03:
+			case 0x04:
+			case 0x05:
+			case 0x06:
+			case 0x07:
+				unicode[result_size++] = one;
+				break;
 
-		case 0x08:
-		case 0x09:
-		case 0x0a:
-		case 0x0b:
-			// case 0x0f:
-			/*
-			 * Bit pattern 10xx or 1111, which are illegal start bytes.
-			 * Note: 1111 is valid for normal UTF-8, but not the
-			 * modified UTF-8 used here.
-			 */
-			break;
+			case 0x08:
+			case 0x09:
+			case 0x0a:
+			case 0x0b:
+				// case 0x0f:
+				/*
+				 * Bit pattern 10xx or 1111, which are illegal start bytes.
+				 * Note: 1111 is valid for normal UTF-8, but not the
+				 * modified UTF-8 used here.
+				 */
+				break;
 
-		case 0x0f:
-		case 0x0e:
+			case 0x0f:
+			case 0x0e:
 
-			// Bit pattern 111x, so there are two additional bytes.
-			if (i < (len - 2))
-			{
-				unsigned char two = utf8[i + 1];
-				unsigned char three = utf8[i + 2];
-
-				if ((two & 0xc0) == 0x80 && (three & 0xc0) == 0x80)
+				// Bit pattern 111x, so there are two additional bytes.
+				if (i < (len - 2))
 				{
-					i += 2;
-					unicode[result_size++] =
-					    ((one & 0x0f) << 12) | ((two & 0x3f) << 6) | (three & 0x3f);
+					unsigned char two = utf8[i + 1];
+					unsigned char three = utf8[i + 2];
+
+					if ((two & 0xc0) == 0x80 && (three & 0xc0) == 0x80)
+					{
+						i += 2;
+						unicode[result_size++] =
+						    ((one & 0x0f) << 12) | ((two & 0x3f) << 6) | (three & 0x3f);
+					}
 				}
-			}
 
-			break;
+				break;
 
-		case 0x0c:
-		case 0x0d:
+			case 0x0c:
+			case 0x0d:
 
-			// Bit pattern 110x, so there is one additional byte.
-			if (i < (len - 1))
-			{
-				unsigned char two = utf8[i + 1];
-
-				if ((two & 0xc0) == 0x80)
+				// Bit pattern 110x, so there is one additional byte.
+				if (i < (len - 1))
 				{
-					i += 1;
-					unicode[result_size++] = ((one & 0x1f) << 6) | (two & 0x3f);
-				}
-			}
+					unsigned char two = utf8[i + 1];
 
-			break;
+					if ((two & 0xc0) == 0x80)
+					{
+						i += 1;
+						unicode[result_size++] = ((one & 0x1f) << 6) | (two & 0x3f);
+					}
+				}
+
+				break;
 		}
 	}
 

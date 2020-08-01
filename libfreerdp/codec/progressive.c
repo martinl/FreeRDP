@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -56,32 +56,32 @@ static const char* progressive_get_block_type_string(UINT16 blockType)
 {
 	switch (blockType)
 	{
-	case PROGRESSIVE_WBT_SYNC:
-		return "PROGRESSIVE_WBT_SYNC";
+		case PROGRESSIVE_WBT_SYNC:
+			return "PROGRESSIVE_WBT_SYNC";
 
-	case PROGRESSIVE_WBT_FRAME_BEGIN:
-		return "PROGRESSIVE_WBT_FRAME_BEGIN";
+		case PROGRESSIVE_WBT_FRAME_BEGIN:
+			return "PROGRESSIVE_WBT_FRAME_BEGIN";
 
-	case PROGRESSIVE_WBT_FRAME_END:
-		return "PROGRESSIVE_WBT_FRAME_END";
+		case PROGRESSIVE_WBT_FRAME_END:
+			return "PROGRESSIVE_WBT_FRAME_END";
 
-	case PROGRESSIVE_WBT_CONTEXT:
-		return "PROGRESSIVE_WBT_CONTEXT";
+		case PROGRESSIVE_WBT_CONTEXT:
+			return "PROGRESSIVE_WBT_CONTEXT";
 
-	case PROGRESSIVE_WBT_REGION:
-		return "PROGRESSIVE_WBT_REGION";
+		case PROGRESSIVE_WBT_REGION:
+			return "PROGRESSIVE_WBT_REGION";
 
-	case PROGRESSIVE_WBT_TILE_SIMPLE:
-		return "PROGRESSIVE_WBT_TILE_SIMPLE";
+		case PROGRESSIVE_WBT_TILE_SIMPLE:
+			return "PROGRESSIVE_WBT_TILE_SIMPLE";
 
-	case PROGRESSIVE_WBT_TILE_FIRST:
-		return "PROGRESSIVE_WBT_TILE_FIRST";
+		case PROGRESSIVE_WBT_TILE_FIRST:
+			return "PROGRESSIVE_WBT_TILE_FIRST";
 
-	case PROGRESSIVE_WBT_TILE_UPGRADE:
-		return "PROGRESSIVE_WBT_TILE_UPGRADE";
+		case PROGRESSIVE_WBT_TILE_UPGRADE:
+			return "PROGRESSIVE_WBT_TILE_UPGRADE";
 
-	default:
-		return "PROGRESSIVE_WBT_UNKNOWN";
+		default:
+			return "PROGRESSIVE_WBT_UNKNOWN";
 	}
 
 	return "PROGRESSIVE_WBT_UNKNOWN";
@@ -1312,197 +1312,197 @@ static INLINE int progressive_process_tiles(PROGRESSIVE_CONTEXT* progressive, co
 
 		switch (blockType)
 		{
-		case PROGRESSIVE_WBT_TILE_SIMPLE:
-			if ((blockLen - boffset) < 16)
-				return -1022;
+			case PROGRESSIVE_WBT_TILE_SIMPLE:
+				if ((blockLen - boffset) < 16)
+					return -1022;
 
-			xIdx = *((UINT16*)&block[boffset + 3]); /* xIdx (2 bytes) */
-			yIdx = *((UINT16*)&block[boffset + 5]); /* yIdx (2 bytes) */
-			zIdx = (yIdx * surface->gridWidth) + xIdx;
+				xIdx = *((UINT16*)&block[boffset + 3]); /* xIdx (2 bytes) */
+				yIdx = *((UINT16*)&block[boffset + 5]); /* yIdx (2 bytes) */
+				zIdx = (yIdx * surface->gridWidth) + xIdx;
 
-			if (zIdx >= surface->gridSize)
-				return -1;
+				if (zIdx >= surface->gridSize)
+					return -1;
 
-			tiles[count] = tile = &(surface->tiles[zIdx]);
-			tile->blockType = blockType;
-			tile->blockLen = blockLen;
-			tile->quality = 0xFF;                  /* simple tiles use no progressive techniques */
-			tile->quantIdxY = block[boffset + 0];  /* quantIdxY (1 byte) */
-			tile->quantIdxCb = block[boffset + 1]; /* quantIdxCb (1 byte) */
-			tile->quantIdxCr = block[boffset + 2]; /* quantIdxCr (1 byte) */
-			tile->xIdx = *((UINT16*)&block[boffset + 3]);     /* xIdx (2 bytes) */
-			tile->yIdx = *((UINT16*)&block[boffset + 5]);     /* yIdx (2 bytes) */
-			tile->flags = block[boffset + 7] & 1;             /* flags (1 byte) */
-			tile->yLen = *((UINT16*)&block[boffset + 8]);     /* yLen (2 bytes) */
-			tile->cbLen = *((UINT16*)&block[boffset + 10]);   /* cbLen (2 bytes) */
-			tile->crLen = *((UINT16*)&block[boffset + 12]);   /* crLen (2 bytes) */
-			tile->tailLen = *((UINT16*)&block[boffset + 14]); /* tailLen (2 bytes) */
-			boffset += 16;
+				tiles[count] = tile = &(surface->tiles[zIdx]);
+				tile->blockType = blockType;
+				tile->blockLen = blockLen;
+				tile->quality = 0xFF; /* simple tiles use no progressive techniques */
+				tile->quantIdxY = block[boffset + 0];             /* quantIdxY (1 byte) */
+				tile->quantIdxCb = block[boffset + 1];            /* quantIdxCb (1 byte) */
+				tile->quantIdxCr = block[boffset + 2];            /* quantIdxCr (1 byte) */
+				tile->xIdx = *((UINT16*)&block[boffset + 3]);     /* xIdx (2 bytes) */
+				tile->yIdx = *((UINT16*)&block[boffset + 5]);     /* yIdx (2 bytes) */
+				tile->flags = block[boffset + 7] & 1;             /* flags (1 byte) */
+				tile->yLen = *((UINT16*)&block[boffset + 8]);     /* yLen (2 bytes) */
+				tile->cbLen = *((UINT16*)&block[boffset + 10]);   /* cbLen (2 bytes) */
+				tile->crLen = *((UINT16*)&block[boffset + 12]);   /* crLen (2 bytes) */
+				tile->tailLen = *((UINT16*)&block[boffset + 14]); /* tailLen (2 bytes) */
+				boffset += 16;
 
-			if ((tile->blockLen - boffset) < tile->yLen)
-				return -1023;
+				if ((tile->blockLen - boffset) < tile->yLen)
+					return -1023;
 
-			tile->yData = &block[boffset];
-			boffset += tile->yLen;
+				tile->yData = &block[boffset];
+				boffset += tile->yLen;
 
-			if ((tile->blockLen - boffset) < tile->cbLen)
-				return -1024;
+				if ((tile->blockLen - boffset) < tile->cbLen)
+					return -1024;
 
-			tile->cbData = &block[boffset];
-			boffset += tile->cbLen;
+				tile->cbData = &block[boffset];
+				boffset += tile->cbLen;
 
-			if ((tile->blockLen - boffset) < tile->crLen)
-				return -1025;
+				if ((tile->blockLen - boffset) < tile->crLen)
+					return -1025;
 
-			tile->crData = &block[boffset];
-			boffset += tile->crLen;
+				tile->crData = &block[boffset];
+				boffset += tile->crLen;
 
-			if ((tile->blockLen - boffset) < tile->tailLen)
-				return -1026;
+				if ((tile->blockLen - boffset) < tile->tailLen)
+					return -1026;
 
-			tile->tailData = &block[boffset];
-			boffset += tile->tailLen;
-			tile->width = 64;
-			tile->height = 64;
-			tile->x = tile->xIdx * 64;
-			tile->y = tile->yIdx * 64;
-			tile->format = progressive->format;
-			tile->stride = GetBytesPerPixel(tile->format) * tile->width;
-			tile->flags &= 1;
-			break;
+				tile->tailData = &block[boffset];
+				boffset += tile->tailLen;
+				tile->width = 64;
+				tile->height = 64;
+				tile->x = tile->xIdx * 64;
+				tile->y = tile->yIdx * 64;
+				tile->format = progressive->format;
+				tile->stride = GetBytesPerPixel(tile->format) * tile->width;
+				tile->flags &= 1;
+				break;
 
-		case PROGRESSIVE_WBT_TILE_FIRST:
-			if ((blockLen - boffset) < 17)
-				return -1027;
+			case PROGRESSIVE_WBT_TILE_FIRST:
+				if ((blockLen - boffset) < 17)
+					return -1027;
 
-			xIdx = *((UINT16*)&block[boffset + 3]); /* xIdx (2 bytes) */
-			yIdx = *((UINT16*)&block[boffset + 5]); /* yIdx (2 bytes) */
-			zIdx = (yIdx * surface->gridWidth) + xIdx;
+				xIdx = *((UINT16*)&block[boffset + 3]); /* xIdx (2 bytes) */
+				yIdx = *((UINT16*)&block[boffset + 5]); /* yIdx (2 bytes) */
+				zIdx = (yIdx * surface->gridWidth) + xIdx;
 
-			if (zIdx >= surface->gridSize)
-				return -1;
+				if (zIdx >= surface->gridSize)
+					return -1;
 
-			tiles[count] = tile = &(surface->tiles[zIdx]);
-			tile->blockType = blockType;
-			tile->blockLen = blockLen;
-			tile->quantIdxY = block[boffset + 0];             /* quantIdxY (1 byte) */
-			tile->quantIdxCb = block[boffset + 1];            /* quantIdxCb (1 byte) */
-			tile->quantIdxCr = block[boffset + 2];            /* quantIdxCr (1 byte) */
-			tile->xIdx = *((UINT16*)&block[boffset + 3]);     /* xIdx (2 bytes) */
-			tile->yIdx = *((UINT16*)&block[boffset + 5]);     /* yIdx (2 bytes) */
-			tile->flags = block[boffset + 7] & 1;             /* flags (1 byte) */
-			tile->quality = block[boffset + 8];               /* quality (1 byte) */
-			tile->yLen = *((UINT16*)&block[boffset + 9]);     /* yLen (2 bytes) */
-			tile->cbLen = *((UINT16*)&block[boffset + 11]);   /* cbLen (2 bytes) */
-			tile->crLen = *((UINT16*)&block[boffset + 13]);   /* crLen (2 bytes) */
-			tile->tailLen = *((UINT16*)&block[boffset + 15]); /* tailLen (2 bytes) */
-			boffset += 17;
+				tiles[count] = tile = &(surface->tiles[zIdx]);
+				tile->blockType = blockType;
+				tile->blockLen = blockLen;
+				tile->quantIdxY = block[boffset + 0];             /* quantIdxY (1 byte) */
+				tile->quantIdxCb = block[boffset + 1];            /* quantIdxCb (1 byte) */
+				tile->quantIdxCr = block[boffset + 2];            /* quantIdxCr (1 byte) */
+				tile->xIdx = *((UINT16*)&block[boffset + 3]);     /* xIdx (2 bytes) */
+				tile->yIdx = *((UINT16*)&block[boffset + 5]);     /* yIdx (2 bytes) */
+				tile->flags = block[boffset + 7] & 1;             /* flags (1 byte) */
+				tile->quality = block[boffset + 8];               /* quality (1 byte) */
+				tile->yLen = *((UINT16*)&block[boffset + 9]);     /* yLen (2 bytes) */
+				tile->cbLen = *((UINT16*)&block[boffset + 11]);   /* cbLen (2 bytes) */
+				tile->crLen = *((UINT16*)&block[boffset + 13]);   /* crLen (2 bytes) */
+				tile->tailLen = *((UINT16*)&block[boffset + 15]); /* tailLen (2 bytes) */
+				boffset += 17;
 
-			if ((tile->blockLen - boffset) < tile->yLen)
-				return -1028;
+				if ((tile->blockLen - boffset) < tile->yLen)
+					return -1028;
 
-			tile->yData = &block[boffset];
-			boffset += tile->yLen;
+				tile->yData = &block[boffset];
+				boffset += tile->yLen;
 
-			if ((tile->blockLen - boffset) < tile->cbLen)
-				return -1029;
+				if ((tile->blockLen - boffset) < tile->cbLen)
+					return -1029;
 
-			tile->cbData = &block[boffset];
-			boffset += tile->cbLen;
+				tile->cbData = &block[boffset];
+				boffset += tile->cbLen;
 
-			if ((tile->blockLen - boffset) < tile->crLen)
-				return -1030;
+				if ((tile->blockLen - boffset) < tile->crLen)
+					return -1030;
 
-			tile->crData = &block[boffset];
-			boffset += tile->crLen;
+				tile->crData = &block[boffset];
+				boffset += tile->crLen;
 
-			if ((tile->blockLen - boffset) < tile->tailLen)
-				return -1031;
+				if ((tile->blockLen - boffset) < tile->tailLen)
+					return -1031;
 
-			tile->tailData = &block[boffset];
-			boffset += tile->tailLen;
-			tile->width = 64;
-			tile->height = 64;
-			tile->x = tile->xIdx * 64;
-			tile->y = tile->yIdx * 64;
-			tile->format = progressive->format;
-			tile->stride = GetBytesPerPixel(tile->format) * tile->width;
-			break;
+				tile->tailData = &block[boffset];
+				boffset += tile->tailLen;
+				tile->width = 64;
+				tile->height = 64;
+				tile->x = tile->xIdx * 64;
+				tile->y = tile->yIdx * 64;
+				tile->format = progressive->format;
+				tile->stride = GetBytesPerPixel(tile->format) * tile->width;
+				break;
 
-		case PROGRESSIVE_WBT_TILE_UPGRADE:
-			if ((blockLen - boffset) < 20)
-				return -1032;
+			case PROGRESSIVE_WBT_TILE_UPGRADE:
+				if ((blockLen - boffset) < 20)
+					return -1032;
 
-			xIdx = *((UINT16*)&block[boffset + 3]); /* xIdx (2 bytes) */
-			yIdx = *((UINT16*)&block[boffset + 5]); /* yIdx (2 bytes) */
-			zIdx = (yIdx * surface->gridWidth) + xIdx;
+				xIdx = *((UINT16*)&block[boffset + 3]); /* xIdx (2 bytes) */
+				yIdx = *((UINT16*)&block[boffset + 5]); /* yIdx (2 bytes) */
+				zIdx = (yIdx * surface->gridWidth) + xIdx;
 
-			if (zIdx >= surface->gridSize)
-				return -1;
+				if (zIdx >= surface->gridSize)
+					return -1;
 
-			tiles[count] = tile = &(surface->tiles[zIdx]);
-			tile->blockType = blockType;
-			tile->blockLen = blockLen;
-			tile->flags = 0;
-			tile->quantIdxY = block[boffset + 0];              /* quantIdxY (1 byte) */
-			tile->quantIdxCb = block[boffset + 1];             /* quantIdxCb (1 byte) */
-			tile->quantIdxCr = block[boffset + 2];             /* quantIdxCr (1 byte) */
-			tile->xIdx = *((UINT16*)&block[boffset + 3]);      /* xIdx (2 bytes) */
-			tile->yIdx = *((UINT16*)&block[boffset + 5]);      /* yIdx (2 bytes) */
-			tile->quality = block[boffset + 7];                /* quality (1 byte) */
-			tile->ySrlLen = *((UINT16*)&block[boffset + 8]);   /* ySrlLen (2 bytes) */
-			tile->yRawLen = *((UINT16*)&block[boffset + 10]);  /* yRawLen (2 bytes) */
-			tile->cbSrlLen = *((UINT16*)&block[boffset + 12]); /* cbSrlLen (2 bytes) */
-			tile->cbRawLen = *((UINT16*)&block[boffset + 14]); /* cbRawLen (2 bytes) */
-			tile->crSrlLen = *((UINT16*)&block[boffset + 16]); /* crSrlLen (2 bytes) */
-			tile->crRawLen = *((UINT16*)&block[boffset + 18]); /* crRawLen (2 bytes) */
-			boffset += 20;
+				tiles[count] = tile = &(surface->tiles[zIdx]);
+				tile->blockType = blockType;
+				tile->blockLen = blockLen;
+				tile->flags = 0;
+				tile->quantIdxY = block[boffset + 0];              /* quantIdxY (1 byte) */
+				tile->quantIdxCb = block[boffset + 1];             /* quantIdxCb (1 byte) */
+				tile->quantIdxCr = block[boffset + 2];             /* quantIdxCr (1 byte) */
+				tile->xIdx = *((UINT16*)&block[boffset + 3]);      /* xIdx (2 bytes) */
+				tile->yIdx = *((UINT16*)&block[boffset + 5]);      /* yIdx (2 bytes) */
+				tile->quality = block[boffset + 7];                /* quality (1 byte) */
+				tile->ySrlLen = *((UINT16*)&block[boffset + 8]);   /* ySrlLen (2 bytes) */
+				tile->yRawLen = *((UINT16*)&block[boffset + 10]);  /* yRawLen (2 bytes) */
+				tile->cbSrlLen = *((UINT16*)&block[boffset + 12]); /* cbSrlLen (2 bytes) */
+				tile->cbRawLen = *((UINT16*)&block[boffset + 14]); /* cbRawLen (2 bytes) */
+				tile->crSrlLen = *((UINT16*)&block[boffset + 16]); /* crSrlLen (2 bytes) */
+				tile->crRawLen = *((UINT16*)&block[boffset + 18]); /* crRawLen (2 bytes) */
+				boffset += 20;
 
-			if ((tile->blockLen - boffset) < tile->ySrlLen)
-				return -1033;
+				if ((tile->blockLen - boffset) < tile->ySrlLen)
+					return -1033;
 
-			tile->ySrlData = &block[boffset];
-			boffset += tile->ySrlLen;
+				tile->ySrlData = &block[boffset];
+				boffset += tile->ySrlLen;
 
-			if ((tile->blockLen - boffset) < tile->yRawLen)
-				return -1034;
+				if ((tile->blockLen - boffset) < tile->yRawLen)
+					return -1034;
 
-			tile->yRawData = &block[boffset];
-			boffset += tile->yRawLen;
+				tile->yRawData = &block[boffset];
+				boffset += tile->yRawLen;
 
-			if ((tile->blockLen - boffset) < tile->cbSrlLen)
-				return -1035;
+				if ((tile->blockLen - boffset) < tile->cbSrlLen)
+					return -1035;
 
-			tile->cbSrlData = &block[boffset];
-			boffset += tile->cbSrlLen;
+				tile->cbSrlData = &block[boffset];
+				boffset += tile->cbSrlLen;
 
-			if ((tile->blockLen - boffset) < tile->cbRawLen)
-				return -1036;
+				if ((tile->blockLen - boffset) < tile->cbRawLen)
+					return -1036;
 
-			tile->cbRawData = &block[boffset];
-			boffset += tile->cbRawLen;
+				tile->cbRawData = &block[boffset];
+				boffset += tile->cbRawLen;
 
-			if ((tile->blockLen - boffset) < tile->crSrlLen)
-				return -1037;
+				if ((tile->blockLen - boffset) < tile->crSrlLen)
+					return -1037;
 
-			tile->crSrlData = &block[boffset];
-			boffset += tile->crSrlLen;
+				tile->crSrlData = &block[boffset];
+				boffset += tile->crSrlLen;
 
-			if ((tile->blockLen - boffset) < tile->crRawLen)
-				return -1038;
+				if ((tile->blockLen - boffset) < tile->crRawLen)
+					return -1038;
 
-			tile->crRawData = &block[boffset];
-			boffset += tile->crRawLen;
-			tile->width = 64;
-			tile->height = 64;
-			tile->x = tile->xIdx * 64;
-			tile->y = tile->yIdx * 64;
-			tile->format = progressive->format;
-			tile->stride = GetBytesPerPixel(tile->format) * tile->width;
-			break;
+				tile->crRawData = &block[boffset];
+				boffset += tile->crRawLen;
+				tile->width = 64;
+				tile->height = 64;
+				tile->x = tile->xIdx * 64;
+				tile->y = tile->yIdx * 64;
+				tile->format = progressive->format;
+				tile->stride = GetBytesPerPixel(tile->format) * tile->width;
+				break;
 
-		default:
-			return -1039;
+			default:
+				return -1039;
 		}
 
 		if (boffset != blockLen)
@@ -1528,14 +1528,14 @@ static INLINE int progressive_process_tiles(PROGRESSIVE_CONTEXT* progressive, co
 
 		switch (tile->blockType)
 		{
-		case PROGRESSIVE_WBT_TILE_SIMPLE:
-		case PROGRESSIVE_WBT_TILE_FIRST:
-			status = progressive_decompress_tile_first(progressive, tile);
-			break;
+			case PROGRESSIVE_WBT_TILE_SIMPLE:
+			case PROGRESSIVE_WBT_TILE_FIRST:
+				status = progressive_decompress_tile_first(progressive, tile);
+				break;
 
-		case PROGRESSIVE_WBT_TILE_UPGRADE:
-			status = progressive_decompress_tile_upgrade(progressive, tile);
-			break;
+			case PROGRESSIVE_WBT_TILE_UPGRADE:
+				status = progressive_decompress_tile_upgrade(progressive, tile);
+				break;
 		}
 
 		if (status < 0)
@@ -1602,294 +1602,297 @@ INT32 progressive_decompress(PROGRESSIVE_CONTEXT* progressive, const BYTE* pSrcD
 
 		switch (blockType)
 		{
-		case PROGRESSIVE_WBT_SYNC:
-			WLog_Print(progressive->log, WLOG_DEBUG, "ProgressiveSync");
-			sync.blockType = blockType;
-			sync.blockLen = blockLen;
+			case PROGRESSIVE_WBT_SYNC:
+				WLog_Print(progressive->log, WLOG_DEBUG, "ProgressiveSync");
+				sync.blockType = blockType;
+				sync.blockLen = blockLen;
 
-			if ((blockLen - boffset) != 6)
-				return -1004;
+				if ((blockLen - boffset) != 6)
+					return -1004;
 
-			sync.magic = (UINT32) * ((UINT32*)&block[boffset + 0]);   /* magic (4 bytes) */
-			sync.version = (UINT32) * ((UINT16*)&block[boffset + 4]); /* version (2 bytes) */
-			boffset += 6;
+				sync.magic = (UINT32) * ((UINT32*)&block[boffset + 0]);   /* magic (4 bytes) */
+				sync.version = (UINT32) * ((UINT16*)&block[boffset + 4]); /* version (2 bytes) */
+				boffset += 6;
 
-			if (sync.magic != 0xCACCACCA)
-				return -1005;
+				if (sync.magic != 0xCACCACCA)
+					return -1005;
 
-			if (sync.version != 0x0100)
-				return -1006;
+				if (sync.version != 0x0100)
+					return -1006;
 
-			break;
+				break;
 
-		case PROGRESSIVE_WBT_FRAME_BEGIN:
-			frameBegin.blockType = blockType;
-			frameBegin.blockLen = blockLen;
+			case PROGRESSIVE_WBT_FRAME_BEGIN:
+				frameBegin.blockType = blockType;
+				frameBegin.blockLen = blockLen;
 
-			if ((blockLen - boffset) < 6)
-				return -1007;
+				if ((blockLen - boffset) < 6)
+					return -1007;
 
-			frameBegin.frameIndex =
-			    (UINT32) * ((UINT32*)&block[boffset + 0]); /* frameIndex (4 bytes) */
-			frameBegin.regionCount =
-			    (UINT32) * ((UINT16*)&block[boffset + 4]); /* regionCount (2 bytes) */
-			boffset += 6;
-			WLog_Print(progressive->log, WLOG_DEBUG,
-			           "ProgressiveFrameBegin: frameIndex: %" PRIu32 " regionCount: %" PRIu16 "",
-			           frameBegin.frameIndex, frameBegin.regionCount);
-			/**
-			 * If the number of elements specified by the regionCount field is
-			 * larger than the actual number of elements in the regions field,
-			 * the decoder SHOULD ignore this inconsistency.
-			 */
-			break;
+				frameBegin.frameIndex =
+				    (UINT32) * ((UINT32*)&block[boffset + 0]); /* frameIndex (4 bytes) */
+				frameBegin.regionCount =
+				    (UINT32) * ((UINT16*)&block[boffset + 4]); /* regionCount (2 bytes) */
+				boffset += 6;
+				WLog_Print(progressive->log, WLOG_DEBUG,
+				           "ProgressiveFrameBegin: frameIndex: %" PRIu32 " regionCount: %" PRIu16
+				           "",
+				           frameBegin.frameIndex, frameBegin.regionCount);
+				/**
+				 * If the number of elements specified by the regionCount field is
+				 * larger than the actual number of elements in the regions field,
+				 * the decoder SHOULD ignore this inconsistency.
+				 */
+				break;
 
-		case PROGRESSIVE_WBT_FRAME_END:
-			WLog_Print(progressive->log, WLOG_DEBUG, "ProgressiveFrameEnd");
-			frameEnd.blockType = blockType;
-			frameEnd.blockLen = blockLen;
+			case PROGRESSIVE_WBT_FRAME_END:
+				WLog_Print(progressive->log, WLOG_DEBUG, "ProgressiveFrameEnd");
+				frameEnd.blockType = blockType;
+				frameEnd.blockLen = blockLen;
 
-			if ((blockLen - boffset) != 0)
-				return -1008;
+				if ((blockLen - boffset) != 0)
+					return -1008;
 
-			break;
+				break;
 
-		case PROGRESSIVE_WBT_CONTEXT:
-			context.blockType = blockType;
-			context.blockLen = blockLen;
+			case PROGRESSIVE_WBT_CONTEXT:
+				context.blockType = blockType;
+				context.blockLen = blockLen;
 
-			if ((blockLen - boffset) != 4)
-				return -1009;
+				if ((blockLen - boffset) != 4)
+					return -1009;
 
-			context.ctxId = block[boffset + 0];                 /* ctxId (1 byte) */
-			context.tileSize = *((UINT16*)&block[boffset + 1]); /* tileSize (2 bytes) */
-			context.flags = block[boffset + 3];                 /* flags (1 byte) */
-			boffset += 4;
+				context.ctxId = block[boffset + 0];                 /* ctxId (1 byte) */
+				context.tileSize = *((UINT16*)&block[boffset + 1]); /* tileSize (2 bytes) */
+				context.flags = block[boffset + 3];                 /* flags (1 byte) */
+				boffset += 4;
 
-			if (context.tileSize != 64)
-				return -1010;
-
-			WLog_Print(progressive->log, WLOG_DEBUG, "ProgressiveContext: flags: 0x%02" PRIX8 "",
-			           context.flags);
-
-			if (!(context.flags & RFX_SUBBAND_DIFFING))
-				WLog_Print(progressive->log, WLOG_WARN, "RFX_SUBBAND_DIFFING is not set");
-
-			break;
-
-		case PROGRESSIVE_WBT_REGION:
-			region->blockType = blockType;
-			region->blockLen = blockLen;
-
-			if ((blockLen - boffset) < 12)
-				return -1011;
-
-			region->tileSize = block[boffset + 0];                  /* tileSize (1 byte) */
-			region->numRects = *((UINT16*)&block[boffset + 1]);     /* numRects (2 bytes) */
-			region->numQuant = block[boffset + 3];                  /* numQuant (1 byte) */
-			region->numProgQuant = block[boffset + 4];              /* numProgQuant (1 byte) */
-			region->flags = block[boffset + 5];                     /* flags (1 byte) */
-			region->numTiles = *((UINT16*)&block[boffset + 6]);     /* numTiles (2 bytes) */
-			region->tileDataSize = *((UINT32*)&block[boffset + 8]); /* tileDataSize (4 bytes) */
-			boffset += 12;
-
-			if (region->tileSize != 64)
-				return -1012;
-
-			if (region->numRects < 1)
-				return -1013;
-
-			if (region->numQuant > 7)
-				return -1014;
-
-			if ((blockLen - boffset) < (region->numRects * 8))
-				return -1015;
-
-			if (region->numRects > progressive->cRects)
-			{
-				RFX_RECT* tmpBuf =
-				    (RFX_RECT*)realloc(progressive->rects, region->numRects * sizeof(RFX_RECT));
-
-				if (!tmpBuf)
-					return -1016;
-
-				progressive->rects = tmpBuf;
-				progressive->cRects = region->numRects;
-			}
-
-			region->rects = progressive->rects;
-
-			if (!region->rects)
-				return -1017;
-
-			for (index = 0; index < region->numRects; index++)
-			{
-				rect = &(region->rects[index]);
-				rect->x = *((UINT16*)&block[boffset + 0]);
-				rect->y = *((UINT16*)&block[boffset + 2]);
-				rect->width = *((UINT16*)&block[boffset + 4]);
-				rect->height = *((UINT16*)&block[boffset + 6]);
-				boffset += 8;
-			}
-
-			if ((blockLen - boffset) < (region->numQuant * 5))
-				return -1018;
-
-			if (region->numQuant > progressive->cQuant)
-			{
-				RFX_COMPONENT_CODEC_QUANT* tmpBuf = (RFX_COMPONENT_CODEC_QUANT*)realloc(
-				    progressive->quantVals, region->numQuant * sizeof(RFX_COMPONENT_CODEC_QUANT));
-
-				if (!tmpBuf)
-					return -1019;
-
-				progressive->quantVals = tmpBuf;
-				progressive->cQuant = region->numQuant;
-			}
-
-			region->quantVals = progressive->quantVals;
-
-			if (!region->quantVals)
-				return -1020;
-
-			for (index = 0; index < region->numQuant; index++)
-			{
-				quantVal = &(region->quantVals[index]);
-				progressive_component_codec_quant_read(&block[boffset], quantVal);
-				boffset += 5;
-
-				if (!progressive_rfx_quant_lcmp_greater_equal(quantVal, 6))
-					return -1;
-
-				if (!progressive_rfx_quant_lcmp_less_equal(quantVal, 15))
-					return -1;
-			}
-
-			if ((blockLen - boffset) < (region->numProgQuant * 16))
-				return -1021;
-
-			if (region->numProgQuant > progressive->cProgQuant)
-			{
-				RFX_PROGRESSIVE_CODEC_QUANT* tmpBuf = (RFX_PROGRESSIVE_CODEC_QUANT*)realloc(
-				    progressive->quantProgVals,
-				    region->numProgQuant * sizeof(RFX_PROGRESSIVE_CODEC_QUANT));
-
-				if (!tmpBuf)
-					return -1022;
-
-				progressive->quantProgVals = tmpBuf;
-				progressive->cProgQuant = region->numProgQuant;
-			}
-
-			region->quantProgVals = progressive->quantProgVals;
-
-			if (!region->quantProgVals)
-				return -1023;
-
-			for (index = 0; index < region->numProgQuant; index++)
-			{
-				quantProgVal = &(region->quantProgVals[index]);
-				quantProgVal->quality = block[boffset + 0];
-				progressive_component_codec_quant_read(&block[boffset + 1],
-				                                       &(quantProgVal->yQuantValues));
-				progressive_component_codec_quant_read(&block[boffset + 6],
-				                                       &(quantProgVal->cbQuantValues));
-				progressive_component_codec_quant_read(&block[boffset + 11],
-				                                       &(quantProgVal->crQuantValues));
-				boffset += 16;
-			}
-
-			if ((blockLen - boffset) < region->tileDataSize)
-				return -1024;
-
-			if (progressive->cTiles < surface->gridSize)
-			{
-				RFX_PROGRESSIVE_TILE** tmpBuf = (RFX_PROGRESSIVE_TILE**)realloc(
-				    progressive->tiles, surface->gridSize * sizeof(RFX_PROGRESSIVE_TILE*));
-
-				if (!tmpBuf)
-					return -1025;
-
-				progressive->tiles = tmpBuf;
-				progressive->cTiles = surface->gridSize;
-			}
-
-			region->tiles = progressive->tiles;
-
-			if (!region->tiles)
-				return -1;
-
-			WLog_Print(progressive->log, WLOG_DEBUG,
-			           "ProgressiveRegion: numRects: %" PRIu16 " numTiles: %" PRIu16
-			           " tileDataSize: %" PRIu32 " flags: 0x%02" PRIX8 " numQuant: %" PRIu8
-			           " numProgQuant: %" PRIu8 "",
-			           region->numRects, region->numTiles, region->tileDataSize, region->flags,
-			           region->numQuant, region->numProgQuant);
-
-			if (!(region->flags & RFX_DWT_REDUCE_EXTRAPOLATE))
-				WLog_Print(progressive->log, WLOG_WARN, "RFX_DWT_REDUCE_EXTRAPOLATE is not set");
-
-			boxLeft = surface->gridWidth;
-			boxTop = surface->gridHeight;
-			boxRight = 0;
-			boxBottom = 0;
-
-			for (index = 0; index < region->numRects; index++)
-			{
-				rect = &(region->rects[index]);
-				idxLeft = rect->x / 64;
-				idxTop = rect->y / 64;
-				idxRight = (rect->x + rect->width + 63) / 64;
-				idxBottom = (rect->y + rect->height + 63) / 64;
-
-				if (idxLeft < boxLeft)
-					boxLeft = idxLeft;
-
-				if (idxTop < boxTop)
-					boxTop = idxTop;
-
-				if (idxRight > boxRight)
-					boxRight = idxRight;
-
-				if (idxBottom > boxBottom)
-					boxBottom = idxBottom;
+				if (context.tileSize != 64)
+					return -1010;
 
 				WLog_Print(progressive->log, WLOG_DEBUG,
-				           "rect[%" PRIu16 "]: x: %" PRIu16 " y: %" PRIu16 " w: %" PRIu16
-				           " h: %" PRIu16 "",
-				           index, rect->x, rect->y, rect->width, rect->height);
-			}
+				           "ProgressiveContext: flags: 0x%02" PRIX8 "", context.flags);
 
-			status = progressive_process_tiles(progressive, &block[boffset], region->tileDataSize,
-			                                   surface);
+				if (!(context.flags & RFX_SUBBAND_DIFFING))
+					WLog_Print(progressive->log, WLOG_WARN, "RFX_SUBBAND_DIFFING is not set");
 
-			if (status < 0)
-				return status;
+				break;
 
-			region->numTiles = 0;
+			case PROGRESSIVE_WBT_REGION:
+				region->blockType = blockType;
+				region->blockLen = blockLen;
 
-			for (index = 0; index < surface->gridSize; index++)
-			{
-				RFX_PROGRESSIVE_TILE* tile = &(surface->tiles[index]);
+				if ((blockLen - boffset) < 12)
+					return -1011;
 
-				if (!tile->data)
-					continue;
+				region->tileSize = block[boffset + 0];                  /* tileSize (1 byte) */
+				region->numRects = *((UINT16*)&block[boffset + 1]);     /* numRects (2 bytes) */
+				region->numQuant = block[boffset + 3];                  /* numQuant (1 byte) */
+				region->numProgQuant = block[boffset + 4];              /* numProgQuant (1 byte) */
+				region->flags = block[boffset + 5];                     /* flags (1 byte) */
+				region->numTiles = *((UINT16*)&block[boffset + 6]);     /* numTiles (2 bytes) */
+				region->tileDataSize = *((UINT32*)&block[boffset + 8]); /* tileDataSize (4 bytes) */
+				boffset += 12;
 
-				if ((tile->xIdx < boxLeft) || (tile->xIdx > boxRight))
-					continue;
+				if (region->tileSize != 64)
+					return -1012;
 
-				if ((tile->yIdx < boxTop) || (tile->yIdx > boxBottom))
-					continue;
+				if (region->numRects < 1)
+					return -1013;
 
-				region->tiles[region->numTiles++] = tile;
-			}
+				if (region->numQuant > 7)
+					return -1014;
 
-			boffset += (UINT32)status;
-			break;
+				if ((blockLen - boffset) < (region->numRects * 8))
+					return -1015;
 
-		default:
-			return -1039;
-			break;
+				if (region->numRects > progressive->cRects)
+				{
+					RFX_RECT* tmpBuf =
+					    (RFX_RECT*)realloc(progressive->rects, region->numRects * sizeof(RFX_RECT));
+
+					if (!tmpBuf)
+						return -1016;
+
+					progressive->rects = tmpBuf;
+					progressive->cRects = region->numRects;
+				}
+
+				region->rects = progressive->rects;
+
+				if (!region->rects)
+					return -1017;
+
+				for (index = 0; index < region->numRects; index++)
+				{
+					rect = &(region->rects[index]);
+					rect->x = *((UINT16*)&block[boffset + 0]);
+					rect->y = *((UINT16*)&block[boffset + 2]);
+					rect->width = *((UINT16*)&block[boffset + 4]);
+					rect->height = *((UINT16*)&block[boffset + 6]);
+					boffset += 8;
+				}
+
+				if ((blockLen - boffset) < (region->numQuant * 5))
+					return -1018;
+
+				if (region->numQuant > progressive->cQuant)
+				{
+					RFX_COMPONENT_CODEC_QUANT* tmpBuf = (RFX_COMPONENT_CODEC_QUANT*)realloc(
+					    progressive->quantVals,
+					    region->numQuant * sizeof(RFX_COMPONENT_CODEC_QUANT));
+
+					if (!tmpBuf)
+						return -1019;
+
+					progressive->quantVals = tmpBuf;
+					progressive->cQuant = region->numQuant;
+				}
+
+				region->quantVals = progressive->quantVals;
+
+				if (!region->quantVals)
+					return -1020;
+
+				for (index = 0; index < region->numQuant; index++)
+				{
+					quantVal = &(region->quantVals[index]);
+					progressive_component_codec_quant_read(&block[boffset], quantVal);
+					boffset += 5;
+
+					if (!progressive_rfx_quant_lcmp_greater_equal(quantVal, 6))
+						return -1;
+
+					if (!progressive_rfx_quant_lcmp_less_equal(quantVal, 15))
+						return -1;
+				}
+
+				if ((blockLen - boffset) < (region->numProgQuant * 16))
+					return -1021;
+
+				if (region->numProgQuant > progressive->cProgQuant)
+				{
+					RFX_PROGRESSIVE_CODEC_QUANT* tmpBuf = (RFX_PROGRESSIVE_CODEC_QUANT*)realloc(
+					    progressive->quantProgVals,
+					    region->numProgQuant * sizeof(RFX_PROGRESSIVE_CODEC_QUANT));
+
+					if (!tmpBuf)
+						return -1022;
+
+					progressive->quantProgVals = tmpBuf;
+					progressive->cProgQuant = region->numProgQuant;
+				}
+
+				region->quantProgVals = progressive->quantProgVals;
+
+				if (!region->quantProgVals)
+					return -1023;
+
+				for (index = 0; index < region->numProgQuant; index++)
+				{
+					quantProgVal = &(region->quantProgVals[index]);
+					quantProgVal->quality = block[boffset + 0];
+					progressive_component_codec_quant_read(&block[boffset + 1],
+					                                       &(quantProgVal->yQuantValues));
+					progressive_component_codec_quant_read(&block[boffset + 6],
+					                                       &(quantProgVal->cbQuantValues));
+					progressive_component_codec_quant_read(&block[boffset + 11],
+					                                       &(quantProgVal->crQuantValues));
+					boffset += 16;
+				}
+
+				if ((blockLen - boffset) < region->tileDataSize)
+					return -1024;
+
+				if (progressive->cTiles < surface->gridSize)
+				{
+					RFX_PROGRESSIVE_TILE** tmpBuf = (RFX_PROGRESSIVE_TILE**)realloc(
+					    progressive->tiles, surface->gridSize * sizeof(RFX_PROGRESSIVE_TILE*));
+
+					if (!tmpBuf)
+						return -1025;
+
+					progressive->tiles = tmpBuf;
+					progressive->cTiles = surface->gridSize;
+				}
+
+				region->tiles = progressive->tiles;
+
+				if (!region->tiles)
+					return -1;
+
+				WLog_Print(progressive->log, WLOG_DEBUG,
+				           "ProgressiveRegion: numRects: %" PRIu16 " numTiles: %" PRIu16
+				           " tileDataSize: %" PRIu32 " flags: 0x%02" PRIX8 " numQuant: %" PRIu8
+				           " numProgQuant: %" PRIu8 "",
+				           region->numRects, region->numTiles, region->tileDataSize, region->flags,
+				           region->numQuant, region->numProgQuant);
+
+				if (!(region->flags & RFX_DWT_REDUCE_EXTRAPOLATE))
+					WLog_Print(progressive->log, WLOG_WARN,
+					           "RFX_DWT_REDUCE_EXTRAPOLATE is not set");
+
+				boxLeft = surface->gridWidth;
+				boxTop = surface->gridHeight;
+				boxRight = 0;
+				boxBottom = 0;
+
+				for (index = 0; index < region->numRects; index++)
+				{
+					rect = &(region->rects[index]);
+					idxLeft = rect->x / 64;
+					idxTop = rect->y / 64;
+					idxRight = (rect->x + rect->width + 63) / 64;
+					idxBottom = (rect->y + rect->height + 63) / 64;
+
+					if (idxLeft < boxLeft)
+						boxLeft = idxLeft;
+
+					if (idxTop < boxTop)
+						boxTop = idxTop;
+
+					if (idxRight > boxRight)
+						boxRight = idxRight;
+
+					if (idxBottom > boxBottom)
+						boxBottom = idxBottom;
+
+					WLog_Print(progressive->log, WLOG_DEBUG,
+					           "rect[%" PRIu16 "]: x: %" PRIu16 " y: %" PRIu16 " w: %" PRIu16
+					           " h: %" PRIu16 "",
+					           index, rect->x, rect->y, rect->width, rect->height);
+				}
+
+				status = progressive_process_tiles(progressive, &block[boffset],
+				                                   region->tileDataSize, surface);
+
+				if (status < 0)
+					return status;
+
+				region->numTiles = 0;
+
+				for (index = 0; index < surface->gridSize; index++)
+				{
+					RFX_PROGRESSIVE_TILE* tile = &(surface->tiles[index]);
+
+					if (!tile->data)
+						continue;
+
+					if ((tile->xIdx < boxLeft) || (tile->xIdx > boxRight))
+						continue;
+
+					if ((tile->yIdx < boxTop) || (tile->yIdx > boxBottom))
+						continue;
+
+					region->tiles[region->numTiles++] = tile;
+				}
+
+				boffset += (UINT32)status;
+				break;
+
+			default:
+				return -1039;
+				break;
 		}
 
 		if (boffset != blockLen)

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -505,45 +505,45 @@ static BOOL clear_decompress_subcodecs_data(CLEAR_CONTEXT* clear, wStream* s,
 
 		switch (subcodecId)
 		{
-		case 0: /* Uncompressed */
-		{
-			UINT32 nSrcStep = width * GetBytesPerPixel(PIXEL_FORMAT_BGR24);
-			UINT32 nSrcSize = nSrcStep * height;
-
-			if (bitmapDataByteCount != nSrcSize)
+			case 0: /* Uncompressed */
 			{
-				WLog_ERR(TAG, "bitmapDataByteCount %" PRIu32 " != nSrcSize %" PRIu32 "",
-				         bitmapDataByteCount, nSrcSize);
-				return FALSE;
+				UINT32 nSrcStep = width * GetBytesPerPixel(PIXEL_FORMAT_BGR24);
+				UINT32 nSrcSize = nSrcStep * height;
+
+				if (bitmapDataByteCount != nSrcSize)
+				{
+					WLog_ERR(TAG, "bitmapDataByteCount %" PRIu32 " != nSrcSize %" PRIu32 "",
+					         bitmapDataByteCount, nSrcSize);
+					return FALSE;
+				}
+
+				if (!convert_color(pDstData, nDstStep, DstFormat, nXDstRel, nYDstRel, width, height,
+				                   Stream_Pointer(s), nSrcStep, PIXEL_FORMAT_BGR24, nDstWidth,
+				                   nDstHeight, palette))
+					return FALSE;
+
+				Stream_Seek(s, bitmapDataByteCount);
 			}
-
-			if (!convert_color(pDstData, nDstStep, DstFormat, nXDstRel, nYDstRel, width, height,
-			                   Stream_Pointer(s), nSrcStep, PIXEL_FORMAT_BGR24, nDstWidth,
-			                   nDstHeight, palette))
-				return FALSE;
-
-			Stream_Seek(s, bitmapDataByteCount);
-		}
-		break;
-
-		case 1: /* NSCodec */
-			if (!clear_decompress_nscodec(clear->nsc, width, height, s, bitmapDataByteCount,
-			                              pDstData, DstFormat, nDstStep, nXDstRel, nYDstRel))
-				return FALSE;
-
 			break;
 
-		case 2: /* CLEARCODEC_SUBCODEC_RLEX */
-			if (!clear_decompress_subcode_rlex(s, bitmapDataByteCount, width, height, pDstData,
-			                                   DstFormat, nDstStep, nXDstRel, nYDstRel, nDstWidth,
-			                                   nDstHeight))
+			case 1: /* NSCodec */
+				if (!clear_decompress_nscodec(clear->nsc, width, height, s, bitmapDataByteCount,
+				                              pDstData, DstFormat, nDstStep, nXDstRel, nYDstRel))
+					return FALSE;
+
+				break;
+
+			case 2: /* CLEARCODEC_SUBCODEC_RLEX */
+				if (!clear_decompress_subcode_rlex(s, bitmapDataByteCount, width, height, pDstData,
+				                                   DstFormat, nDstStep, nXDstRel, nYDstRel,
+				                                   nDstWidth, nDstHeight))
+					return FALSE;
+
+				break;
+
+			default:
+				WLog_ERR(TAG, "Unknown subcodec ID %" PRIu8 "", subcodecId);
 				return FALSE;
-
-			break;
-
-		default:
-			WLog_ERR(TAG, "Unknown subcodec ID %" PRIu8 "", subcodecId);
-			return FALSE;
 		}
 
 		suboffset += bitmapDataByteCount;

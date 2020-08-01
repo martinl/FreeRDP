@@ -224,11 +224,12 @@ extern "C"
 
 		UINT64 paddingB[32 - 22]; /* 22 */
 
-		ALIGN64 rdpRdp* rdp;               /**< (offset 32)
+		ALIGN64 rdpRdp*
+		    rdp;                           /**< (offset 32)
 		                              Pointer to a rdp_rdp structure used to keep the connection's parameters.
 		                              It is allocated by freerdp_context_new() and deallocated by
-		                              freerdp_context_free(), at the same		       time that this rdp_context structure -
-		                              there is no need to specifically allocate/deallocate this. */
+		                              freerdp_context_free(), at the same		       time that this rdp_context
+		                              structure -		       there is no need to specifically allocate/deallocate this. */
 		ALIGN64 rdpGdi* gdi;               /**< (offset 33)
 		                              Pointer to a rdp_gdi structure used to keep the gdi settings.
 		                              It is allocated by gdi_init() and deallocated by gdi_free().
@@ -277,15 +278,15 @@ extern "C"
 	struct rdp_freerdp
 	{
 		ALIGN64
-		    rdpContext* context; /**< (offset 0)
-		                      Pointer to a rdpContext structure.
-		                      Client applications can use the ContextSize field to register a
-		                      context bigger than the rdpContext structure. This allow clients to
-		                      use additional context information. When using this capability, client
-		                      application should ALWAYS declare their structure with the rdpContext
-		                      field first, and any additional content following it. Can be allocated
-		                      by a call to freerdp_context_new(). Must be deallocated by a call to
-		                      freerdp_context_free() before deallocating the current instance. */
+		rdpContext* context; /**< (offset 0)
+		                  Pointer to a rdpContext structure.
+		                  Client applications can use the ContextSize field to register a
+		                  context bigger than the rdpContext structure. This allow clients to
+		                  use additional context information. When using this capability, client
+		                  application should ALWAYS declare their structure with the rdpContext
+		                  field first, and any additional content following it. Can be allocated
+		                  by a call to freerdp_context_new(). Must be deallocated by a call to
+		                  freerdp_context_free() before deallocating the current instance. */
 
 		ALIGN64 RDP_CLIENT_ENTRY_POINTS* pClientEntryPoints;
 
@@ -295,13 +296,14 @@ extern "C"
 		                    Input handle for the connection.
 		                    Will be initialized by a call to freerdp_context_new() */
 		ALIGN64 rdpUpdate*
-		    update; /* (offset 17)
-		       Update display parameters. Used to register display events callbacks and settings.
-		       Will be initialized by a call to freerdp_context_new() */
-		ALIGN64 rdpSettings*
-		    settings;                      /**< (offset 18)
-		                                Pointer to a rdpSettings structure. Will be used to maintain the required RDP
-		                                settings.		              Will be initialized by a call to freerdp_context_new() */
+		    update;                        /* (offset 17)
+		                              Update display parameters. Used to register display events callbacks and settings.
+		                              Will be initialized by a call to freerdp_context_new() */
+		ALIGN64 rdpSettings* settings;     /**< (offset 18)
+		                                Pointer to a rdpSettings structure. Will be used to maintain the
+		                                required RDP	 settings.		              Will be initialized by
+		                                a call to freerdp_context_new()
+		                              */
 		ALIGN64 rdpAutoDetect* autodetect; /* (offset 19)
 		                                Auto-Detect handle for the connection.
 		                                Will be initialized by a call to freerdp_context_new() */
@@ -345,19 +347,18 @@ extern "C"
 		              Can be set before calling freerdp_connect() to have it executed after the
 		              actual connection has succeeded. Must be set to NULL if not needed. */
 
-		ALIGN64 pAuthenticate Authenticate;           /**< (offset 50)
-		                                           Callback for authentication.
-		                                           It is used to get the username/password when it was not
-		                                           provided at connection time. */
-		ALIGN64 pVerifyCertificate VerifyCertificate; /**< (offset 51)
-		                                           Callback for certificate validation.
-		                                           Used to verify that an unknown certificate is
-	 trusted. DEPRECATED: Use VerifyChangedCertificateEx*/
-		ALIGN64 pVerifyChangedCertificate
-		    VerifyChangedCertificate; /**< (offset 52)
-		                           Callback for changed certificate validation.
-		                           Used when a certificate differs from stored fingerprint.
-DEPRECATED: Use VerifyChangedCertificateEx */
+		ALIGN64 pAuthenticate Authenticate;                         /**< (offset 50)
+		                                                         Callback for authentication.
+		                                                         It is used to get the username/password when it was not
+		                                                         provided at connection time. */
+		ALIGN64 pVerifyCertificate VerifyCertificate;               /**< (offset 51)
+		                                                         Callback for certificate validation.
+		                                                         Used to verify that an unknown certificate is
+		           trusted. DEPRECATED: Use VerifyChangedCertificateEx*/
+		ALIGN64 pVerifyChangedCertificate VerifyChangedCertificate; /**< (offset 52)
+		                                                         Callback for changed certificate
+		                      validation. Used when a certificate differs from stored fingerprint.
+		                      DEPRECATED: Use VerifyChangedCertificateEx */
 
 		ALIGN64 pVerifyX509Certificate
 		    VerifyX509Certificate; /**< (offset 53)  Callback for X509 certificate verification (PEM

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -52,72 +52,72 @@ static BOOL gdi_rop_color(UINT32 rop, BYTE* pixelPtr, UINT32 pen, UINT32 format)
 
 	switch (rop)
 	{
-	case GDI_R2_BLACK: /* LineTo_BLACK */
-		dstPixel = FreeRDPGetColor(format, 0, 0, 0, 0xFF);
-		break;
+		case GDI_R2_BLACK: /* LineTo_BLACK */
+			dstPixel = FreeRDPGetColor(format, 0, 0, 0, 0xFF);
+			break;
 
-	case GDI_R2_NOTMERGEPEN: /* LineTo_NOTMERGEPEN */
-		dstPixel = ~(srcPixel | pen);
-		break;
+		case GDI_R2_NOTMERGEPEN: /* LineTo_NOTMERGEPEN */
+			dstPixel = ~(srcPixel | pen);
+			break;
 
-	case GDI_R2_MASKNOTPEN: /* LineTo_MASKNOTPEN */
-		dstPixel = srcPixel & ~pen;
-		break;
+		case GDI_R2_MASKNOTPEN: /* LineTo_MASKNOTPEN */
+			dstPixel = srcPixel & ~pen;
+			break;
 
-	case GDI_R2_NOTCOPYPEN: /* LineTo_NOTCOPYPEN */
-		dstPixel = ~pen;
-		break;
+		case GDI_R2_NOTCOPYPEN: /* LineTo_NOTCOPYPEN */
+			dstPixel = ~pen;
+			break;
 
-	case GDI_R2_MASKPENNOT: /* LineTo_MASKPENNOT */
-		dstPixel = pen & ~srcPixel;
-		break;
+		case GDI_R2_MASKPENNOT: /* LineTo_MASKPENNOT */
+			dstPixel = pen & ~srcPixel;
+			break;
 
-	case GDI_R2_NOT: /* LineTo_NOT */
-		dstPixel = ~srcPixel;
-		break;
+		case GDI_R2_NOT: /* LineTo_NOT */
+			dstPixel = ~srcPixel;
+			break;
 
-	case GDI_R2_XORPEN: /* LineTo_XORPEN */
-		dstPixel = srcPixel ^ pen;
-		break;
+		case GDI_R2_XORPEN: /* LineTo_XORPEN */
+			dstPixel = srcPixel ^ pen;
+			break;
 
-	case GDI_R2_NOTMASKPEN: /* LineTo_NOTMASKPEN */
-		dstPixel = ~(srcPixel & pen);
-		break;
+		case GDI_R2_NOTMASKPEN: /* LineTo_NOTMASKPEN */
+			dstPixel = ~(srcPixel & pen);
+			break;
 
-	case GDI_R2_MASKPEN: /* LineTo_MASKPEN */
-		dstPixel = srcPixel & pen;
-		break;
+		case GDI_R2_MASKPEN: /* LineTo_MASKPEN */
+			dstPixel = srcPixel & pen;
+			break;
 
-	case GDI_R2_NOTXORPEN: /* LineTo_NOTXORPEN */
-		dstPixel = ~(srcPixel ^ pen);
-		break;
+		case GDI_R2_NOTXORPEN: /* LineTo_NOTXORPEN */
+			dstPixel = ~(srcPixel ^ pen);
+			break;
 
-	case GDI_R2_NOP: /* LineTo_NOP */
-		dstPixel = srcPixel;
-		break;
+		case GDI_R2_NOP: /* LineTo_NOP */
+			dstPixel = srcPixel;
+			break;
 
-	case GDI_R2_MERGENOTPEN: /* LineTo_MERGENOTPEN */
-		dstPixel = srcPixel | ~pen;
-		break;
+		case GDI_R2_MERGENOTPEN: /* LineTo_MERGENOTPEN */
+			dstPixel = srcPixel | ~pen;
+			break;
 
-	case GDI_R2_COPYPEN: /* LineTo_COPYPEN */
-		dstPixel = pen;
-		break;
+		case GDI_R2_COPYPEN: /* LineTo_COPYPEN */
+			dstPixel = pen;
+			break;
 
-	case GDI_R2_MERGEPENNOT: /* LineTo_MERGEPENNOT */
-		dstPixel = srcPixel | ~pen;
-		break;
+		case GDI_R2_MERGEPENNOT: /* LineTo_MERGEPENNOT */
+			dstPixel = srcPixel | ~pen;
+			break;
 
-	case GDI_R2_MERGEPEN: /* LineTo_MERGEPEN */
-		dstPixel = srcPixel | pen;
-		break;
+		case GDI_R2_MERGEPEN: /* LineTo_MERGEPEN */
+			dstPixel = srcPixel | pen;
+			break;
 
-	case GDI_R2_WHITE: /* LineTo_WHITE */
-		dstPixel = FreeRDPGetColor(format, 0xFF, 0xFF, 0xFF, 0xFF);
-		break;
+		case GDI_R2_WHITE: /* LineTo_WHITE */
+			dstPixel = FreeRDPGetColor(format, 0xFF, 0xFF, 0xFF, 0xFF);
+			break;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	return WriteColor(pixelPtr, format, dstPixel);

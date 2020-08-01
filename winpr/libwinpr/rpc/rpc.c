@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -27,8 +27,8 @@
 
 #if !defined(_WIN32) || defined(_UWP)
 
-#	include "../log.h"
-#	define TAG WINPR_TAG("rpc")
+#include "../log.h"
+#define TAG WINPR_TAG("rpc")
 
 RPC_STATUS RpcBindingCopy(RPC_BINDING_HANDLE SourceBinding, RPC_BINDING_HANDLE* DestinationBinding)
 {

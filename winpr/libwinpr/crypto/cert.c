@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crypto.h>
@@ -154,7 +154,7 @@
 
 #ifndef _WIN32
 
-#	include "crypto.h"
+#include "crypto.h"
 
 HCERTSTORE CertOpenStore(LPCSTR lpszStoreProvider, DWORD dwMsgAndCertEncodingType,
                          HCRYPTPROV_LEGACY hCryptProv, DWORD dwFlags, const void* pvPara)

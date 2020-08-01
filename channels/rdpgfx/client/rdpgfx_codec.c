@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -279,29 +279,29 @@ UINT rdpgfx_decode(RDPGFX_PLUGIN* gfx, RDPGFX_SURFACE_COMMAND* cmd)
 
 	switch (cmd->codecId)
 	{
-	case RDPGFX_CODECID_AVC420:
-		if ((error = rdpgfx_decode_AVC420(gfx, cmd)))
-			WLog_ERR(TAG, "rdpgfx_decode_AVC420 failed with error %" PRIu32 "", error);
+		case RDPGFX_CODECID_AVC420:
+			if ((error = rdpgfx_decode_AVC420(gfx, cmd)))
+				WLog_ERR(TAG, "rdpgfx_decode_AVC420 failed with error %" PRIu32 "", error);
 
-		break;
+			break;
 
-	case RDPGFX_CODECID_AVC444:
-	case RDPGFX_CODECID_AVC444v2:
-		if ((error = rdpgfx_decode_AVC444(gfx, cmd)))
-			WLog_ERR(TAG, "rdpgfx_decode_AVC444 failed with error %" PRIu32 "", error);
+		case RDPGFX_CODECID_AVC444:
+		case RDPGFX_CODECID_AVC444v2:
+			if ((error = rdpgfx_decode_AVC444(gfx, cmd)))
+				WLog_ERR(TAG, "rdpgfx_decode_AVC444 failed with error %" PRIu32 "", error);
 
-		break;
+			break;
 
-	default:
-		if (context)
-		{
-			IFCALLRET(context->SurfaceCommand, error, context, cmd);
+		default:
+			if (context)
+			{
+				IFCALLRET(context->SurfaceCommand, error, context, cmd);
 
-			if (error)
-				WLog_ERR(TAG, "context->SurfaceCommand failed with error %" PRIu32 "", error);
-		}
+				if (error)
+					WLog_ERR(TAG, "context->SurfaceCommand failed with error %" PRIu32 "", error);
+			}
 
-		break;
+			break;
 	}
 
 	PROFILER_EXIT(context->SurfaceProfiler)

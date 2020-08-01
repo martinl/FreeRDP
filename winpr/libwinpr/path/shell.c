@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -37,14 +37,14 @@
 #include <winpr/path.h>
 
 #if defined(__IOS__)
-#	include "shell_ios.h"
+#include "shell_ios.h"
 #endif
 
 #if defined(WIN32)
-#	include <shlobj.h>
+#include <shlobj.h>
 #else
-#	include <errno.h>
-#	include <dirent.h>
+#include <errno.h>
+#include <dirent.h>
 #endif
 
 static char* GetPath_XDG_CONFIG_HOME(void);
@@ -327,33 +327,33 @@ char* GetKnownPath(int id)
 
 	switch (id)
 	{
-	case KNOWN_PATH_HOME:
-		path = GetPath_HOME();
-		break;
+		case KNOWN_PATH_HOME:
+			path = GetPath_HOME();
+			break;
 
-	case KNOWN_PATH_TEMP:
-		path = GetPath_TEMP();
-		break;
+		case KNOWN_PATH_TEMP:
+			path = GetPath_TEMP();
+			break;
 
-	case KNOWN_PATH_XDG_DATA_HOME:
-		path = GetPath_XDG_DATA_HOME();
-		break;
+		case KNOWN_PATH_XDG_DATA_HOME:
+			path = GetPath_XDG_DATA_HOME();
+			break;
 
-	case KNOWN_PATH_XDG_CONFIG_HOME:
-		path = GetPath_XDG_CONFIG_HOME();
-		break;
+		case KNOWN_PATH_XDG_CONFIG_HOME:
+			path = GetPath_XDG_CONFIG_HOME();
+			break;
 
-	case KNOWN_PATH_XDG_CACHE_HOME:
-		path = GetPath_XDG_CACHE_HOME();
-		break;
+		case KNOWN_PATH_XDG_CACHE_HOME:
+			path = GetPath_XDG_CACHE_HOME();
+			break;
 
-	case KNOWN_PATH_XDG_RUNTIME_DIR:
-		path = GetPath_XDG_RUNTIME_DIR();
-		break;
+		case KNOWN_PATH_XDG_RUNTIME_DIR:
+			path = GetPath_XDG_RUNTIME_DIR();
+			break;
 
-	default:
-		path = NULL;
-		break;
+		default:
+			path = NULL;
+			break;
 	}
 
 	return path;
@@ -484,28 +484,28 @@ BOOL PathMakePathA(LPCSTR path, LPSECURITY_ATTRIBUTES lpAttributes)
 	char* p;
 	BOOL result = TRUE;
 	/* we only operate on a non-null, absolute path */
-#	if defined(__OS2__)
+#if defined(__OS2__)
 
 	if (!path)
 		return FALSE;
 
-#	else
+#else
 
 	if (!path || *path != delim)
 		return FALSE;
 
-#	endif
+#endif
 
 	if (!(dup = _strdup(path)))
 		return FALSE;
 
-#	ifdef __OS2__
+#ifdef __OS2__
 	p = (strlen(dup) > 3) && (dup[1] == ':') && (dup[2] == delim)) ? &dup[3] : dup;
 
 	while (p)
-#	else
+#else
 	for (p = dup; p;)
-#	endif
+#endif
 	{
 		if ((p = strchr(p + 1, delim)))
 			*p = '\0';
@@ -588,8 +588,8 @@ BOOL PathIsDirectoryEmptyW(LPCWSTR pszPath)
 
 #else
 
-#	ifdef _WIN32
-#		pragma comment(lib, "shlwapi.lib")
-#	endif
+#ifdef _WIN32
+#pragma comment(lib, "shlwapi.lib")
+#endif
 
 #endif

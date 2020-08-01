@@ -10,7 +10,7 @@
 
 HRESULT PATH_CCH_APPEND(PWSTR pszPath, size_t cchPath, PCWSTR pszMore)
 {
-#	ifdef _WIN32
+#ifdef _WIN32
 	BOOL pathBackslash;
 	BOOL moreBackslash;
 	size_t pszMoreLength;
@@ -56,7 +56,7 @@ HRESULT PATH_CCH_APPEND(PWSTR pszPath, size_t cchPath, PCWSTR pszMore)
 		}
 	}
 
-#	endif
+#endif
 	return HRESULT_FROM_WIN32(ERROR_FILENAME_EXCED_RANGE);
 }
 

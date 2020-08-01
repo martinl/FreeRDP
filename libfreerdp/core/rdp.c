@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -899,141 +899,144 @@ int rdp_recv_data_pdu(rdpRdp* rdp, wStream* s)
 
 	switch (type)
 	{
-	case DATA_PDU_TYPE_UPDATE:
-		if (!update_recv(rdp->update, cs))
-		{
-			WLog_ERR(TAG, "DATA_PDU_TYPE_UPDATE - update_recv() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_UPDATE:
+			if (!update_recv(rdp->update, cs))
+			{
+				WLog_ERR(TAG, "DATA_PDU_TYPE_UPDATE - update_recv() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_CONTROL:
-		if (!rdp_recv_server_control_pdu(rdp, cs))
-		{
-			WLog_ERR(TAG, "DATA_PDU_TYPE_CONTROL - rdp_recv_server_control_pdu() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_CONTROL:
+			if (!rdp_recv_server_control_pdu(rdp, cs))
+			{
+				WLog_ERR(TAG, "DATA_PDU_TYPE_CONTROL - rdp_recv_server_control_pdu() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_POINTER:
-		if (!update_recv_pointer(rdp->update, cs))
-		{
-			WLog_ERR(TAG, "DATA_PDU_TYPE_POINTER - update_recv_pointer() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_POINTER:
+			if (!update_recv_pointer(rdp->update, cs))
+			{
+				WLog_ERR(TAG, "DATA_PDU_TYPE_POINTER - update_recv_pointer() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_SYNCHRONIZE:
-		if (!rdp_recv_synchronize_pdu(rdp, cs))
-		{
-			WLog_ERR(TAG, "DATA_PDU_TYPE_SYNCHRONIZE - rdp_recv_synchronize_pdu() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_SYNCHRONIZE:
+			if (!rdp_recv_synchronize_pdu(rdp, cs))
+			{
+				WLog_ERR(TAG, "DATA_PDU_TYPE_SYNCHRONIZE - rdp_recv_synchronize_pdu() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_PLAY_SOUND:
-		if (!update_recv_play_sound(rdp->update, cs))
-		{
-			WLog_ERR(TAG, "DATA_PDU_TYPE_PLAY_SOUND - update_recv_play_sound() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_PLAY_SOUND:
+			if (!update_recv_play_sound(rdp->update, cs))
+			{
+				WLog_ERR(TAG, "DATA_PDU_TYPE_PLAY_SOUND - update_recv_play_sound() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_SHUTDOWN_DENIED:
-		if (!rdp_recv_server_shutdown_denied_pdu(rdp, cs))
-		{
-			WLog_ERR(
-			    TAG,
-			    "DATA_PDU_TYPE_SHUTDOWN_DENIED - rdp_recv_server_shutdown_denied_pdu() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_SHUTDOWN_DENIED:
+			if (!rdp_recv_server_shutdown_denied_pdu(rdp, cs))
+			{
+				WLog_ERR(
+				    TAG,
+				    "DATA_PDU_TYPE_SHUTDOWN_DENIED - rdp_recv_server_shutdown_denied_pdu() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_SAVE_SESSION_INFO:
-		if (!rdp_recv_save_session_info(rdp, cs))
-		{
-			WLog_ERR(TAG, "DATA_PDU_TYPE_SAVE_SESSION_INFO - rdp_recv_save_session_info() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_SAVE_SESSION_INFO:
+			if (!rdp_recv_save_session_info(rdp, cs))
+			{
+				WLog_ERR(TAG,
+				         "DATA_PDU_TYPE_SAVE_SESSION_INFO - rdp_recv_save_session_info() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_FONT_MAP:
-		if (!rdp_recv_font_map_pdu(rdp, cs))
-		{
-			WLog_ERR(TAG, "DATA_PDU_TYPE_FONT_MAP - rdp_recv_font_map_pdu() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_FONT_MAP:
+			if (!rdp_recv_font_map_pdu(rdp, cs))
+			{
+				WLog_ERR(TAG, "DATA_PDU_TYPE_FONT_MAP - rdp_recv_font_map_pdu() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_SET_KEYBOARD_INDICATORS:
-		if (!rdp_recv_server_set_keyboard_indicators_pdu(rdp, cs))
-		{
-			WLog_ERR(TAG, "DATA_PDU_TYPE_SET_KEYBOARD_INDICATORS - "
-			              "rdp_recv_server_set_keyboard_indicators_pdu() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_SET_KEYBOARD_INDICATORS:
+			if (!rdp_recv_server_set_keyboard_indicators_pdu(rdp, cs))
+			{
+				WLog_ERR(TAG, "DATA_PDU_TYPE_SET_KEYBOARD_INDICATORS - "
+				              "rdp_recv_server_set_keyboard_indicators_pdu() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_SET_KEYBOARD_IME_STATUS:
-		if (!rdp_recv_server_set_keyboard_ime_status_pdu(rdp, cs))
-		{
-			WLog_ERR(TAG, "DATA_PDU_TYPE_SET_KEYBOARD_IME_STATUS - "
-			              "rdp_recv_server_set_keyboard_ime_status_pdu() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_SET_KEYBOARD_IME_STATUS:
+			if (!rdp_recv_server_set_keyboard_ime_status_pdu(rdp, cs))
+			{
+				WLog_ERR(TAG, "DATA_PDU_TYPE_SET_KEYBOARD_IME_STATUS - "
+				              "rdp_recv_server_set_keyboard_ime_status_pdu() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_SET_ERROR_INFO:
-		if (!rdp_recv_set_error_info_data_pdu(rdp, cs))
-		{
-			WLog_ERR(TAG,
-			         "DATA_PDU_TYPE_SET_ERROR_INFO - rdp_recv_set_error_info_data_pdu() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_SET_ERROR_INFO:
+			if (!rdp_recv_set_error_info_data_pdu(rdp, cs))
+			{
+				WLog_ERR(
+				    TAG,
+				    "DATA_PDU_TYPE_SET_ERROR_INFO - rdp_recv_set_error_info_data_pdu() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_ARC_STATUS:
-		if (!rdp_recv_server_auto_reconnect_status_pdu(rdp, cs))
-		{
-			WLog_ERR(
-			    TAG,
-			    "DATA_PDU_TYPE_ARC_STATUS - rdp_recv_server_auto_reconnect_status_pdu() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_ARC_STATUS:
+			if (!rdp_recv_server_auto_reconnect_status_pdu(rdp, cs))
+			{
+				WLog_ERR(TAG, "DATA_PDU_TYPE_ARC_STATUS - "
+				              "rdp_recv_server_auto_reconnect_status_pdu() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_STATUS_INFO:
-		if (!rdp_recv_server_status_info_pdu(rdp, cs))
-		{
-			WLog_ERR(TAG, "DATA_PDU_TYPE_STATUS_INFO - rdp_recv_server_status_info_pdu() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_STATUS_INFO:
+			if (!rdp_recv_server_status_info_pdu(rdp, cs))
+			{
+				WLog_ERR(TAG,
+				         "DATA_PDU_TYPE_STATUS_INFO - rdp_recv_server_status_info_pdu() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	case DATA_PDU_TYPE_MONITOR_LAYOUT:
-		if (!rdp_recv_monitor_layout_pdu(rdp, cs))
-		{
-			WLog_ERR(TAG, "DATA_PDU_TYPE_MONITOR_LAYOUT - rdp_recv_monitor_layout_pdu() failed");
-			goto out_fail;
-		}
+		case DATA_PDU_TYPE_MONITOR_LAYOUT:
+			if (!rdp_recv_monitor_layout_pdu(rdp, cs))
+			{
+				WLog_ERR(TAG,
+				         "DATA_PDU_TYPE_MONITOR_LAYOUT - rdp_recv_monitor_layout_pdu() failed");
+				goto out_fail;
+			}
 
-		break;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	if (cs != s)
@@ -1287,37 +1290,37 @@ static int rdp_recv_tpkt_pdu(rdpRdp* rdp, wStream* s)
 
 			switch (pduType)
 			{
-			case PDU_TYPE_DATA:
-				if (rdp_recv_data_pdu(rdp, s) < 0)
-				{
-					WLog_ERR(TAG, "rdp_recv_data_pdu() failed");
-					return -1;
-				}
+				case PDU_TYPE_DATA:
+					if (rdp_recv_data_pdu(rdp, s) < 0)
+					{
+						WLog_ERR(TAG, "rdp_recv_data_pdu() failed");
+						return -1;
+					}
 
-				break;
+					break;
 
-			case PDU_TYPE_DEACTIVATE_ALL:
-				if (!rdp_recv_deactivate_all(rdp, s))
-				{
-					WLog_ERR(TAG, "rdp_recv_tpkt_pdu: rdp_recv_deactivate_all() fail");
-					return -1;
-				}
+				case PDU_TYPE_DEACTIVATE_ALL:
+					if (!rdp_recv_deactivate_all(rdp, s))
+					{
+						WLog_ERR(TAG, "rdp_recv_tpkt_pdu: rdp_recv_deactivate_all() fail");
+						return -1;
+					}
 
-				break;
+					break;
 
-			case PDU_TYPE_SERVER_REDIRECTION:
-				return rdp_recv_enhanced_security_redirection_packet(rdp, s);
-				break;
+				case PDU_TYPE_SERVER_REDIRECTION:
+					return rdp_recv_enhanced_security_redirection_packet(rdp, s);
+					break;
 
-			case PDU_TYPE_FLOW_RESPONSE:
-			case PDU_TYPE_FLOW_STOP:
-			case PDU_TYPE_FLOW_TEST:
-				WLog_DBG(TAG, "flow message 0x%04" PRIX16 "", pduType);
-				break;
+				case PDU_TYPE_FLOW_RESPONSE:
+				case PDU_TYPE_FLOW_STOP:
+				case PDU_TYPE_FLOW_TEST:
+					WLog_DBG(TAG, "flow message 0x%04" PRIX16 "", pduType);
+					break;
 
-			default:
-				WLog_ERR(TAG, "incorrect PDU type: 0x%04" PRIX16 "", pduType);
-				break;
+				default:
+					WLog_ERR(TAG, "incorrect PDU type: 0x%04" PRIX16 "", pduType);
+					break;
 			}
 
 			Stream_SetPosition(s, nextPosition);
@@ -1408,165 +1411,167 @@ int rdp_recv_callback(rdpTransport* transport, wStream* s, void* extra)
 
 	switch (rdp->state)
 	{
-	case CONNECTION_STATE_NLA:
-		if (nla_get_state(rdp->nla) < NLA_STATE_AUTH_INFO)
-		{
-			if (nla_recv_pdu(rdp->nla, s) < 1)
+		case CONNECTION_STATE_NLA:
+			if (nla_get_state(rdp->nla) < NLA_STATE_AUTH_INFO)
 			{
-				WLog_ERR(TAG, "rdp_recv_callback: CONNECTION_STATE_NLA - nla_recv_pdu() fail");
-				return -1;
-			}
-		}
-		else if (nla_get_state(rdp->nla) == NLA_STATE_POST_NEGO)
-		{
-			nego_recv(rdp->transport, s, (void*)rdp->nego);
-
-			if (nego_get_state(rdp->nego) != NEGO_STATE_FINAL)
-			{
-				WLog_ERR(TAG, "rdp_recv_callback: CONNECTION_STATE_NLA - nego_recv() fail");
-				return -1;
-			}
-
-			if (!nla_set_state(rdp->nla, NLA_STATE_FINAL))
-				return -1;
-		}
-
-		if (nla_get_state(rdp->nla) == NLA_STATE_AUTH_INFO)
-		{
-			transport_set_nla_mode(rdp->transport, FALSE);
-
-			if (rdp->settings->VmConnectMode)
-			{
-				if (!nego_set_state(rdp->nego, NEGO_STATE_NLA))
+				if (nla_recv_pdu(rdp->nla, s) < 1)
+				{
+					WLog_ERR(TAG, "rdp_recv_callback: CONNECTION_STATE_NLA - nla_recv_pdu() fail");
 					return -1;
-
-				if (!nego_set_requested_protocols(rdp->nego, PROTOCOL_HYBRID | PROTOCOL_SSL))
-					return -1;
-
-				nego_send_negotiation_request(rdp->nego);
-
-				if (!nla_set_state(rdp->nla, NLA_STATE_POST_NEGO))
-					return -1;
+				}
 			}
-			else
+			else if (nla_get_state(rdp->nla) == NLA_STATE_POST_NEGO)
 			{
+				nego_recv(rdp->transport, s, (void*)rdp->nego);
+
+				if (nego_get_state(rdp->nego) != NEGO_STATE_FINAL)
+				{
+					WLog_ERR(TAG, "rdp_recv_callback: CONNECTION_STATE_NLA - nego_recv() fail");
+					return -1;
+				}
+
 				if (!nla_set_state(rdp->nla, NLA_STATE_FINAL))
 					return -1;
 			}
-		}
 
-		if (nla_get_state(rdp->nla) == NLA_STATE_FINAL)
-		{
-			nla_free(rdp->nla);
-			rdp->nla = NULL;
-
-			if (!mcs_client_begin(rdp->mcs))
+			if (nla_get_state(rdp->nla) == NLA_STATE_AUTH_INFO)
 			{
-				WLog_ERR(TAG, "rdp_recv_callback: CONNECTION_STATE_NLA - mcs_client_begin() fail");
+				transport_set_nla_mode(rdp->transport, FALSE);
+
+				if (rdp->settings->VmConnectMode)
+				{
+					if (!nego_set_state(rdp->nego, NEGO_STATE_NLA))
+						return -1;
+
+					if (!nego_set_requested_protocols(rdp->nego, PROTOCOL_HYBRID | PROTOCOL_SSL))
+						return -1;
+
+					nego_send_negotiation_request(rdp->nego);
+
+					if (!nla_set_state(rdp->nla, NLA_STATE_POST_NEGO))
+						return -1;
+				}
+				else
+				{
+					if (!nla_set_state(rdp->nla, NLA_STATE_FINAL))
+						return -1;
+				}
+			}
+
+			if (nla_get_state(rdp->nla) == NLA_STATE_FINAL)
+			{
+				nla_free(rdp->nla);
+				rdp->nla = NULL;
+
+				if (!mcs_client_begin(rdp->mcs))
+				{
+					WLog_ERR(TAG,
+					         "rdp_recv_callback: CONNECTION_STATE_NLA - mcs_client_begin() fail");
+					return -1;
+				}
+			}
+
+			break;
+
+		case CONNECTION_STATE_MCS_CONNECT:
+			if (!mcs_recv_connect_response(rdp->mcs, s))
+			{
+				WLog_ERR(TAG, "mcs_recv_connect_response failure");
 				return -1;
 			}
-		}
 
-		break;
+			if (!mcs_send_erect_domain_request(rdp->mcs))
+			{
+				WLog_ERR(TAG, "mcs_send_erect_domain_request failure");
+				return -1;
+			}
 
-	case CONNECTION_STATE_MCS_CONNECT:
-		if (!mcs_recv_connect_response(rdp->mcs, s))
-		{
-			WLog_ERR(TAG, "mcs_recv_connect_response failure");
-			return -1;
-		}
+			if (!mcs_send_attach_user_request(rdp->mcs))
+			{
+				WLog_ERR(TAG, "mcs_send_attach_user_request failure");
+				return -1;
+			}
 
-		if (!mcs_send_erect_domain_request(rdp->mcs))
-		{
-			WLog_ERR(TAG, "mcs_send_erect_domain_request failure");
-			return -1;
-		}
+			rdp_client_transition_to_state(rdp, CONNECTION_STATE_MCS_ATTACH_USER);
+			break;
 
-		if (!mcs_send_attach_user_request(rdp->mcs))
-		{
-			WLog_ERR(TAG, "mcs_send_attach_user_request failure");
-			return -1;
-		}
+		case CONNECTION_STATE_MCS_ATTACH_USER:
+			if (!mcs_recv_attach_user_confirm(rdp->mcs, s))
+			{
+				WLog_ERR(TAG, "mcs_recv_attach_user_confirm failure");
+				return -1;
+			}
 
-		rdp_client_transition_to_state(rdp, CONNECTION_STATE_MCS_ATTACH_USER);
-		break;
+			if (!mcs_send_channel_join_request(rdp->mcs, rdp->mcs->userId))
+			{
+				WLog_ERR(TAG, "mcs_send_channel_join_request failure");
+				return -1;
+			}
 
-	case CONNECTION_STATE_MCS_ATTACH_USER:
-		if (!mcs_recv_attach_user_confirm(rdp->mcs, s))
-		{
-			WLog_ERR(TAG, "mcs_recv_attach_user_confirm failure");
-			return -1;
-		}
+			rdp_client_transition_to_state(rdp, CONNECTION_STATE_MCS_CHANNEL_JOIN);
+			break;
 
-		if (!mcs_send_channel_join_request(rdp->mcs, rdp->mcs->userId))
-		{
-			WLog_ERR(TAG, "mcs_send_channel_join_request failure");
-			return -1;
-		}
+		case CONNECTION_STATE_MCS_CHANNEL_JOIN:
+			if (!rdp_client_connect_mcs_channel_join_confirm(rdp, s))
+			{
+				WLog_ERR(TAG, "rdp_recv_callback: CONNECTION_STATE_MCS_CHANNEL_JOIN - "
+				              "rdp_client_connect_mcs_channel_join_confirm() fail");
+				status = -1;
+			}
 
-		rdp_client_transition_to_state(rdp, CONNECTION_STATE_MCS_CHANNEL_JOIN);
-		break;
+			break;
 
-	case CONNECTION_STATE_MCS_CHANNEL_JOIN:
-		if (!rdp_client_connect_mcs_channel_join_confirm(rdp, s))
-		{
-			WLog_ERR(TAG, "rdp_recv_callback: CONNECTION_STATE_MCS_CHANNEL_JOIN - "
-			              "rdp_client_connect_mcs_channel_join_confirm() fail");
+		case CONNECTION_STATE_LICENSING:
+			status = rdp_client_connect_license(rdp, s);
+
+			if (status < 0)
+				WLog_DBG(TAG, "CONNECTION_STATE_LICENSING - rdp_client_connect_license() - %i",
+				         status);
+
+			break;
+
+		case CONNECTION_STATE_CAPABILITIES_EXCHANGE:
+			status = rdp_client_connect_demand_active(rdp, s);
+
+			if (status < 0)
+				WLog_DBG(TAG,
+				         "CONNECTION_STATE_CAPABILITIES_EXCHANGE - "
+				         "rdp_client_connect_demand_active() - %i",
+				         status);
+
+			break;
+
+		case CONNECTION_STATE_FINALIZATION:
+			status = rdp_recv_pdu(rdp, s);
+
+			if ((status >= 0) && (rdp->finalize_sc_pdus == FINALIZE_SC_COMPLETE))
+			{
+				ActivatedEventArgs activatedEvent;
+				rdpContext* context = rdp->context;
+				rdp_client_transition_to_state(rdp, CONNECTION_STATE_ACTIVE);
+				EventArgsInit(&activatedEvent, "libfreerdp");
+				activatedEvent.firstActivation = !rdp->deactivation_reactivation;
+				PubSub_OnActivated(context->pubSub, context, &activatedEvent);
+				return 2;
+			}
+
+			if (status < 0)
+				WLog_DBG(TAG, "CONNECTION_STATE_FINALIZATION - rdp_recv_pdu() - %i", status);
+
+			break;
+
+		case CONNECTION_STATE_ACTIVE:
+			status = rdp_recv_pdu(rdp, s);
+
+			if (status < 0)
+				WLog_DBG(TAG, "CONNECTION_STATE_ACTIVE - rdp_recv_pdu() - %i", status);
+
+			break;
+
+		default:
+			WLog_ERR(TAG, "Invalid state %d", rdp->state);
 			status = -1;
-		}
-
-		break;
-
-	case CONNECTION_STATE_LICENSING:
-		status = rdp_client_connect_license(rdp, s);
-
-		if (status < 0)
-			WLog_DBG(TAG, "CONNECTION_STATE_LICENSING - rdp_client_connect_license() - %i", status);
-
-		break;
-
-	case CONNECTION_STATE_CAPABILITIES_EXCHANGE:
-		status = rdp_client_connect_demand_active(rdp, s);
-
-		if (status < 0)
-			WLog_DBG(
-			    TAG,
-			    "CONNECTION_STATE_CAPABILITIES_EXCHANGE - rdp_client_connect_demand_active() - %i",
-			    status);
-
-		break;
-
-	case CONNECTION_STATE_FINALIZATION:
-		status = rdp_recv_pdu(rdp, s);
-
-		if ((status >= 0) && (rdp->finalize_sc_pdus == FINALIZE_SC_COMPLETE))
-		{
-			ActivatedEventArgs activatedEvent;
-			rdpContext* context = rdp->context;
-			rdp_client_transition_to_state(rdp, CONNECTION_STATE_ACTIVE);
-			EventArgsInit(&activatedEvent, "libfreerdp");
-			activatedEvent.firstActivation = !rdp->deactivation_reactivation;
-			PubSub_OnActivated(context->pubSub, context, &activatedEvent);
-			return 2;
-		}
-
-		if (status < 0)
-			WLog_DBG(TAG, "CONNECTION_STATE_FINALIZATION - rdp_recv_pdu() - %i", status);
-
-		break;
-
-	case CONNECTION_STATE_ACTIVE:
-		status = rdp_recv_pdu(rdp, s);
-
-		if (status < 0)
-			WLog_DBG(TAG, "CONNECTION_STATE_ACTIVE - rdp_recv_pdu() - %i", status);
-
-		break;
-
-	default:
-		WLog_ERR(TAG, "Invalid state %d", rdp->state);
-		status = -1;
-		break;
+			break;
 	}
 
 	return status;

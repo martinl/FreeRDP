@@ -50,7 +50,7 @@ static UINT32 x11_shadow_enum_monitors(MONITOR_DEF* monitors, UINT32 maxMonitors
 
 #ifdef WITH_PAM
 
-#	include <security/pam_appl.h>
+#include <security/pam_appl.h>
 
 struct _SHADOW_PAM_AUTH_DATA
 {
@@ -85,27 +85,27 @@ static int x11_shadow_pam_conv(int num_msg, const struct pam_message** msg,
 	{
 		switch (msg[index]->msg_style)
 		{
-		case PAM_PROMPT_ECHO_ON:
-			response[index].resp = _strdup(appdata->user);
+			case PAM_PROMPT_ECHO_ON:
+				response[index].resp = _strdup(appdata->user);
 
-			if (!response[index].resp)
+				if (!response[index].resp)
+					goto out_fail;
+
+				response[index].resp_retcode = PAM_SUCCESS;
+				break;
+
+			case PAM_PROMPT_ECHO_OFF:
+				response[index].resp = _strdup(appdata->password);
+
+				if (!response[index].resp)
+					goto out_fail;
+
+				response[index].resp_retcode = PAM_SUCCESS;
+				break;
+
+			default:
+				pam_status = PAM_CONV_ERR;
 				goto out_fail;
-
-			response[index].resp_retcode = PAM_SUCCESS;
-			break;
-
-		case PAM_PROMPT_ECHO_OFF:
-			response[index].resp = _strdup(appdata->password);
-
-			if (!response[index].resp)
-				goto out_fail;
-
-			response[index].resp_retcode = PAM_SUCCESS;
-			break;
-
-		default:
-			pam_status = PAM_CONV_ERR;
-			goto out_fail;
 		}
 	}
 
@@ -397,20 +397,20 @@ static void x11_shadow_message_free(UINT32 id, SHADOW_MSG_OUT* msg)
 {
 	switch (id)
 	{
-	case SHADOW_MSG_OUT_POINTER_POSITION_UPDATE_ID:
-		free(msg);
-		break;
+		case SHADOW_MSG_OUT_POINTER_POSITION_UPDATE_ID:
+			free(msg);
+			break;
 
-	case SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE_ID:
-		free(((SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE*)msg)->xorMaskData);
-		free(((SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE*)msg)->andMaskData);
-		free(msg);
-		break;
+		case SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE_ID:
+			free(((SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE*)msg)->xorMaskData);
+			free(((SHADOW_MSG_OUT_POINTER_ALPHA_UPDATE*)msg)->andMaskData);
+			free(msg);
+			break;
 
-	default:
-		WLog_ERR(TAG, "Unknown message id: %" PRIu32 "", id);
-		free(msg);
-		break;
+		default:
+			WLog_ERR(TAG, "Unknown message id: %" PRIu32 "", id);
+			free(msg);
+			break;
 	}
 }
 
@@ -873,13 +873,13 @@ static int x11_shadow_subsystem_process_message(x11ShadowSubsystem* subsystem, w
 {
 	switch (message->id)
 	{
-	case SHADOW_MSG_IN_REFRESH_REQUEST_ID:
-		shadow_subsystem_frame_update((rdpShadowSubsystem*)subsystem);
-		break;
+		case SHADOW_MSG_IN_REFRESH_REQUEST_ID:
+			shadow_subsystem_frame_update((rdpShadowSubsystem*)subsystem);
+			break;
 
-	default:
-		WLog_ERR(TAG, "Unknown message id: %" PRIu32 "", message->id);
-		break;
+		default:
+			WLog_ERR(TAG, "Unknown message id: %" PRIu32 "", message->id);
+			break;
 	}
 
 	if (message->Free)
@@ -1053,13 +1053,13 @@ static int x11_shadow_xdamage_init(x11ShadowSubsystem* subsystem)
 	if (!subsystem->xdamage)
 		return -1;
 
-#	ifdef WITH_XFIXES
+#ifdef WITH_XFIXES
 	subsystem->xdamage_region = XFixesCreateRegion(subsystem->display, NULL, 0);
 
 	if (!subsystem->xdamage_region)
 		return -1;
 
-#	endif
+#endif
 	return 1;
 #else
 	return -1;

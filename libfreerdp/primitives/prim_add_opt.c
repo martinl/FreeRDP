@@ -15,7 +15,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/types.h>
@@ -23,12 +23,12 @@
 #include <winpr/sysinfo.h>
 
 #ifdef WITH_SSE2
-#	include <emmintrin.h>
-#	include <pmmintrin.h>
+#include <emmintrin.h>
+#include <pmmintrin.h>
 #endif /* WITH_SSE2 */
 
 #ifdef WITH_IPP
-#	include <ipps.h>
+#include <ipps.h>
 #endif /* WITH_IPP */
 
 #include "prim_internal.h"
@@ -37,11 +37,11 @@
 static primitives_t* generic = NULL;
 
 #ifdef WITH_SSE2
-#	if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
+#if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
 /* ------------------------------------------------------------------------- */
 SSE3_SSD_ROUTINE(sse3_add_16s, INT16, generic->add_16s, _mm_adds_epi16,
                  generic->add_16s(sptr1++, sptr2++, dptr++, 1))
-#	endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
+#endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
 #endif
 
 /* ------------------------------------------------------------------------- */

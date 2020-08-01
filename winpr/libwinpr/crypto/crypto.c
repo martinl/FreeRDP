@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crypto.h>
@@ -138,11 +138,11 @@
 
 #ifndef _WIN32
 
-#	include "crypto.h"
+#include "crypto.h"
 
-#	include <winpr/crt.h>
-#	include <winpr/crypto.h>
-#	include <winpr/collections.h>
+#include <winpr/crt.h>
+#include <winpr/crypto.h>
+#include <winpr/collections.h>
 
 static wListDictionary* g_ProtectedMemoryBlocks = NULL;
 

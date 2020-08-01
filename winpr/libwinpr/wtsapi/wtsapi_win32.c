@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -624,7 +624,7 @@ BOOL WINAPI Win32_WTSVirtualChannelWrite(HANDLE hChannel, LPCVOID lpBuffer,
 }
 
 #ifndef FILE_DEVICE_TERMSRV
-#	define FILE_DEVICE_TERMSRV 0x00000038
+#define FILE_DEVICE_TERMSRV 0x00000038
 #endif
 
 BOOL Win32_WTSVirtualChannelPurge_Internal(HANDLE hChannelHandle, ULONG IoControlCode)

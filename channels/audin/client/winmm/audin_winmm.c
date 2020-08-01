@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -66,44 +66,44 @@ static void CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance
 
 	switch (uMsg)
 	{
-	case WIM_CLOSE:
-		break;
+		case WIM_CLOSE:
+			break;
 
-	case WIM_DATA:
-		pWaveHdr = (WAVEHDR*)dwParam1;
+		case WIM_DATA:
+			pWaveHdr = (WAVEHDR*)dwParam1;
 
-		if (WHDR_DONE == (WHDR_DONE & pWaveHdr->dwFlags))
-		{
-			if (pWaveHdr->dwBytesRecorded &&
-			    !(WaitForSingleObject(winmm->stopEvent, 0) == WAIT_OBJECT_0))
+			if (WHDR_DONE == (WHDR_DONE & pWaveHdr->dwFlags))
 			{
-				AUDIO_FORMAT format;
-				format.cbSize = winmm->pwfx_cur->cbSize;
-				format.nBlockAlign = winmm->pwfx_cur->nBlockAlign;
-				format.nAvgBytesPerSec = winmm->pwfx_cur->nAvgBytesPerSec;
-				format.nChannels = winmm->pwfx_cur->nChannels;
-				format.nSamplesPerSec = winmm->pwfx_cur->nSamplesPerSec;
-				format.wBitsPerSample = winmm->pwfx_cur->wBitsPerSample;
-				format.wFormatTag = winmm->pwfx_cur->wFormatTag;
+				if (pWaveHdr->dwBytesRecorded &&
+				    !(WaitForSingleObject(winmm->stopEvent, 0) == WAIT_OBJECT_0))
+				{
+					AUDIO_FORMAT format;
+					format.cbSize = winmm->pwfx_cur->cbSize;
+					format.nBlockAlign = winmm->pwfx_cur->nBlockAlign;
+					format.nAvgBytesPerSec = winmm->pwfx_cur->nAvgBytesPerSec;
+					format.nChannels = winmm->pwfx_cur->nChannels;
+					format.nSamplesPerSec = winmm->pwfx_cur->nSamplesPerSec;
+					format.wBitsPerSample = winmm->pwfx_cur->wBitsPerSample;
+					format.wFormatTag = winmm->pwfx_cur->wFormatTag;
 
-				if ((error = winmm->receive(&format, pWaveHdr->lpData, pWaveHdr->dwBytesRecorded,
-				                            winmm->user_data)))
-					break;
+					if ((error = winmm->receive(&format, pWaveHdr->lpData,
+					                            pWaveHdr->dwBytesRecorded, winmm->user_data)))
+						break;
 
-				mmResult = waveInAddBuffer(hWaveIn, pWaveHdr, sizeof(WAVEHDR));
+					mmResult = waveInAddBuffer(hWaveIn, pWaveHdr, sizeof(WAVEHDR));
 
-				if (mmResult != MMSYSERR_NOERROR)
-					error = ERROR_INTERNAL_ERROR;
+					if (mmResult != MMSYSERR_NOERROR)
+						error = ERROR_INTERNAL_ERROR;
+				}
 			}
-		}
 
-		break;
+			break;
 
-	case WIM_OPEN:
-		break;
+		case WIM_OPEN:
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	if (error && winmm->rdpcontext)
@@ -449,9 +449,9 @@ static UINT audin_winmm_parse_addin_args(AudinWinmmDevice* device, ADDIN_ARGV* a
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_audin_client_subsystem_entry winmm_freerdp_audin_client_subsystem_entry
+#define freerdp_audin_client_subsystem_entry winmm_freerdp_audin_client_subsystem_entry
 #else
-#	define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
+#define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
 #endif
 
 /**

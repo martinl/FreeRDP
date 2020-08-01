@@ -28,19 +28,19 @@
 
 #ifndef _WIN32
 
-#	define LOGON32_LOGON_INTERACTIVE 2
-#	define LOGON32_LOGON_NETWORK 3
-#	define LOGON32_LOGON_BATCH 4
-#	define LOGON32_LOGON_SERVICE 5
-#	define LOGON32_LOGON_UNLOCK 7
-#	define LOGON32_LOGON_NETWORK_CLEARTEXT 8
-#	define LOGON32_LOGON_NEW_CREDENTIALS 9
+#define LOGON32_LOGON_INTERACTIVE 2
+#define LOGON32_LOGON_NETWORK 3
+#define LOGON32_LOGON_BATCH 4
+#define LOGON32_LOGON_SERVICE 5
+#define LOGON32_LOGON_UNLOCK 7
+#define LOGON32_LOGON_NETWORK_CLEARTEXT 8
+#define LOGON32_LOGON_NEW_CREDENTIALS 9
 
-#	define LOGON32_PROVIDER_DEFAULT 0
-#	define LOGON32_PROVIDER_WINNT35 1
-#	define LOGON32_PROVIDER_WINNT40 2
-#	define LOGON32_PROVIDER_WINNT50 3
-#	define LOGON32_PROVIDER_VIRTUAL 4
+#define LOGON32_PROVIDER_DEFAULT 0
+#define LOGON32_PROVIDER_WINNT35 1
+#define LOGON32_PROVIDER_WINNT40 2
+#define LOGON32_PROVIDER_WINNT50 3
+#define LOGON32_PROVIDER_VIRTUAL 4
 
 typedef struct _QUOTA_LIMITS
 {
@@ -102,10 +102,10 @@ typedef enum
 } EXTENDED_NAME_FORMAT,
     *PEXTENDED_NAME_FORMAT;
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-#	endif
+#endif
 
 	WINPR_API BOOL LogonUserA(LPCSTR lpszUsername, LPCSTR lpszDomain, LPCSTR lpszPassword,
 	                          DWORD dwLogonType, DWORD dwLogonProvider, PHANDLE phToken);
@@ -128,19 +128,19 @@ extern "C"
 	WINPR_API BOOL GetUserNameExW(EXTENDED_NAME_FORMAT NameFormat, LPWSTR lpNameBuffer,
 	                              PULONG nSize);
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 }
-#	endif
+#endif
 
-#	ifdef UNICODE
-#		define LogonUser LogonUserW
-#		define LogonUserEx LogonUserExW
-#		define GetUserNameEx GetUserNameExW
-#	else
-#		define LogonUser LogonUserA
-#		define LogonUserEx LogonUserExA
-#		define GetUserNameEx GetUserNameExA
-#	endif
+#ifdef UNICODE
+#define LogonUser LogonUserW
+#define LogonUserEx LogonUserExW
+#define GetUserNameEx GetUserNameExW
+#else
+#define LogonUser LogonUserA
+#define LogonUserEx LogonUserExA
+#define GetUserNameEx GetUserNameExA
+#endif
 
 #endif
 

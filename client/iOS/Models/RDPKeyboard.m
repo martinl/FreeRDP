@@ -23,7 +23,8 @@
 @synthesize delegate = _delegate, ctrlPressed = _ctrl_pressed, altPressed = _alt_pressed,
             shiftPressed = _shift_pressed, winPressed = _win_pressed;
 
-- (id)init {
+- (id)init
+{
 	if ((self = [super init]) != nil)
 	{
 		[self initWithSession:nil delegate:nil];
@@ -108,7 +109,8 @@
 	return self;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[super dealloc];
 }
 
@@ -116,7 +118,8 @@
 #pragma mark class methods
 
 // return a keyboard instance
-+ (RDPKeyboard *)getSharedRDPKeyboard {
++ (RDPKeyboard *)getSharedRDPKeyboard
+{
 	static RDPKeyboard *_shared_keyboard = nil;
 
 	if (_shared_keyboard == nil)
@@ -132,7 +135,8 @@
 }
 
 // reset the keyboard instance and assign the given rdp instance
-- (void)initWithSession:(RDPSession *)session delegate:(NSObject<RDPKeyboardDelegate> *)delegate {
+- (void)initWithSession:(RDPSession *)session delegate:(NSObject<RDPKeyboardDelegate> *)delegate
+{
 	_alt_pressed = NO;
 	_ctrl_pressed = NO;
 	_shift_pressed = NO;
@@ -142,7 +146,8 @@
 	_delegate = delegate;
 }
 
-- (void)reset {
+- (void)reset
+{
 	// reset pressed ctrl, alt, shift or win key
 	if (_shift_pressed)
 		[self toggleShiftKey];
@@ -156,7 +161,8 @@
 
 // handles button pressed input event from the iOS keyboard
 // performs all conversions etc.
-- (void)sendUnicode:(int)character {
+- (void)sendUnicode:(int)character
+{
 	if (isalnum(character))
 		[self handleAlphaNumChar:character];
 	else
@@ -166,35 +172,40 @@
 }
 
 // send a backspace key press
-- (void)sendVirtualKeyCode:(int)keyCode {
+- (void)sendVirtualKeyCode:(int)keyCode
+{
 	[self sendVirtualKey:keyCode up:NO];
 	[self sendVirtualKey:keyCode up:YES];
 }
 
 #pragma mark modifier key handling
 // toggle ctrl key, returns true if pressed, otherwise false
-- (void)toggleCtrlKey {
+- (void)toggleCtrlKey
+{
 	[self sendVirtualKey:VK_LCONTROL up:_ctrl_pressed];
 	_ctrl_pressed = !_ctrl_pressed;
 	[self notifyDelegateModifiersChanged];
 }
 
 // toggle alt key, returns true if pressed, otherwise false
-- (void)toggleAltKey {
+- (void)toggleAltKey
+{
 	[self sendVirtualKey:VK_LMENU up:_alt_pressed];
 	_alt_pressed = !_alt_pressed;
 	[self notifyDelegateModifiersChanged];
 }
 
 // toggle shift key, returns true if pressed, otherwise false
-- (void)toggleShiftKey {
+- (void)toggleShiftKey
+{
 	[self sendVirtualKey:VK_LSHIFT up:_shift_pressed];
 	_shift_pressed = !_shift_pressed;
 	[self notifyDelegateModifiersChanged];
 }
 
 // toggle windows key, returns true if pressed, otherwise false
-- (void)toggleWinKey {
+- (void)toggleWinKey
+{
 	[self sendVirtualKey:(VK_LWIN | KBDEXT) up:_win_pressed];
 	_win_pressed = !_win_pressed;
 	[self notifyDelegateModifiersChanged];
@@ -202,15 +213,18 @@
 
 #pragma mark Sending special key strokes
 
-- (void)sendEnterKeyStroke {
+- (void)sendEnterKeyStroke
+{
 	[self sendVirtualKeyCode:(VK_RETURN | KBDEXT)];
 }
 
-- (void)sendEscapeKeyStroke {
+- (void)sendEscapeKeyStroke
+{
 	[self sendVirtualKeyCode:VK_ESCAPE];
 }
 
-- (void)sendBackspaceKeyStroke {
+- (void)sendBackspaceKeyStroke
+{
 	[self sendVirtualKeyCode:VK_BACK];
 }
 
@@ -219,7 +233,8 @@
 #pragma mark -
 @implementation RDPKeyboard (Private)
 
-- (void)handleAlphaNumChar:(int)character {
+- (void)handleAlphaNumChar:(int)character
+{
 	// if we recive an uppercase letter - make it lower and send an shift down event to server
 	BOOL shift_was_sent = NO;
 	if (isupper(character) && _shift_pressed == NO)
@@ -243,7 +258,8 @@
 		[self sendVirtualKey:VK_LSHIFT up:YES];
 }
 
-- (void)handleSpecialKey:(int)character {
+- (void)handleSpecialKey:(int)character
+{
 	NSDictionary *eventDescriptor = nil;
 	if (character < 256)
 	{
@@ -268,7 +284,8 @@
 }
 
 // sends the vk code to the session
-- (void)sendVirtualKey:(int)vKey up:(BOOL)up {
+- (void)sendVirtualKey:(int)vKey up:(BOOL)up
+{
 	DWORD scancode = GetVirtualScanCodeFromVirtualKeyCode(vKey, 4);
 	int flags = (up ? KBD_FLAGS_RELEASE : KBD_FLAGS_DOWN);
 	flags |= ((scancode & KBDEXT) ? KBD_FLAGS_EXTENDED : 0);
@@ -284,7 +301,8 @@
 	                                                    @"scancode", nil]];
 }
 
-- (void)notifyDelegateModifiersChanged {
+- (void)notifyDelegateModifiersChanged
+{
 	if ([[self delegate] respondsToSelector:@selector(modifiersChangedForKeyboard:)])
 		[[self delegate] modifiersChangedForKeyboard:self];
 }

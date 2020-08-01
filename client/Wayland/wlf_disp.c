@@ -283,29 +283,29 @@ UINT wlf_disp_sendLayout(DispClientContext* disp, rdpMonitor* monitors, size_t n
 
 		switch (monitors[i].attributes.orientation)
 		{
-		case 90:
-			layouts[i].Orientation = ORIENTATION_PORTRAIT;
-			break;
+			case 90:
+				layouts[i].Orientation = ORIENTATION_PORTRAIT;
+				break;
 
-		case 180:
-			layouts[i].Orientation = ORIENTATION_LANDSCAPE_FLIPPED;
-			break;
+			case 180:
+				layouts[i].Orientation = ORIENTATION_LANDSCAPE_FLIPPED;
+				break;
 
-		case 270:
-			layouts[i].Orientation = ORIENTATION_PORTRAIT_FLIPPED;
-			break;
+			case 270:
+				layouts[i].Orientation = ORIENTATION_PORTRAIT_FLIPPED;
+				break;
 
-		case 0:
-		default:
-			/* MS-RDPEDISP - 2.2.2.2.1:
-			 * Orientation (4 bytes): A 32-bit unsigned integer that specifies the
-			 * orientation of the monitor in degrees. Valid values are 0, 90, 180
-			 * or 270
-			 *
-			 * So we default to ORIENTATION_LANDSCAPE
-			 */
-			layouts[i].Orientation = ORIENTATION_LANDSCAPE;
-			break;
+			case 0:
+			default:
+				/* MS-RDPEDISP - 2.2.2.2.1:
+				 * Orientation (4 bytes): A 32-bit unsigned integer that specifies the
+				 * orientation of the monitor in degrees. Valid values are 0, 90, 180
+				 * or 270
+				 *
+				 * So we default to ORIENTATION_LANDSCAPE
+				 */
+				layouts[i].Orientation = ORIENTATION_LANDSCAPE;
+				break;
 		}
 
 		layouts[i].DesktopScaleFactor = settings->DesktopScaleFactor;

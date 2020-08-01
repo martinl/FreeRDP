@@ -46,7 +46,8 @@ static NSString *SFHFKeychainUtilsErrorDomain = @"SFHFKeychainUtilsErrorDomain";
 
 + (NSString *)getPasswordForUsername:(NSString *)username
                        andServerName:(NSString *)serverName
-                               error:(NSError **)error {
+                               error:(NSError **)error
+{
 	if (!username || !serviceName)
 	{
 		*error = [NSError errorWithDomain:SFHFKeychainUtilsErrorDomain code:-2000 userInfo:nil];
@@ -111,7 +112,8 @@ static NSString *SFHFKeychainUtilsErrorDomain = @"SFHFKeychainUtilsErrorDomain";
           andPassword:(NSString *)password
         forServerName:(NSString *)serverName
        updateExisting:(BOOL)updateExisting
-                error:(NSError **)error {
+                error:(NSError **)error
+{
 	if (!username || !password || !serverName)
 	{
 		*error = [NSError errorWithDomain:SFHFKeychainUtilsErrorDomain code:-2000 userInfo:nil];
@@ -154,7 +156,8 @@ static NSString *SFHFKeychainUtilsErrorDomain = @"SFHFKeychainUtilsErrorDomain";
 
 + (void)deleteItemForUsername:(NSString *)username
                 andServerName:(NSString *)serverName
-                        error:(NSError **)error {
+                        error:(NSError **)error
+{
 	if (!username || !serverName)
 	{
 		*error = [NSError errorWithDomain:SFHFKeychainUtilsErrorDomain code:2000 userInfo:nil];
@@ -189,7 +192,8 @@ static NSString *SFHFKeychainUtilsErrorDomain = @"SFHFKeychainUtilsErrorDomain";
 
 + (SecKeychainItemRef)getKeychainItemReferenceForUsername:(NSString *)username
                                             andServerName:(NSString *)serverName
-                                                    error:(NSError **)error {
+                                                    error:(NSError **)error
+{
 	if (!username || !serverName)
 	{
 		*error = [NSError errorWithDomain:SFHFKeychainUtilsErrorDomain code:-2000 userInfo:nil];
@@ -223,7 +227,8 @@ static NSString *SFHFKeychainUtilsErrorDomain = @"SFHFKeychainUtilsErrorDomain";
 
 + (NSString *)getPasswordForUsername:(NSString *)username
                        andServerName:(NSString *)serverName
-                               error:(NSError **)error {
+                               error:(NSError **)error
+{
 	if (!username || !serverName)
 	{
 		if (error != nil)
@@ -343,7 +348,8 @@ static NSString *SFHFKeychainUtilsErrorDomain = @"SFHFKeychainUtilsErrorDomain";
           andPassword:(NSString *)password
         forServerName:(NSString *)serverName
        updateExisting:(BOOL)updateExisting
-                error:(NSError **)error {
+                error:(NSError **)error
+{
 	if (!username || !password || !serverName)
 	{
 		if (error != nil)
@@ -453,7 +459,8 @@ static NSString *SFHFKeychainUtilsErrorDomain = @"SFHFKeychainUtilsErrorDomain";
 
 + (BOOL)deleteItemForUsername:(NSString *)username
                 andServerName:(NSString *)serverName
-                        error:(NSError **)error {
+                        error:(NSError **)error
+{
 	if (!username || !serverName)
 	{
 		if (error != nil)

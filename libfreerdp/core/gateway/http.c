@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <errno.h>
@@ -31,7 +31,7 @@
 #include <freerdp/log.h>
 
 #ifdef HAVE_VALGRIND_MEMCHECK_H
-#	include <valgrind/memcheck.h>
+#include <valgrind/memcheck.h>
 #endif
 
 #include "http.h"
@@ -723,15 +723,15 @@ static BOOL http_use_content_length(const char* cur)
 
 		switch (end)
 		{
-		case ' ':
-		case ';':
-		case '\0':
-		case '\r':
-		case '\n':
-			return TRUE;
+			case ' ':
+			case ';':
+			case '\0':
+			case '\r':
+			case '\n':
+				return TRUE;
 
-		default:
-			return FALSE;
+			default:
+				return FALSE;
 		}
 	}
 

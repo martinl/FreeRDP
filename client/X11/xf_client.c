@@ -23,7 +23,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -33,21 +33,21 @@
 #include <X11/Xatom.h>
 
 #ifdef WITH_XRENDER
-#	include <X11/extensions/Xrender.h>
-#	include <math.h>
+#include <X11/extensions/Xrender.h>
+#include <math.h>
 #endif
 
 #ifdef WITH_XI
-#	include <X11/extensions/XInput.h>
-#	include <X11/extensions/XInput2.h>
+#include <X11/extensions/XInput.h>
+#include <X11/extensions/XInput2.h>
 #endif
 
 #ifdef WITH_XCURSOR
-#	include <X11/Xcursor/Xcursor.h>
+#include <X11/Xcursor/Xcursor.h>
 #endif
 
 #ifdef WITH_XINERAMA
-#	include <X11/extensions/Xinerama.h>
+#include <X11/extensions/Xinerama.h>
 #endif
 
 #include <X11/XKBlib.h>
@@ -1366,54 +1366,54 @@ static DWORD WINAPI xf_input_thread(LPVOID arg)
 
 		switch (status)
 		{
-		case WAIT_OBJECT_0:
-		case WAIT_OBJECT_0 + 1:
-		case WAIT_OBJECT_0 + 2:
-			if (WaitForSingleObject(events[0], 0) == WAIT_OBJECT_0)
-			{
-				if (MessageQueue_Peek(queue, &msg, FALSE))
+			case WAIT_OBJECT_0:
+			case WAIT_OBJECT_0 + 1:
+			case WAIT_OBJECT_0 + 2:
+				if (WaitForSingleObject(events[0], 0) == WAIT_OBJECT_0)
 				{
-					if (msg.id == WMQ_QUIT)
-						running = FALSE;
+					if (MessageQueue_Peek(queue, &msg, FALSE))
+					{
+						if (msg.id == WMQ_QUIT)
+							running = FALSE;
+					}
 				}
-			}
 
-			if (WaitForSingleObject(events[1], 0) == WAIT_OBJECT_0)
-			{
-				do
+				if (WaitForSingleObject(events[1], 0) == WAIT_OBJECT_0)
 				{
-					xf_lock_x11(xfc, FALSE);
-					pending_status = XPending(xfc->display);
-					xf_unlock_x11(xfc, FALSE);
-
-					if (pending_status)
+					do
 					{
 						xf_lock_x11(xfc, FALSE);
-						ZeroMemory(&xevent, sizeof(xevent));
-						XNextEvent(xfc->display, &xevent);
-						process_status = xf_event_process(instance, &xevent);
+						pending_status = XPending(xfc->display);
 						xf_unlock_x11(xfc, FALSE);
 
-						if (!process_status)
-							break;
+						if (pending_status)
+						{
+							xf_lock_x11(xfc, FALSE);
+							ZeroMemory(&xevent, sizeof(xevent));
+							XNextEvent(xfc->display, &xevent);
+							process_status = xf_event_process(instance, &xevent);
+							xf_unlock_x11(xfc, FALSE);
+
+							if (!process_status)
+								break;
+						}
+					} while (pending_status);
+
+					if (!process_status)
+					{
+						running = FALSE;
+						break;
 					}
-				} while (pending_status);
-
-				if (!process_status)
-				{
-					running = FALSE;
-					break;
 				}
-			}
 
-			if (WaitForSingleObject(events[2], 0) == WAIT_OBJECT_0)
+				if (WaitForSingleObject(events[2], 0) == WAIT_OBJECT_0)
+					running = FALSE;
+
+				break;
+
+			default:
 				running = FALSE;
-
-			break;
-
-		default:
-			running = FALSE;
-			break;
+				break;
 		}
 	}
 

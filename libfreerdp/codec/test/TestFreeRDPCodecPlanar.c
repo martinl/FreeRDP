@@ -5439,20 +5439,20 @@ static BOOL CompareBitmap(const BYTE* srcA, UINT32 srcAFormat, const BYTE* srcB,
 	 */
 	switch (diff)
 	{
-	case 1:
-		maxDiff = 2 * 2.0;
-		break;
+		case 1:
+			maxDiff = 2 * 2.0;
+			break;
 
-	case 8:
-	case 9:
-	case 16:
-	case 17:
-		maxDiff = 2 * 8.0;
-		break;
+		case 8:
+		case 9:
+		case 16:
+		case 17:
+			maxDiff = 2 * 8.0;
+			break;
 
-	default:
-		maxDiff = 0.0;
-		break;
+		default:
+			maxDiff = 0.0;
+			break;
 	}
 
 	if ((srcABits == 32) || (srcBBits == 32))

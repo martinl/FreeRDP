@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -30,11 +30,11 @@
 #include <signal.h>
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 #ifndef _WIN32
-#	include <sys/time.h>
+#include <sys/time.h>
 #endif
 
 #include <winpr/crt.h>
@@ -678,13 +678,13 @@ static BOOL tsmf_sample_playback(TSMF_SAMPLE* sample)
 
 		switch (sample->stream->major_type)
 		{
-		case TSMF_MAJOR_TYPE_VIDEO:
-			ret = tsmf_sample_playback_video(sample) && tsmf_sample_queue_ack(sample);
-			break;
+			case TSMF_MAJOR_TYPE_VIDEO:
+				ret = tsmf_sample_playback_video(sample) && tsmf_sample_queue_ack(sample);
+				break;
 
-		case TSMF_MAJOR_TYPE_AUDIO:
-			ret = tsmf_sample_playback_audio(sample) && tsmf_sample_queue_ack(sample);
-			break;
+			case TSMF_MAJOR_TYPE_AUDIO:
+				ret = tsmf_sample_playback_audio(sample) && tsmf_sample_queue_ack(sample);
+				break;
 		}
 	}
 	else
@@ -705,15 +705,15 @@ static BOOL tsmf_sample_playback(TSMF_SAMPLE* sample)
 
 		switch (sample->stream->major_type)
 		{
-		case TSMF_MAJOR_TYPE_VIDEO:
-		{
-			break;
-		}
+			case TSMF_MAJOR_TYPE_VIDEO:
+			{
+				break;
+			}
 
-		case TSMF_MAJOR_TYPE_AUDIO:
-		{
-			break;
-		}
+			case TSMF_MAJOR_TYPE_AUDIO:
+			{
+				break;
+			}
 		}
 
 		sample->ack_time = ack_anticipation_time;

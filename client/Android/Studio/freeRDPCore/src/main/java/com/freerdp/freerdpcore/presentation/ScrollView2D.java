@@ -309,46 +309,46 @@ public class ScrollView2D extends FrameLayout
 		{
 			switch (event.getKeyCode())
 			{
-			case KeyEvent.KEYCODE_DPAD_UP:
-				if (!event.isAltPressed())
-				{
-					handled = arrowScroll(View.FOCUS_UP, false);
-				}
-				else
-				{
-					handled = fullScroll(View.FOCUS_UP, false);
-				}
-				break;
-			case KeyEvent.KEYCODE_DPAD_DOWN:
-				if (!event.isAltPressed())
-				{
-					handled = arrowScroll(View.FOCUS_DOWN, false);
-				}
-				else
-				{
-					handled = fullScroll(View.FOCUS_DOWN, false);
-				}
-				break;
-			case KeyEvent.KEYCODE_DPAD_LEFT:
-				if (!event.isAltPressed())
-				{
-					handled = arrowScroll(View.FOCUS_LEFT, true);
-				}
-				else
-				{
-					handled = fullScroll(View.FOCUS_LEFT, true);
-				}
-				break;
-			case KeyEvent.KEYCODE_DPAD_RIGHT:
-				if (!event.isAltPressed())
-				{
-					handled = arrowScroll(View.FOCUS_RIGHT, true);
-				}
-				else
-				{
-					handled = fullScroll(View.FOCUS_RIGHT, true);
-				}
-				break;
+				case KeyEvent.KEYCODE_DPAD_UP:
+					if (!event.isAltPressed())
+					{
+						handled = arrowScroll(View.FOCUS_UP, false);
+					}
+					else
+					{
+						handled = fullScroll(View.FOCUS_UP, false);
+					}
+					break;
+				case KeyEvent.KEYCODE_DPAD_DOWN:
+					if (!event.isAltPressed())
+					{
+						handled = arrowScroll(View.FOCUS_DOWN, false);
+					}
+					else
+					{
+						handled = fullScroll(View.FOCUS_DOWN, false);
+					}
+					break;
+				case KeyEvent.KEYCODE_DPAD_LEFT:
+					if (!event.isAltPressed())
+					{
+						handled = arrowScroll(View.FOCUS_LEFT, true);
+					}
+					else
+					{
+						handled = fullScroll(View.FOCUS_LEFT, true);
+					}
+					break;
+				case KeyEvent.KEYCODE_DPAD_RIGHT:
+					if (!event.isAltPressed())
+					{
+						handled = arrowScroll(View.FOCUS_RIGHT, true);
+					}
+					else
+					{
+						handled = fullScroll(View.FOCUS_RIGHT, true);
+					}
+					break;
 			}
 		}
 		return handled;
@@ -379,41 +379,41 @@ public class ScrollView2D extends FrameLayout
 		final float x = ev.getX();
 		switch (action)
 		{
-		case MotionEvent.ACTION_MOVE:
-			/*
-			 * mIsBeingDragged == false, otherwise the shortcut would have caught it. Check
-			 * whether the user has moved far enough from his original down touch.
-			 */
-			/*
-			 * Locally do absolute value. mLastMotionY is set to the y value
-			 * of the down event.
-			 */
-			final int yDiff = (int)Math.abs(y - mLastMotionY);
-			final int xDiff = (int)Math.abs(x - mLastMotionX);
-			if (yDiff > mTouchSlop || xDiff > mTouchSlop)
-			{
-				mIsBeingDragged = true;
-			}
-			break;
+			case MotionEvent.ACTION_MOVE:
+				/*
+				 * mIsBeingDragged == false, otherwise the shortcut would have caught it. Check
+				 * whether the user has moved far enough from his original down touch.
+				 */
+				/*
+				 * Locally do absolute value. mLastMotionY is set to the y value
+				 * of the down event.
+				 */
+				final int yDiff = (int)Math.abs(y - mLastMotionY);
+				final int xDiff = (int)Math.abs(x - mLastMotionX);
+				if (yDiff > mTouchSlop || xDiff > mTouchSlop)
+				{
+					mIsBeingDragged = true;
+				}
+				break;
 
-		case MotionEvent.ACTION_DOWN:
-			/* Remember location of down touch */
-			mLastMotionY = y;
-			mLastMotionX = x;
+			case MotionEvent.ACTION_DOWN:
+				/* Remember location of down touch */
+				mLastMotionY = y;
+				mLastMotionX = x;
 
-			/*
-			 * If being flinged and user touches the screen, initiate drag;
-			 * otherwise don't.  mScroller.isFinished should be false when
-			 * being flinged.
-			 */
-			mIsBeingDragged = !mScroller.isFinished();
-			break;
+				/*
+				 * If being flinged and user touches the screen, initiate drag;
+				 * otherwise don't.  mScroller.isFinished should be false when
+				 * being flinged.
+				 */
+				mIsBeingDragged = !mScroller.isFinished();
+				break;
 
-		case MotionEvent.ACTION_CANCEL:
-		case MotionEvent.ACTION_UP:
-			/* Release the drag */
-			mIsBeingDragged = false;
-			break;
+			case MotionEvent.ACTION_CANCEL:
+			case MotionEvent.ACTION_UP:
+				/* Release the drag */
+				mIsBeingDragged = false;
+				break;
 		}
 
 		/*
@@ -450,85 +450,87 @@ public class ScrollView2D extends FrameLayout
 
 		switch (action)
 		{
-		case MotionEvent.ACTION_DOWN:
-			/*
-			 * If being flinged and user touches, stop the fling. isFinished
-			 * will be false if being flinged.
-			 */
-			if (!mScroller.isFinished())
-			{
-				mScroller.abortAnimation();
-			}
+			case MotionEvent.ACTION_DOWN:
+				/*
+				 * If being flinged and user touches, stop the fling. isFinished
+				 * will be false if being flinged.
+				 */
+				if (!mScroller.isFinished())
+				{
+					mScroller.abortAnimation();
+				}
 
-			// Remember where the motion event started
-			mLastMotionY = y;
-			mLastMotionX = x;
-			break;
-		case MotionEvent.ACTION_MOVE:
-			// Scroll to follow the motion event
-			int deltaX = (int)(mLastMotionX - x);
-			int deltaY = (int)(mLastMotionY - y);
-			mLastMotionX = x;
-			mLastMotionY = y;
+				// Remember where the motion event started
+				mLastMotionY = y;
+				mLastMotionX = x;
+				break;
+			case MotionEvent.ACTION_MOVE:
+				// Scroll to follow the motion event
+				int deltaX = (int)(mLastMotionX - x);
+				int deltaY = (int)(mLastMotionY - y);
+				mLastMotionX = x;
+				mLastMotionY = y;
 
-			if (deltaX < 0)
-			{
-				if (getScrollX() < 0)
+				if (deltaX < 0)
 				{
-					deltaX = 0;
+					if (getScrollX() < 0)
+					{
+						deltaX = 0;
+					}
 				}
-			}
-			else if (deltaX > 0)
-			{
-				final int rightEdge = getWidth() - getPaddingRight();
-				final int availableToScroll = getChildAt(0).getRight() - getScrollX() - rightEdge;
-				if (availableToScroll > 0)
+				else if (deltaX > 0)
 				{
-					deltaX = Math.min(availableToScroll, deltaX);
+					final int rightEdge = getWidth() - getPaddingRight();
+					final int availableToScroll =
+					    getChildAt(0).getRight() - getScrollX() - rightEdge;
+					if (availableToScroll > 0)
+					{
+						deltaX = Math.min(availableToScroll, deltaX);
+					}
+					else
+					{
+						deltaX = 0;
+					}
 				}
-				else
+				if (deltaY < 0)
 				{
-					deltaX = 0;
+					if (getScrollY() < 0)
+					{
+						deltaY = 0;
+					}
 				}
-			}
-			if (deltaY < 0)
-			{
-				if (getScrollY() < 0)
+				else if (deltaY > 0)
 				{
-					deltaY = 0;
+					final int bottomEdge = getHeight() - getPaddingBottom();
+					final int availableToScroll =
+					    getChildAt(0).getBottom() - getScrollY() - bottomEdge;
+					if (availableToScroll > 0)
+					{
+						deltaY = Math.min(availableToScroll, deltaY);
+					}
+					else
+					{
+						deltaY = 0;
+					}
 				}
-			}
-			else if (deltaY > 0)
-			{
-				final int bottomEdge = getHeight() - getPaddingBottom();
-				final int availableToScroll = getChildAt(0).getBottom() - getScrollY() - bottomEdge;
-				if (availableToScroll > 0)
+				if (deltaY != 0 || deltaX != 0)
+					scrollBy(deltaX, deltaY);
+				break;
+			case MotionEvent.ACTION_UP:
+				final VelocityTracker velocityTracker = mVelocityTracker;
+				velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
+				int initialXVelocity = (int)velocityTracker.getXVelocity();
+				int initialYVelocity = (int)velocityTracker.getYVelocity();
+				if ((Math.abs(initialXVelocity) + Math.abs(initialYVelocity) > mMinimumVelocity) &&
+				    getChildCount() > 0)
 				{
-					deltaY = Math.min(availableToScroll, deltaY);
+					fling(-initialXVelocity, -initialYVelocity);
 				}
-				else
+				if (mVelocityTracker != null)
 				{
-					deltaY = 0;
+					mVelocityTracker.recycle();
+					mVelocityTracker = null;
 				}
-			}
-			if (deltaY != 0 || deltaX != 0)
-				scrollBy(deltaX, deltaY);
-			break;
-		case MotionEvent.ACTION_UP:
-			final VelocityTracker velocityTracker = mVelocityTracker;
-			velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
-			int initialXVelocity = (int)velocityTracker.getXVelocity();
-			int initialYVelocity = (int)velocityTracker.getYVelocity();
-			if ((Math.abs(initialXVelocity) + Math.abs(initialYVelocity) > mMinimumVelocity) &&
-			    getChildCount() > 0)
-			{
-				fling(-initialXVelocity, -initialYVelocity);
-			}
-			if (mVelocityTracker != null)
-			{
-				mVelocityTracker.recycle();
-				mVelocityTracker = null;
-			}
 		}
 		return true;
 	}

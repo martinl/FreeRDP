@@ -28,8 +28,8 @@
 #include <libavcodec/version.h>
 
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 48, 101)
-#	error \
-	    "DSP module requires libavcodec version >= 57.48.101. Upgrade or set WITH_DSP_FFMPEG=OFF to continue"
+#error \
+    "DSP module requires libavcodec version >= 57.48.101. Upgrade or set WITH_DSP_FFMPEG=OFF to continue"
 #endif
 
 FREERDP_DSP_CONTEXT* freerdp_dsp_ffmpeg_context_new(BOOL encode);

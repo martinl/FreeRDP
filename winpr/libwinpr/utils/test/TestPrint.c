@@ -15,9 +15,9 @@
  */
 
 #if 0
-#	define _printf printf
+#define _printf printf
 #else
-#	define _printf wprintfx
+#define _printf wprintfx
 #endif
 
 int TestPrint(int argc, char* argv[])

@@ -8,16 +8,16 @@
 #define BlockUI_h
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED < 60000
-#	define NSTextAlignmentCenter UITextAlignmentCenter
-#	define NSLineBreakByWordWrapping UILineBreakModeWordWrap
-#	define NSLineBreakByClipping UILineBreakModeClip
+#define NSTextAlignmentCenter UITextAlignmentCenter
+#define NSLineBreakByWordWrapping UILineBreakModeWordWrap
+#define NSLineBreakByClipping UILineBreakModeClip
 
 #endif
 
 #ifndef IOS_LESS_THAN_6
-#	define IOS_LESS_THAN_6                                                                    \
-		!([[[UIDevice currentDevice] systemVersion] compare:@"6.0" options:NSNumericSearch] != \
-		  NSOrderedAscending)
+#define IOS_LESS_THAN_6                                        \
+	!([[[UIDevice currentDevice] systemVersion] compare:@"6.0" \
+	                                            options:NSNumericSearch] != NSOrderedAscending)
 
 #endif
 

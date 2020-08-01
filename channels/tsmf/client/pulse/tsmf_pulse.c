@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -51,20 +51,20 @@ static void tsmf_pulse_context_state_callback(pa_context* context, void* userdat
 
 	switch (state)
 	{
-	case PA_CONTEXT_READY:
-		DEBUG_TSMF("PA_CONTEXT_READY");
-		pa_threaded_mainloop_signal(pulse->mainloop, 0);
-		break;
+		case PA_CONTEXT_READY:
+			DEBUG_TSMF("PA_CONTEXT_READY");
+			pa_threaded_mainloop_signal(pulse->mainloop, 0);
+			break;
 
-	case PA_CONTEXT_FAILED:
-	case PA_CONTEXT_TERMINATED:
-		DEBUG_TSMF("state %d", state);
-		pa_threaded_mainloop_signal(pulse->mainloop, 0);
-		break;
+		case PA_CONTEXT_FAILED:
+		case PA_CONTEXT_TERMINATED:
+			DEBUG_TSMF("state %d", state);
+			pa_threaded_mainloop_signal(pulse->mainloop, 0);
+			break;
 
-	default:
-		DEBUG_TSMF("state %d", state);
-		break;
+		default:
+			DEBUG_TSMF("state %d", state);
+			break;
 	}
 }
 
@@ -184,20 +184,20 @@ static void tsmf_pulse_stream_state_callback(pa_stream* stream, void* userdata)
 
 	switch (state)
 	{
-	case PA_STREAM_READY:
-		DEBUG_TSMF("PA_STREAM_READY");
-		pa_threaded_mainloop_signal(pulse->mainloop, 0);
-		break;
+		case PA_STREAM_READY:
+			DEBUG_TSMF("PA_STREAM_READY");
+			pa_threaded_mainloop_signal(pulse->mainloop, 0);
+			break;
 
-	case PA_STREAM_FAILED:
-	case PA_STREAM_TERMINATED:
-		DEBUG_TSMF("state %d", state);
-		pa_threaded_mainloop_signal(pulse->mainloop, 0);
-		break;
+		case PA_STREAM_FAILED:
+		case PA_STREAM_TERMINATED:
+			DEBUG_TSMF("state %d", state);
+			pa_threaded_mainloop_signal(pulse->mainloop, 0);
+			break;
 
-	default:
-		DEBUG_TSMF("state %d", state);
-		break;
+		default:
+			DEBUG_TSMF("state %d", state);
+			break;
 	}
 }
 

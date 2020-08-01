@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -28,7 +28,7 @@
 
 #ifndef _WIN32
 
-#	include "wnd.h"
+#include "wnd.h"
 
 /**
  * Custom Functions

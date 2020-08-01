@@ -112,14 +112,14 @@ enum SPI_MASK
 
 /* Client Notify Event PDU */
 #ifndef _WIN32
-#	define NIN_SELECT 0x00000400
-#	define NIN_KEYSELECT 0x00000401
-#	define NIN_BALLOONSHOW 0x00000402
-#	define NIN_BALLOONHIDE 0x00000403
-#	define NIN_BALLOONTIMEOUT 0x00000404
-#	define NIN_BALLOONUSERCLICK 0x00000405
+#define NIN_SELECT 0x00000400
+#define NIN_KEYSELECT 0x00000401
+#define NIN_BALLOONSHOW 0x00000402
+#define NIN_BALLOONHIDE 0x00000403
+#define NIN_BALLOONTIMEOUT 0x00000404
+#define NIN_BALLOONUSERCLICK 0x00000405
 #else
-#	include <shellapi.h>
+#include <shellapi.h>
 #endif
 
 /* DEPRECATED: Client Information PDU
@@ -182,12 +182,12 @@ enum SPI_MASK
 
 /* LanguageProfileCLSID and ProfileGUID */
 #ifndef _WIN32
-#	define GUID_NULL                                                                  \
-		{                                                                              \
-			0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-		}
+#define GUID_NULL                                                                  \
+	{                                                                              \
+		0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
+	}
 #else
-#	include <cguid.h>
+#include <cguid.h>
 #endif
 #define GUID_MSIME_JPN                                                             \
 	{                                                                              \
@@ -244,27 +244,27 @@ enum SPI_MASK
 
 /* ImeConvMode */
 #ifndef _IME_CMODES_
-#	define IME_CMODE_NATIVE 0x00000001
-#	define IME_CMODE_KATAKANA 0x00000002
-#	define IME_CMODE_FULLSHAPE 0x00000008
-#	define IME_CMODE_ROMAN 0x00000010
-#	define IME_CMODE_CHARCODE 0x00000020
-#	define IME_CMODE_HANJACONVERT 0x00000040
-#	define IME_CMODE_SOFTKBD 0x00000080
-#	define IME_CMODE_NOCONVERSION 0x00000100
-#	define IME_CMODE_EUDC 0x00000200
-#	define IME_CMODE_SYMBOL 0x00000400
-#	define IME_CMODE_FIXED 0x00000800
+#define IME_CMODE_NATIVE 0x00000001
+#define IME_CMODE_KATAKANA 0x00000002
+#define IME_CMODE_FULLSHAPE 0x00000008
+#define IME_CMODE_ROMAN 0x00000010
+#define IME_CMODE_CHARCODE 0x00000020
+#define IME_CMODE_HANJACONVERT 0x00000040
+#define IME_CMODE_SOFTKBD 0x00000080
+#define IME_CMODE_NOCONVERSION 0x00000100
+#define IME_CMODE_EUDC 0x00000200
+#define IME_CMODE_SYMBOL 0x00000400
+#define IME_CMODE_FIXED 0x00000800
 #endif
 
 /* ImeSentenceMode */
 #ifndef _IMM_
-#	define IME_SMODE_NONE 0x00000000
-#	define IME_SMODE_PLURALCASE 0x00000001
-#	define IME_SMODE_SINGLECONVERT 0x00000002
-#	define IME_SMODE_AUTOMATIC 0x00000004
-#	define IME_SMODE_PHRASEPREDICT 0x00000008
-#	define IME_SMODE_CONVERSATION 0x00000010
+#define IME_SMODE_NONE 0x00000000
+#define IME_SMODE_PLURALCASE 0x00000001
+#define IME_SMODE_SINGLECONVERT 0x00000002
+#define IME_SMODE_AUTOMATIC 0x00000004
+#define IME_SMODE_PHRASEPREDICT 0x00000008
+#define IME_SMODE_CONVERSATION 0x00000010
 #endif
 
 /* KANAMode */

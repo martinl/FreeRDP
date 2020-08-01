@@ -18,22 +18,22 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "schannel_openssl.h"
 
 #ifdef WITH_OPENSSL
 
-#	include <winpr/crt.h>
-#	include <winpr/sspi.h>
-#	include <winpr/ssl.h>
-#	include <winpr/print.h>
-#	include <winpr/crypto.h>
+#include <winpr/crt.h>
+#include <winpr/sspi.h>
+#include <winpr/ssl.h>
+#include <winpr/print.h>
+#include <winpr/crypto.h>
 
-#	include <openssl/ssl.h>
-#	include <openssl/err.h>
-#	include <openssl/bio.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include <openssl/bio.h>
 
 struct _SCHANNEL_OPENSSL
 {
@@ -46,27 +46,27 @@ struct _SCHANNEL_OPENSSL
 	BYTE* WriteBuffer;
 };
 
-#	include "../../log.h"
-#	define TAG WINPR_TAG("sspi.schannel")
+#include "../../log.h"
+#define TAG WINPR_TAG("sspi.schannel")
 
 char* openssl_get_ssl_error_string(int ssl_error)
 {
 	switch (ssl_error)
 	{
-	case SSL_ERROR_ZERO_RETURN:
-		return "SSL_ERROR_ZERO_RETURN";
+		case SSL_ERROR_ZERO_RETURN:
+			return "SSL_ERROR_ZERO_RETURN";
 
-	case SSL_ERROR_WANT_READ:
-		return "SSL_ERROR_WANT_READ";
+		case SSL_ERROR_WANT_READ:
+			return "SSL_ERROR_WANT_READ";
 
-	case SSL_ERROR_WANT_WRITE:
-		return "SSL_ERROR_WANT_WRITE";
+		case SSL_ERROR_WANT_WRITE:
+			return "SSL_ERROR_WANT_WRITE";
 
-	case SSL_ERROR_SYSCALL:
-		return "SSL_ERROR_SYSCALL";
+		case SSL_ERROR_SYSCALL:
+			return "SSL_ERROR_SYSCALL";
 
-	case SSL_ERROR_SSL:
-		return "SSL_ERROR_SSL";
+		case SSL_ERROR_SSL:
+			return "SSL_ERROR_SSL";
 	}
 
 	return "SSL_ERROR_UNKNOWN";
@@ -93,9 +93,9 @@ int schannel_openssl_client_init(SCHANNEL_OPENSSL* context)
 	 * and the FreeRDP client, and caused major performance issues,
 	 * which is why we're disabling it.
 	 */
-#	ifdef SSL_OP_NO_COMPRESSION
+#ifdef SSL_OP_NO_COMPRESSION
 	options |= SSL_OP_NO_COMPRESSION;
-#	endif
+#endif
 	/**
 	 * SSL_OP_TLS_BLOCK_PADDING_BUG:
 	 *
@@ -221,9 +221,9 @@ int schannel_openssl_server_init(SCHANNEL_OPENSSL* context)
 	 * and the FreeRDP client, and caused major performance issues,
 	 * which is why we're disabling it.
 	 */
-#	ifdef SSL_OP_NO_COMPRESSION
+#ifdef SSL_OP_NO_COMPRESSION
 	options |= SSL_OP_NO_COMPRESSION;
-#	endif
+#endif
 	/**
 	 * SSL_OP_TLS_BLOCK_PADDING_BUG:
 	 *

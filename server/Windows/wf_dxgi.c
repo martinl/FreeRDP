@@ -18,23 +18,23 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "wf_interface.h"
 
 #ifdef WITH_DXGI_1_2
 
-#	define CINTERFACE
+#define CINTERFACE
 
-#	include <D3D11.h>
-#	include <dxgi1_2.h>
+#include <D3D11.h>
+#include <dxgi1_2.h>
 
-#	include <tchar.h>
-#	include "wf_dxgi.h"
+#include <tchar.h>
+#include "wf_dxgi.h"
 
-#	include <freerdp/log.h>
-#	define TAG SERVER_TAG("windows")
+#include <freerdp/log.h>
+#define TAG SERVER_TAG("windows")
 
 /* Driver types supported */
 D3D_DRIVER_TYPE DriverTypes[] = {

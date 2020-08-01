@@ -24,7 +24,8 @@
 @synthesize parent = _parent, uuid = _uuid, label = _label, image = _image;
 @synthesize params = _connection_params, conntectedViaWLAN = _connected_via_wlan;
 
-- (id)init {
+- (id)init
+{
 	if (!(self = [super init]))
 		return nil;
 
@@ -35,7 +36,8 @@
 }
 
 // Designated initializer.
-- (id)initWithConnectionParameters:(ConnectionParams *)params {
+- (id)initWithConnectionParameters:(ConnectionParams *)params
+{
 	if (!(self = [self init]))
 		return nil;
 
@@ -44,7 +46,8 @@
 	return self;
 }
 
-- (id)initWithCoder:(NSCoder *)decoder {
+- (id)initWithCoder:(NSCoder *)decoder
+{
 	if (!(self = [self init]))
 		return nil;
 
@@ -69,25 +72,29 @@
 	return self;
 }
 
-- (id)initWithBaseDefaultParameters {
+- (id)initWithBaseDefaultParameters
+{
 	return [self initWithConnectionParameters:[[[ConnectionParams alloc]
 	                                              initWithBaseDefaultParameters] autorelease]];
 }
 
-- (id)copy {
+- (id)copy
+{
 	ComputerBookmark *copy = [[[self class] alloc] init];
 	[copy setLabel:[self label]];
 	copy->_connection_params = [_connection_params copy];
 	return copy;
 }
 
-- (id)copyWithUUID {
+- (id)copyWithUUID
+{
 	ComputerBookmark *copy = [self copy];
 	copy->_uuid = [[self uuid] copy];
 	return copy;
 }
 
-- (void)encodeWithCoder:(NSCoder *)coder {
+- (void)encodeWithCoder:(NSCoder *)coder
+{
 	if (![coder allowsKeyedCoding])
 		[NSException raise:NSInvalidArgumentException format:@"coder must support keyed archiving"];
 
@@ -96,7 +103,8 @@
 	[coder encodeObject:_connection_params forKey:@"connectionParams"];
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	_parent = nil;
 	[_label release];
 	_label = nil;
@@ -107,19 +115,23 @@
 	[super dealloc];
 }
 
-- (UIImage *)image {
+- (UIImage *)image
+{
 	return nil;
 }
 
-- (BOOL)isEqual:(id)object {
+- (BOOL)isEqual:(id)object
+{
 	return [object respondsToSelector:@selector(uuid)] && [[object uuid] isEqual:_uuid];
 }
 
-- (NSString *)description {
+- (NSString *)description
+{
 	return ([self label] != nil) ? [self label] : _uuid;
 }
 
-- (BOOL)validateValue:(id *)val forKey:(NSString *)key error:(NSError **)error {
+- (BOOL)validateValue:(id *)val forKey:(NSString *)key error:(NSError **)error
+{
 	NSString *string_value = *val;
 
 	if ([key isEqualToString:@"label"])
@@ -150,27 +162,33 @@
 	return YES;
 }
 
-- (BOOL)validateValue:(id *)val forKeyPath:(NSString *)keyPath error:(NSError **)error {
+- (BOOL)validateValue:(id *)val forKeyPath:(NSString *)keyPath error:(NSError **)error
+{
 	// Could be used to validate params.hostname, params.password, params.port, etc.
 	return [super validateValue:val forKeyPath:keyPath error:error];
 }
 
-- (BOOL)isDeletable {
+- (BOOL)isDeletable
+{
 	return YES;
 }
-- (BOOL)isMovable {
+- (BOOL)isMovable
+{
 	return YES;
 }
-- (BOOL)isRenamable {
+- (BOOL)isRenamable
+{
 	return YES;
 }
-- (BOOL)hasImmutableHost {
+- (BOOL)hasImmutableHost
+{
 	return NO;
 }
 
 #pragma mark Custom KVC
 
-- (void)setValue:(id)value forKeyPath:(NSString *)keyPath {
+- (void)setValue:(id)value forKeyPath:(NSString *)keyPath
+{
 	if ([keyPath isEqualToString:@"params.resolution"])
 	{
 		int width, height;
@@ -199,7 +217,8 @@
 	}
 }
 
-- (id)valueForKeyPath:(NSString *)keyPath {
+- (id)valueForKeyPath:(NSString *)keyPath
+{
 	if ([keyPath isEqualToString:@"params.resolution"])
 		return ScreenResolutionDescription([[self params] intForKey:@"screen_resolution_type"],
 		                                   [[self params] intForKey:@"width"],
@@ -211,14 +230,16 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
                         change:(NSDictionary *)change
-                       context:(void *)context {
+                       context:(void *)context
+{
 	if ([[change objectForKey:NSKeyValueChangeNotificationIsPriorKey] boolValue])
 		[self willChangeValueForKeyPath:keyPath];
 	else
 		[self didChangeValueForKeyPath:keyPath];
 }
 
-- (NSDictionary *)targetForChangeNotificationForKeyPath:(NSString *)keyPath {
+- (NSDictionary *)targetForChangeNotificationForKeyPath:(NSString *)keyPath
+{
 	NSString *changed_key = keyPath;
 	NSObject *changed_object = self;
 
@@ -232,47 +253,60 @@
 	    dictionaryWithObjectsAndKeys:changed_key, @"key", changed_object, @"object", nil];
 }
 
-- (void)willChangeValueForKeyPath:(NSString *)keyPath {
+- (void)willChangeValueForKeyPath:(NSString *)keyPath
+{
 	NSDictionary *target = [self targetForChangeNotificationForKeyPath:keyPath];
 	[[target objectForKey:@"object"] willChangeValueForKey:[target objectForKey:@"key"]];
 }
 
-- (void)didChangeValueForKeyPath:(NSString *)keyPath {
+- (void)didChangeValueForKeyPath:(NSString *)keyPath
+{
 	NSDictionary *target = [self targetForChangeNotificationForKeyPath:keyPath];
 	[[target objectForKey:@"object"] didChangeValueForKey:[target objectForKey:@"key"]];
 }
 
-- (ConnectionParams *)copyMarkedParams {
+- (ConnectionParams *)copyMarkedParams
+{
 	ConnectionParams *param_copy = [[self params] copy];
 	[param_copy setValue:[self uuid] forKey:@"_bookmark_uuid"];
 	return param_copy;
 }
 
 #pragma mark No children
-- (NSUInteger)numberOfChildren {
+- (NSUInteger)numberOfChildren
+{
 	return 0;
 }
-- (NSUInteger)numberOfDescendants {
+- (NSUInteger)numberOfDescendants
+{
 	return 1;
 }
-- (BookmarkBase *)childAtIndex:(NSUInteger)index {
+- (BookmarkBase *)childAtIndex:(NSUInteger)index
+{
 	return nil;
 }
-- (NSUInteger)indexOfChild:(BookmarkBase *)child {
+- (NSUInteger)indexOfChild:(BookmarkBase *)child
+{
 	return 0;
 }
-- (void)removeChild:(BookmarkBase *)child {
+- (void)removeChild:(BookmarkBase *)child
+{
 }
-- (void)addChild:(BookmarkBase *)child {
+- (void)addChild:(BookmarkBase *)child
+{
 }
-- (void)addChild:(BookmarkBase *)child afterExistingChild:(BookmarkBase *)existingChild {
+- (void)addChild:(BookmarkBase *)child afterExistingChild:(BookmarkBase *)existingChild
+{
 }
-- (void)addChild:(BookmarkBase *)child atIndex:(NSInteger)index {
+- (void)addChild:(BookmarkBase *)child atIndex:(NSInteger)index
+{
 }
-- (BOOL)hasDescendant:(BookmarkBase *)needle {
+- (BOOL)hasDescendant:(BookmarkBase *)needle
+{
 	return NO;
 }
-- (BOOL)canContainChildren {
+- (BOOL)canContainChildren
+{
 	return NO;
 }
 @end

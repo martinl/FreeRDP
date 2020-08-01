@@ -33,7 +33,7 @@
 #include <freerdp/server/rdpsnd.h>
 
 #if _WIN32_WINNT >= 0x0602
-#	define WITH_DXGI_1_2 1
+#define WITH_DXGI_1_2 1
 #endif
 
 #define FREERDP_SERVER_WIN_SRV_CALLBACK_EVENT_CONNECT 1

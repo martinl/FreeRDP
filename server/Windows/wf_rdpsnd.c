@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -33,11 +33,11 @@
 
 #ifdef WITH_RDPSND_DSOUND
 
-#	include "wf_directsound.h"
+#include "wf_directsound.h"
 
 #else
 
-#	include "wf_wasapi.h"
+#include "wf_wasapi.h"
 
 #endif
 
@@ -95,19 +95,19 @@ int wf_rdpsnd_lock()
 
 	switch (dRes)
 	{
-	case WAIT_ABANDONED:
-	case WAIT_OBJECT_0:
-		return TRUE;
-		break;
+		case WAIT_ABANDONED:
+		case WAIT_OBJECT_0:
+			return TRUE;
+			break;
 
-	case WAIT_TIMEOUT:
-		return FALSE;
-		break;
+		case WAIT_TIMEOUT:
+			return FALSE;
+			break;
 
-	case WAIT_FAILED:
-		WLog_ERR(TAG, "wf_rdpsnd_lock failed with 0x%08lX", GetLastError());
-		return -1;
-		break;
+		case WAIT_FAILED:
+			WLog_ERR(TAG, "wf_rdpsnd_lock failed with 0x%08lX", GetLastError());
+			return -1;
+			break;
 	}
 
 	return -1;

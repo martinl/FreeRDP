@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -41,12 +41,12 @@
 
 #define TAG FREERDP_TAG("core.server")
 #ifdef WITH_DEBUG_DVC
-#	define DEBUG_DVC(...) WLog_DBG(TAG, __VA_ARGS__)
+#define DEBUG_DVC(...) WLog_DBG(TAG, __VA_ARGS__)
 #else
-#	define DEBUG_DVC(...) \
-		do                 \
-		{                  \
-		} while (0)
+#define DEBUG_DVC(...) \
+	do                 \
+	{                  \
+	} while (0)
 #endif
 
 struct _wtsChannelMessage
@@ -118,26 +118,26 @@ static int wts_read_variable_uint(wStream* s, int cbLen, UINT32* val)
 {
 	switch (cbLen)
 	{
-	case 0:
-		if (Stream_GetRemainingLength(s) < 1)
-			return 0;
+		case 0:
+			if (Stream_GetRemainingLength(s) < 1)
+				return 0;
 
-		Stream_Read_UINT8(s, *val);
-		return 1;
+			Stream_Read_UINT8(s, *val);
+			return 1;
 
-	case 1:
-		if (Stream_GetRemainingLength(s) < 2)
-			return 0;
+		case 1:
+			if (Stream_GetRemainingLength(s) < 2)
+				return 0;
 
-		Stream_Read_UINT16(s, *val);
-		return 2;
+			Stream_Read_UINT16(s, *val);
+			return 2;
 
-	default:
-		if (Stream_GetRemainingLength(s) < 4)
-			return 0;
+		default:
+			if (Stream_GetRemainingLength(s) < 4)
+				return 0;
 
-		Stream_Read_UINT32(s, *val);
-		return 4;
+			Stream_Read_UINT32(s, *val);
+			return 4;
 	}
 }
 
@@ -278,22 +278,22 @@ static BOOL wts_read_drdynvc_pdu(rdpPeerChannel* channel)
 		{
 			switch (Cmd)
 			{
-			case CREATE_REQUEST_PDU:
-				return wts_read_drdynvc_create_response(dvc, channel->receiveData, length);
+				case CREATE_REQUEST_PDU:
+					return wts_read_drdynvc_create_response(dvc, channel->receiveData, length);
 
-			case DATA_FIRST_PDU:
-				return wts_read_drdynvc_data_first(dvc, channel->receiveData, Sp, length);
+				case DATA_FIRST_PDU:
+					return wts_read_drdynvc_data_first(dvc, channel->receiveData, Sp, length);
 
-			case DATA_PDU:
-				return wts_read_drdynvc_data(dvc, channel->receiveData, length);
+				case DATA_PDU:
+					return wts_read_drdynvc_data(dvc, channel->receiveData, length);
 
-			case CLOSE_REQUEST_PDU:
-				wts_read_drdynvc_close_response(dvc);
-				break;
+				case CLOSE_REQUEST_PDU:
+					wts_read_drdynvc_close_response(dvc);
+					break;
 
-			default:
-				WLog_ERR(TAG, "Cmd %d not recognized.", Cmd);
-				break;
+				default:
+					WLog_ERR(TAG, "Cmd %d not recognized.", Cmd);
+					break;
 			}
 		}
 		else
@@ -1368,90 +1368,90 @@ BOOL WINAPI FreeRDP_WTSVirtualChannelQuery(HANDLE hChannelHandle, WTS_VIRTUAL_CL
 
 	switch ((UINT32)WtsVirtualClass)
 	{
-	case WTSVirtualFileHandle:
-		pfd = GetEventWaitObject(hEvent);
+		case WTSVirtualFileHandle:
+			pfd = GetEventWaitObject(hEvent);
 
-		if (pfd)
-		{
-			fds[fds_count] = pfd;
-			(fds_count)++;
-		}
-
-		*ppBuffer = malloc(sizeof(void*));
-
-		if (!*ppBuffer)
-		{
-			SetLastError(E_OUTOFMEMORY);
-		}
-		else
-		{
-			CopyMemory(*ppBuffer, &fds[0], sizeof(void*));
-			*pBytesReturned = sizeof(void*);
-			status = TRUE;
-		}
-
-		break;
-
-	case WTSVirtualEventHandle:
-		*ppBuffer = malloc(sizeof(HANDLE));
-
-		if (!*ppBuffer)
-		{
-			SetLastError(E_OUTOFMEMORY);
-		}
-		else
-		{
-			CopyMemory(*ppBuffer, &(hEvent), sizeof(HANDLE));
-			*pBytesReturned = sizeof(void*);
-			status = TRUE;
-		}
-
-		break;
-
-	case WTSVirtualChannelReady:
-		if (channel->channelType == RDP_PEER_CHANNEL_TYPE_SVC)
-		{
-			bval = TRUE;
-			status = TRUE;
-		}
-		else
-		{
-			switch (channel->dvc_open_state)
+			if (pfd)
 			{
-			case DVC_OPEN_STATE_NONE:
-				bval = FALSE;
-				status = TRUE;
-				break;
+				fds[fds_count] = pfd;
+				(fds_count)++;
+			}
 
-			case DVC_OPEN_STATE_SUCCEEDED:
+			*ppBuffer = malloc(sizeof(void*));
+
+			if (!*ppBuffer)
+			{
+				SetLastError(E_OUTOFMEMORY);
+			}
+			else
+			{
+				CopyMemory(*ppBuffer, &fds[0], sizeof(void*));
+				*pBytesReturned = sizeof(void*);
+				status = TRUE;
+			}
+
+			break;
+
+		case WTSVirtualEventHandle:
+			*ppBuffer = malloc(sizeof(HANDLE));
+
+			if (!*ppBuffer)
+			{
+				SetLastError(E_OUTOFMEMORY);
+			}
+			else
+			{
+				CopyMemory(*ppBuffer, &(hEvent), sizeof(HANDLE));
+				*pBytesReturned = sizeof(void*);
+				status = TRUE;
+			}
+
+			break;
+
+		case WTSVirtualChannelReady:
+			if (channel->channelType == RDP_PEER_CHANNEL_TYPE_SVC)
+			{
 				bval = TRUE;
 				status = TRUE;
-				break;
-
-			default:
-				bval = FALSE;
-				status = FALSE;
-				break;
 			}
-		}
+			else
+			{
+				switch (channel->dvc_open_state)
+				{
+					case DVC_OPEN_STATE_NONE:
+						bval = FALSE;
+						status = TRUE;
+						break;
 
-		*ppBuffer = malloc(sizeof(BOOL));
+					case DVC_OPEN_STATE_SUCCEEDED:
+						bval = TRUE;
+						status = TRUE;
+						break;
 
-		if (!*ppBuffer)
-		{
-			SetLastError(E_OUTOFMEMORY);
-			status = FALSE;
-		}
-		else
-		{
-			CopyMemory(*ppBuffer, &bval, sizeof(BOOL));
-			*pBytesReturned = sizeof(BOOL);
-		}
+					default:
+						bval = FALSE;
+						status = FALSE;
+						break;
+				}
+			}
 
-		break;
+			*ppBuffer = malloc(sizeof(BOOL));
 
-	default:
-		break;
+			if (!*ppBuffer)
+			{
+				SetLastError(E_OUTOFMEMORY);
+				status = FALSE;
+			}
+			else
+			{
+				CopyMemory(*ppBuffer, &bval, sizeof(BOOL));
+				*pBytesReturned = sizeof(BOOL);
+			}
+
+			break;
+
+		default:
+			break;
 	}
 
 	return status;

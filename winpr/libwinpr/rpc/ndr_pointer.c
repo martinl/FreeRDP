@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -28,8 +28,8 @@
 
 #ifndef _WIN32
 
-#	include "ndr_pointer.h"
-#	include "ndr_private.h"
+#include "ndr_pointer.h"
+#include "ndr_private.h"
 
 /**
  * Pointer Layout: http://msdn.microsoft.com/en-us/library/windows/desktop/aa374376/
@@ -138,19 +138,19 @@ void NdrpPointerBufferSize(unsigned char* pMemory, PFORMAT_STRING pFormat,
 
 	switch (type)
 	{
-	case FC_RP: /* Reference Pointer */
-		break;
+		case FC_RP: /* Reference Pointer */
+			break;
 
-	case FC_UP: /* Unique Pointer */
-	case FC_OP: /* Unique Pointer in an object interface */
-		if (!pMemory)
-			return;
+		case FC_UP: /* Unique Pointer */
+		case FC_OP: /* Unique Pointer in an object interface */
+			if (!pMemory)
+				return;
 
-		break;
+			break;
 
-	case FC_FP: /* Full Pointer */
-		WLog_ERR(TAG, "warning: FC_FP unimplemented");
-		break;
+		case FC_FP: /* Full Pointer */
+			WLog_ERR(TAG, "warning: FC_FP unimplemented");
+			break;
 	}
 
 	if ((attributes & FC_POINTER_DEREF) && pMemory)

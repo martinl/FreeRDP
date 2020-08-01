@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <string.h>
@@ -464,20 +464,20 @@ static DWORD client_cli_accept_certificate(rdpSettings* settings)
 
 		switch (answer)
 		{
-		case 'y':
-		case 'Y':
-			return 1;
+			case 'y':
+			case 'Y':
+				return 1;
 
-		case 't':
-		case 'T':
-			return 2;
+			case 't':
+			case 'T':
+				return 2;
 
-		case 'n':
-		case 'N':
-			return 0;
+			case 'n':
+			case 'N':
+				return 0;
 
-		default:
-			break;
+			default:
+				break;
 		}
 
 		printf("\n");

@@ -32,7 +32,8 @@ static EncryptionController *_shared_encryption_controller = nil;
 
 @implementation EncryptionController
 
-+ (EncryptionController *)sharedEncryptionController {
++ (EncryptionController *)sharedEncryptionController
+{
 	@synchronized(self)
 	{
 		if (_shared_encryption_controller == nil)
@@ -44,7 +45,8 @@ static EncryptionController *_shared_encryption_controller = nil;
 
 #pragma mark Getting an encryptor or decryptor
 
-- (Encryptor *)encryptor {
+- (Encryptor *)encryptor
+{
 	if (_shared_encryptor)
 		return _shared_encryptor;
 
@@ -67,7 +69,8 @@ static EncryptionController *_shared_encryption_controller = nil;
 }
 
 // For the current implementation, decryptors and encryptors are equivilant.
-- (Encryptor *)decryptor {
+- (Encryptor *)decryptor
+{
 	return [self encryptor];
 }
 
@@ -80,15 +83,18 @@ static EncryptionController *_shared_encryption_controller = nil;
 #pragma mark -
 #pragma mark Keychain password storage
 
-- (NSString *)keychainServerName {
+- (NSString *)keychainServerName
+{
 	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
 }
 
-- (NSString *)keychainUsername {
+- (NSString *)keychainUsername
+{
 	return @"master.password";
 }
 
-- (void)setKeychainPassword:(NSString *)password {
+- (void)setKeychainPassword:(NSString *)password
+{
 	NSError *error;
 	if (password == nil)
 	{
@@ -105,14 +111,16 @@ static EncryptionController *_shared_encryption_controller = nil;
 	                           error:&error];
 }
 
-- (NSString *)keychainPassword {
+- (NSString *)keychainPassword
+{
 	NSError *error;
 	return [SFHFKeychainUtils getPasswordForUsername:[self keychainUsername]
 	                                   andServerName:[self keychainServerName]
 	                                           error:&error];
 }
 
-- (NSString *)keychainDefaultPassword {
+- (NSString *)keychainDefaultPassword
+{
 	NSString *password = [[NSUserDefaults standardUserDefaults] stringForKey:@"UUID"];
 	if ([password length] == 0)
 	{
@@ -126,16 +134,19 @@ static EncryptionController *_shared_encryption_controller = nil;
 #pragma mark -
 #pragma mark Verification of encryption key against verification data
 
-- (BOOL)verifyPassword:(Encryptor *)decryptor {
+- (BOOL)verifyPassword:(Encryptor *)decryptor
+{
 	return [[decryptor plaintextPassword]
 	    isEqualToString:[decryptor decryptString:[self encryptedVerificationData]]];
 }
 
-- (NSData *)encryptedVerificationData {
+- (NSData *)encryptedVerificationData
+{
 	return [[NSUserDefaults standardUserDefaults] dataForKey:@"TSXMasterPasswordVerification"];
 }
 
-- (void)setEncryptedVerificationData:(Encryptor *)encryptor {
+- (void)setEncryptedVerificationData:(Encryptor *)encryptor
+{
 	[[NSUserDefaults standardUserDefaults]
 	    setObject:[encryptor encryptString:[encryptor plaintextPassword]]
 	       forKey:@"TSXMasterPasswordVerification"];

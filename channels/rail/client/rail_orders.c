@@ -23,7 +23,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -182,16 +182,16 @@ static UINT rail_read_server_sysparam_order(wStream* s, RAIL_SYSPARAM_ORDER* sys
 
 	switch (sysparam->param)
 	{
-	case SPI_SETSCREENSAVEACTIVE:
-		sysparam->setScreenSaveActive = (body != 0) ? TRUE : FALSE;
-		break;
+		case SPI_SETSCREENSAVEACTIVE:
+			sysparam->setScreenSaveActive = (body != 0) ? TRUE : FALSE;
+			break;
 
-	case SPI_SETSCREENSAVESECURE:
-		sysparam->setScreenSaveSecure = (body != 0) ? TRUE : FALSE;
-		break;
+		case SPI_SETSCREENSAVESECURE:
+			sysparam->setScreenSaveSecure = (body != 0) ? TRUE : FALSE;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return CHANNEL_RC_OK;
@@ -375,84 +375,84 @@ UINT rail_write_client_sysparam_order(railPlugin* rail, wStream* s,
 
 	switch (sysparam->param)
 	{
-	case SPI_SET_DRAG_FULL_WINDOWS:
-		body = sysparam->dragFullWindows ? 1 : 0;
-		Stream_Write_UINT8(s, body);
-		break;
+		case SPI_SET_DRAG_FULL_WINDOWS:
+			body = sysparam->dragFullWindows ? 1 : 0;
+			Stream_Write_UINT8(s, body);
+			break;
 
-	case SPI_SET_KEYBOARD_CUES:
-		body = sysparam->keyboardCues ? 1 : 0;
-		Stream_Write_UINT8(s, body);
-		break;
+		case SPI_SET_KEYBOARD_CUES:
+			body = sysparam->keyboardCues ? 1 : 0;
+			Stream_Write_UINT8(s, body);
+			break;
 
-	case SPI_SET_KEYBOARD_PREF:
-		body = sysparam->keyboardPref ? 1 : 0;
-		Stream_Write_UINT8(s, body);
-		break;
+		case SPI_SET_KEYBOARD_PREF:
+			body = sysparam->keyboardPref ? 1 : 0;
+			Stream_Write_UINT8(s, body);
+			break;
 
-	case SPI_SET_MOUSE_BUTTON_SWAP:
-		body = sysparam->mouseButtonSwap ? 1 : 0;
-		Stream_Write_UINT8(s, body);
-		break;
+		case SPI_SET_MOUSE_BUTTON_SWAP:
+			body = sysparam->mouseButtonSwap ? 1 : 0;
+			Stream_Write_UINT8(s, body);
+			break;
 
-	case SPI_SET_WORK_AREA:
-		Stream_Write_UINT16(s, sysparam->workArea.left);   /* left (2 bytes) */
-		Stream_Write_UINT16(s, sysparam->workArea.top);    /* top (2 bytes) */
-		Stream_Write_UINT16(s, sysparam->workArea.right);  /* right (2 bytes) */
-		Stream_Write_UINT16(s, sysparam->workArea.bottom); /* bottom (2 bytes) */
-		break;
+		case SPI_SET_WORK_AREA:
+			Stream_Write_UINT16(s, sysparam->workArea.left);   /* left (2 bytes) */
+			Stream_Write_UINT16(s, sysparam->workArea.top);    /* top (2 bytes) */
+			Stream_Write_UINT16(s, sysparam->workArea.right);  /* right (2 bytes) */
+			Stream_Write_UINT16(s, sysparam->workArea.bottom); /* bottom (2 bytes) */
+			break;
 
-	case SPI_DISPLAY_CHANGE:
-		Stream_Write_UINT16(s, sysparam->displayChange.left);   /* left (2 bytes) */
-		Stream_Write_UINT16(s, sysparam->displayChange.top);    /* top (2 bytes) */
-		Stream_Write_UINT16(s, sysparam->displayChange.right);  /* right (2 bytes) */
-		Stream_Write_UINT16(s, sysparam->displayChange.bottom); /* bottom (2 bytes) */
-		break;
+		case SPI_DISPLAY_CHANGE:
+			Stream_Write_UINT16(s, sysparam->displayChange.left);   /* left (2 bytes) */
+			Stream_Write_UINT16(s, sysparam->displayChange.top);    /* top (2 bytes) */
+			Stream_Write_UINT16(s, sysparam->displayChange.right);  /* right (2 bytes) */
+			Stream_Write_UINT16(s, sysparam->displayChange.bottom); /* bottom (2 bytes) */
+			break;
 
-	case SPI_TASKBAR_POS:
-		Stream_Write_UINT16(s, sysparam->taskbarPos.left);   /* left (2 bytes) */
-		Stream_Write_UINT16(s, sysparam->taskbarPos.top);    /* top (2 bytes) */
-		Stream_Write_UINT16(s, sysparam->taskbarPos.right);  /* right (2 bytes) */
-		Stream_Write_UINT16(s, sysparam->taskbarPos.bottom); /* bottom (2 bytes) */
-		break;
+		case SPI_TASKBAR_POS:
+			Stream_Write_UINT16(s, sysparam->taskbarPos.left);   /* left (2 bytes) */
+			Stream_Write_UINT16(s, sysparam->taskbarPos.top);    /* top (2 bytes) */
+			Stream_Write_UINT16(s, sysparam->taskbarPos.right);  /* right (2 bytes) */
+			Stream_Write_UINT16(s, sysparam->taskbarPos.bottom); /* bottom (2 bytes) */
+			break;
 
-	case SPI_SET_HIGH_CONTRAST:
-		error = rail_write_high_contrast(s, &sysparam->highContrast);
-		break;
+		case SPI_SET_HIGH_CONTRAST:
+			error = rail_write_high_contrast(s, &sysparam->highContrast);
+			break;
 
-	case SPI_SETCARETWIDTH:
-		if ((rail->channelFlags & TS_RAIL_ORDER_HANDSHAKE_EX_FLAGS_EXTENDED_SPI_SUPPORTED) == 0)
-			return ERROR_INVALID_DATA;
+		case SPI_SETCARETWIDTH:
+			if ((rail->channelFlags & TS_RAIL_ORDER_HANDSHAKE_EX_FLAGS_EXTENDED_SPI_SUPPORTED) == 0)
+				return ERROR_INVALID_DATA;
 
-		if (sysparam->caretWidth < 0x0001)
-			return ERROR_INVALID_DATA;
+			if (sysparam->caretWidth < 0x0001)
+				return ERROR_INVALID_DATA;
 
-		Stream_Write_UINT32(s, sysparam->caretWidth);
-		break;
+			Stream_Write_UINT32(s, sysparam->caretWidth);
+			break;
 
-	case SPI_SETSTICKYKEYS:
-		if ((rail->channelFlags & TS_RAIL_ORDER_HANDSHAKE_EX_FLAGS_EXTENDED_SPI_SUPPORTED) == 0)
-			return ERROR_INVALID_DATA;
+		case SPI_SETSTICKYKEYS:
+			if ((rail->channelFlags & TS_RAIL_ORDER_HANDSHAKE_EX_FLAGS_EXTENDED_SPI_SUPPORTED) == 0)
+				return ERROR_INVALID_DATA;
 
-		Stream_Write_UINT32(s, sysparam->stickyKeys);
-		break;
+			Stream_Write_UINT32(s, sysparam->stickyKeys);
+			break;
 
-	case SPI_SETTOGGLEKEYS:
-		if ((rail->channelFlags & TS_RAIL_ORDER_HANDSHAKE_EX_FLAGS_EXTENDED_SPI_SUPPORTED) == 0)
-			return ERROR_INVALID_DATA;
+		case SPI_SETTOGGLEKEYS:
+			if ((rail->channelFlags & TS_RAIL_ORDER_HANDSHAKE_EX_FLAGS_EXTENDED_SPI_SUPPORTED) == 0)
+				return ERROR_INVALID_DATA;
 
-		Stream_Write_UINT32(s, sysparam->toggleKeys);
-		break;
+			Stream_Write_UINT32(s, sysparam->toggleKeys);
+			break;
 
-	case SPI_SETFILTERKEYS:
-		if ((rail->channelFlags & TS_RAIL_ORDER_HANDSHAKE_EX_FLAGS_EXTENDED_SPI_SUPPORTED) == 0)
-			return ERROR_INVALID_DATA;
+		case SPI_SETFILTERKEYS:
+			if ((rail->channelFlags & TS_RAIL_ORDER_HANDSHAKE_EX_FLAGS_EXTENDED_SPI_SUPPORTED) == 0)
+				return ERROR_INVALID_DATA;
 
-		error = rail_write_filterkeys(s, &sysparam->filterKeys);
-		break;
+			error = rail_write_filterkeys(s, &sysparam->filterKeys);
+			break;
 
-	default:
-		return ERROR_INVALID_PARAMETER;
+		default:
+			return ERROR_INVALID_PARAMETER;
 	}
 
 	return error;
@@ -1125,48 +1125,48 @@ UINT rail_order_recv(railPlugin* rail, wStream* s)
 
 	switch (orderType)
 	{
-	case TS_RAIL_ORDER_HANDSHAKE:
-		return rail_recv_handshake_order(rail, s);
+		case TS_RAIL_ORDER_HANDSHAKE:
+			return rail_recv_handshake_order(rail, s);
 
-	case TS_RAIL_ORDER_HANDSHAKE_EX:
-		return rail_recv_handshake_ex_order(rail, s);
+		case TS_RAIL_ORDER_HANDSHAKE_EX:
+			return rail_recv_handshake_ex_order(rail, s);
 
-	case TS_RAIL_ORDER_EXEC_RESULT:
-		return rail_recv_exec_result_order(rail, s);
+		case TS_RAIL_ORDER_EXEC_RESULT:
+			return rail_recv_exec_result_order(rail, s);
 
-	case TS_RAIL_ORDER_SYSPARAM:
-		return rail_recv_server_sysparam_order(rail, s);
+		case TS_RAIL_ORDER_SYSPARAM:
+			return rail_recv_server_sysparam_order(rail, s);
 
-	case TS_RAIL_ORDER_MINMAXINFO:
-		return rail_recv_server_minmaxinfo_order(rail, s);
+		case TS_RAIL_ORDER_MINMAXINFO:
+			return rail_recv_server_minmaxinfo_order(rail, s);
 
-	case TS_RAIL_ORDER_LOCALMOVESIZE:
-		return rail_recv_server_localmovesize_order(rail, s);
+		case TS_RAIL_ORDER_LOCALMOVESIZE:
+			return rail_recv_server_localmovesize_order(rail, s);
 
-	case TS_RAIL_ORDER_GET_APPID_RESP:
-		return rail_recv_server_get_appid_resp_order(rail, s);
+		case TS_RAIL_ORDER_GET_APPID_RESP:
+			return rail_recv_server_get_appid_resp_order(rail, s);
 
-	case TS_RAIL_ORDER_LANGBARINFO:
-		return rail_recv_langbar_info_order(rail, s);
+		case TS_RAIL_ORDER_LANGBARINFO:
+			return rail_recv_langbar_info_order(rail, s);
 
-	case TS_RAIL_ORDER_TASKBARINFO:
-		return rail_recv_taskbar_info_order(rail, s);
+		case TS_RAIL_ORDER_TASKBARINFO:
+			return rail_recv_taskbar_info_order(rail, s);
 
-	case TS_RAIL_ORDER_ZORDER_SYNC:
-		return rail_recv_zorder_sync_order(rail, s);
+		case TS_RAIL_ORDER_ZORDER_SYNC:
+			return rail_recv_zorder_sync_order(rail, s);
 
-	case TS_RAIL_ORDER_CLOAK:
-		return rail_recv_order_cloak(rail, s);
+		case TS_RAIL_ORDER_CLOAK:
+			return rail_recv_order_cloak(rail, s);
 
-	case TS_RAIL_ORDER_POWER_DISPLAY_REQUEST:
-		return rail_recv_power_display_request_order(rail, s);
+		case TS_RAIL_ORDER_POWER_DISPLAY_REQUEST:
+			return rail_recv_power_display_request_order(rail, s);
 
-	case TS_RAIL_ORDER_GET_APPID_RESP_EX:
-		return rail_recv_get_application_id_extended_response_order(rail, s);
+		case TS_RAIL_ORDER_GET_APPID_RESP_EX:
+			return rail_recv_get_application_id_extended_response_order(rail, s);
 
-	default:
-		WLog_ERR(TAG, "Unknown RAIL PDU order reveived.");
-		return ERROR_INVALID_DATA;
+		default:
+			WLog_ERR(TAG, "Unknown RAIL PDU order reveived.");
+			return ERROR_INVALID_DATA;
 	}
 
 	return CHANNEL_RC_OK;
@@ -1316,36 +1316,36 @@ static UINT rail_send_client_sysparam_order(railPlugin* rail, const RAIL_SYSPARA
 
 	switch (sysparam->param)
 	{
-	case SPI_SET_DRAG_FULL_WINDOWS:
-	case SPI_SET_KEYBOARD_CUES:
-	case SPI_SET_KEYBOARD_PREF:
-	case SPI_SET_MOUSE_BUTTON_SWAP:
-		length += 1;
-		break;
+		case SPI_SET_DRAG_FULL_WINDOWS:
+		case SPI_SET_KEYBOARD_CUES:
+		case SPI_SET_KEYBOARD_PREF:
+		case SPI_SET_MOUSE_BUTTON_SWAP:
+			length += 1;
+			break;
 
-	case SPI_SETCARETWIDTH:
-	case SPI_SETSTICKYKEYS:
-	case SPI_SETTOGGLEKEYS:
-		length += 4;
-		break;
+		case SPI_SETCARETWIDTH:
+		case SPI_SETSTICKYKEYS:
+		case SPI_SETTOGGLEKEYS:
+			length += 4;
+			break;
 
-	case SPI_SETFILTERKEYS:
-		length += 20;
-		break;
+		case SPI_SETFILTERKEYS:
+			length += 20;
+			break;
 
-	case SPI_SET_WORK_AREA:
-	case SPI_DISPLAY_CHANGE:
-	case SPI_TASKBAR_POS:
-		length += 8;
-		break;
+		case SPI_SET_WORK_AREA:
+		case SPI_DISPLAY_CHANGE:
+		case SPI_TASKBAR_POS:
+			length += 8;
+			break;
 
-	case SPI_SET_HIGH_CONTRAST:
-		length += sysparam->highContrast.colorSchemeLength + 10;
-		break;
+		case SPI_SET_HIGH_CONTRAST:
+			length += sysparam->highContrast.colorSchemeLength + 10;
+			break;
 
-	default:
-		length += 8;
-		break;
+		default:
+			length += 8;
+			break;
 	}
 
 	s = rail_pdu_init(length);

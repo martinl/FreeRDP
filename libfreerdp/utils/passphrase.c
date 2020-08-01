@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <errno.h>
@@ -34,13 +34,13 @@ char* freerdp_passphrase_read(const char* prompt, char* buf, size_t bufsiz, int 
 
 #elif !defined(ANDROID)
 
-#	include <fcntl.h>
-#	include <stdio.h>
-#	include <string.h>
-#	include <sys/stat.h>
-#	include <termios.h>
-#	include <unistd.h>
-#	include <freerdp/utils/signal.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <termios.h>
+#include <unistd.h>
+#include <freerdp/utils/signal.h>
 
 char* freerdp_passphrase_read(const char* prompt, char* buf, size_t bufsiz, int from_stdin)
 {

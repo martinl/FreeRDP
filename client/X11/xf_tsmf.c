@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -38,8 +38,8 @@
 
 #ifdef WITH_XV
 
-#	include <X11/extensions/Xv.h>
-#	include <X11/extensions/Xvlib.h>
+#include <X11/extensions/Xv.h>
+#include <X11/extensions/Xvlib.h>
 
 static long xv_port = 0;
 
@@ -54,7 +54,7 @@ struct xf_xv_context
 };
 typedef struct xf_xv_context xfXvContext;
 
-#	define TAG CLIENT_TAG("x11")
+#define TAG CLIENT_TAG("x11")
 
 static BOOL xf_tsmf_is_format_supported(xfXvContext* xv, UINT32 pixfmt)
 {
@@ -222,75 +222,75 @@ static int xf_tsmf_xv_video_frame_event(TsmfClientContext* tsmf, TSMF_VIDEO_FRAM
 	   and we need to convert our original image data. */
 	switch (pixfmt)
 	{
-	case RDP_PIXFMT_I420:
-	case RDP_PIXFMT_YV12:
+		case RDP_PIXFMT_I420:
+		case RDP_PIXFMT_YV12:
 
-		/* Y */
-		if (image->pitches[0] == event->frameWidth)
-		{
-			CopyMemory(image->data + image->offsets[0], event->frameData,
-			           event->frameWidth * event->frameHeight);
-		}
-		else
-		{
-			for (i = 0; i < event->frameHeight; i++)
+			/* Y */
+			if (image->pitches[0] == event->frameWidth)
 			{
-				CopyMemory(image->data + image->offsets[0] + i * image->pitches[0],
-				           event->frameData + i * event->frameWidth, event->frameWidth);
+				CopyMemory(image->data + image->offsets[0], event->frameData,
+				           event->frameWidth * event->frameHeight);
 			}
-		}
-
-		/* UV */
-		/* Conversion between I420 and YV12 is to simply swap U and V */
-		if (!converti420yv12)
-		{
-			data1 = event->frameData + event->frameWidth * event->frameHeight;
-			data2 = event->frameData + event->frameWidth * event->frameHeight +
-			        event->frameWidth * event->frameHeight / 4;
-		}
-		else
-		{
-			data2 = event->frameData + event->frameWidth * event->frameHeight;
-			data1 = event->frameData + event->frameWidth * event->frameHeight +
-			        event->frameWidth * event->frameHeight / 4;
-			image->id = pixfmt == RDP_PIXFMT_I420 ? RDP_PIXFMT_YV12 : RDP_PIXFMT_I420;
-		}
-
-		if (image->pitches[1] * 2 == event->frameWidth)
-		{
-			CopyMemory(image->data + image->offsets[1], data1,
-			           event->frameWidth * event->frameHeight / 4);
-			CopyMemory(image->data + image->offsets[2], data2,
-			           event->frameWidth * event->frameHeight / 4);
-		}
-		else
-		{
-			for (i = 0; i < event->frameHeight / 2; i++)
+			else
 			{
-				CopyMemory(image->data + image->offsets[1] + i * image->pitches[1],
-				           data1 + i * event->frameWidth / 2, event->frameWidth / 2);
-				CopyMemory(image->data + image->offsets[2] + i * image->pitches[2],
-				           data2 + i * event->frameWidth / 2, event->frameWidth / 2);
+				for (i = 0; i < event->frameHeight; i++)
+				{
+					CopyMemory(image->data + image->offsets[0] + i * image->pitches[0],
+					           event->frameData + i * event->frameWidth, event->frameWidth);
+				}
 			}
-		}
 
-		break;
+			/* UV */
+			/* Conversion between I420 and YV12 is to simply swap U and V */
+			if (!converti420yv12)
+			{
+				data1 = event->frameData + event->frameWidth * event->frameHeight;
+				data2 = event->frameData + event->frameWidth * event->frameHeight +
+				        event->frameWidth * event->frameHeight / 4;
+			}
+			else
+			{
+				data2 = event->frameData + event->frameWidth * event->frameHeight;
+				data1 = event->frameData + event->frameWidth * event->frameHeight +
+				        event->frameWidth * event->frameHeight / 4;
+				image->id = pixfmt == RDP_PIXFMT_I420 ? RDP_PIXFMT_YV12 : RDP_PIXFMT_I420;
+			}
 
-	default:
-		if (image->data_size < 0)
-		{
-			free(xrects);
-			return -2000;
-		}
-		else
-		{
-			const size_t size = ((UINT32)image->data_size <= event->frameSize)
-			                        ? (UINT32)image->data_size
-			                        : event->frameSize;
-			CopyMemory(image->data, event->frameData, size);
-		}
+			if (image->pitches[1] * 2 == event->frameWidth)
+			{
+				CopyMemory(image->data + image->offsets[1], data1,
+				           event->frameWidth * event->frameHeight / 4);
+				CopyMemory(image->data + image->offsets[2], data2,
+				           event->frameWidth * event->frameHeight / 4);
+			}
+			else
+			{
+				for (i = 0; i < event->frameHeight / 2; i++)
+				{
+					CopyMemory(image->data + image->offsets[1] + i * image->pitches[1],
+					           data1 + i * event->frameWidth / 2, event->frameWidth / 2);
+					CopyMemory(image->data + image->offsets[2] + i * image->pitches[2],
+					           data2 + i * event->frameWidth / 2, event->frameWidth / 2);
+				}
+			}
 
-		break;
+			break;
+
+		default:
+			if (image->data_size < 0)
+			{
+				free(xrects);
+				return -2000;
+			}
+			else
+			{
+				const size_t size = ((UINT32)image->data_size <= event->frameSize)
+				                        ? (UINT32)image->data_size
+				                        : event->frameSize;
+				CopyMemory(image->data, event->frameData, size);
+			}
+
+			break;
 	}
 
 	XvShmPutImage(xfc->display, xv->xv_port, xfc->window->handle, xfc->gc, image, 0, 0,

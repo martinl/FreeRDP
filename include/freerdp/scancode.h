@@ -133,10 +133,11 @@
 #define RDP_SCANCODE_OEM_102 MAKE_RDP_SCANCODE(0x56, FALSE)  /* VK_OEM_102 Lower left '\' on US */
 #define RDP_SCANCODE_F11 MAKE_RDP_SCANCODE(0x57, FALSE)      /* VK_F11 */
 #define RDP_SCANCODE_F12 MAKE_RDP_SCANCODE(0x58, FALSE)      /* VK_F12 */
-#define RDP_SCANCODE_SLEEP MAKE_RDP_SCANCODE(0x5F, FALSE) /* VK_SLEEP OEM_8 on FR (undocumented?) \
-	                                                       */
-#define RDP_SCANCODE_ZOOM MAKE_RDP_SCANCODE(0x62, FALSE)  /* VK_ZOOM (undocumented?) */
-#define RDP_SCANCODE_HELP MAKE_RDP_SCANCODE(0x63, FALSE)  /* VK_HELP (undocumented?) */
+#define RDP_SCANCODE_SLEEP                                                                       \
+	MAKE_RDP_SCANCODE(0x5F, FALSE)                       /* VK_SLEEP OEM_8 on FR (undocumented?) \
+	                                                      */
+#define RDP_SCANCODE_ZOOM MAKE_RDP_SCANCODE(0x62, FALSE) /* VK_ZOOM (undocumented?) */
+#define RDP_SCANCODE_HELP MAKE_RDP_SCANCODE(0x63, FALSE) /* VK_HELP (undocumented?) */
 
 #define RDP_SCANCODE_F13 \
 	MAKE_RDP_SCANCODE(0x64, FALSE) /* VK_F13 */ /* JP agree, should 0x7d according to ms894073 */
@@ -212,8 +213,9 @@
 #define RDP_SCANCODE_MEDIA_NEXT_TRACK MAKE_RDP_SCANCODE(0x19, TRUE) /* VK_MEDIA_NEXT_TRACK */
 #define RDP_SCANCODE_MEDIA_PREV_TRACK MAKE_RDP_SCANCODE(0x10, TRUE) /* VK_MEDIA_PREV_TRACK */
 #define RDP_SCANCODE_MEDIA_STOP MAKE_RDP_SCANCODE(0x24, TRUE)       /* VK_MEDIA_MEDIA_STOP */
-#define RDP_SCANCODE_MEDIA_PLAY_PAUSE MAKE_RDP_SCANCODE(0x22, TRUE) /* VK_MEDIA_MEDIA_PLAY_PAUSE \
-	                                                                 */
+#define RDP_SCANCODE_MEDIA_PLAY_PAUSE                          \
+	MAKE_RDP_SCANCODE(0x22, TRUE) /* VK_MEDIA_MEDIA_PLAY_PAUSE \
+	                               */
 
 /* Browser functions */
 #define RDP_SCANCODE_BROWSER_BACK MAKE_RDP_SCANCODE(0x6A, TRUE)      /* VK_BROWSER_BACK */

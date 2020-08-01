@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <X11/Xlib.h>
@@ -925,73 +925,73 @@ static UINT xf_rail_server_local_move_size(RailClientContext* context,
 
 	switch (localMoveSize->moveSizeType)
 	{
-	case RAIL_WMSZ_LEFT:
-		direction = _NET_WM_MOVERESIZE_SIZE_LEFT;
-		x = localMoveSize->posX;
-		y = localMoveSize->posY;
-		break;
+		case RAIL_WMSZ_LEFT:
+			direction = _NET_WM_MOVERESIZE_SIZE_LEFT;
+			x = localMoveSize->posX;
+			y = localMoveSize->posY;
+			break;
 
-	case RAIL_WMSZ_RIGHT:
-		direction = _NET_WM_MOVERESIZE_SIZE_RIGHT;
-		x = localMoveSize->posX;
-		y = localMoveSize->posY;
-		break;
+		case RAIL_WMSZ_RIGHT:
+			direction = _NET_WM_MOVERESIZE_SIZE_RIGHT;
+			x = localMoveSize->posX;
+			y = localMoveSize->posY;
+			break;
 
-	case RAIL_WMSZ_TOP:
-		direction = _NET_WM_MOVERESIZE_SIZE_TOP;
-		x = localMoveSize->posX;
-		y = localMoveSize->posY;
-		break;
+		case RAIL_WMSZ_TOP:
+			direction = _NET_WM_MOVERESIZE_SIZE_TOP;
+			x = localMoveSize->posX;
+			y = localMoveSize->posY;
+			break;
 
-	case RAIL_WMSZ_TOPLEFT:
-		direction = _NET_WM_MOVERESIZE_SIZE_TOPLEFT;
-		x = localMoveSize->posX;
-		y = localMoveSize->posY;
-		break;
+		case RAIL_WMSZ_TOPLEFT:
+			direction = _NET_WM_MOVERESIZE_SIZE_TOPLEFT;
+			x = localMoveSize->posX;
+			y = localMoveSize->posY;
+			break;
 
-	case RAIL_WMSZ_TOPRIGHT:
-		direction = _NET_WM_MOVERESIZE_SIZE_TOPRIGHT;
-		x = localMoveSize->posX;
-		y = localMoveSize->posY;
-		break;
+		case RAIL_WMSZ_TOPRIGHT:
+			direction = _NET_WM_MOVERESIZE_SIZE_TOPRIGHT;
+			x = localMoveSize->posX;
+			y = localMoveSize->posY;
+			break;
 
-	case RAIL_WMSZ_BOTTOM:
-		direction = _NET_WM_MOVERESIZE_SIZE_BOTTOM;
-		x = localMoveSize->posX;
-		y = localMoveSize->posY;
-		break;
+		case RAIL_WMSZ_BOTTOM:
+			direction = _NET_WM_MOVERESIZE_SIZE_BOTTOM;
+			x = localMoveSize->posX;
+			y = localMoveSize->posY;
+			break;
 
-	case RAIL_WMSZ_BOTTOMLEFT:
-		direction = _NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT;
-		x = localMoveSize->posX;
-		y = localMoveSize->posY;
-		break;
+		case RAIL_WMSZ_BOTTOMLEFT:
+			direction = _NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT;
+			x = localMoveSize->posX;
+			y = localMoveSize->posY;
+			break;
 
-	case RAIL_WMSZ_BOTTOMRIGHT:
-		direction = _NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT;
-		x = localMoveSize->posX;
-		y = localMoveSize->posY;
-		break;
+		case RAIL_WMSZ_BOTTOMRIGHT:
+			direction = _NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT;
+			x = localMoveSize->posX;
+			y = localMoveSize->posY;
+			break;
 
-	case RAIL_WMSZ_MOVE:
-		direction = _NET_WM_MOVERESIZE_MOVE;
-		XTranslateCoordinates(xfc->display, appWindow->handle, RootWindowOfScreen(xfc->screen),
-		                      localMoveSize->posX, localMoveSize->posY, &x, &y, &child_window);
-		break;
+		case RAIL_WMSZ_MOVE:
+			direction = _NET_WM_MOVERESIZE_MOVE;
+			XTranslateCoordinates(xfc->display, appWindow->handle, RootWindowOfScreen(xfc->screen),
+			                      localMoveSize->posX, localMoveSize->posY, &x, &y, &child_window);
+			break;
 
-	case RAIL_WMSZ_KEYMOVE:
-		direction = _NET_WM_MOVERESIZE_MOVE_KEYBOARD;
-		x = localMoveSize->posX;
-		y = localMoveSize->posY;
-		/* FIXME: local keyboard moves not working */
-		return CHANNEL_RC_OK;
+		case RAIL_WMSZ_KEYMOVE:
+			direction = _NET_WM_MOVERESIZE_MOVE_KEYBOARD;
+			x = localMoveSize->posX;
+			y = localMoveSize->posY;
+			/* FIXME: local keyboard moves not working */
+			return CHANNEL_RC_OK;
 
-	case RAIL_WMSZ_KEYSIZE:
-		direction = _NET_WM_MOVERESIZE_SIZE_KEYBOARD;
-		x = localMoveSize->posX;
-		y = localMoveSize->posY;
-		/* FIXME: local keyboard moves not working */
-		return CHANNEL_RC_OK;
+		case RAIL_WMSZ_KEYSIZE:
+			direction = _NET_WM_MOVERESIZE_SIZE_KEYBOARD;
+			x = localMoveSize->posX;
+			y = localMoveSize->posY;
+			/* FIXME: local keyboard moves not working */
+			return CHANNEL_RC_OK;
 	}
 
 	if (localMoveSize->isMoveSizeStart)

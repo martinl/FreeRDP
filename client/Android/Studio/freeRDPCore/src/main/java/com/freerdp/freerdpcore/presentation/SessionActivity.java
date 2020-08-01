@@ -606,20 +606,20 @@ public class SessionActivity extends AppCompatActivity
 			{
 				switch (keyboardMapper.getModifierState(curKey.codes[0]))
 				{
-				case KeyboardMapper.KEYSTATE_ON:
-					curKey.on = true;
-					curKey.pressed = false;
-					break;
+					case KeyboardMapper.KEYSTATE_ON:
+						curKey.on = true;
+						curKey.pressed = false;
+						break;
 
-				case KeyboardMapper.KEYSTATE_OFF:
-					curKey.on = false;
-					curKey.pressed = false;
-					break;
+					case KeyboardMapper.KEYSTATE_OFF:
+						curKey.on = false;
+						curKey.pressed = false;
+						break;
 
-				case KeyboardMapper.KEYSTATE_LOCKED:
-					curKey.on = true;
-					curKey.pressed = true;
-					break;
+					case KeyboardMapper.KEYSTATE_LOCKED:
+						curKey.on = true;
+						curKey.pressed = true;
+						break;
 				}
 			}
 		}
@@ -788,20 +788,20 @@ public class SessionActivity extends AppCompatActivity
 	{
 		switch (keyboardType)
 		{
-		case KeyboardMapper.KEYBOARD_TYPE_FUNCTIONKEYS:
-			keyboardView.setKeyboard(specialkeysKeyboard);
-			break;
+			case KeyboardMapper.KEYBOARD_TYPE_FUNCTIONKEYS:
+				keyboardView.setKeyboard(specialkeysKeyboard);
+				break;
 
-		case KeyboardMapper.KEYBOARD_TYPE_NUMPAD:
-			keyboardView.setKeyboard(numpadKeyboard);
-			break;
+			case KeyboardMapper.KEYBOARD_TYPE_NUMPAD:
+				keyboardView.setKeyboard(numpadKeyboard);
+				break;
 
-		case KeyboardMapper.KEYBOARD_TYPE_CURSOR:
-			keyboardView.setKeyboard(cursorKeyboard);
-			break;
+			case KeyboardMapper.KEYBOARD_TYPE_CURSOR:
+				keyboardView.setKeyboard(cursorKeyboard);
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -1166,19 +1166,19 @@ public class SessionActivity extends AppCompatActivity
 		super.onGenericMotionEvent(e);
 		switch (e.getAction())
 		{
-		case MotionEvent.ACTION_SCROLL:
-			final float vScroll = e.getAxisValue(MotionEvent.AXIS_VSCROLL);
-			if (vScroll < 0)
-			{
-				LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0,
-				                           Mouse.getScrollEvent(this, false));
-			}
-			if (vScroll > 0)
-			{
-				LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0,
-				                           Mouse.getScrollEvent(this, true));
-			}
-			break;
+			case MotionEvent.ACTION_SCROLL:
+				final float vScroll = e.getAxisValue(MotionEvent.AXIS_VSCROLL);
+				if (vScroll < 0)
+				{
+					LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0,
+					                           Mouse.getScrollEvent(this, false));
+				}
+				if (vScroll > 0)
+				{
+					LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0,
+					                           Mouse.getScrollEvent(this, true));
+				}
+				break;
 		}
 		return true;
 	}
@@ -1211,73 +1211,74 @@ public class SessionActivity extends AppCompatActivity
 		{
 			switch (msg.what)
 			{
-			case GRAPHICS_CHANGED:
-			{
-				sessionView.onSurfaceChange(session);
-				scrollView.requestLayout();
-				break;
-			}
-			case REFRESH_SESSIONVIEW:
-			{
-				sessionView.invalidateRegion();
-				break;
-			}
-			case DISPLAY_TOAST:
-			{
-				Toast errorToast =
-				    Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_LONG);
-				errorToast.show();
-				break;
-			}
-			case HIDE_ZOOMCONTROLS:
-			{
-				zoomControls.hide();
-				break;
-			}
-			case SEND_MOVE_EVENT:
-			{
-				LibFreeRDP.sendCursorEvent(session.getInstance(), msg.arg1, msg.arg2,
-				                           Mouse.getMoveEvent());
-				break;
-			}
-			case SHOW_DIALOG:
-			{
-				// create and show the dialog
-				((Dialog)msg.obj).show();
-				break;
-			}
-			case SCROLLING_REQUESTED:
-			{
-				int scrollX = 0;
-				int scrollY = 0;
-				float[] pointerPos = touchPointerView.getPointerPosition();
+				case GRAPHICS_CHANGED:
+				{
+					sessionView.onSurfaceChange(session);
+					scrollView.requestLayout();
+					break;
+				}
+				case REFRESH_SESSIONVIEW:
+				{
+					sessionView.invalidateRegion();
+					break;
+				}
+				case DISPLAY_TOAST:
+				{
+					Toast errorToast = Toast.makeText(getApplicationContext(), msg.obj.toString(),
+					                                  Toast.LENGTH_LONG);
+					errorToast.show();
+					break;
+				}
+				case HIDE_ZOOMCONTROLS:
+				{
+					zoomControls.hide();
+					break;
+				}
+				case SEND_MOVE_EVENT:
+				{
+					LibFreeRDP.sendCursorEvent(session.getInstance(), msg.arg1, msg.arg2,
+					                           Mouse.getMoveEvent());
+					break;
+				}
+				case SHOW_DIALOG:
+				{
+					// create and show the dialog
+					((Dialog)msg.obj).show();
+					break;
+				}
+				case SCROLLING_REQUESTED:
+				{
+					int scrollX = 0;
+					int scrollY = 0;
+					float[] pointerPos = touchPointerView.getPointerPosition();
 
-				if (pointerPos[0] > (screen_width - touchPointerView.getPointerWidth()))
-					scrollX = SCROLLING_DISTANCE;
-				else if (pointerPos[0] < 0)
-					scrollX = -SCROLLING_DISTANCE;
+					if (pointerPos[0] > (screen_width - touchPointerView.getPointerWidth()))
+						scrollX = SCROLLING_DISTANCE;
+					else if (pointerPos[0] < 0)
+						scrollX = -SCROLLING_DISTANCE;
 
-				if (pointerPos[1] > (screen_height - touchPointerView.getPointerHeight()))
-					scrollY = SCROLLING_DISTANCE;
-				else if (pointerPos[1] < 0)
-					scrollY = -SCROLLING_DISTANCE;
+					if (pointerPos[1] > (screen_height - touchPointerView.getPointerHeight()))
+						scrollY = SCROLLING_DISTANCE;
+					else if (pointerPos[1] < 0)
+						scrollY = -SCROLLING_DISTANCE;
 
-				scrollView.scrollBy(scrollX, scrollY);
+					scrollView.scrollBy(scrollX, scrollY);
 
-				// see if we reached the min/max scroll positions
-				if (scrollView.getScrollX() == 0 ||
-				    scrollView.getScrollX() == (sessionView.getWidth() - scrollView.getWidth()))
-					scrollX = 0;
-				if (scrollView.getScrollY() == 0 ||
-				    scrollView.getScrollY() == (sessionView.getHeight() - scrollView.getHeight()))
-					scrollY = 0;
+					// see if we reached the min/max scroll positions
+					if (scrollView.getScrollX() == 0 ||
+					    scrollView.getScrollX() == (sessionView.getWidth() - scrollView.getWidth()))
+						scrollX = 0;
+					if (scrollView.getScrollY() == 0 ||
+					    scrollView.getScrollY() ==
+					        (sessionView.getHeight() - scrollView.getHeight()))
+						scrollY = 0;
 
-				if (scrollX != 0 || scrollY != 0)
-					uiHandler.sendEmptyMessageDelayed(SCROLLING_REQUESTED, SCROLLING_TIMEOUT);
-				else
-					Log.v(TAG, "Stopping auto-scroll");
-				break;
-			}
+					if (scrollX != 0 || scrollY != 0)
+						uiHandler.sendEmptyMessageDelayed(SCROLLING_REQUESTED, SCROLLING_TIMEOUT);
+					else
+						Log.v(TAG, "Stopping auto-scroll");
+					break;
+				}
 			}
 		}
 	}
@@ -1343,16 +1344,16 @@ public class SessionActivity extends AppCompatActivity
 
 			switch (intent.getExtras().getInt(GlobalApp.EVENT_TYPE, -1))
 			{
-			case GlobalApp.FREERDP_EVENT_CONNECTION_SUCCESS:
-				OnConnectionSuccess(context);
-				break;
+				case GlobalApp.FREERDP_EVENT_CONNECTION_SUCCESS:
+					OnConnectionSuccess(context);
+					break;
 
-			case GlobalApp.FREERDP_EVENT_CONNECTION_FAILURE:
-				OnConnectionFailure(context);
-				break;
-			case GlobalApp.FREERDP_EVENT_DISCONNECTED:
-				OnDisconnected(context);
-				break;
+				case GlobalApp.FREERDP_EVENT_CONNECTION_FAILURE:
+					OnConnectionFailure(context);
+					break;
+				case GlobalApp.FREERDP_EVENT_DISCONNECTED:
+					OnDisconnected(context);
+					break;
 			}
 		}
 

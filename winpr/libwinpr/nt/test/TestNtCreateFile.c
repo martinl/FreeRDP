@@ -4,9 +4,9 @@
 #include <winpr/nt.h>
 
 #ifdef _WIN32
-#	define TESTFILE "\\??\\C:\\Documents and Settings\\All Users\\winpr_test_nt_create_file.txt"
+#define TESTFILE "\\??\\C:\\Documents and Settings\\All Users\\winpr_test_nt_create_file.txt"
 #else
-#	define TESTFILE "/tmp/winpr_test_nt_create_file.txt"
+#define TESTFILE "/tmp/winpr_test_nt_create_file.txt"
 #endif
 
 int TestNtCreateFile(int argc, char* argv[])

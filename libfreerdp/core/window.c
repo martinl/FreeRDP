@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -92,18 +92,18 @@ static BOOL update_read_icon_info(wStream* s, ICON_INFO* iconInfo)
 	/* cbColorTable is only present when bpp is 1, 4 or 8 */
 	switch (iconInfo->bpp)
 	{
-	case 1:
-	case 4:
-	case 8:
-		if (Stream_GetRemainingLength(s) < 2)
-			return FALSE;
+		case 1:
+		case 4:
+		case 8:
+			if (Stream_GetRemainingLength(s) < 2)
+				return FALSE;
 
-		Stream_Read_UINT16(s, iconInfo->cbColorTable); /* cbColorTable (2 bytes) */
-		break;
+			Stream_Read_UINT16(s, iconInfo->cbColorTable); /* cbColorTable (2 bytes) */
+			break;
 
-	default:
-		iconInfo->cbColorTable = 0;
-		break;
+		default:
+			iconInfo->cbColorTable = 0;
+			break;
 	}
 
 	if (Stream_GetRemainingLength(s) < 4)
@@ -482,17 +482,17 @@ static BOOL window_order_supported(const rdpSettings* settings, UINT32 fieldFlag
 
 	switch (settings->RemoteWndSupportLevel)
 	{
-	case WINDOW_LEVEL_SUPPORTED_EX:
-		return TRUE;
+		case WINDOW_LEVEL_SUPPORTED_EX:
+			return TRUE;
 
-	case WINDOW_LEVEL_SUPPORTED:
-		return ((fieldFlags & mask) == 0) || dresult;
+		case WINDOW_LEVEL_SUPPORTED:
+			return ((fieldFlags & mask) == 0) || dresult;
 
-	case WINDOW_LEVEL_NOT_SUPPORTED:
-		return dresult;
+		case WINDOW_LEVEL_NOT_SUPPORTED:
+			return dresult;
 
-	default:
-		return dresult;
+		default:
+			return dresult;
 	}
 }
 
@@ -553,25 +553,25 @@ static void dump_window_state_order(wLog* log, const char* msg, const WINDOW_ORD
 
 		switch (state->showState)
 		{
-		case 0:
-			showStr = "hidden";
-			break;
+			case 0:
+				showStr = "hidden";
+				break;
 
-		case 2:
-			showStr = "minimized";
-			break;
+			case 2:
+				showStr = "minimized";
+				break;
 
-		case 3:
-			showStr = "maximized";
-			break;
+			case 3:
+				showStr = "maximized";
+				break;
 
-		case 5:
-			showStr = "current";
-			break;
+			case 5:
+				showStr = "current";
+				break;
 
-		default:
-			showStr = "<unknown>";
-			break;
+			default:
+				showStr = "<unknown>";
+				break;
 		}
 
 		DUMP_APPEND(buffer, bufferSize, " show=%s", showStr);
@@ -673,25 +673,25 @@ static void dump_window_state_order(wLog* log, const char* msg, const WINDOW_ORD
 
 		switch (state->AppBarEdge)
 		{
-		case 0:
-			appBarEdgeStr = "left";
-			break;
+			case 0:
+				appBarEdgeStr = "left";
+				break;
 
-		case 1:
-			appBarEdgeStr = "top";
-			break;
+			case 1:
+				appBarEdgeStr = "top";
+				break;
 
-		case 2:
-			appBarEdgeStr = "right";
-			break;
+			case 2:
+				appBarEdgeStr = "right";
+				break;
 
-		case 3:
-			appBarEdgeStr = "bottom";
-			break;
+			case 3:
+				appBarEdgeStr = "bottom";
+				break;
 
-		default:
-			appBarEdgeStr = "<unknown>";
-			break;
+			default:
+				appBarEdgeStr = "<unknown>";
+				break;
 		}
 
 		DUMP_APPEND(buffer, bufferSize, " appBarEdge=%s", appBarEdgeStr);

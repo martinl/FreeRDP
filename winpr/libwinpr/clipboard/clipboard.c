@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -30,7 +30,7 @@
 #include "clipboard.h"
 
 #ifdef WITH_WCLIPBOARD_POSIX
-#	include "posix.h"
+#include "posix.h"
 #endif
 
 #include "../log.h"

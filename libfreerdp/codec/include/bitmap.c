@@ -191,215 +191,221 @@ static INLINE BOOL RLEDECOMPRESS(const BYTE* pbSrcBuffer, UINT32 cbSrcBuffer, BY
 
 		switch (code)
 		{
-		/* Handle Foreground Run Orders. */
-		case REGULAR_FG_RUN:
-		case MEGA_MEGA_FG_RUN:
-		case LITE_SET_FG_FG_RUN:
-		case MEGA_MEGA_SET_FG_RUN:
-			runLength = ExtractRunLength(code, pbSrc, &advance);
-			pbSrc = pbSrc + advance;
+			/* Handle Foreground Run Orders. */
+			case REGULAR_FG_RUN:
+			case MEGA_MEGA_FG_RUN:
+			case LITE_SET_FG_FG_RUN:
+			case MEGA_MEGA_SET_FG_RUN:
+				runLength = ExtractRunLength(code, pbSrc, &advance);
+				pbSrc = pbSrc + advance;
 
-			if (code == LITE_SET_FG_FG_RUN || code == MEGA_MEGA_SET_FG_RUN)
-			{
-				SRCREADPIXEL(fgPel, pbSrc);
+				if (code == LITE_SET_FG_FG_RUN || code == MEGA_MEGA_SET_FG_RUN)
+				{
+					SRCREADPIXEL(fgPel, pbSrc);
+					SRCNEXTPIXEL(pbSrc);
+				}
+
+				if (!ENSURE_CAPACITY(pbDest, pbDestEnd, runLength))
+					return FALSE;
+
+				if (fFirstLine)
+				{
+					UNROLL(runLength, {
+						DESTWRITEPIXEL(pbDest, fgPel);
+						DESTNEXTPIXEL(pbDest);
+					});
+				}
+				else
+				{
+					UNROLL(runLength, {
+						DESTREADPIXEL(temp, pbDest - rowDelta);
+						DESTWRITEPIXEL(pbDest, temp ^ fgPel);
+						DESTNEXTPIXEL(pbDest);
+					});
+				}
+
+				break;
+
+			/* Handle Dithered Run Orders. */
+			case LITE_DITHERED_RUN:
+			case MEGA_MEGA_DITHERED_RUN:
+				runLength = ExtractRunLength(code, pbSrc, &advance);
+				pbSrc = pbSrc + advance;
+				SRCREADPIXEL(pixelA, pbSrc);
 				SRCNEXTPIXEL(pbSrc);
-			}
+				SRCREADPIXEL(pixelB, pbSrc);
+				SRCNEXTPIXEL(pbSrc);
 
-			if (!ENSURE_CAPACITY(pbDest, pbDestEnd, runLength))
-				return FALSE;
+				if (!ENSURE_CAPACITY(pbDest, pbDestEnd, runLength * 2))
+					return FALSE;
 
-			if (fFirstLine)
-			{
 				UNROLL(runLength, {
-					DESTWRITEPIXEL(pbDest, fgPel);
+					DESTWRITEPIXEL(pbDest, pixelA);
+					DESTNEXTPIXEL(pbDest);
+					DESTWRITEPIXEL(pbDest, pixelB);
 					DESTNEXTPIXEL(pbDest);
 				});
-			}
-			else
-			{
+				break;
+
+			/* Handle Color Run Orders. */
+			case REGULAR_COLOR_RUN:
+			case MEGA_MEGA_COLOR_RUN:
+				runLength = ExtractRunLength(code, pbSrc, &advance);
+				pbSrc = pbSrc + advance;
+				SRCREADPIXEL(pixelA, pbSrc);
+				SRCNEXTPIXEL(pbSrc);
+
+				if (!ENSURE_CAPACITY(pbDest, pbDestEnd, runLength))
+					return FALSE;
+
 				UNROLL(runLength, {
-					DESTREADPIXEL(temp, pbDest - rowDelta);
-					DESTWRITEPIXEL(pbDest, temp ^ fgPel);
+					DESTWRITEPIXEL(pbDest, pixelA);
 					DESTNEXTPIXEL(pbDest);
 				});
-			}
+				break;
 
-			break;
+			/* Handle Foreground/Background Image Orders. */
+			case REGULAR_FGBG_IMAGE:
+			case MEGA_MEGA_FGBG_IMAGE:
+			case LITE_SET_FG_FGBG_IMAGE:
+			case MEGA_MEGA_SET_FGBG_IMAGE:
+				runLength = ExtractRunLength(code, pbSrc, &advance);
+				pbSrc = pbSrc + advance;
 
-		/* Handle Dithered Run Orders. */
-		case LITE_DITHERED_RUN:
-		case MEGA_MEGA_DITHERED_RUN:
-			runLength = ExtractRunLength(code, pbSrc, &advance);
-			pbSrc = pbSrc + advance;
-			SRCREADPIXEL(pixelA, pbSrc);
-			SRCNEXTPIXEL(pbSrc);
-			SRCREADPIXEL(pixelB, pbSrc);
-			SRCNEXTPIXEL(pbSrc);
+				if (code == LITE_SET_FG_FGBG_IMAGE || code == MEGA_MEGA_SET_FGBG_IMAGE)
+				{
+					SRCREADPIXEL(fgPel, pbSrc);
+					SRCNEXTPIXEL(pbSrc);
+				}
 
-			if (!ENSURE_CAPACITY(pbDest, pbDestEnd, runLength * 2))
-				return FALSE;
+				if (fFirstLine)
+				{
+					while (runLength > 8)
+					{
+						bitmask = *pbSrc;
+						pbSrc = pbSrc + 1;
+						pbDest = WRITEFIRSTLINEFGBGIMAGE(pbDest, pbDestEnd, bitmask, fgPel, 8);
 
-			UNROLL(runLength, {
-				DESTWRITEPIXEL(pbDest, pixelA);
-				DESTNEXTPIXEL(pbDest);
-				DESTWRITEPIXEL(pbDest, pixelB);
-				DESTNEXTPIXEL(pbDest);
-			});
-			break;
+						if (!pbDest)
+							return FALSE;
 
-		/* Handle Color Run Orders. */
-		case REGULAR_COLOR_RUN:
-		case MEGA_MEGA_COLOR_RUN:
-			runLength = ExtractRunLength(code, pbSrc, &advance);
-			pbSrc = pbSrc + advance;
-			SRCREADPIXEL(pixelA, pbSrc);
-			SRCNEXTPIXEL(pbSrc);
+						runLength = runLength - 8;
+					}
+				}
+				else
+				{
+					while (runLength > 8)
+					{
+						bitmask = *pbSrc;
+						pbSrc = pbSrc + 1;
+						pbDest = WRITEFGBGIMAGE(pbDest, pbDestEnd, rowDelta, bitmask, fgPel, 8);
 
-			if (!ENSURE_CAPACITY(pbDest, pbDestEnd, runLength))
-				return FALSE;
+						if (!pbDest)
+							return FALSE;
 
-			UNROLL(runLength, {
-				DESTWRITEPIXEL(pbDest, pixelA);
-				DESTNEXTPIXEL(pbDest);
-			});
-			break;
+						runLength = runLength - 8;
+					}
+				}
 
-		/* Handle Foreground/Background Image Orders. */
-		case REGULAR_FGBG_IMAGE:
-		case MEGA_MEGA_FGBG_IMAGE:
-		case LITE_SET_FG_FGBG_IMAGE:
-		case MEGA_MEGA_SET_FGBG_IMAGE:
-			runLength = ExtractRunLength(code, pbSrc, &advance);
-			pbSrc = pbSrc + advance;
-
-			if (code == LITE_SET_FG_FGBG_IMAGE || code == MEGA_MEGA_SET_FGBG_IMAGE)
-			{
-				SRCREADPIXEL(fgPel, pbSrc);
-				SRCNEXTPIXEL(pbSrc);
-			}
-
-			if (fFirstLine)
-			{
-				while (runLength > 8)
+				if (runLength > 0)
 				{
 					bitmask = *pbSrc;
 					pbSrc = pbSrc + 1;
-					pbDest = WRITEFIRSTLINEFGBGIMAGE(pbDest, pbDestEnd, bitmask, fgPel, 8);
+
+					if (fFirstLine)
+					{
+						pbDest =
+						    WRITEFIRSTLINEFGBGIMAGE(pbDest, pbDestEnd, bitmask, fgPel, runLength);
+					}
+					else
+					{
+						pbDest =
+						    WRITEFGBGIMAGE(pbDest, pbDestEnd, rowDelta, bitmask, fgPel, runLength);
+					}
 
 					if (!pbDest)
 						return FALSE;
-
-					runLength = runLength - 8;
 				}
-			}
-			else
-			{
-				while (runLength > 8)
-				{
-					bitmask = *pbSrc;
-					pbSrc = pbSrc + 1;
-					pbDest = WRITEFGBGIMAGE(pbDest, pbDestEnd, rowDelta, bitmask, fgPel, 8);
 
-					if (!pbDest)
-						return FALSE;
+				break;
 
-					runLength = runLength - 8;
-				}
-			}
+			/* Handle Color Image Orders. */
+			case REGULAR_COLOR_IMAGE:
+			case MEGA_MEGA_COLOR_IMAGE:
+				runLength = ExtractRunLength(code, pbSrc, &advance);
+				pbSrc = pbSrc + advance;
+				UNROLL(runLength, {
+					SRCREADPIXEL(temp, pbSrc);
+					SRCNEXTPIXEL(pbSrc);
+					DESTWRITEPIXEL(pbDest, temp);
+					DESTNEXTPIXEL(pbDest);
+				});
+				break;
 
-			if (runLength > 0)
-			{
-				bitmask = *pbSrc;
+			/* Handle Special Order 1. */
+			case SPECIAL_FGBG_1:
 				pbSrc = pbSrc + 1;
 
 				if (fFirstLine)
 				{
-					pbDest = WRITEFIRSTLINEFGBGIMAGE(pbDest, pbDestEnd, bitmask, fgPel, runLength);
+					pbDest =
+					    WRITEFIRSTLINEFGBGIMAGE(pbDest, pbDestEnd, g_MaskSpecialFgBg1, fgPel, 8);
 				}
 				else
 				{
-					pbDest = WRITEFGBGIMAGE(pbDest, pbDestEnd, rowDelta, bitmask, fgPel, runLength);
+					pbDest =
+					    WRITEFGBGIMAGE(pbDest, pbDestEnd, rowDelta, g_MaskSpecialFgBg1, fgPel, 8);
 				}
 
 				if (!pbDest)
 					return FALSE;
-			}
 
-			break;
+				break;
 
-		/* Handle Color Image Orders. */
-		case REGULAR_COLOR_IMAGE:
-		case MEGA_MEGA_COLOR_IMAGE:
-			runLength = ExtractRunLength(code, pbSrc, &advance);
-			pbSrc = pbSrc + advance;
-			UNROLL(runLength, {
-				SRCREADPIXEL(temp, pbSrc);
-				SRCNEXTPIXEL(pbSrc);
-				DESTWRITEPIXEL(pbDest, temp);
+			/* Handle Special Order 2. */
+			case SPECIAL_FGBG_2:
+				pbSrc = pbSrc + 1;
+
+				if (fFirstLine)
+				{
+					pbDest =
+					    WRITEFIRSTLINEFGBGIMAGE(pbDest, pbDestEnd, g_MaskSpecialFgBg2, fgPel, 8);
+				}
+				else
+				{
+					pbDest =
+					    WRITEFGBGIMAGE(pbDest, pbDestEnd, rowDelta, g_MaskSpecialFgBg2, fgPel, 8);
+				}
+
+				if (!pbDest)
+					return FALSE;
+
+				break;
+
+			/* Handle White Order. */
+			case SPECIAL_WHITE:
+				pbSrc = pbSrc + 1;
+
+				if (!ENSURE_CAPACITY(pbDest, pbDestEnd, 1))
+					return FALSE;
+
+				DESTWRITEPIXEL(pbDest, WHITE_PIXEL);
 				DESTNEXTPIXEL(pbDest);
-			});
-			break;
+				break;
 
-		/* Handle Special Order 1. */
-		case SPECIAL_FGBG_1:
-			pbSrc = pbSrc + 1;
+			/* Handle Black Order. */
+			case SPECIAL_BLACK:
+				pbSrc = pbSrc + 1;
 
-			if (fFirstLine)
-			{
-				pbDest = WRITEFIRSTLINEFGBGIMAGE(pbDest, pbDestEnd, g_MaskSpecialFgBg1, fgPel, 8);
-			}
-			else
-			{
-				pbDest = WRITEFGBGIMAGE(pbDest, pbDestEnd, rowDelta, g_MaskSpecialFgBg1, fgPel, 8);
-			}
+				if (!ENSURE_CAPACITY(pbDest, pbDestEnd, 1))
+					return FALSE;
 
-			if (!pbDest)
+				DESTWRITEPIXEL(pbDest, BLACK_PIXEL);
+				DESTNEXTPIXEL(pbDest);
+				break;
+
+			default:
 				return FALSE;
-
-			break;
-
-		/* Handle Special Order 2. */
-		case SPECIAL_FGBG_2:
-			pbSrc = pbSrc + 1;
-
-			if (fFirstLine)
-			{
-				pbDest = WRITEFIRSTLINEFGBGIMAGE(pbDest, pbDestEnd, g_MaskSpecialFgBg2, fgPel, 8);
-			}
-			else
-			{
-				pbDest = WRITEFGBGIMAGE(pbDest, pbDestEnd, rowDelta, g_MaskSpecialFgBg2, fgPel, 8);
-			}
-
-			if (!pbDest)
-				return FALSE;
-
-			break;
-
-		/* Handle White Order. */
-		case SPECIAL_WHITE:
-			pbSrc = pbSrc + 1;
-
-			if (!ENSURE_CAPACITY(pbDest, pbDestEnd, 1))
-				return FALSE;
-
-			DESTWRITEPIXEL(pbDest, WHITE_PIXEL);
-			DESTNEXTPIXEL(pbDest);
-			break;
-
-		/* Handle Black Order. */
-		case SPECIAL_BLACK:
-			pbSrc = pbSrc + 1;
-
-			if (!ENSURE_CAPACITY(pbDest, pbDestEnd, 1))
-				return FALSE;
-
-			DESTWRITEPIXEL(pbDest, BLACK_PIXEL);
-			DESTNEXTPIXEL(pbDest);
-			break;
-
-		default:
-			return FALSE;
 		}
 	}
 

@@ -36,7 +36,7 @@
 #include <freerdp/channels/channels.h>
 
 #ifndef CHANNEL_MAX_COUNT
-#	define CHANNEL_MAX_COUNT 30
+#define CHANNEL_MAX_COUNT 30
 #endif
 
 struct rdp_channel_client_data

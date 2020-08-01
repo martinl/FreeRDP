@@ -24,8 +24,8 @@
 #include <freerdp/freerdp.h>
 
 #ifndef _WIN32
-#	include <signal.h>
-#	include <termios.h>
+#include <signal.h>
+#include <termios.h>
 
 FREERDP_API extern volatile sig_atomic_t terminal_needs_reset;
 FREERDP_API extern int terminal_fildes;

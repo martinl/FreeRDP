@@ -18,34 +18,34 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #ifndef _WIN32
 
-#	ifdef __APPLE__
-#		include <sys/types.h>
-#		include <sys/param.h>
-#		include <sys/sysctl.h>
-#		include <string.h>
-#		include <ctype.h>
-#		include <errno.h>
-#	endif
+#ifdef __APPLE__
+#include <sys/types.h>
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#include <string.h>
+#include <ctype.h>
+#include <errno.h>
+#endif
 
-#	include <stdio.h>
-#	include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#	include <winpr/crt.h>
-#	include <winpr/synch.h>
-#	include <winpr/library.h>
-#	include <winpr/smartcard.h>
-#	include <winpr/collections.h>
-#	include <winpr/environment.h>
+#include <winpr/crt.h>
+#include <winpr/synch.h>
+#include <winpr/library.h>
+#include <winpr/smartcard.h>
+#include <winpr/collections.h>
+#include <winpr/environment.h>
 
-#	include "smartcard_pcsc.h"
+#include "smartcard_pcsc.h"
 
-#	include "../log.h"
-#	define TAG WINPR_TAG("smartcard")
+#include "../log.h"
+#define TAG WINPR_TAG("smartcard")
 
 /**
  * PC/SC transactions:
@@ -138,9 +138,9 @@ static int g_StartedEventRefCount = 0;
 static BOOL g_SCardAutoAllocate = FALSE;
 static BOOL g_PnP_Notification = TRUE;
 
-#	ifdef __MACOSX__
+#ifdef __MACOSX__
 static unsigned int OSXVersion = 0;
-#	endif
+#endif
 
 static wListDictionary* g_CardHandles = NULL;
 static wListDictionary* g_CardContexts = NULL;
@@ -1652,7 +1652,7 @@ WINSCARDAPI LONG WINAPI PCSC_SCardStatus_Internal(SCARDHANDLE hCard, LPSTR mszRe
 
 	if (allocateReader && pcsc_cchReaderLen > 0 && mszReaderNames)
 	{
-#	ifdef __MACOSX__
+#ifdef __MACOSX__
 
 		/**
 		 * Workaround for SCardStatus Bug in MAC OS X Yosemite
@@ -1660,7 +1660,7 @@ WINSCARDAPI LONG WINAPI PCSC_SCardStatus_Internal(SCARDHANDLE hCard, LPSTR mszRe
 		if (OSXVersion == 0x10100000)
 			pcsc_cchReaderLen++;
 
-#	endif
+#endif
 		tReader = calloc(1, pcsc_cchReaderLen);
 
 		if (!tReader)
@@ -2465,7 +2465,7 @@ WINSCARDAPI LONG WINAPI PCSC_SCardAudit(SCARDCONTEXT hContext, DWORD dwEvent)
 	return 0;
 }
 
-#	ifdef __MACOSX__
+#ifdef __MACOSX__
 unsigned int determineMacOSXVersion(void)
 {
 	int mib[2];
@@ -2501,29 +2501,29 @@ unsigned int determineMacOSXVersion(void)
 	{
 		switch (count)
 		{
-		case 0:
-			majorVersion = strtol(tok, NULL, 0);
+			case 0:
+				majorVersion = strtol(tok, NULL, 0);
 
-			if (errno != 0)
-				goto fail;
+				if (errno != 0)
+					goto fail;
 
-			break;
+				break;
 
-		case 1:
-			minorVersion = strtol(tok, NULL, 0);
+			case 1:
+				minorVersion = strtol(tok, NULL, 0);
 
-			if (errno != 0)
-				goto fail;
+				if (errno != 0)
+					goto fail;
 
-			break;
+				break;
 
-		case 2:
-			patchVersion = strtol(tok, NULL, 0);
+			case 2:
+				patchVersion = strtol(tok, NULL, 0);
 
-			if (errno != 0)
-				goto fail;
+				if (errno != 0)
+					goto fail;
 
-			break;
+				break;
 		}
 
 		tok = strtok(NULL, ".");
@@ -2544,45 +2544,45 @@ unsigned int determineMacOSXVersion(void)
 	{
 		switch (majorVersion)
 		{
-		case 5:
-			version = 0x10010000;
-			break;
+			case 5:
+				version = 0x10010000;
+				break;
 
-		case 6:
-			version = 0x10020000;
-			break;
+			case 6:
+				version = 0x10020000;
+				break;
 
-		case 7:
-			version = 0x10030000;
-			break;
+			case 7:
+				version = 0x10030000;
+				break;
 
-		case 8:
-			version = 0x10040000;
-			break;
+			case 8:
+				version = 0x10040000;
+				break;
 
-		case 9:
-			version = 0x10050000;
-			break;
+			case 9:
+				version = 0x10050000;
+				break;
 
-		case 10:
-			version = 0x10060000;
-			break;
+			case 10:
+				version = 0x10060000;
+				break;
 
-		case 11:
-			version = 0x10070000;
-			break;
+			case 11:
+				version = 0x10070000;
+				break;
 
-		case 12:
-			version = 0x10080000;
-			break;
+			case 12:
+				version = 0x10080000;
+				break;
 
-		case 13:
-			version = 0x10090000;
-			break;
+			case 13:
+				version = 0x10090000;
+				break;
 
-		default:
-			version = 0x10100000;
-			break;
+			default:
+				version = 0x10100000;
+				break;
 		}
 
 		version |= (minorVersion << 8) | (patchVersion);
@@ -2592,7 +2592,7 @@ fail:
 	free(kernelVersion);
 	return version;
 }
-#	endif
+#endif
 
 SCardApiFunctionTable PCSC_SCardApiFunctionTable = {
 	0, /* dwVersion */
@@ -2685,20 +2685,20 @@ int PCSC_InitializeSCardApi(void)
 {
 	/* Disable pcsc-lite's (poor) blocking so we can handle it ourselves */
 	SetEnvironmentVariableA("PCSCLITE_NO_BLOCKING", "1");
-#	ifdef __MACOSX__
+#ifdef __MACOSX__
 	g_PCSCModule = LoadLibraryA("/System/Library/Frameworks/PCSC.framework/PCSC");
 	OSXVersion = determineMacOSXVersion();
 
 	if (OSXVersion == 0)
 		return -1;
 
-#	else
+#else
 	g_PCSCModule = LoadLibraryA("libpcsclite.so.1");
 
 	if (!g_PCSCModule)
 		g_PCSCModule = LoadLibraryA("libpcsclite.so");
 
-#	endif
+#endif
 
 	if (!g_PCSCModule)
 		return -1;
@@ -2713,16 +2713,16 @@ int PCSC_InitializeSCardApi(void)
 	g_PCSC.pfnSCardEndTransaction = (void*)GetProcAddress(g_PCSCModule, "SCardEndTransaction");
 	g_PCSC.pfnSCardStatus = (void*)GetProcAddress(g_PCSCModule, "SCardStatus");
 	g_PCSC.pfnSCardGetStatusChange = (void*)GetProcAddress(g_PCSCModule, "SCardGetStatusChange");
-#	ifdef __MACOSX__
+#ifdef __MACOSX__
 
 	if (OSXVersion >= 0x10050600)
 		g_PCSC.pfnSCardControl = (void*)GetProcAddress(g_PCSCModule, "SCardControl132");
 	else
 		g_PCSC.pfnSCardControl = (void*)GetProcAddress(g_PCSCModule, "SCardControl");
 
-#	else
+#else
 	g_PCSC.pfnSCardControl = (void*)GetProcAddress(g_PCSCModule, "SCardControl");
-#	endif
+#endif
 	g_PCSC.pfnSCardTransmit = (void*)GetProcAddress(g_PCSCModule, "SCardTransmit");
 	g_PCSC.pfnSCardListReaderGroups = (void*)GetProcAddress(g_PCSCModule, "SCardListReaderGroups");
 	g_PCSC.pfnSCardListReaders = (void*)GetProcAddress(g_PCSCModule, "SCardListReaders");
@@ -2730,20 +2730,20 @@ int PCSC_InitializeSCardApi(void)
 	g_PCSC.pfnSCardGetAttrib = (void*)GetProcAddress(g_PCSCModule, "SCardGetAttrib");
 	g_PCSC.pfnSCardSetAttrib = (void*)GetProcAddress(g_PCSCModule, "SCardSetAttrib");
 	g_PCSC.pfnSCardFreeMemory = NULL;
-#	ifndef __APPLE__
+#ifndef __APPLE__
 	g_PCSC.pfnSCardFreeMemory = (void*)GetProcAddress(g_PCSCModule, "SCardFreeMemory");
-#	endif
+#endif
 
 	if (g_PCSC.pfnSCardFreeMemory)
 		g_SCardAutoAllocate = TRUE;
 
-#	ifdef DISABLE_PCSC_SCARD_AUTOALLOCATE
+#ifdef DISABLE_PCSC_SCARD_AUTOALLOCATE
 	g_PCSC.pfnSCardFreeMemory = NULL;
 	g_SCardAutoAllocate = FALSE;
-#	endif
-#	ifdef __APPLE__
+#endif
+#ifdef __APPLE__
 	g_PnP_Notification = FALSE;
-#	endif
+#endif
 	return 1;
 }
 

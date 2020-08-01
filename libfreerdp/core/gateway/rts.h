@@ -21,7 +21,7 @@
 #define FREERDP_LIB_CORE_GATEWAY_RTS_H
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "rpc.h"

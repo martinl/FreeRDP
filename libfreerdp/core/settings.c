@@ -18,14 +18,14 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "certificate.h"
 #include "capabilities.h"
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include <ctype.h>
@@ -41,8 +41,8 @@
 #include <ctype.h>
 
 #ifdef _WIN32
-#	pragma warning(push)
-#	pragma warning(disable : 4244)
+#pragma warning(push)
+#pragma warning(disable : 4244)
 #endif
 
 static const char client_dll[] = "C:\\Windows\\System32\\mstscax.dll";
@@ -1122,5 +1122,5 @@ out_fail:
 	return NULL;
 }
 #ifdef _WIN32
-#	pragma warning(pop)
+#pragma warning(pop)
 #endif

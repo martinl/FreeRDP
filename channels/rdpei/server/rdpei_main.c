@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -183,13 +183,13 @@ static UINT read_cs_ready_message(RdpeiServerContext* context, wStream* s)
 
 	switch (context->clientVersion)
 	{
-	case RDPINPUT_PROTOCOL_V10:
-	case RDPINPUT_PROTOCOL_V101:
-		break;
+		case RDPINPUT_PROTOCOL_V10:
+		case RDPINPUT_PROTOCOL_V101:
+			break;
 
-	default:
-		WLog_ERR(TAG, "unhandled RPDEI protocol version 0x%" PRIx32 "", context->clientVersion);
-		break;
+		default:
+			WLog_ERR(TAG, "unhandled RPDEI protocol version 0x%" PRIx32 "", context->clientVersion);
+			break;
 	}
 
 	IFCALLRET(context->onClientReady, error, context);
@@ -431,41 +431,42 @@ UINT rdpei_server_handle_messages(RdpeiServerContext* context)
 	/* when here we have the header + the body */
 	switch (priv->currentMsgType)
 	{
-	case EVENTID_CS_READY:
-		if (priv->automataState != STATE_WAITING_CLIENT_READY)
-		{
-			WLog_ERR(TAG, "not expecting a CS_READY packet in this state(%d)", priv->automataState);
-			return ERROR_INVALID_STATE;
-		}
+		case EVENTID_CS_READY:
+			if (priv->automataState != STATE_WAITING_CLIENT_READY)
+			{
+				WLog_ERR(TAG, "not expecting a CS_READY packet in this state(%d)",
+				         priv->automataState);
+				return ERROR_INVALID_STATE;
+			}
 
-		if ((error = read_cs_ready_message(context, s)))
-		{
-			WLog_ERR(TAG, "read_cs_ready_message failed with error %" PRIu32 "", error);
-			return error;
-		}
+			if ((error = read_cs_ready_message(context, s)))
+			{
+				WLog_ERR(TAG, "read_cs_ready_message failed with error %" PRIu32 "", error);
+				return error;
+			}
 
-		break;
+			break;
 
-	case EVENTID_TOUCH:
-		if ((error = read_touch_event(context, s)))
-		{
-			WLog_ERR(TAG, "read_touch_event failed with error %" PRIu32 "", error);
-			return error;
-		}
+		case EVENTID_TOUCH:
+			if ((error = read_touch_event(context, s)))
+			{
+				WLog_ERR(TAG, "read_touch_event failed with error %" PRIu32 "", error);
+				return error;
+			}
 
-		break;
+			break;
 
-	case EVENTID_DISMISS_HOVERING_CONTACT:
-		if ((error = read_dismiss_hovering_contact(context, s)))
-		{
-			WLog_ERR(TAG, "read_dismiss_hovering_contact failed with error %" PRIu32 "", error);
-			return error;
-		}
+		case EVENTID_DISMISS_HOVERING_CONTACT:
+			if ((error = read_dismiss_hovering_contact(context, s)))
+			{
+				WLog_ERR(TAG, "read_dismiss_hovering_contact failed with error %" PRIu32 "", error);
+				return error;
+			}
 
-		break;
+			break;
 
-	default:
-		WLog_ERR(TAG, "unexpected message type 0x%" PRIx16 "", priv->currentMsgType);
+		default:
+			WLog_ERR(TAG, "unexpected message type 0x%" PRIx16 "", priv->currentMsgType);
 	}
 
 	Stream_SetPosition(s, 0);
@@ -525,16 +526,16 @@ UINT rdpei_server_suspend(RdpeiServerContext* context)
 
 	switch (priv->automataState)
 	{
-	case STATE_SUSPENDED:
-		WLog_ERR(TAG, "already suspended");
-		return CHANNEL_RC_OK;
+		case STATE_SUSPENDED:
+			WLog_ERR(TAG, "already suspended");
+			return CHANNEL_RC_OK;
 
-	case STATE_WAITING_FRAME:
-		break;
+		case STATE_WAITING_FRAME:
+			break;
 
-	default:
-		WLog_ERR(TAG, "called from unexpected state %d", priv->automataState);
-		return ERROR_INVALID_STATE;
+		default:
+			WLog_ERR(TAG, "called from unexpected state %d", priv->automataState);
+			return ERROR_INVALID_STATE;
 	}
 
 	Stream_SetPosition(priv->outputStream, 0);
@@ -571,16 +572,16 @@ UINT rdpei_server_resume(RdpeiServerContext* context)
 
 	switch (priv->automataState)
 	{
-	case STATE_WAITING_FRAME:
-		WLog_ERR(TAG, "not suspended");
-		return CHANNEL_RC_OK;
+		case STATE_WAITING_FRAME:
+			WLog_ERR(TAG, "not suspended");
+			return CHANNEL_RC_OK;
 
-	case STATE_SUSPENDED:
-		break;
+		case STATE_SUSPENDED:
+			break;
 
-	default:
-		WLog_ERR(TAG, "called from unexpected state %d", priv->automataState);
-		return ERROR_INVALID_STATE;
+		default:
+			WLog_ERR(TAG, "called from unexpected state %d", priv->automataState);
+			return ERROR_INVALID_STATE;
 	}
 
 	Stream_SetPosition(priv->outputStream, 0);

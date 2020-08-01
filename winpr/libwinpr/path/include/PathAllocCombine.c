@@ -23,7 +23,7 @@
 HRESULT PATH_ALLOC_COMBINE(PCWSTR pszPathIn, PCWSTR pszMore, unsigned long dwFlags,
                            PWSTR* ppszPathOut)
 {
-#	ifdef _WIN32
+#ifdef _WIN32
 	PWSTR pszPathOut;
 	BOOL backslashIn;
 	BOOL backslashMore;
@@ -91,7 +91,7 @@ HRESULT PATH_ALLOC_COMBINE(PCWSTR pszPathIn, PCWSTR pszMore, unsigned long dwFla
 		return S_OK;
 	}
 
-#	endif
+#endif
 	return E_FAIL;
 }
 

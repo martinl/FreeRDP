@@ -14,7 +14,8 @@
 
 @implementation GlobalDefaults
 
-+ (GlobalDefaults *)sharedGlobalDefaults {
++ (GlobalDefaults *)sharedGlobalDefaults
+{
 	static GlobalDefaults *_shared_global_defaults = nil;
 
 	if (_shared_global_defaults == nil)
@@ -29,7 +30,8 @@
 	return _shared_global_defaults;
 }
 
-- (id)init {
+- (id)init
+{
 	if (!(self = [super init]))
 		return nil;
 
@@ -47,7 +49,8 @@
 	return self;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[_default_bookmark release];
 	[super dealloc];
 }
@@ -56,16 +59,19 @@
 
 @synthesize bookmark = _default_bookmark;
 
-- (ComputerBookmark *)newBookmark {
+- (ComputerBookmark *)newBookmark
+{
 	return [[ComputerBookmark alloc] initWithConnectionParameters:[[self newParams] autorelease]];
 }
 
-- (ConnectionParams *)newParams {
+- (ConnectionParams *)newParams
+{
 	ConnectionParams *param_copy = [[[self bookmark] params] copy];
 	return param_copy;
 }
 
-- (ComputerBookmark *)newTestServerBookmark {
+- (ComputerBookmark *)newTestServerBookmark
+{
 	ComputerBookmark *bm = [self newBookmark];
 	[bm setLabel:@"Test Server"];
 	[[bm params] setValue:@"testservice.ifreerdp.com" forKey:@"hostname"];

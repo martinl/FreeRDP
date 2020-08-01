@@ -22,7 +22,8 @@
 @synthesize window = _window, tabBarController = _tabBarController;
 
 - (BOOL)application:(UIApplication *)application
-    didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
 	// Set default values for most NSUserDefaults
 	[[NSUserDefaults standardUserDefaults]
 	    registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle]
@@ -70,7 +71,8 @@
 	return YES;
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application {
+- (void)applicationWillResignActive:(UIApplication *)application
+{
 	/*
 	 Sent when the application is about to move from active to inactive state. This can occur for
 	 certain types of temporary interruptions (such as an incoming phone call or SMS message) or
@@ -80,7 +82,8 @@
 	 */
 }
 
-- (void)applicationDidEnterBackground:(UIApplication *)application {
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
 	/*
 	 Use this method to release shared resources, save user data, invalidate timers, and store
 	 enough application state information to restore your application to its current state in case
@@ -89,7 +92,8 @@
 	 */
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application {
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
 	/*
 	 Called as part of the transition from the background to the inactive state; here you can undo
 	 many of the changes made on entering the background.
@@ -97,14 +101,16 @@
 	// cancel disconnect timer
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application {
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
 	/*
 	 Restart any tasks that were paused (or not yet started) while the application was inactive. If
 	 the application was previously in the background, optionally refresh the user interface.
 	 */
 }
 
-- (void)applicationWillTerminate:(UIApplication *)application {
+- (void)applicationWillTerminate:(UIApplication *)application
+{
 	/*
 	 Called when the application is about to terminate.
 	 Save data if appropriate.
@@ -112,7 +118,8 @@
 	 */
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[_window release];
 	[super dealloc];
 }

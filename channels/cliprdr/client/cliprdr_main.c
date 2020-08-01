@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -226,19 +226,20 @@ static UINT cliprdr_process_clip_caps(cliprdrPlugin* cliprdr, wStream* s, UINT32
 
 		switch (capabilitySetType)
 		{
-		case CB_CAPSTYPE_GENERAL:
-			if ((error = cliprdr_process_general_capability(cliprdr, s)))
-			{
-				WLog_ERR(TAG, "cliprdr_process_general_capability failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
+			case CB_CAPSTYPE_GENERAL:
+				if ((error = cliprdr_process_general_capability(cliprdr, s)))
+				{
+					WLog_ERR(TAG,
+					         "cliprdr_process_general_capability failed with error %" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		default:
-			WLog_ERR(TAG, "unknown cliprdr capability set: %" PRIu16 "", capabilitySetType);
-			return CHANNEL_RC_BAD_PROC;
+			default:
+				WLog_ERR(TAG, "unknown cliprdr capability set: %" PRIu16 "", capabilitySetType);
+				return CHANNEL_RC_BAD_PROC;
 		}
 	}
 
@@ -482,75 +483,79 @@ static UINT cliprdr_order_recv(cliprdrPlugin* cliprdr, wStream* s)
 
 	switch (msgType)
 	{
-	case CB_CLIP_CAPS:
-		if ((error = cliprdr_process_clip_caps(cliprdr, s, dataLen, msgFlags)))
-			WLog_ERR(TAG, "cliprdr_process_clip_caps failed with error %" PRIu32 "!", error);
+		case CB_CLIP_CAPS:
+			if ((error = cliprdr_process_clip_caps(cliprdr, s, dataLen, msgFlags)))
+				WLog_ERR(TAG, "cliprdr_process_clip_caps failed with error %" PRIu32 "!", error);
 
-		break;
+			break;
 
-	case CB_MONITOR_READY:
-		if ((error = cliprdr_process_monitor_ready(cliprdr, s, dataLen, msgFlags)))
-			WLog_ERR(TAG, "cliprdr_process_monitor_ready failed with error %" PRIu32 "!", error);
+		case CB_MONITOR_READY:
+			if ((error = cliprdr_process_monitor_ready(cliprdr, s, dataLen, msgFlags)))
+				WLog_ERR(TAG, "cliprdr_process_monitor_ready failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_FORMAT_LIST:
-		if ((error = cliprdr_process_format_list(cliprdr, s, dataLen, msgFlags)))
-			WLog_ERR(TAG, "cliprdr_process_format_list failed with error %" PRIu32 "!", error);
+		case CB_FORMAT_LIST:
+			if ((error = cliprdr_process_format_list(cliprdr, s, dataLen, msgFlags)))
+				WLog_ERR(TAG, "cliprdr_process_format_list failed with error %" PRIu32 "!", error);
 
-		break;
+			break;
 
-	case CB_FORMAT_LIST_RESPONSE:
-		if ((error = cliprdr_process_format_list_response(cliprdr, s, dataLen, msgFlags)))
-			WLog_ERR(TAG, "cliprdr_process_format_list_response failed with error %" PRIu32 "!",
-			         error);
+		case CB_FORMAT_LIST_RESPONSE:
+			if ((error = cliprdr_process_format_list_response(cliprdr, s, dataLen, msgFlags)))
+				WLog_ERR(TAG, "cliprdr_process_format_list_response failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_FORMAT_DATA_REQUEST:
-		if ((error = cliprdr_process_format_data_request(cliprdr, s, dataLen, msgFlags)))
-			WLog_ERR(TAG, "cliprdr_process_format_data_request failed with error %" PRIu32 "!",
-			         error);
+		case CB_FORMAT_DATA_REQUEST:
+			if ((error = cliprdr_process_format_data_request(cliprdr, s, dataLen, msgFlags)))
+				WLog_ERR(TAG, "cliprdr_process_format_data_request failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_FORMAT_DATA_RESPONSE:
-		if ((error = cliprdr_process_format_data_response(cliprdr, s, dataLen, msgFlags)))
-			WLog_ERR(TAG, "cliprdr_process_format_data_response failed with error %" PRIu32 "!",
-			         error);
+		case CB_FORMAT_DATA_RESPONSE:
+			if ((error = cliprdr_process_format_data_response(cliprdr, s, dataLen, msgFlags)))
+				WLog_ERR(TAG, "cliprdr_process_format_data_response failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_FILECONTENTS_REQUEST:
-		if ((error = cliprdr_process_filecontents_request(cliprdr, s, dataLen, msgFlags)))
-			WLog_ERR(TAG, "cliprdr_process_filecontents_request failed with error %" PRIu32 "!",
-			         error);
+		case CB_FILECONTENTS_REQUEST:
+			if ((error = cliprdr_process_filecontents_request(cliprdr, s, dataLen, msgFlags)))
+				WLog_ERR(TAG, "cliprdr_process_filecontents_request failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_FILECONTENTS_RESPONSE:
-		if ((error = cliprdr_process_filecontents_response(cliprdr, s, dataLen, msgFlags)))
-			WLog_ERR(TAG, "cliprdr_process_filecontents_response failed with error %" PRIu32 "!",
-			         error);
+		case CB_FILECONTENTS_RESPONSE:
+			if ((error = cliprdr_process_filecontents_response(cliprdr, s, dataLen, msgFlags)))
+				WLog_ERR(TAG,
+				         "cliprdr_process_filecontents_response failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_LOCK_CLIPDATA:
-		if ((error = cliprdr_process_lock_clipdata(cliprdr, s, dataLen, msgFlags)))
-			WLog_ERR(TAG, "cliprdr_process_lock_clipdata failed with error %" PRIu32 "!", error);
+		case CB_LOCK_CLIPDATA:
+			if ((error = cliprdr_process_lock_clipdata(cliprdr, s, dataLen, msgFlags)))
+				WLog_ERR(TAG, "cliprdr_process_lock_clipdata failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_UNLOCK_CLIPDATA:
-		if ((error = cliprdr_process_unlock_clipdata(cliprdr, s, dataLen, msgFlags)))
-			WLog_ERR(TAG, "cliprdr_process_lock_clipdata failed with error %" PRIu32 "!", error);
+		case CB_UNLOCK_CLIPDATA:
+			if ((error = cliprdr_process_unlock_clipdata(cliprdr, s, dataLen, msgFlags)))
+				WLog_ERR(TAG, "cliprdr_process_lock_clipdata failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	default:
-		error = CHANNEL_RC_BAD_PROC;
-		WLog_ERR(TAG, "unknown msgType %" PRIu16 "", msgType);
-		break;
+		default:
+			error = CHANNEL_RC_BAD_PROC;
+			WLog_ERR(TAG, "unknown msgType %" PRIu16 "", msgType);
+			break;
 	}
 
 	Stream_Free(s, TRUE);
@@ -1020,18 +1025,18 @@ static VOID VCAPITYPE cliprdr_virtual_channel_open_event_ex(LPVOID lpUserParam, 
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_DATA_RECEIVED:
-		if ((error = cliprdr_virtual_channel_event_data_received(cliprdr, pData, dataLength,
-		                                                         totalLength, dataFlags)))
-			WLog_ERR(TAG, "failed with error %" PRIu32 "", error);
+		case CHANNEL_EVENT_DATA_RECEIVED:
+			if ((error = cliprdr_virtual_channel_event_data_received(cliprdr, pData, dataLength,
+			                                                         totalLength, dataFlags)))
+				WLog_ERR(TAG, "failed with error %" PRIu32 "", error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_WRITE_COMPLETE:
-		break;
+		case CHANNEL_EVENT_WRITE_COMPLETE:
+			break;
 
-	case CHANNEL_EVENT_USER:
-		break;
+		case CHANNEL_EVENT_USER:
+			break;
 	}
 
 	if (error && cliprdr->context->rdpcontext)
@@ -1209,27 +1214,30 @@ static VOID VCAPITYPE cliprdr_virtual_channel_init_event_ex(LPVOID lpUserParam, 
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_CONNECTED:
-		if ((error = cliprdr_virtual_channel_event_connected(cliprdr, pData, dataLength)))
-			WLog_ERR(TAG, "cliprdr_virtual_channel_event_connected failed with error %" PRIu32 "!",
-			         error);
+		case CHANNEL_EVENT_CONNECTED:
+			if ((error = cliprdr_virtual_channel_event_connected(cliprdr, pData, dataLength)))
+				WLog_ERR(TAG,
+				         "cliprdr_virtual_channel_event_connected failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_DISCONNECTED:
-		if ((error = cliprdr_virtual_channel_event_disconnected(cliprdr)))
-			WLog_ERR(TAG,
-			         "cliprdr_virtual_channel_event_disconnected failed with error %" PRIu32 "!",
-			         error);
+		case CHANNEL_EVENT_DISCONNECTED:
+			if ((error = cliprdr_virtual_channel_event_disconnected(cliprdr)))
+				WLog_ERR(TAG,
+				         "cliprdr_virtual_channel_event_disconnected failed with error %" PRIu32
+				         "!",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_TERMINATED:
-		if ((error = cliprdr_virtual_channel_event_terminated(cliprdr)))
-			WLog_ERR(TAG, "cliprdr_virtual_channel_event_terminated failed with error %" PRIu32 "!",
-			         error);
+		case CHANNEL_EVENT_TERMINATED:
+			if ((error = cliprdr_virtual_channel_event_terminated(cliprdr)))
+				WLog_ERR(TAG,
+				         "cliprdr_virtual_channel_event_terminated failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 	}
 
 	if (error && cliprdr->context->rdpcontext)

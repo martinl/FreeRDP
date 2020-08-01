@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -33,35 +33,36 @@
 #include <freerdp/codec/dsp.h>
 
 #if !defined(WITH_DSP_FFMPEG)
-#	if defined(WITH_GSM)
-#		include <gsm/gsm.h>
-#	endif
+#if defined(WITH_GSM)
+#include <gsm/gsm.h>
+#endif
 
-#	if defined(WITH_LAME)
-#		include <lame/lame.h>
-#	endif
+#if defined(WITH_LAME)
+#include <lame/lame.h>
+#endif
 
-#	if defined(WITH_FAAD2)
-#		include <neaacdec.h>
-#	endif
+#if defined(WITH_FAAD2)
+#include <neaacdec.h>
+#endif
 
-#	if defined(WITH_FAAC)
-#		include <faac.h>
-#	endif
+#if defined(WITH_FAAC)
+#include <faac.h>
+#endif
 
-#	if defined(WITH_SOXR)
-#		include <soxr.h>
-#	endif
+#if defined(WITH_SOXR)
+#include <soxr.h>
+#endif
 
 #else
-#	include "dsp_ffmpeg.h"
+#include "dsp_ffmpeg.h"
 #endif
 
 #define TAG FREERDP_TAG("dsp")
 
 #if !defined(WITH_DSP_FFMPEG)
 
-union _ADPCM {
+union _ADPCM
+{
 	struct
 	{
 		INT16 last_sample[2];
@@ -87,27 +88,27 @@ struct _FREERDP_DSP_CONTEXT
 	wStream* buffer;
 	wStream* resample;
 
-#	if defined(WITH_GSM)
+#if defined(WITH_GSM)
 	gsm gsm;
-#	endif
-#	if defined(WITH_LAME)
+#endif
+#if defined(WITH_LAME)
 	lame_t lame;
 	hip_t hip;
-#	endif
-#	if defined(WITH_FAAD2)
+#endif
+#if defined(WITH_FAAD2)
 	NeAACDecHandle faad;
 	BOOL faadSetup;
-#	endif
+#endif
 
-#	if defined(WITH_FAAC)
+#if defined(WITH_FAAC)
 	faacEncHandle faac;
 	unsigned long faacInputSamples;
 	unsigned long faacMaxOutputBytes;
-#	endif
+#endif
 
-#	if defined(WITH_SOXR)
+#if defined(WITH_SOXR)
 	soxr_t sox;
-#	endif
+#endif
 };
 
 static INT16 read_int16(const BYTE* src)
@@ -152,17 +153,43 @@ static BOOL freerdp_dsp_channel_mix(FREERDP_DSP_CONTEXT* context, const BYTE* sr
 	{
 		switch (srcFormat->nChannels)
 		{
-		case 1:
-			if (!Stream_EnsureCapacity(context->buffer, size * 2))
+			case 1:
+				if (!Stream_EnsureCapacity(context->buffer, size * 2))
+					return FALSE;
+
+				for (x = 0; x < samples; x++)
+				{
+					for (y = 0; y < bpp; y++)
+						Stream_Write_UINT8(context->buffer, src[x * bpp + y]);
+
+					for (y = 0; y < bpp; y++)
+						Stream_Write_UINT8(context->buffer, src[x * bpp + y]);
+				}
+
+				Stream_SealLength(context->buffer);
+				*data = Stream_Buffer(context->buffer);
+				*length = Stream_Length(context->buffer);
+				return TRUE;
+
+			case 2:  /* We only support stereo, so we can not handle this case. */
+			default: /* Unsupported number of channels */
+				return FALSE;
+		}
+	}
+
+	/* Destination has less channels than source */
+	switch (srcFormat->nChannels)
+	{
+		case 2:
+			if (!Stream_EnsureCapacity(context->buffer, size / 2))
 				return FALSE;
 
+			/* Simply drop second channel.
+			 * TODO: Calculate average */
 			for (x = 0; x < samples; x++)
 			{
 				for (y = 0; y < bpp; y++)
-					Stream_Write_UINT8(context->buffer, src[x * bpp + y]);
-
-				for (y = 0; y < bpp; y++)
-					Stream_Write_UINT8(context->buffer, src[x * bpp + y]);
+					Stream_Write_UINT8(context->buffer, src[2 * x * bpp + y]);
 			}
 
 			Stream_SealLength(context->buffer);
@@ -170,35 +197,9 @@ static BOOL freerdp_dsp_channel_mix(FREERDP_DSP_CONTEXT* context, const BYTE* sr
 			*length = Stream_Length(context->buffer);
 			return TRUE;
 
-		case 2:  /* We only support stereo, so we can not handle this case. */
+		case 1:  /* Invalid, do we want to use a 0 channel sound? */
 		default: /* Unsupported number of channels */
 			return FALSE;
-		}
-	}
-
-	/* Destination has less channels than source */
-	switch (srcFormat->nChannels)
-	{
-	case 2:
-		if (!Stream_EnsureCapacity(context->buffer, size / 2))
-			return FALSE;
-
-		/* Simply drop second channel.
-		 * TODO: Calculate average */
-		for (x = 0; x < samples; x++)
-		{
-			for (y = 0; y < bpp; y++)
-				Stream_Write_UINT8(context->buffer, src[2 * x * bpp + y]);
-		}
-
-		Stream_SealLength(context->buffer);
-		*data = Stream_Buffer(context->buffer);
-		*length = Stream_Length(context->buffer);
-		return TRUE;
-
-	case 1:  /* Invalid, do we want to use a 0 channel sound? */
-	default: /* Unsupported number of channels */
-		return FALSE;
 	}
 
 	return FALSE;
@@ -212,14 +213,14 @@ static BOOL freerdp_dsp_channel_mix(FREERDP_DSP_CONTEXT* context, const BYTE* sr
 static BOOL freerdp_dsp_resample(FREERDP_DSP_CONTEXT* context, const BYTE* src, size_t size,
                                  const AUDIO_FORMAT* srcFormat, const BYTE** data, size_t* length)
 {
-#	if defined(WITH_SOXR)
+#if defined(WITH_SOXR)
 	soxr_error_t error;
 	size_t idone, odone;
 	size_t sframes, rframes;
 	size_t rsize;
 	size_t j;
 	size_t sbytes, rbytes;
-#	endif
+#endif
 	size_t srcBytesPerFrame, dstBytesPerFrame;
 	size_t srcChannels, dstChannels;
 	AUDIO_FORMAT format;
@@ -243,7 +244,7 @@ static BOOL freerdp_dsp_resample(FREERDP_DSP_CONTEXT* context, const BYTE* src, 
 	if (audio_format_compatible(&format, &context->format))
 		return TRUE;
 
-#	if defined(WITH_SOXR)
+#if defined(WITH_SOXR)
 	sbytes = srcChannels * srcBytesPerFrame;
 	sframes = size / sbytes;
 	rbytes = dstBytesPerFrame * dstChannels;
@@ -261,14 +262,14 @@ static BOOL freerdp_dsp_resample(FREERDP_DSP_CONTEXT* context, const BYTE* src, 
 	*data = Stream_Buffer(context->resample);
 	*length = Stream_Length(context->resample);
 	return (error == 0) ? TRUE : FALSE;
-#	else
+#else
 	WINPR_UNUSED(src);
 	WINPR_UNUSED(size);
 	WINPR_UNUSED(data);
 	WINPR_UNUSED(length);
 	WLog_ERR(TAG, "Missing resample support, recompile -DWITH_SOXR=ON or -DWITH_DSP_FFMPEG=ON");
 	return FALSE;
-#	endif
+#endif
 }
 
 /**
@@ -406,7 +407,7 @@ static BOOL freerdp_dsp_decode_ima_adpcm(FREERDP_DSP_CONTEXT* context, const BYT
 	return TRUE;
 }
 
-#	if defined(WITH_GSM)
+#if defined(WITH_GSM)
 static BOOL freerdp_dsp_decode_gsm610(FREERDP_DSP_CONTEXT* context, const BYTE* src, size_t size,
                                       wStream* out)
 {
@@ -461,9 +462,9 @@ static BOOL freerdp_dsp_encode_gsm610(FREERDP_DSP_CONTEXT* context, const BYTE* 
 
 	return TRUE;
 }
-#	endif
+#endif
 
-#	if defined(WITH_LAME)
+#if defined(WITH_LAME)
 static BOOL freerdp_dsp_decode_mp3(FREERDP_DSP_CONTEXT* context, const BYTE* src, size_t size,
                                    wStream* out)
 {
@@ -525,9 +526,9 @@ static BOOL freerdp_dsp_encode_mp3(FREERDP_DSP_CONTEXT* context, const BYTE* src
 	Stream_Seek(out, (size_t)rc);
 	return TRUE;
 }
-#	endif
+#endif
 
-#	if defined(WITH_FAAC)
+#if defined(WITH_FAAC)
 static BOOL freerdp_dsp_encode_faac(FREERDP_DSP_CONTEXT* context, const BYTE* src, size_t size,
                                     wStream* out)
 {
@@ -565,9 +566,9 @@ static BOOL freerdp_dsp_encode_faac(FREERDP_DSP_CONTEXT* context, const BYTE* sr
 
 	return TRUE;
 }
-#	endif
+#endif
 
-#	if defined(WITH_FAAD2)
+#if defined(WITH_FAAD2)
 static BOOL freerdp_dsp_decode_faad(FREERDP_DSP_CONTEXT* context, const BYTE* src, size_t size,
                                     wStream* out)
 {
@@ -626,7 +627,7 @@ static BOOL freerdp_dsp_decode_faad(FREERDP_DSP_CONTEXT* context, const BYTE* sr
 	return TRUE;
 }
 
-#	endif
+#endif
 
 /**
  * 0     1     2     3
@@ -1037,7 +1038,7 @@ FREERDP_DSP_CONTEXT* freerdp_dsp_context_new(BOOL encoder)
 		goto fail;
 
 	context->encoder = encoder;
-#	if defined(WITH_GSM)
+#if defined(WITH_GSM)
 	context->gsm = gsm_create();
 
 	if (!context->gsm)
@@ -1051,8 +1052,8 @@ FREERDP_DSP_CONTEXT* freerdp_dsp_context_new(BOOL encoder)
 		if (rc < 0)
 			goto fail;
 	}
-#	endif
-#	if defined(WITH_LAME)
+#endif
+#if defined(WITH_LAME)
 
 	if (encoder)
 	{
@@ -1069,8 +1070,8 @@ FREERDP_DSP_CONTEXT* freerdp_dsp_context_new(BOOL encoder)
 			goto fail;
 	}
 
-#	endif
-#	if defined(WITH_FAAD2)
+#endif
+#if defined(WITH_FAAD2)
 
 	if (!encoder)
 	{
@@ -1080,7 +1081,7 @@ FREERDP_DSP_CONTEXT* freerdp_dsp_context_new(BOOL encoder)
 			goto fail;
 	}
 
-#	endif
+#endif
 	return context;
 fail:
 	freerdp_dsp_context_free(context);
@@ -1098,32 +1099,32 @@ void freerdp_dsp_context_free(FREERDP_DSP_CONTEXT* context)
 	{
 		Stream_Free(context->buffer, TRUE);
 		Stream_Free(context->resample, TRUE);
-#	if defined(WITH_GSM)
+#if defined(WITH_GSM)
 		gsm_destroy(context->gsm);
-#	endif
-#	if defined(WITH_LAME)
+#endif
+#if defined(WITH_LAME)
 
 		if (context->encoder)
 			lame_close(context->lame);
 		else
 			hip_decode_exit(context->hip);
 
-#	endif
-#	if defined(WITH_FAAD2)
+#endif
+#if defined(WITH_FAAD2)
 
 		if (!context->encoder)
 			NeAACDecClose(context->faad);
 
-#	endif
-#	if defined(WITH_FAAC)
+#endif
+#if defined(WITH_FAAC)
 
 		if (context->faac)
 			faacEncClose(context->faac);
 
-#	endif
-#	if defined(WITH_SOXR)
+#endif
+#if defined(WITH_SOXR)
 		soxr_delete(context->sox);
-#	endif
+#endif
 		free(context);
 	}
 
@@ -1155,36 +1156,36 @@ BOOL freerdp_dsp_encode(FREERDP_DSP_CONTEXT* context, const AUDIO_FORMAT* srcFor
 
 	switch (context->format.wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		if (!Stream_EnsureRemainingCapacity(out, length))
+		case WAVE_FORMAT_PCM:
+			if (!Stream_EnsureRemainingCapacity(out, length))
+				return FALSE;
+
+			Stream_Write(out, data, length);
+			return TRUE;
+
+		case WAVE_FORMAT_ADPCM:
+			return freerdp_dsp_encode_ms_adpcm(context, data, length, out);
+
+		case WAVE_FORMAT_DVI_ADPCM:
+			return freerdp_dsp_encode_ima_adpcm(context, data, length, out);
+#if defined(WITH_GSM)
+
+		case WAVE_FORMAT_GSM610:
+			return freerdp_dsp_encode_gsm610(context, data, length, out);
+#endif
+#if defined(WITH_LAME)
+
+		case WAVE_FORMAT_MPEGLAYER3:
+			return freerdp_dsp_encode_mp3(context, data, length, out);
+#endif
+#if defined(WITH_FAAC)
+
+		case WAVE_FORMAT_AAC_MS:
+			return freerdp_dsp_encode_faac(context, data, length, out);
+#endif
+
+		default:
 			return FALSE;
-
-		Stream_Write(out, data, length);
-		return TRUE;
-
-	case WAVE_FORMAT_ADPCM:
-		return freerdp_dsp_encode_ms_adpcm(context, data, length, out);
-
-	case WAVE_FORMAT_DVI_ADPCM:
-		return freerdp_dsp_encode_ima_adpcm(context, data, length, out);
-#	if defined(WITH_GSM)
-
-	case WAVE_FORMAT_GSM610:
-		return freerdp_dsp_encode_gsm610(context, data, length, out);
-#	endif
-#	if defined(WITH_LAME)
-
-	case WAVE_FORMAT_MPEGLAYER3:
-		return freerdp_dsp_encode_mp3(context, data, length, out);
-#	endif
-#	if defined(WITH_FAAC)
-
-	case WAVE_FORMAT_AAC_MS:
-		return freerdp_dsp_encode_faac(context, data, length, out);
-#	endif
-
-	default:
-		return FALSE;
 	}
 
 	return FALSE;
@@ -1203,36 +1204,36 @@ BOOL freerdp_dsp_decode(FREERDP_DSP_CONTEXT* context, const AUDIO_FORMAT* srcFor
 
 	switch (context->format.wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		if (!Stream_EnsureRemainingCapacity(out, length))
+		case WAVE_FORMAT_PCM:
+			if (!Stream_EnsureRemainingCapacity(out, length))
+				return FALSE;
+
+			Stream_Write(out, data, length);
+			return TRUE;
+
+		case WAVE_FORMAT_ADPCM:
+			return freerdp_dsp_decode_ms_adpcm(context, data, length, out);
+
+		case WAVE_FORMAT_DVI_ADPCM:
+			return freerdp_dsp_decode_ima_adpcm(context, data, length, out);
+#if defined(WITH_GSM)
+
+		case WAVE_FORMAT_GSM610:
+			return freerdp_dsp_decode_gsm610(context, data, length, out);
+#endif
+#if defined(WITH_LAME)
+
+		case WAVE_FORMAT_MPEGLAYER3:
+			return freerdp_dsp_decode_mp3(context, data, length, out);
+#endif
+#if defined(WITH_FAAD2)
+
+		case WAVE_FORMAT_AAC_MS:
+			return freerdp_dsp_decode_faad(context, data, length, out);
+#endif
+
+		default:
 			return FALSE;
-
-		Stream_Write(out, data, length);
-		return TRUE;
-
-	case WAVE_FORMAT_ADPCM:
-		return freerdp_dsp_decode_ms_adpcm(context, data, length, out);
-
-	case WAVE_FORMAT_DVI_ADPCM:
-		return freerdp_dsp_decode_ima_adpcm(context, data, length, out);
-#	if defined(WITH_GSM)
-
-	case WAVE_FORMAT_GSM610:
-		return freerdp_dsp_decode_gsm610(context, data, length, out);
-#	endif
-#	if defined(WITH_LAME)
-
-	case WAVE_FORMAT_MPEGLAYER3:
-		return freerdp_dsp_decode_mp3(context, data, length, out);
-#	endif
-#	if defined(WITH_FAAD2)
-
-	case WAVE_FORMAT_AAC_MS:
-		return freerdp_dsp_decode_faad(context, data, length, out);
-#	endif
-
-	default:
-		return FALSE;
 	}
 
 	return FALSE;
@@ -1244,54 +1245,54 @@ BOOL freerdp_dsp_supports_format(const AUDIO_FORMAT* format, BOOL encode)
 #if defined(WITH_DSP_FFMPEG)
 	return freerdp_dsp_ffmpeg_supports_format(format, encode);
 #else
-#	if !defined(WITH_DSP_EXPERIMENTAL)
+#if !defined(WITH_DSP_EXPERIMENTAL)
 	WINPR_UNUSED(encode);
-#	endif
+#endif
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		return TRUE;
-#	if defined(WITH_DSP_EXPERIMENTAL)
-
-	case WAVE_FORMAT_ADPCM:
-	case WAVE_FORMAT_DVI_ADPCM:
-		return TRUE;
-#	endif
-#	if defined(WITH_GSM)
-
-	case WAVE_FORMAT_GSM610:
-#		if defined(WITH_DSP_EXPERIMENTAL)
-		return TRUE;
-#		else
-		return !encode;
-#		endif
-#	endif
-#	if defined(WITH_LAME)
-
-	case WAVE_FORMAT_MPEGLAYER3:
-#		if defined(WITH_DSP_EXPERIMENTAL)
-		return TRUE;
-#		else
-		return !encode;
-#		endif
-#	endif
-
-	case WAVE_FORMAT_AAC_MS:
-#	if defined(WITH_FAAD2)
-		if (!encode)
+		case WAVE_FORMAT_PCM:
 			return TRUE;
+#if defined(WITH_DSP_EXPERIMENTAL)
 
-#	endif
-#	if defined(WITH_FAAC) && defined(WITH_DSP_EXPERIMENTAL)
-
-		if (encode)
+		case WAVE_FORMAT_ADPCM:
+		case WAVE_FORMAT_DVI_ADPCM:
 			return TRUE;
+#endif
+#if defined(WITH_GSM)
 
-#	endif
+		case WAVE_FORMAT_GSM610:
+#if defined(WITH_DSP_EXPERIMENTAL)
+			return TRUE;
+#else
+			return !encode;
+#endif
+#endif
+#if defined(WITH_LAME)
 
-	default:
-		return FALSE;
+		case WAVE_FORMAT_MPEGLAYER3:
+#if defined(WITH_DSP_EXPERIMENTAL)
+			return TRUE;
+#else
+			return !encode;
+#endif
+#endif
+
+		case WAVE_FORMAT_AAC_MS:
+#if defined(WITH_FAAD2)
+			if (!encode)
+				return TRUE;
+
+#endif
+#if defined(WITH_FAAC) && defined(WITH_DSP_EXPERIMENTAL)
+
+			if (encode)
+				return TRUE;
+
+#endif
+
+		default:
+			return FALSE;
 	}
 
 	return FALSE;
@@ -1308,10 +1309,10 @@ BOOL freerdp_dsp_context_reset(FREERDP_DSP_CONTEXT* context, const AUDIO_FORMAT*
 		return FALSE;
 
 	context->format = *targetFormat;
-#	if defined(WITH_FAAD2)
+#if defined(WITH_FAAD2)
 	context->faadSetup = FALSE;
-#	endif
-#	if defined(WITH_FAAC)
+#endif
+#if defined(WITH_FAAC)
 
 	if (context->encoder)
 	{
@@ -1331,8 +1332,8 @@ BOOL freerdp_dsp_context_reset(FREERDP_DSP_CONTEXT* context, const AUDIO_FORMAT*
 		faacEncSetConfiguration(context->faac, cfg);
 	}
 
-#	endif
-#	if defined(WITH_SOXR)
+#endif
+#if defined(WITH_SOXR)
 	{
 		soxr_io_spec_t iospec = soxr_io_spec(SOXR_INT16, SOXR_INT16);
 		soxr_error_t error;
@@ -1343,7 +1344,7 @@ BOOL freerdp_dsp_context_reset(FREERDP_DSP_CONTEXT* context, const AUDIO_FORMAT*
 		if (!context->sox || (error != 0))
 			return FALSE;
 	}
-#	endif
+#endif
 	return TRUE;
 #endif
 }

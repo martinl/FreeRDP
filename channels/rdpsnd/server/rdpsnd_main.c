@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -327,23 +327,23 @@ static UINT rdpsnd_server_select_format(RdpsndServerContext* context, UINT16 cli
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_DVI_ADPCM:
-		bs = (format->nBlockAlign - 4 * format->nChannels) * 4;
-		context->priv->out_frames -= context->priv->out_frames % bs;
+		case WAVE_FORMAT_DVI_ADPCM:
+			bs = (format->nBlockAlign - 4 * format->nChannels) * 4;
+			context->priv->out_frames -= context->priv->out_frames % bs;
 
-		if (context->priv->out_frames < bs)
-			context->priv->out_frames = bs;
+			if (context->priv->out_frames < bs)
+				context->priv->out_frames = bs;
 
-		break;
+			break;
 
-	case WAVE_FORMAT_ADPCM:
-		bs = (format->nBlockAlign - 7 * format->nChannels) * 2 / format->nChannels + 2;
-		context->priv->out_frames -= context->priv->out_frames % bs;
+		case WAVE_FORMAT_ADPCM:
+			bs = (format->nBlockAlign - 7 * format->nChannels) * 2 / format->nChannels + 2;
+			context->priv->out_frames -= context->priv->out_frames % bs;
 
-		if (context->priv->out_frames < bs)
-			context->priv->out_frames = bs;
+			if (context->priv->out_frames < bs)
+				context->priv->out_frames = bs;
 
-		break;
+			break;
 	}
 
 	context->priv->out_pending_frames = 0;
@@ -947,31 +947,32 @@ UINT rdpsnd_server_handle_messages(RdpsndServerContext* context)
 
 	switch (priv->msgType)
 	{
-	case SNDC_WAVECONFIRM:
-		ret = rdpsnd_server_recv_waveconfirm(context, s);
-		break;
+		case SNDC_WAVECONFIRM:
+			ret = rdpsnd_server_recv_waveconfirm(context, s);
+			break;
 
-	case SNDC_FORMATS:
-		ret = rdpsnd_server_recv_formats(context, s);
+		case SNDC_FORMATS:
+			ret = rdpsnd_server_recv_formats(context, s);
 
-		if ((ret == CHANNEL_RC_OK) && (context->clientVersion < CHANNEL_VERSION_WIN_7))
-			IFCALL(context->Activated, context);
+			if ((ret == CHANNEL_RC_OK) && (context->clientVersion < CHANNEL_VERSION_WIN_7))
+				IFCALL(context->Activated, context);
 
-		break;
+			break;
 
-	case SNDC_QUALITYMODE:
-		ret = rdpsnd_server_recv_quality_mode(context, s);
-		Stream_SetPosition(s, 0); /* in case the Activated callback tries to treat some messages */
+		case SNDC_QUALITYMODE:
+			ret = rdpsnd_server_recv_quality_mode(context, s);
+			Stream_SetPosition(s,
+			                   0); /* in case the Activated callback tries to treat some messages */
 
-		if ((ret == CHANNEL_RC_OK) && (context->clientVersion >= CHANNEL_VERSION_WIN_7))
-			IFCALL(context->Activated, context);
+			if ((ret == CHANNEL_RC_OK) && (context->clientVersion >= CHANNEL_VERSION_WIN_7))
+				IFCALL(context->Activated, context);
 
-		break;
+			break;
 
-	default:
-		WLog_ERR(TAG, "UNKNOWN MESSAGE TYPE!! (0x%02" PRIX8 ")", priv->msgType);
-		ret = ERROR_INVALID_DATA;
-		break;
+		default:
+			WLog_ERR(TAG, "UNKNOWN MESSAGE TYPE!! (0x%02" PRIX8 ")", priv->msgType);
+			ret = ERROR_INVALID_DATA;
+			break;
 	}
 
 	Stream_SetPosition(s, 0);

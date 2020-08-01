@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <errno.h>
@@ -459,7 +459,7 @@ static BOOL certificate_process_server_public_signature(rdpCertificate* certific
 
 	/* Verify signature. */
 	/* Do not bother with validation of server proprietary certificate as described above. */
-#	if defined(CERT_VALIDATE_MD5)
+#if defined(CERT_VALIDATE_MD5)
 
 	if (memcmp(md5hash, sig, sizeof(md5hash)) != 0)
 	{
@@ -467,7 +467,7 @@ static BOOL certificate_process_server_public_signature(rdpCertificate* certific
 		return FALSE;
 	}
 
-#	endif
+#endif
 	/*
 	 * Verify rest of decrypted data:
 	 * The 17th byte is 0x00.
@@ -683,19 +683,19 @@ BOOL certificate_read_server_certificate(rdpCertificate* certificate, BYTE* serv
 
 	switch (dwVersion & CERT_CHAIN_VERSION_MASK)
 	{
-	case CERT_CHAIN_VERSION_1:
-		ret = certificate_read_server_proprietary_certificate(certificate, s);
-		break;
+		case CERT_CHAIN_VERSION_1:
+			ret = certificate_read_server_proprietary_certificate(certificate, s);
+			break;
 
-	case CERT_CHAIN_VERSION_2:
-		ret = certificate_read_server_x509_certificate_chain(certificate, s);
-		break;
+		case CERT_CHAIN_VERSION_2:
+			ret = certificate_read_server_x509_certificate_chain(certificate, s);
+			break;
 
-	default:
-		WLog_ERR(TAG, "invalid certificate chain version:%" PRIu32 "",
-		         dwVersion & CERT_CHAIN_VERSION_MASK);
-		ret = FALSE;
-		break;
+		default:
+			WLog_ERR(TAG, "invalid certificate chain version:%" PRIu32 "",
+			         dwVersion & CERT_CHAIN_VERSION_MASK);
+			ret = FALSE;
+			break;
 	}
 
 	Stream_Free(s, FALSE);
@@ -731,18 +731,18 @@ rdpRsaKey* key_new_from_content(const char* keycontent, const char* keyfile)
 
 	switch (RSA_check_key(rsa))
 	{
-	case 0:
-		WLog_ERR(TAG, "invalid RSA key in %s", keyfile);
-		goto out_free_rsa;
+		case 0:
+			WLog_ERR(TAG, "invalid RSA key in %s", keyfile);
+			goto out_free_rsa;
 
-	case 1:
-		/* Valid key. */
-		break;
+		case 1:
+			/* Valid key. */
+			break;
 
-	default:
-		WLog_ERR(TAG, "unexpected error when checking RSA key from %s: %s.", keyfile,
-		         strerror(errno));
-		goto out_free_rsa;
+		default:
+			WLog_ERR(TAG, "unexpected error when checking RSA key from %s: %s.", keyfile,
+			         strerror(errno));
+			goto out_free_rsa;
 	}
 
 	RSA_get0_key(rsa, &rsa_n, &rsa_e, &rsa_d);

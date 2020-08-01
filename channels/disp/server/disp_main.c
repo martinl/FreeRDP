@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "disp_main.h"
@@ -106,16 +106,16 @@ static BOOL disp_server_is_monitor_layout_valid(DISPLAY_CONTROL_MONITOR_LAYOUT* 
 
 	switch (monitor->Orientation)
 	{
-	case ORIENTATION_LANDSCAPE:
-	case ORIENTATION_PORTRAIT:
-	case ORIENTATION_LANDSCAPE_FLIPPED:
-	case ORIENTATION_PORTRAIT_FLIPPED:
-		break;
+		case ORIENTATION_LANDSCAPE:
+		case ORIENTATION_PORTRAIT:
+		case ORIENTATION_LANDSCAPE_FLIPPED:
+		case ORIENTATION_PORTRAIT_FLIPPED:
+			break;
 
-	default:
-		WLog_WARN(TAG, "Received incorrect value for monitor->Orientation: %" PRIu32 "",
-		          monitor->Orientation);
-		return FALSE;
+		default:
+			WLog_WARN(TAG, "Received incorrect value for monitor->Orientation: %" PRIu32 "",
+			          monitor->Orientation);
+			return FALSE;
 	}
 
 	return TRUE;
@@ -223,19 +223,19 @@ static UINT disp_server_receive_pdu(DispServerContext* context, wStream* s)
 
 	switch (header.type)
 	{
-	case DISPLAY_CONTROL_PDU_TYPE_MONITOR_LAYOUT:
-		if ((error = disp_recv_display_control_monitor_layout_pdu(s, context)))
-			WLog_ERR(TAG,
-			         "disp_recv_display_control_monitor_layout_pdu "
-			         "failed with error %" PRIu32 "!",
-			         error);
+		case DISPLAY_CONTROL_PDU_TYPE_MONITOR_LAYOUT:
+			if ((error = disp_recv_display_control_monitor_layout_pdu(s, context)))
+				WLog_ERR(TAG,
+				         "disp_recv_display_control_monitor_layout_pdu "
+				         "failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	default:
-		error = CHANNEL_RC_BAD_PROC;
-		WLog_WARN(TAG, "Received unknown PDU type: %" PRIu32 "", header.type);
-		break;
+		default:
+			error = CHANNEL_RC_BAD_PROC;
+			WLog_WARN(TAG, "Received unknown PDU type: %" PRIu32 "", header.type);
+			break;
 	}
 
 	end = Stream_GetPosition(s);

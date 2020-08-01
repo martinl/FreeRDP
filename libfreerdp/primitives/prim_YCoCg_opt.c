@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/types.h>
@@ -26,10 +26,10 @@
 #include <winpr/sysinfo.h>
 
 #ifdef WITH_SSE2
-#	include <emmintrin.h>
-#	include <tmmintrin.h>
+#include <emmintrin.h>
+#include <tmmintrin.h>
 #elif defined(WITH_NEON)
-#	include <arm_neon.h>
+#include <arm_neon.h>
 #endif /* WITH_SSE2 else WITH_NEON */
 
 #include "prim_internal.h"
@@ -409,19 +409,19 @@ static pstatus_t ssse3_YCoCgRToRGB_8u_AC4R(const BYTE* pSrc, INT32 srcStep, BYTE
 {
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRX32:
-	case PIXEL_FORMAT_BGRA32:
-		return ssse3_YCoCgRToRGB_8u_AC4R_no_invert(pSrc, srcStep, pDst, DstFormat, dstStep, width,
-		                                           height, shift, withAlpha);
+		case PIXEL_FORMAT_BGRX32:
+		case PIXEL_FORMAT_BGRA32:
+			return ssse3_YCoCgRToRGB_8u_AC4R_no_invert(pSrc, srcStep, pDst, DstFormat, dstStep,
+			                                           width, height, shift, withAlpha);
 
-	case PIXEL_FORMAT_RGBX32:
-	case PIXEL_FORMAT_RGBA32:
-		return ssse3_YCoCgRToRGB_8u_AC4R_invert(pSrc, srcStep, pDst, DstFormat, dstStep, width,
-		                                        height, shift, withAlpha);
+		case PIXEL_FORMAT_RGBX32:
+		case PIXEL_FORMAT_RGBA32:
+			return ssse3_YCoCgRToRGB_8u_AC4R_invert(pSrc, srcStep, pDst, DstFormat, dstStep, width,
+			                                        height, shift, withAlpha);
 
-	default:
-		return generic->YCoCgToRGB_8u_AC4R(pSrc, srcStep, pDst, DstFormat, dstStep, width, height,
-		                                   shift, withAlpha);
+		default:
+			return generic->YCoCgToRGB_8u_AC4R(pSrc, srcStep, pDst, DstFormat, dstStep, width,
+			                                   height, shift, withAlpha);
 	}
 }
 #elif defined(WITH_NEON)
@@ -510,41 +510,41 @@ static pstatus_t neon_YCoCgToRGB_8u_AC4R(const BYTE* pSrc, INT32 srcStep, BYTE* 
 {
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-		return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift,
-		                            2, 1, 0, 3, withAlpha);
+		case PIXEL_FORMAT_BGRA32:
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height,
+			                            shift, 2, 1, 0, 3, withAlpha);
 
-	case PIXEL_FORMAT_BGRX32:
-		return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift,
-		                            2, 1, 0, 3, withAlpha);
+		case PIXEL_FORMAT_BGRX32:
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height,
+			                            shift, 2, 1, 0, 3, withAlpha);
 
-	case PIXEL_FORMAT_RGBA32:
-		return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift,
-		                            0, 1, 2, 3, withAlpha);
+		case PIXEL_FORMAT_RGBA32:
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height,
+			                            shift, 0, 1, 2, 3, withAlpha);
 
-	case PIXEL_FORMAT_RGBX32:
-		return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift,
-		                            0, 1, 2, 3, withAlpha);
+		case PIXEL_FORMAT_RGBX32:
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height,
+			                            shift, 0, 1, 2, 3, withAlpha);
 
-	case PIXEL_FORMAT_ARGB32:
-		return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift,
-		                            1, 2, 3, 0, withAlpha);
+		case PIXEL_FORMAT_ARGB32:
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height,
+			                            shift, 1, 2, 3, 0, withAlpha);
 
-	case PIXEL_FORMAT_XRGB32:
-		return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift,
-		                            1, 2, 3, 0, withAlpha);
+		case PIXEL_FORMAT_XRGB32:
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height,
+			                            shift, 1, 2, 3, 0, withAlpha);
 
-	case PIXEL_FORMAT_ABGR32:
-		return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift,
-		                            3, 2, 1, 0, withAlpha);
+		case PIXEL_FORMAT_ABGR32:
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height,
+			                            shift, 3, 2, 1, 0, withAlpha);
 
-	case PIXEL_FORMAT_XBGR32:
-		return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height, shift,
-		                            3, 2, 1, 0, withAlpha);
+		case PIXEL_FORMAT_XBGR32:
+			return neon_YCoCgToRGB_8u_X(pSrc, srcStep, pDst, DstFormat, dstStep, width, height,
+			                            shift, 3, 2, 1, 0, withAlpha);
 
-	default:
-		return generic->YCoCgToRGB_8u_AC4R(pSrc, srcStep, pDst, DstFormat, dstStep, width, height,
-		                                   shift, withAlpha);
+		default:
+			return generic->YCoCgToRGB_8u_AC4R(pSrc, srcStep, pDst, DstFormat, dstStep, width,
+			                                   height, shift, withAlpha);
 	}
 }
 #endif /* WITH_SSE2 */

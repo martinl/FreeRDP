@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/utils/ringbuffer.h>
@@ -33,12 +33,12 @@
 #define TAG FREERDP_TAG("utils.ringbuffer")
 
 #ifdef WITH_DEBUG_RINGBUFFER
-#	define DEBUG_RINGBUFFER(...) WLog_DBG(TAG, __VA_ARGS__)
+#define DEBUG_RINGBUFFER(...) WLog_DBG(TAG, __VA_ARGS__)
 #else
-#	define DEBUG_RINGBUFFER(...) \
-		do                        \
-		{                         \
-		} while (0)
+#define DEBUG_RINGBUFFER(...) \
+	do                        \
+	{                         \
+	} while (0)
 #endif
 
 BOOL ringbuffer_init(RingBuffer* rb, size_t initialSize)

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -141,69 +141,69 @@ BOOL gdi_FillRect(HGDI_DC hdc, const HGDI_RECT rect, HGDI_BRUSH hbr)
 
 	switch (hbr->style)
 	{
-	case GDI_BS_SOLID:
-		color = hbr->color;
+		case GDI_BS_SOLID:
+			color = hbr->color;
 
-		for (x = 0; x < nWidth; x++)
-		{
-			BYTE* dstp = gdi_get_bitmap_pointer(hdc, nXDest + x, nYDest);
-
-			if (dstp)
-				WriteColor(dstp, hdc->format, color);
-		}
-
-		srcp = gdi_get_bitmap_pointer(hdc, nXDest, nYDest);
-		formatSize = GetBytesPerPixel(hdc->format);
-
-		for (y = 1; y < nHeight; y++)
-		{
-			BYTE* dstp = gdi_get_bitmap_pointer(hdc, nXDest, nYDest + y);
-			memcpy(dstp, srcp, nWidth * formatSize);
-		}
-
-		break;
-
-	case GDI_BS_HATCHED:
-	case GDI_BS_PATTERN:
-		monochrome = (hbr->pattern->format == PIXEL_FORMAT_MONO);
-		formatSize = GetBytesPerPixel(hbr->pattern->format);
-
-		for (y = 0; y < nHeight; y++)
-		{
 			for (x = 0; x < nWidth; x++)
 			{
-				const UINT32 yOffset =
-				    ((nYDest + y) * hbr->pattern->width % hbr->pattern->height) * formatSize;
-				const UINT32 xOffset = ((nXDest + x) % hbr->pattern->width) * formatSize;
-				const BYTE* patp = &hbr->pattern->data[yOffset + xOffset];
-				BYTE* dstp = gdi_get_bitmap_pointer(hdc, nXDest + x, nYDest + y);
-
-				if (!patp)
-					return FALSE;
-
-				if (monochrome)
-				{
-					if (*patp == 0)
-						dstColor = hdc->bkColor;
-					else
-						dstColor = hdc->textColor;
-				}
-				else
-				{
-					dstColor = ReadColor(patp, hbr->pattern->format);
-					dstColor =
-					    FreeRDPConvertColor(dstColor, hbr->pattern->format, hdc->format, NULL);
-				}
+				BYTE* dstp = gdi_get_bitmap_pointer(hdc, nXDest + x, nYDest);
 
 				if (dstp)
-					WriteColor(dstp, hdc->format, dstColor);
+					WriteColor(dstp, hdc->format, color);
 			}
-		}
 
-		break;
+			srcp = gdi_get_bitmap_pointer(hdc, nXDest, nYDest);
+			formatSize = GetBytesPerPixel(hdc->format);
 
-	default:
-		break;
+			for (y = 1; y < nHeight; y++)
+			{
+				BYTE* dstp = gdi_get_bitmap_pointer(hdc, nXDest, nYDest + y);
+				memcpy(dstp, srcp, nWidth * formatSize);
+			}
+
+			break;
+
+		case GDI_BS_HATCHED:
+		case GDI_BS_PATTERN:
+			monochrome = (hbr->pattern->format == PIXEL_FORMAT_MONO);
+			formatSize = GetBytesPerPixel(hbr->pattern->format);
+
+			for (y = 0; y < nHeight; y++)
+			{
+				for (x = 0; x < nWidth; x++)
+				{
+					const UINT32 yOffset =
+					    ((nYDest + y) * hbr->pattern->width % hbr->pattern->height) * formatSize;
+					const UINT32 xOffset = ((nXDest + x) % hbr->pattern->width) * formatSize;
+					const BYTE* patp = &hbr->pattern->data[yOffset + xOffset];
+					BYTE* dstp = gdi_get_bitmap_pointer(hdc, nXDest + x, nYDest + y);
+
+					if (!patp)
+						return FALSE;
+
+					if (monochrome)
+					{
+						if (*patp == 0)
+							dstColor = hdc->bkColor;
+						else
+							dstColor = hdc->textColor;
+					}
+					else
+					{
+						dstColor = ReadColor(patp, hbr->pattern->format);
+						dstColor =
+						    FreeRDPConvertColor(dstColor, hbr->pattern->format, hdc->format, NULL);
+					}
+
+					if (dstp)
+						WriteColor(dstp, hdc->format, dstColor);
+				}
+			}
+
+			break;
+
+		default:
+			break;
 	}
 
 	if (!gdi_InvalidateRegion(hdc, nXDest, nYDest, nWidth, nHeight))

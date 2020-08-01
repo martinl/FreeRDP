@@ -27,27 +27,27 @@
 
 typedef HANDLE DLL_DIRECTORY_COOKIE;
 
-#	define LOAD_LIBRARY_SEARCH_APPLICATION_DIR 0x00000200
-#	define LOAD_LIBRARY_SEARCH_DEFAULT_DIRS 0x00001000
-#	define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
-#	define LOAD_LIBRARY_SEARCH_USER_DIRS 0x00000400
+#define LOAD_LIBRARY_SEARCH_APPLICATION_DIR 0x00000200
+#define LOAD_LIBRARY_SEARCH_DEFAULT_DIRS 0x00001000
+#define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
+#define LOAD_LIBRARY_SEARCH_USER_DIRS 0x00000400
 
-#	define DONT_RESOLVE_DLL_REFERENCES 0x00000001
-#	define LOAD_LIBRARY_AS_DATAFILE 0x00000002
-#	define LOAD_WITH_ALTERED_SEARCH_PATH 0x00000008
-#	define LOAD_IGNORE_CODE_AUTHZ_LEVEL 0x00000010
-#	define LOAD_LIBRARY_AS_IMAGE_RESOURCE 0x00000020
-#	define LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE 0x00000040
-#	define LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR 0x00000100
-#	define LOAD_LIBRARY_SEARCH_APPLICATION_DIR 0x00000200
-#	define LOAD_LIBRARY_SEARCH_USER_DIRS 0x00000400
-#	define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
-#	define LOAD_LIBRARY_SEARCH_DEFAULT_DIRS 0x00001000
+#define DONT_RESOLVE_DLL_REFERENCES 0x00000001
+#define LOAD_LIBRARY_AS_DATAFILE 0x00000002
+#define LOAD_WITH_ALTERED_SEARCH_PATH 0x00000008
+#define LOAD_IGNORE_CODE_AUTHZ_LEVEL 0x00000010
+#define LOAD_LIBRARY_AS_IMAGE_RESOURCE 0x00000020
+#define LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE 0x00000040
+#define LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR 0x00000100
+#define LOAD_LIBRARY_SEARCH_APPLICATION_DIR 0x00000200
+#define LOAD_LIBRARY_SEARCH_USER_DIRS 0x00000400
+#define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
+#define LOAD_LIBRARY_SEARCH_DEFAULT_DIRS 0x00001000
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-#	endif
+#endif
 
 	WINPR_API DLL_DIRECTORY_COOKIE AddDllDirectory(PCWSTR NewDirectory);
 	WINPR_API BOOL RemoveDllDirectory(DLL_DIRECTORY_COOKIE Cookie);
@@ -59,26 +59,26 @@ extern "C"
 	WINPR_API HMODULE LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
 	WINPR_API HMODULE LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 }
-#	endif
+#endif
 
-#	ifdef UNICODE
-#		define LoadLibrary LoadLibraryW
-#		define LoadLibraryEx LoadLibraryExW
-#	else
-#		define LoadLibrary LoadLibraryA
-#		define LoadLibraryEx LoadLibraryExA
-#	endif
+#ifdef UNICODE
+#define LoadLibrary LoadLibraryW
+#define LoadLibraryEx LoadLibraryExW
+#else
+#define LoadLibrary LoadLibraryA
+#define LoadLibraryEx LoadLibraryExA
+#endif
 
 #endif
 
 #if !defined(_WIN32) && !defined(__CYGWIN__)
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-#	endif
+#endif
 
 	WINPR_API HMODULE GetModuleHandleA(LPCSTR lpModuleName);
 	WINPR_API HMODULE GetModuleHandleW(LPCWSTR lpModuleName);
@@ -90,17 +90,17 @@ extern "C"
 
 	WINPR_API BOOL FreeLibrary(HMODULE hLibModule);
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 }
-#	endif
+#endif
 
-#	ifdef UNICODE
-#		define GetModuleHandle GetModuleHandleW
-#		define GetModuleFileName GetModuleFileNameW
-#	else
-#		define GetModuleHandle GetModuleHandleA
-#		define GetModuleFileName GetModuleFileNameA
-#	endif
+#ifdef UNICODE
+#define GetModuleHandle GetModuleHandleW
+#define GetModuleFileName GetModuleFileNameW
+#else
+#define GetModuleHandle GetModuleHandleA
+#define GetModuleFileName GetModuleFileNameA
+#endif
 
 #endif
 

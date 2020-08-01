@@ -22,9 +22,9 @@
 #define FREERDP_CHANNEL_URBDRC_CLIENT_LIBUSB_UDEVICE_H
 
 #if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
-#	include <libusb.h>
+#include <libusb.h>
 #else
-#	include <libusb-1.0/libusb.h>
+#include <libusb-1.0/libusb.h>
 #endif
 
 #include "urbdrc_types.h"

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "rdp.h"
@@ -432,13 +432,13 @@ wMessageQueue* freerdp_get_message_queue(freerdp* instance, DWORD id)
 
 	switch (id)
 	{
-	case FREERDP_UPDATE_MESSAGE_QUEUE:
-		queue = instance->update->queue;
-		break;
+		case FREERDP_UPDATE_MESSAGE_QUEUE:
+			queue = instance->update->queue;
+			break;
 
-	case FREERDP_INPUT_MESSAGE_QUEUE:
-		queue = instance->input->queue;
-		break;
+		case FREERDP_INPUT_MESSAGE_QUEUE:
+			queue = instance->input->queue;
+			break;
 	}
 
 	return queue;
@@ -462,13 +462,13 @@ int freerdp_message_queue_process_message(freerdp* instance, DWORD id, wMessage*
 
 	switch (id)
 	{
-	case FREERDP_UPDATE_MESSAGE_QUEUE:
-		status = update_message_queue_process_message(instance->update, message);
-		break;
+		case FREERDP_UPDATE_MESSAGE_QUEUE:
+			status = update_message_queue_process_message(instance->update, message);
+			break;
 
-	case FREERDP_INPUT_MESSAGE_QUEUE:
-		status = input_message_queue_process_message(instance->input, message);
-		break;
+		case FREERDP_INPUT_MESSAGE_QUEUE:
+			status = input_message_queue_process_message(instance->input, message);
+			break;
 	}
 
 	return status;
@@ -480,13 +480,13 @@ int freerdp_message_queue_process_pending_messages(freerdp* instance, DWORD id)
 
 	switch (id)
 	{
-	case FREERDP_UPDATE_MESSAGE_QUEUE:
-		status = update_message_queue_process_pending_messages(instance->update);
-		break;
+		case FREERDP_UPDATE_MESSAGE_QUEUE:
+			status = update_message_queue_process_pending_messages(instance->update);
+			break;
 
-	case FREERDP_INPUT_MESSAGE_QUEUE:
-		status = input_message_queue_process_pending_messages(instance->input);
-		break;
+		case FREERDP_INPUT_MESSAGE_QUEUE:
+			status = input_message_queue_process_pending_messages(instance->input);
+			break;
 	}
 
 	return status;
@@ -795,21 +795,21 @@ const char* freerdp_get_last_error_name(UINT32 code)
 
 	switch (cls)
 	{
-	case FREERDP_ERROR_ERRBASE_CLASS:
-		name = freerdp_get_error_base_name(type);
-		break;
+		case FREERDP_ERROR_ERRBASE_CLASS:
+			name = freerdp_get_error_base_name(type);
+			break;
 
-	case FREERDP_ERROR_ERRINFO_CLASS:
-		name = freerdp_get_error_info_name(type);
-		break;
+		case FREERDP_ERROR_ERRINFO_CLASS:
+			name = freerdp_get_error_info_name(type);
+			break;
 
-	case FREERDP_ERROR_CONNECT_CLASS:
-		name = freerdp_get_error_connect_name(type);
-		break;
+		case FREERDP_ERROR_CONNECT_CLASS:
+			name = freerdp_get_error_connect_name(type);
+			break;
 
-	default:
-		name = "Unknown error class";
-		break;
+		default:
+			name = "Unknown error class";
+			break;
 	}
 
 	return name;
@@ -823,21 +823,21 @@ const char* freerdp_get_last_error_string(UINT32 code)
 
 	switch (cls)
 	{
-	case FREERDP_ERROR_ERRBASE_CLASS:
-		string = freerdp_get_error_base_string(type);
-		break;
+		case FREERDP_ERROR_ERRBASE_CLASS:
+			string = freerdp_get_error_base_string(type);
+			break;
 
-	case FREERDP_ERROR_ERRINFO_CLASS:
-		string = freerdp_get_error_info_string(type);
-		break;
+		case FREERDP_ERROR_ERRINFO_CLASS:
+			string = freerdp_get_error_info_string(type);
+			break;
 
-	case FREERDP_ERROR_CONNECT_CLASS:
-		string = freerdp_get_error_connect_string(type);
-		break;
+		case FREERDP_ERROR_CONNECT_CLASS:
+			string = freerdp_get_error_connect_string(type);
+			break;
 
-	default:
-		string = "Unknown error class";
-		break;
+		default:
+			string = "Unknown error class";
+			break;
 	}
 
 	return string;
@@ -860,57 +860,57 @@ void freerdp_set_last_error(rdpContext* context, UINT32 lastError)
 
 	switch (lastError)
 	{
-	case FREERDP_ERROR_PRE_CONNECT_FAILED:
-		connectErrorCode = PREECONNECTERROR;
-		break;
+		case FREERDP_ERROR_PRE_CONNECT_FAILED:
+			connectErrorCode = PREECONNECTERROR;
+			break;
 
-	case FREERDP_ERROR_CONNECT_UNDEFINED:
-		connectErrorCode = UNDEFINEDCONNECTERROR;
-		break;
+		case FREERDP_ERROR_CONNECT_UNDEFINED:
+			connectErrorCode = UNDEFINEDCONNECTERROR;
+			break;
 
-	case FREERDP_ERROR_POST_CONNECT_FAILED:
-		connectErrorCode = POSTCONNECTERROR;
-		break;
+		case FREERDP_ERROR_POST_CONNECT_FAILED:
+			connectErrorCode = POSTCONNECTERROR;
+			break;
 
-	case FREERDP_ERROR_DNS_ERROR:
-		connectErrorCode = DNSERROR;
-		break;
+		case FREERDP_ERROR_DNS_ERROR:
+			connectErrorCode = DNSERROR;
+			break;
 
-	case FREERDP_ERROR_DNS_NAME_NOT_FOUND:
-		connectErrorCode = DNSNAMENOTFOUND;
-		break;
+		case FREERDP_ERROR_DNS_NAME_NOT_FOUND:
+			connectErrorCode = DNSNAMENOTFOUND;
+			break;
 
-	case FREERDP_ERROR_CONNECT_FAILED:
-		connectErrorCode = CONNECTERROR;
-		break;
+		case FREERDP_ERROR_CONNECT_FAILED:
+			connectErrorCode = CONNECTERROR;
+			break;
 
-	case FREERDP_ERROR_MCS_CONNECT_INITIAL_ERROR:
-		connectErrorCode = MCSCONNECTINITIALERROR;
-		break;
+		case FREERDP_ERROR_MCS_CONNECT_INITIAL_ERROR:
+			connectErrorCode = MCSCONNECTINITIALERROR;
+			break;
 
-	case FREERDP_ERROR_TLS_CONNECT_FAILED:
-		connectErrorCode = TLSCONNECTERROR;
-		break;
+		case FREERDP_ERROR_TLS_CONNECT_FAILED:
+			connectErrorCode = TLSCONNECTERROR;
+			break;
 
-	case FREERDP_ERROR_AUTHENTICATION_FAILED:
-		connectErrorCode = AUTHENTICATIONERROR;
-		break;
+		case FREERDP_ERROR_AUTHENTICATION_FAILED:
+			connectErrorCode = AUTHENTICATIONERROR;
+			break;
 
-	case FREERDP_ERROR_INSUFFICIENT_PRIVILEGES:
-		connectErrorCode = INSUFFICIENTPRIVILEGESERROR;
-		break;
+		case FREERDP_ERROR_INSUFFICIENT_PRIVILEGES:
+			connectErrorCode = INSUFFICIENTPRIVILEGESERROR;
+			break;
 
-	case FREERDP_ERROR_CONNECT_CANCELLED:
-		connectErrorCode = CANCELEDBYUSER;
-		break;
+		case FREERDP_ERROR_CONNECT_CANCELLED:
+			connectErrorCode = CANCELEDBYUSER;
+			break;
 
-	case FREERDP_ERROR_SECURITY_NEGO_CONNECT_FAILED:
-		connectErrorCode = CONNECTERROR;
-		break;
+		case FREERDP_ERROR_SECURITY_NEGO_CONNECT_FAILED:
+			connectErrorCode = CONNECTERROR;
+			break;
 
-	case FREERDP_ERROR_CONNECT_TRANSPORT_FAILED:
-		connectErrorCode = CONNECTERROR;
-		break;
+		case FREERDP_ERROR_CONNECT_TRANSPORT_FAILED:
+			connectErrorCode = CONNECTERROR;
+			break;
 	}
 }
 
@@ -918,26 +918,26 @@ const char* freerdp_get_logon_error_info_type(UINT32 type)
 {
 	switch (type)
 	{
-	case LOGON_MSG_DISCONNECT_REFUSED:
-		return "LOGON_MSG_DISCONNECT_REFUSED";
+		case LOGON_MSG_DISCONNECT_REFUSED:
+			return "LOGON_MSG_DISCONNECT_REFUSED";
 
-	case LOGON_MSG_NO_PERMISSION:
-		return "LOGON_MSG_NO_PERMISSION";
+		case LOGON_MSG_NO_PERMISSION:
+			return "LOGON_MSG_NO_PERMISSION";
 
-	case LOGON_MSG_BUMP_OPTIONS:
-		return "LOGON_MSG_BUMP_OPTIONS";
+		case LOGON_MSG_BUMP_OPTIONS:
+			return "LOGON_MSG_BUMP_OPTIONS";
 
-	case LOGON_MSG_RECONNECT_OPTIONS:
-		return "LOGON_MSG_RECONNECT_OPTIONS";
+		case LOGON_MSG_RECONNECT_OPTIONS:
+			return "LOGON_MSG_RECONNECT_OPTIONS";
 
-	case LOGON_MSG_SESSION_TERMINATE:
-		return "LOGON_MSG_SESSION_TERMINATE";
+		case LOGON_MSG_SESSION_TERMINATE:
+			return "LOGON_MSG_SESSION_TERMINATE";
 
-	case LOGON_MSG_SESSION_CONTINUE:
-		return "LOGON_MSG_SESSION_CONTINUE";
+		case LOGON_MSG_SESSION_CONTINUE:
+			return "LOGON_MSG_SESSION_CONTINUE";
 
-	default:
-		return "UNKNOWN";
+		default:
+			return "UNKNOWN";
 	}
 }
 
@@ -945,20 +945,20 @@ const char* freerdp_get_logon_error_info_data(UINT32 data)
 {
 	switch (data)
 	{
-	case LOGON_FAILED_BAD_PASSWORD:
-		return "LOGON_FAILED_BAD_PASSWORD";
+		case LOGON_FAILED_BAD_PASSWORD:
+			return "LOGON_FAILED_BAD_PASSWORD";
 
-	case LOGON_FAILED_UPDATE_PASSWORD:
-		return "LOGON_FAILED_UPDATE_PASSWORD";
+		case LOGON_FAILED_UPDATE_PASSWORD:
+			return "LOGON_FAILED_UPDATE_PASSWORD";
 
-	case LOGON_FAILED_OTHER:
-		return "LOGON_FAILED_OTHER";
+		case LOGON_FAILED_OTHER:
+			return "LOGON_FAILED_OTHER";
 
-	case LOGON_WARNING:
-		return "LOGON_WARNING";
+		case LOGON_WARNING:
+			return "LOGON_WARNING";
 
-	default:
-		return "SESSION_ID";
+		default:
+			return "SESSION_ID";
 	}
 }
 

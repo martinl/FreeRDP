@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/sysinfo.h>
@@ -35,7 +35,7 @@
 #include <tmmintrin.h>
 
 #if !defined(WITH_SSE2)
-#	error "This file needs WITH_SSE2 enabled!"
+#error "This file needs WITH_SSE2 enabled!"
 #endif
 
 static primitives_t* generic = NULL;
@@ -208,12 +208,12 @@ static pstatus_t ssse3_YUV420ToRGB(const BYTE** pSrc, const UINT32* srcStep, BYT
 {
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRX32:
-	case PIXEL_FORMAT_BGRA32:
-		return ssse3_YUV420ToRGB_BGRX(pSrc, srcStep, pDst, dstStep, roi);
+		case PIXEL_FORMAT_BGRX32:
+		case PIXEL_FORMAT_BGRA32:
+			return ssse3_YUV420ToRGB_BGRX(pSrc, srcStep, pDst, dstStep, roi);
 
-	default:
-		return generic->YUV420ToRGB_8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		default:
+			return generic->YUV420ToRGB_8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
 	}
 }
 
@@ -273,12 +273,12 @@ static pstatus_t ssse3_YUV444ToRGB_8u_P3AC4R(const BYTE** pSrc, const UINT32* sr
 
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRX32:
-	case PIXEL_FORMAT_BGRA32:
-		return ssse3_YUV444ToRGB_8u_P3AC4R_BGRX(pSrc, srcStep, pDst, dstStep, roi);
+		case PIXEL_FORMAT_BGRX32:
+		case PIXEL_FORMAT_BGRA32:
+			return ssse3_YUV444ToRGB_8u_P3AC4R_BGRX(pSrc, srcStep, pDst, dstStep, roi);
 
-	default:
-		return generic->YUV444ToRGB_8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		default:
+			return generic->YUV444ToRGB_8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
 	}
 }
 
@@ -481,12 +481,12 @@ static pstatus_t ssse3_RGBToYUV420(const BYTE* pSrc, UINT32 srcFormat, UINT32 sr
 {
 	switch (srcFormat)
 	{
-	case PIXEL_FORMAT_BGRX32:
-	case PIXEL_FORMAT_BGRA32:
-		return ssse3_RGBToYUV420_BGRX(pSrc, srcFormat, srcStep, pDst, dstStep, roi);
+		case PIXEL_FORMAT_BGRX32:
+		case PIXEL_FORMAT_BGRA32:
+			return ssse3_RGBToYUV420_BGRX(pSrc, srcFormat, srcStep, pDst, dstStep, roi);
 
-	default:
-		return generic->RGBToYUV420_8u_P3AC4R(pSrc, srcFormat, srcStep, pDst, dstStep, roi);
+		default:
+			return generic->RGBToYUV420_8u_P3AC4R(pSrc, srcFormat, srcStep, pDst, dstStep, roi);
 	}
 }
 
@@ -739,14 +739,14 @@ static pstatus_t ssse3_RGBToAVC444YUV(const BYTE* pSrc, UINT32 srcFormat, UINT32
 {
 	switch (srcFormat)
 	{
-	case PIXEL_FORMAT_BGRX32:
-	case PIXEL_FORMAT_BGRA32:
-		return ssse3_RGBToAVC444YUV_BGRX(pSrc, srcFormat, srcStep, pDst1, dst1Step, pDst2, dst2Step,
-		                                 roi);
+		case PIXEL_FORMAT_BGRX32:
+		case PIXEL_FORMAT_BGRA32:
+			return ssse3_RGBToAVC444YUV_BGRX(pSrc, srcFormat, srcStep, pDst1, dst1Step, pDst2,
+			                                 dst2Step, roi);
 
-	default:
-		return generic->RGBToAVC444YUV(pSrc, srcFormat, srcStep, pDst1, dst1Step, pDst2, dst2Step,
-		                               roi);
+		default:
+			return generic->RGBToAVC444YUV(pSrc, srcFormat, srcStep, pDst1, dst1Step, pDst2,
+			                               dst2Step, roi);
 	}
 }
 
@@ -1039,14 +1039,14 @@ static pstatus_t ssse3_RGBToAVC444YUVv2(const BYTE* pSrc, UINT32 srcFormat, UINT
 {
 	switch (srcFormat)
 	{
-	case PIXEL_FORMAT_BGRX32:
-	case PIXEL_FORMAT_BGRA32:
-		return ssse3_RGBToAVC444YUVv2_BGRX(pSrc, srcFormat, srcStep, pDst1, dst1Step, pDst2,
-		                                   dst2Step, roi);
+		case PIXEL_FORMAT_BGRX32:
+		case PIXEL_FORMAT_BGRA32:
+			return ssse3_RGBToAVC444YUVv2_BGRX(pSrc, srcFormat, srcStep, pDst1, dst1Step, pDst2,
+			                                   dst2Step, roi);
 
-	default:
-		return generic->RGBToAVC444YUVv2(pSrc, srcFormat, srcStep, pDst1, dst1Step, pDst2, dst2Step,
-		                                 roi);
+		default:
+			return generic->RGBToAVC444YUVv2(pSrc, srcFormat, srcStep, pDst1, dst1Step, pDst2,
+			                                 dst2Step, roi);
 	}
 }
 
@@ -1434,17 +1434,17 @@ static pstatus_t ssse3_YUV420CombineToYUV444(avc444_frame_type type, const BYTE*
 
 	switch (type)
 	{
-	case AVC444_LUMA:
-		return ssse3_LumaToYUV444(pSrc, srcStep, pDst, dstStep, roi);
+		case AVC444_LUMA:
+			return ssse3_LumaToYUV444(pSrc, srcStep, pDst, dstStep, roi);
 
-	case AVC444_CHROMAv1:
-		return ssse3_ChromaV1ToYUV444(pSrc, srcStep, pDst, dstStep, roi);
+		case AVC444_CHROMAv1:
+			return ssse3_ChromaV1ToYUV444(pSrc, srcStep, pDst, dstStep, roi);
 
-	case AVC444_CHROMAv2:
-		return ssse3_ChromaV2ToYUV444(pSrc, srcStep, nWidth, nHeight, pDst, dstStep, roi);
+		case AVC444_CHROMAv2:
+			return ssse3_ChromaV2ToYUV444(pSrc, srcStep, nWidth, nHeight, pDst, dstStep, roi);
 
-	default:
-		return -1;
+		default:
+			return -1;
 	}
 }
 

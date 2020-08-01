@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -84,20 +84,20 @@ static BOOL wf_decode_color(wfContext* wfc, const UINT32 srcColor, COLORREF* col
 
 	switch (GetBitsPerPixel(gdi->dstFormat))
 	{
-	case 32:
-		DstFormat = PIXEL_FORMAT_ABGR32;
-		break;
+		case 32:
+			DstFormat = PIXEL_FORMAT_ABGR32;
+			break;
 
-	case 24:
-		DstFormat = PIXEL_FORMAT_BGR24;
-		break;
+		case 24:
+			DstFormat = PIXEL_FORMAT_BGR24;
+			break;
 
-	case 16:
-		DstFormat = PIXEL_FORMAT_RGB16;
-		break;
+		case 16:
+			DstFormat = PIXEL_FORMAT_RGB16;
+			break;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	*color = FreeRDPConvertColor(srcColor, SrcFormat, DstFormat, &gdi->palette);
@@ -734,20 +734,20 @@ static BOOL wf_gdi_mem3blt(rdpContext* context, MEM3BLT_ORDER* mem3blt)
 
 	switch (mem3blt->brush.style)
 	{
-	case GDI_BS_SOLID:
-		brush = CreateSolidBrush(fgcolor);
+		case GDI_BS_SOLID:
+			brush = CreateSolidBrush(fgcolor);
+			break;
+
+		case GDI_BS_HATCHED:
+		case GDI_BS_PATTERN:
+		{
+			HBITMAP bmp = CreateBitmap(8, 8, 1, mem3blt->brush.bpp, mem3blt->brush.data);
+			brush = CreatePatternBrush(bmp);
+		}
 		break;
 
-	case GDI_BS_HATCHED:
-	case GDI_BS_PATTERN:
-	{
-		HBITMAP bmp = CreateBitmap(8, 8, 1, mem3blt->brush.bpp, mem3blt->brush.data);
-		brush = CreatePatternBrush(bmp);
-	}
-	break;
-
-	default:
-		goto fail;
+		default:
+			goto fail;
 	}
 
 	orgBrush = SelectObject(hdc, brush);

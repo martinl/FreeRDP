@@ -26,7 +26,7 @@
 #include <freerdp/types.h>
 
 #ifdef _WIN32
-#	include <mmreg.h>
+#include <mmreg.h>
 #endif
 
 struct AUDIO_FORMAT
@@ -72,7 +72,7 @@ typedef struct AUDIO_FORMAT AUDIO_FORMAT;
 #define WAVE_FORMAT_UNKNOWN 0x0000
 
 #ifndef WAVE_FORMAT_PCM
-#	define WAVE_FORMAT_PCM 0x0001
+#define WAVE_FORMAT_PCM 0x0001
 #endif
 
 #define WAVE_FORMAT_ADPCM 0x0002
@@ -122,7 +122,7 @@ typedef struct AUDIO_FORMAT AUDIO_FORMAT;
 #define WAVE_FORMAT_PAC 0x0053
 
 #ifndef WAVE_FORMAT_MPEGLAYER3
-#	define WAVE_FORMAT_MPEGLAYER3 0x0055
+#define WAVE_FORMAT_MPEGLAYER3 0x0055
 #endif
 
 #define WAVE_FORMAT_LUCENT_G723 0x0059

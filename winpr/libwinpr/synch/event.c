@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -31,23 +31,23 @@
 
 #ifndef _WIN32
 
-#	include "synch.h"
+#include "synch.h"
 
-#	ifdef HAVE_UNISTD_H
-#		include <unistd.h>
-#	endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
-#	ifdef HAVE_SYS_EVENTFD_H
-#		include <sys/eventfd.h>
-#	endif
+#ifdef HAVE_SYS_EVENTFD_H
+#include <sys/eventfd.h>
+#endif
 
-#	include <errno.h>
+#include <errno.h>
 
-#	include "../handle/handle.h"
-#	include "../pipe/pipe.h"
+#include "../handle/handle.h"
+#include "../pipe/pipe.h"
 
-#	include "../log.h"
-#	define TAG WINPR_TAG("synch.event")
+#include "../log.h"
+#define TAG WINPR_TAG("synch.event")
 
 static BOOL EventCloseHandle(HANDLE handle);
 
@@ -163,18 +163,18 @@ HANDLE CreateEventA(LPSECURITY_ATTRIBUTES lpEventAttributes, BOOL bManualReset, 
 
 	event->pipe_fd[0] = -1;
 	event->pipe_fd[1] = -1;
-#	ifdef HAVE_SYS_EVENTFD_H
+#ifdef HAVE_SYS_EVENTFD_H
 	event->pipe_fd[0] = eventfd(0, EFD_NONBLOCK);
 
 	if (event->pipe_fd[0] < 0)
 		goto fail;
 
-#	else
+#else
 
 	if (pipe(event->pipe_fd) < 0)
 		goto fail;
 
-#	endif
+#endif
 
 	if (bInitialState)
 	{
@@ -246,8 +246,8 @@ HANDLE OpenEventA(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName)
 	return NULL;
 }
 
-#	ifdef HAVE_SYS_EVENTFD_H
-#		if !defined(WITH_EVENTFD_READ_WRITE)
+#ifdef HAVE_SYS_EVENTFD_H
+#if !defined(WITH_EVENTFD_READ_WRITE)
 static int eventfd_read(int fd, eventfd_t* value)
 {
 	return (read(fd, value, sizeof(*value)) == sizeof(*value)) ? 0 : -1;
@@ -257,8 +257,8 @@ static int eventfd_write(int fd, eventfd_t value)
 {
 	return (write(fd, &value, sizeof(value)) == sizeof(value)) ? 0 : -1;
 }
-#		endif
-#	endif
+#endif
+#endif
 
 BOOL SetEvent(HANDLE hEvent)
 {
@@ -272,7 +272,7 @@ BOOL SetEvent(HANDLE hEvent)
 	if (winpr_Handle_GetInfo(hEvent, &Type, &Object))
 	{
 		event = (WINPR_EVENT*)Object;
-#	ifdef HAVE_SYS_EVENTFD_H
+#ifdef HAVE_SYS_EVENTFD_H
 		eventfd_t val = 1;
 
 		do
@@ -281,7 +281,7 @@ BOOL SetEvent(HANDLE hEvent)
 		} while ((length < 0) && (errno == EINTR));
 
 		status = (length == 0) ? TRUE : FALSE;
-#	else
+#else
 
 		if (WaitForSingleObject(hEvent, 0) != WAIT_OBJECT_0)
 		{
@@ -295,7 +295,7 @@ BOOL SetEvent(HANDLE hEvent)
 			status = TRUE;
 		}
 
-#	endif
+#endif
 	}
 
 	return status;
@@ -318,12 +318,12 @@ BOOL ResetEvent(HANDLE hEvent)
 	{
 		do
 		{
-#	ifdef HAVE_SYS_EVENTFD_H
+#ifdef HAVE_SYS_EVENTFD_H
 			eventfd_t value;
 			length = eventfd_read(event->pipe_fd[0], &value);
-#	else
+#else
 			length = read(event->pipe_fd[0], &length, 1);
-#	endif
+#endif
 		} while ((length < 0) && (errno == EINTR));
 
 		if (length < 0)

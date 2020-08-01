@@ -366,19 +366,19 @@ BOOL proxy_connect(rdpSettings* settings, BIO* bufferedBio, const char* proxyUse
 {
 	switch (settings->ProxyType)
 	{
-	case PROXY_TYPE_NONE:
-	case PROXY_TYPE_IGNORE:
-		return TRUE;
+		case PROXY_TYPE_NONE:
+		case PROXY_TYPE_IGNORE:
+			return TRUE;
 
-	case PROXY_TYPE_HTTP:
-		return http_proxy_connect(bufferedBio, hostname, port);
+		case PROXY_TYPE_HTTP:
+			return http_proxy_connect(bufferedBio, hostname, port);
 
-	case PROXY_TYPE_SOCKS:
-		return socks_proxy_connect(bufferedBio, proxyUsername, proxyPassword, hostname, port);
+		case PROXY_TYPE_SOCKS:
+			return socks_proxy_connect(bufferedBio, proxyUsername, proxyPassword, hostname, port);
 
-	default:
-		WLog_ERR(TAG, "Invalid internal proxy configuration");
-		return FALSE;
+		default:
+			WLog_ERR(TAG, "Invalid internal proxy configuration");
+			return FALSE;
 	}
 }
 
@@ -558,59 +558,59 @@ static BOOL socks_proxy_connect(BIO* bufferedBio, const char* proxyUsername,
 
 	switch (buf[1])
 	{
-	case AUTH_M_NO_AUTH:
-		WLog_DBG(TAG, "SOCKS Proxy: (NO AUTH) method was selected");
-		break;
+		case AUTH_M_NO_AUTH:
+			WLog_DBG(TAG, "SOCKS Proxy: (NO AUTH) method was selected");
+			break;
 
-	case AUTH_M_USR_PASS:
-		if (!proxyUsername || !proxyPassword)
+		case AUTH_M_USR_PASS:
+			if (!proxyUsername || !proxyPassword)
+				return FALSE;
+			else
+			{
+				int usernameLen = strnlen(proxyUsername, 255);
+				int userpassLen = strnlen(proxyPassword, 255);
+				BYTE* ptr;
+
+				if (nauthMethods < 2)
+				{
+					WLog_ERR(TAG, "SOCKS Proxy: USER/PASS method was not proposed to server");
+					return FALSE;
+				}
+
+				/* user/password v1 method */
+				ptr = buf + 2;
+				buf[0] = 1;
+				buf[1] = usernameLen;
+				memcpy(ptr, proxyUsername, usernameLen);
+				ptr += usernameLen;
+				*ptr = userpassLen;
+				ptr++;
+				memcpy(ptr, proxyPassword, userpassLen);
+				status = BIO_write(bufferedBio, buf, 3 + usernameLen + userpassLen);
+
+				if (status != 3 + usernameLen + userpassLen)
+				{
+					WLog_ERR(TAG, "SOCKS Proxy: error writing user/password request");
+					return FALSE;
+				}
+
+				status = recv_socks_reply(bufferedBio, buf, 2, "AUTH REQ", 1);
+
+				if (status < 2)
+					return FALSE;
+
+				if (buf[1] != 0x00)
+				{
+					WLog_ERR(TAG, "SOCKS Proxy: invalid user/password");
+					return FALSE;
+				}
+			}
+
+			break;
+
+		default:
+			WLog_ERR(TAG, "SOCKS Proxy: unknown method 0x%x was selected by proxy", buf[1]);
 			return FALSE;
-		else
-		{
-			int usernameLen = strnlen(proxyUsername, 255);
-			int userpassLen = strnlen(proxyPassword, 255);
-			BYTE* ptr;
-
-			if (nauthMethods < 2)
-			{
-				WLog_ERR(TAG, "SOCKS Proxy: USER/PASS method was not proposed to server");
-				return FALSE;
-			}
-
-			/* user/password v1 method */
-			ptr = buf + 2;
-			buf[0] = 1;
-			buf[1] = usernameLen;
-			memcpy(ptr, proxyUsername, usernameLen);
-			ptr += usernameLen;
-			*ptr = userpassLen;
-			ptr++;
-			memcpy(ptr, proxyPassword, userpassLen);
-			status = BIO_write(bufferedBio, buf, 3 + usernameLen + userpassLen);
-
-			if (status != 3 + usernameLen + userpassLen)
-			{
-				WLog_ERR(TAG, "SOCKS Proxy: error writing user/password request");
-				return FALSE;
-			}
-
-			status = recv_socks_reply(bufferedBio, buf, 2, "AUTH REQ", 1);
-
-			if (status < 2)
-				return FALSE;
-
-			if (buf[1] != 0x00)
-			{
-				WLog_ERR(TAG, "SOCKS Proxy: invalid user/password");
-				return FALSE;
-			}
-		}
-
-		break;
-
-	default:
-		WLog_ERR(TAG, "SOCKS Proxy: unknown method 0x%x was selected by proxy", buf[1]);
-		return FALSE;
 	}
 
 	/* CONN request */

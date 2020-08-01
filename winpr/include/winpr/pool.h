@@ -56,7 +56,8 @@ typedef struct _TP_CALLBACK_ENVIRON_V1
 	struct _ACTIVATION_CONTEXT* ActivationContext;
 	PTP_SIMPLE_CALLBACK FinalizationCallback;
 
-	union {
+	union
+	{
 		DWORD Flags;
 		struct
 		{
@@ -95,11 +96,11 @@ than XP will conditionally define it. The following
 logic tries to fix that.
 */
 #ifdef _THREADPOOLAPISET_H_
-#	define PTP_WIN32_IO_CALLBACK_DEFINED 1
+#define PTP_WIN32_IO_CALLBACK_DEFINED 1
 #else
-#	if (_WIN32_WINNT >= 0x0600)
-#		define PTP_WIN32_IO_CALLBACK_DEFINED 1
-#	endif
+#if (_WIN32_WINNT >= 0x0600)
+#define PTP_WIN32_IO_CALLBACK_DEFINED 1
+#endif
 #endif
 
 #ifndef PTP_WIN32_IO_CALLBACK_DEFINED
@@ -111,7 +112,7 @@ typedef VOID (*PTP_WIN32_IO_CALLBACK)(PTP_CALLBACK_INSTANCE Instance, PVOID Cont
 #endif
 
 #if (!defined(_WIN32) || ((defined(_WIN32) && (_WIN32_WINNT < 0x0600))))
-#	define WINPR_THREAD_POOL 1
+#define WINPR_THREAD_POOL 1
 #endif
 
 #ifdef __cplusplus
@@ -129,10 +130,10 @@ extern "C"
 	WINPR_API VOID winpr_SetThreadpoolWait(PTP_WAIT pwa, HANDLE h, PFILETIME pftTimeout);
 	WINPR_API VOID winpr_WaitForThreadpoolWaitCallbacks(PTP_WAIT pwa, BOOL fCancelPendingCallbacks);
 
-#	define CreateThreadpoolWait winpr_CreateThreadpoolWait
-#	define CloseThreadpoolWait winpr_CloseThreadpoolWait
-#	define SetThreadpoolWait winpr_SetThreadpoolWait
-#	define WaitForThreadpoolWaitCallbacks winpr_WaitForThreadpoolWaitCallbacks
+#define CreateThreadpoolWait winpr_CreateThreadpoolWait
+#define CloseThreadpoolWait winpr_CloseThreadpoolWait
+#define SetThreadpoolWait winpr_SetThreadpoolWait
+#define WaitForThreadpoolWaitCallbacks winpr_WaitForThreadpoolWaitCallbacks
 
 	/* Work */
 
@@ -144,11 +145,11 @@ extern "C"
 	                                                 PTP_CALLBACK_ENVIRON pcbe);
 	WINPR_API VOID winpr_WaitForThreadpoolWorkCallbacks(PTP_WORK pwk, BOOL fCancelPendingCallbacks);
 
-#	define CreateThreadpoolWork winpr_CreateThreadpoolWork
-#	define CloseThreadpoolWork winpr_CloseThreadpoolWork
-#	define SubmitThreadpoolWork winpr_SubmitThreadpoolWork
-#	define TrySubmitThreadpoolCallback winpr_TrySubmitThreadpoolCallback
-#	define WaitForThreadpoolWorkCallbacks winpr_WaitForThreadpoolWorkCallbacks
+#define CreateThreadpoolWork winpr_CreateThreadpoolWork
+#define CloseThreadpoolWork winpr_CloseThreadpoolWork
+#define SubmitThreadpoolWork winpr_SubmitThreadpoolWork
+#define TrySubmitThreadpoolCallback winpr_TrySubmitThreadpoolCallback
+#define WaitForThreadpoolWorkCallbacks winpr_WaitForThreadpoolWorkCallbacks
 
 	/* Timer */
 
@@ -161,11 +162,11 @@ extern "C"
 	WINPR_API VOID winpr_WaitForThreadpoolTimerCallbacks(PTP_TIMER pti,
 	                                                     BOOL fCancelPendingCallbacks);
 
-#	define CreateThreadpoolTimer winpr_CreateThreadpoolTimer
-#	define CloseThreadpoolTimer winpr_CloseThreadpoolTimer
-#	define IsThreadpoolTimerSet winpr_IsThreadpoolTimerSet
-#	define SetThreadpoolTimer winpr_SetThreadpoolTimer
-#	define WaitForThreadpoolTimerCallbacks winpr_WaitForThreadpoolTimerCallbacks
+#define CreateThreadpoolTimer winpr_CreateThreadpoolTimer
+#define CloseThreadpoolTimer winpr_CloseThreadpoolTimer
+#define IsThreadpoolTimerSet winpr_IsThreadpoolTimerSet
+#define SetThreadpoolTimer winpr_SetThreadpoolTimer
+#define WaitForThreadpoolTimerCallbacks winpr_WaitForThreadpoolTimerCallbacks
 
 	/* I/O */
 
@@ -176,11 +177,11 @@ extern "C"
 	WINPR_API VOID winpr_CancelThreadpoolIo(PTP_IO pio);
 	WINPR_API VOID winpr_WaitForThreadpoolIoCallbacks(PTP_IO pio, BOOL fCancelPendingCallbacks);
 
-#	define CreateThreadpoolIo winpr_CreateThreadpoolIo
-#	define CloseThreadpoolIo winpr_CloseThreadpoolIo
-#	define StartThreadpoolIo winpr_StartThreadpoolIo
-#	define CancelThreadpoolIo winpr_CancelThreadpoolIo
-#	define WaitForThreadpoolIoCallbacks winpr_WaitForThreadpoolIoCallbacks
+#define CreateThreadpoolIo winpr_CreateThreadpoolIo
+#define CloseThreadpoolIo winpr_CloseThreadpoolIo
+#define StartThreadpoolIo winpr_StartThreadpoolIo
+#define CancelThreadpoolIo winpr_CancelThreadpoolIo
+#define WaitForThreadpoolIoCallbacks winpr_WaitForThreadpoolIoCallbacks
 
 	/* Clean-up Group */
 
@@ -193,10 +194,10 @@ extern "C"
 	                                                        PVOID pvCleanupContext);
 	WINPR_API VOID winpr_CloseThreadpoolCleanupGroup(PTP_CLEANUP_GROUP ptpcg);
 
-#	define SetThreadpoolCallbackCleanupGroup winpr_SetThreadpoolCallbackCleanupGroup
-#	define CreateThreadpoolCleanupGroup winpr_CreateThreadpoolCleanupGroup
-#	define CloseThreadpoolCleanupGroupMembers winpr_CloseThreadpoolCleanupGroupMembers
-#	define CloseThreadpoolCleanupGroup winpr_CloseThreadpoolCleanupGroup
+#define SetThreadpoolCallbackCleanupGroup winpr_SetThreadpoolCallbackCleanupGroup
+#define CreateThreadpoolCleanupGroup winpr_CreateThreadpoolCleanupGroup
+#define CloseThreadpoolCleanupGroupMembers winpr_CloseThreadpoolCleanupGroupMembers
+#define CloseThreadpoolCleanupGroup winpr_CloseThreadpoolCleanupGroup
 
 	/* Pool */
 
@@ -205,10 +206,10 @@ extern "C"
 	WINPR_API BOOL winpr_SetThreadpoolThreadMinimum(PTP_POOL ptpp, DWORD cthrdMic);
 	WINPR_API VOID winpr_SetThreadpoolThreadMaximum(PTP_POOL ptpp, DWORD cthrdMost);
 
-#	define CreateThreadpool winpr_CreateThreadpool
-#	define CloseThreadpool winpr_CloseThreadpool
-#	define SetThreadpoolThreadMinimum winpr_SetThreadpoolThreadMinimum
-#	define SetThreadpoolThreadMaximum winpr_SetThreadpoolThreadMaximum
+#define CreateThreadpool winpr_CreateThreadpool
+#define CloseThreadpool winpr_CloseThreadpool
+#define SetThreadpoolThreadMinimum winpr_SetThreadpoolThreadMinimum
+#define SetThreadpoolThreadMaximum winpr_SetThreadpoolThreadMaximum
 
 	/* Callback Environment */
 
@@ -259,12 +260,12 @@ extern "C"
 	WINPR_API VOID winpr_FreeLibraryWhenCallbackReturns(PTP_CALLBACK_INSTANCE pci, HMODULE mod);
 	WINPR_API VOID winpr_DisassociateCurrentThreadFromCallback(PTP_CALLBACK_INSTANCE pci);
 
-#	define SetEventWhenCallbackReturns winpr_SetEventWhenCallbackReturns
-#	define ReleaseSemaphoreWhenCallbackReturns winpr_ReleaseSemaphoreWhenCallbackReturns
-#	define ReleaseMutexWhenCallbackReturns winpr_ReleaseMutexWhenCallbackReturns
-#	define LeaveCriticalSectionWhenCallbackReturns winpr_LeaveCriticalSectionWhenCallbackReturns
-#	define FreeLibraryWhenCallbackReturns winpr_FreeLibraryWhenCallbackReturns
-#	define DisassociateCurrentThreadFromCallback winpr_DisassociateCurrentThreadFromCallback
+#define SetEventWhenCallbackReturns winpr_SetEventWhenCallbackReturns
+#define ReleaseSemaphoreWhenCallbackReturns winpr_ReleaseSemaphoreWhenCallbackReturns
+#define ReleaseMutexWhenCallbackReturns winpr_ReleaseMutexWhenCallbackReturns
+#define LeaveCriticalSectionWhenCallbackReturns winpr_LeaveCriticalSectionWhenCallbackReturns
+#define FreeLibraryWhenCallbackReturns winpr_FreeLibraryWhenCallbackReturns
+#define DisassociateCurrentThreadFromCallback winpr_DisassociateCurrentThreadFromCallback
 
 #endif
 

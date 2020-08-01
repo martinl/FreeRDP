@@ -23,11 +23,11 @@
 
 #ifndef _WIN32
 
-#	include <pthread.h>
+#include <pthread.h>
 
-#	include <winpr/thread.h>
+#include <winpr/thread.h>
 
-#	include "../handle/handle.h"
+#include "../handle/handle.h"
 
 typedef void* (*pthread_start_routine)(void*);
 
@@ -50,10 +50,10 @@ struct winpr_thread
 	pthread_cond_t threadIsReady;
 	LPTHREAD_START_ROUTINE lpStartAddress;
 	LPSECURITY_ATTRIBUTES lpThreadAttributes;
-#	if defined(WITH_DEBUG_THREADS)
+#if defined(WITH_DEBUG_THREADS)
 	void* create_stack;
 	void* exit_stack;
-#	endif
+#endif
 };
 typedef struct winpr_thread WINPR_THREAD;
 

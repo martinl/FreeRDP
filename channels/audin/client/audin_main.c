@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <errno.h>
@@ -576,26 +576,26 @@ static UINT audin_on_data_received(IWTSVirtualChannelCallback* pChannelCallback,
 
 	switch (MessageId)
 	{
-	case MSG_SNDIN_VERSION:
-		error = audin_process_version(audin, callback, data);
-		break;
+		case MSG_SNDIN_VERSION:
+			error = audin_process_version(audin, callback, data);
+			break;
 
-	case MSG_SNDIN_FORMATS:
-		error = audin_process_formats(audin, callback, data);
-		break;
+		case MSG_SNDIN_FORMATS:
+			error = audin_process_formats(audin, callback, data);
+			break;
 
-	case MSG_SNDIN_OPEN:
-		error = audin_process_open(audin, callback, data);
-		break;
+		case MSG_SNDIN_OPEN:
+			error = audin_process_open(audin, callback, data);
+			break;
 
-	case MSG_SNDIN_FORMATCHANGE:
-		error = audin_process_format_change(audin, callback, data);
-		break;
+		case MSG_SNDIN_FORMATCHANGE:
+			error = audin_process_format_change(audin, callback, data);
+			break;
 
-	default:
-		WLog_Print(audin->log, WLOG_ERROR, "unknown MessageId=0x%02" PRIx8 "", MessageId);
-		error = ERROR_INVALID_DATA;
-		break;
+		default:
+			WLog_Print(audin->log, WLOG_ERROR, "unknown MessageId=0x%02" PRIx8 "", MessageId);
+			error = ERROR_INVALID_DATA;
+			break;
 	}
 
 	return error;
@@ -937,9 +937,9 @@ BOOL audin_process_addin_args(AUDIN_PLUGIN* audin, ADDIN_ARGV* args)
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define DVCPluginEntry audin_DVCPluginEntry
+#define DVCPluginEntry audin_DVCPluginEntry
 #else
-#	define DVCPluginEntry FREERDP_API DVCPluginEntry
+#define DVCPluginEntry FREERDP_API DVCPluginEntry
 #endif
 
 /**

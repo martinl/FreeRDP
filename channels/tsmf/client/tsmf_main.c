@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -178,164 +178,165 @@ static UINT tsmf_on_data_received(IWTSVirtualChannelCallback* pChannelCallback, 
 
 	switch (InterfaceId)
 	{
-	case TSMF_INTERFACE_CAPABILITIES | STREAM_ID_NONE:
-		switch (FunctionId)
-		{
-		case RIM_EXCHANGE_CAPABILITY_REQUEST:
-			error = tsmf_ifman_rim_exchange_capability_request(&ifman);
-			processed = TRUE;
-			break;
-
-		case RIMCALL_RELEASE:
-		case RIMCALL_QUERYINTERFACE:
-			break;
-
-		default:
-			break;
-		}
-
-		break;
-
-	case TSMF_INTERFACE_DEFAULT | STREAM_ID_PROXY:
-		switch (FunctionId)
-		{
-		case SET_CHANNEL_PARAMS:
-			if (Stream_GetRemainingLength(input) < GUID_SIZE + 4)
+		case TSMF_INTERFACE_CAPABILITIES | STREAM_ID_NONE:
+			switch (FunctionId)
 			{
-				error = ERROR_INVALID_DATA;
-				goto out;
+				case RIM_EXCHANGE_CAPABILITY_REQUEST:
+					error = tsmf_ifman_rim_exchange_capability_request(&ifman);
+					processed = TRUE;
+					break;
+
+				case RIMCALL_RELEASE:
+				case RIMCALL_QUERYINTERFACE:
+					break;
+
+				default:
+					break;
 			}
 
-			CopyMemory(callback->presentation_id, Stream_Pointer(input), GUID_SIZE);
-			Stream_Seek(input, GUID_SIZE);
-			Stream_Read_UINT32(input, callback->stream_id);
-			DEBUG_TSMF("SET_CHANNEL_PARAMS StreamId=%" PRIu32 "", callback->stream_id);
-			ifman.output_pending = TRUE;
-			processed = TRUE;
 			break;
 
-		case EXCHANGE_CAPABILITIES_REQ:
-			error = tsmf_ifman_exchange_capability_request(&ifman);
-			processed = TRUE;
-			break;
+		case TSMF_INTERFACE_DEFAULT | STREAM_ID_PROXY:
+			switch (FunctionId)
+			{
+				case SET_CHANNEL_PARAMS:
+					if (Stream_GetRemainingLength(input) < GUID_SIZE + 4)
+					{
+						error = ERROR_INVALID_DATA;
+						goto out;
+					}
 
-		case CHECK_FORMAT_SUPPORT_REQ:
-			error = tsmf_ifman_check_format_support_request(&ifman);
-			processed = TRUE;
-			break;
+					CopyMemory(callback->presentation_id, Stream_Pointer(input), GUID_SIZE);
+					Stream_Seek(input, GUID_SIZE);
+					Stream_Read_UINT32(input, callback->stream_id);
+					DEBUG_TSMF("SET_CHANNEL_PARAMS StreamId=%" PRIu32 "", callback->stream_id);
+					ifman.output_pending = TRUE;
+					processed = TRUE;
+					break;
 
-		case ON_NEW_PRESENTATION:
-			error = tsmf_ifman_on_new_presentation(&ifman);
-			processed = TRUE;
-			break;
+				case EXCHANGE_CAPABILITIES_REQ:
+					error = tsmf_ifman_exchange_capability_request(&ifman);
+					processed = TRUE;
+					break;
 
-		case ADD_STREAM:
-			error = tsmf_ifman_add_stream(&ifman, ((TSMF_PLUGIN*)callback->plugin)->rdpcontext);
-			processed = TRUE;
-			break;
+				case CHECK_FORMAT_SUPPORT_REQ:
+					error = tsmf_ifman_check_format_support_request(&ifman);
+					processed = TRUE;
+					break;
 
-		case SET_TOPOLOGY_REQ:
-			error = tsmf_ifman_set_topology_request(&ifman);
-			processed = TRUE;
-			break;
+				case ON_NEW_PRESENTATION:
+					error = tsmf_ifman_on_new_presentation(&ifman);
+					processed = TRUE;
+					break;
 
-		case REMOVE_STREAM:
-			error = tsmf_ifman_remove_stream(&ifman);
-			processed = TRUE;
-			break;
+				case ADD_STREAM:
+					error =
+					    tsmf_ifman_add_stream(&ifman, ((TSMF_PLUGIN*)callback->plugin)->rdpcontext);
+					processed = TRUE;
+					break;
 
-		case SET_SOURCE_VIDEO_RECT:
-			error = tsmf_ifman_set_source_video_rect(&ifman);
-			processed = TRUE;
-			break;
+				case SET_TOPOLOGY_REQ:
+					error = tsmf_ifman_set_topology_request(&ifman);
+					processed = TRUE;
+					break;
 
-		case SHUTDOWN_PRESENTATION_REQ:
-			error = tsmf_ifman_shutdown_presentation(&ifman);
-			processed = TRUE;
-			break;
+				case REMOVE_STREAM:
+					error = tsmf_ifman_remove_stream(&ifman);
+					processed = TRUE;
+					break;
 
-		case ON_STREAM_VOLUME:
-			error = tsmf_ifman_on_stream_volume(&ifman);
-			processed = TRUE;
-			break;
+				case SET_SOURCE_VIDEO_RECT:
+					error = tsmf_ifman_set_source_video_rect(&ifman);
+					processed = TRUE;
+					break;
 
-		case ON_CHANNEL_VOLUME:
-			error = tsmf_ifman_on_channel_volume(&ifman);
-			processed = TRUE;
-			break;
+				case SHUTDOWN_PRESENTATION_REQ:
+					error = tsmf_ifman_shutdown_presentation(&ifman);
+					processed = TRUE;
+					break;
 
-		case SET_VIDEO_WINDOW:
-			error = tsmf_ifman_set_video_window(&ifman);
-			processed = TRUE;
-			break;
+				case ON_STREAM_VOLUME:
+					error = tsmf_ifman_on_stream_volume(&ifman);
+					processed = TRUE;
+					break;
 
-		case UPDATE_GEOMETRY_INFO:
-			error = tsmf_ifman_update_geometry_info(&ifman);
-			processed = TRUE;
-			break;
+				case ON_CHANNEL_VOLUME:
+					error = tsmf_ifman_on_channel_volume(&ifman);
+					processed = TRUE;
+					break;
 
-		case SET_ALLOCATOR:
-			error = tsmf_ifman_set_allocator(&ifman);
-			processed = TRUE;
-			break;
+				case SET_VIDEO_WINDOW:
+					error = tsmf_ifman_set_video_window(&ifman);
+					processed = TRUE;
+					break;
 
-		case NOTIFY_PREROLL:
-			error = tsmf_ifman_notify_preroll(&ifman);
-			processed = TRUE;
-			break;
+				case UPDATE_GEOMETRY_INFO:
+					error = tsmf_ifman_update_geometry_info(&ifman);
+					processed = TRUE;
+					break;
 
-		case ON_SAMPLE:
-			error = tsmf_ifman_on_sample(&ifman);
-			processed = TRUE;
-			break;
+				case SET_ALLOCATOR:
+					error = tsmf_ifman_set_allocator(&ifman);
+					processed = TRUE;
+					break;
 
-		case ON_FLUSH:
-			error = tsmf_ifman_on_flush(&ifman);
-			processed = TRUE;
-			break;
+				case NOTIFY_PREROLL:
+					error = tsmf_ifman_notify_preroll(&ifman);
+					processed = TRUE;
+					break;
 
-		case ON_END_OF_STREAM:
-			error = tsmf_ifman_on_end_of_stream(&ifman);
-			processed = TRUE;
-			break;
+				case ON_SAMPLE:
+					error = tsmf_ifman_on_sample(&ifman);
+					processed = TRUE;
+					break;
 
-		case ON_PLAYBACK_STARTED:
-			error = tsmf_ifman_on_playback_started(&ifman);
-			processed = TRUE;
-			break;
+				case ON_FLUSH:
+					error = tsmf_ifman_on_flush(&ifman);
+					processed = TRUE;
+					break;
 
-		case ON_PLAYBACK_PAUSED:
-			error = tsmf_ifman_on_playback_paused(&ifman);
-			processed = TRUE;
-			break;
+				case ON_END_OF_STREAM:
+					error = tsmf_ifman_on_end_of_stream(&ifman);
+					processed = TRUE;
+					break;
 
-		case ON_PLAYBACK_RESTARTED:
-			error = tsmf_ifman_on_playback_restarted(&ifman);
-			processed = TRUE;
-			break;
+				case ON_PLAYBACK_STARTED:
+					error = tsmf_ifman_on_playback_started(&ifman);
+					processed = TRUE;
+					break;
 
-		case ON_PLAYBACK_STOPPED:
-			error = tsmf_ifman_on_playback_stopped(&ifman);
-			processed = TRUE;
-			break;
+				case ON_PLAYBACK_PAUSED:
+					error = tsmf_ifman_on_playback_paused(&ifman);
+					processed = TRUE;
+					break;
 
-		case ON_PLAYBACK_RATE_CHANGED:
-			error = tsmf_ifman_on_playback_rate_changed(&ifman);
-			processed = TRUE;
-			break;
+				case ON_PLAYBACK_RESTARTED:
+					error = tsmf_ifman_on_playback_restarted(&ifman);
+					processed = TRUE;
+					break;
 
-		case RIMCALL_RELEASE:
-		case RIMCALL_QUERYINTERFACE:
+				case ON_PLAYBACK_STOPPED:
+					error = tsmf_ifman_on_playback_stopped(&ifman);
+					processed = TRUE;
+					break;
+
+				case ON_PLAYBACK_RATE_CHANGED:
+					error = tsmf_ifman_on_playback_rate_changed(&ifman);
+					processed = TRUE;
+					break;
+
+				case RIMCALL_RELEASE:
+				case RIMCALL_QUERYINTERFACE:
+					break;
+
+				default:
+					break;
+			}
+
 			break;
 
 		default:
 			break;
-		}
-
-		break;
-
-	default:
-		break;
 	}
 
 	input = NULL;
@@ -350,18 +351,18 @@ static UINT tsmf_on_data_received(IWTSVirtualChannelCallback* pChannelCallback, 
 	{
 		switch (FunctionId)
 		{
-		case RIMCALL_RELEASE:
-			/* [MS-RDPEXPS] 2.2.2.2 Interface Release (IFACE_RELEASE)
-			   This message does not require a reply. */
-			processed = TRUE;
-			ifman.output_pending = 1;
-			break;
+			case RIMCALL_RELEASE:
+				/* [MS-RDPEXPS] 2.2.2.2 Interface Release (IFACE_RELEASE)
+				   This message does not require a reply. */
+				processed = TRUE;
+				ifman.output_pending = 1;
+				break;
 
-		case RIMCALL_QUERYINTERFACE:
-			/* [MS-RDPEXPS] 2.2.2.1.2 Query Interface Response (QI_RSP)
-			   This message is not supported in this channel. */
-			processed = TRUE;
-			break;
+			case RIMCALL_QUERYINTERFACE:
+				/* [MS-RDPEXPS] 2.2.2.1.2 Query Interface Response (QI_RSP)
+				   This message is not supported in this channel. */
+				processed = TRUE;
+				break;
 		}
 
 		if (!processed)
@@ -554,9 +555,9 @@ static UINT tsmf_process_addin_args(IWTSPlugin* pPlugin, ADDIN_ARGV* args)
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define DVCPluginEntry tsmf_DVCPluginEntry
+#define DVCPluginEntry tsmf_DVCPluginEntry
 #else
-#	define DVCPluginEntry FREERDP_API DVCPluginEntry
+#define DVCPluginEntry FREERDP_API DVCPluginEntry
 #endif
 
 /**

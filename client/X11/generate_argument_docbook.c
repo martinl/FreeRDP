@@ -40,104 +40,104 @@ LPSTR tr_esc_str(LPCSTR arg, bool format)
 	{
 		switch (arg[x])
 		{
-		case '<':
-			len = format ? 13 : 4;
-			ds += len - 1;
-			tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
+			case '<':
+				len = format ? 13 : 4;
+				ds += len - 1;
+				tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
 
-			if (NULL == tmp)
-			{
-				fprintf(stderr, "Could not reallocate string buffer.\n");
-				exit(-3);
-			}
+				if (NULL == tmp)
+				{
+					fprintf(stderr, "Could not reallocate string buffer.\n");
+					exit(-3);
+				}
 
-			if (format)
-				/* coverity[buffer_size] */
-				strncpy(&tmp[cs], "<replaceable>", len);
-			else
-				/* coverity[buffer_size] */
-				strncpy(&tmp[cs], "&lt;", len);
+				if (format)
+					/* coverity[buffer_size] */
+					strncpy(&tmp[cs], "<replaceable>", len);
+				else
+					/* coverity[buffer_size] */
+					strncpy(&tmp[cs], "&lt;", len);
 
-			cs += len;
-			break;
+				cs += len;
+				break;
 
-		case '>':
-			len = format ? 14 : 4;
-			ds += len - 1;
-			tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
+			case '>':
+				len = format ? 14 : 4;
+				ds += len - 1;
+				tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
 
-			if (NULL == tmp)
-			{
-				fprintf(stderr, "Could not reallocate string buffer.\n");
-				exit(-4);
-			}
+				if (NULL == tmp)
+				{
+					fprintf(stderr, "Could not reallocate string buffer.\n");
+					exit(-4);
+				}
 
-			if (format)
-				/* coverity[buffer_size] */
-				strncpy(&tmp[cs], "</replaceable>", len);
-			else
-				/* coverity[buffer_size] */
-				strncpy(&tmp[cs], "&lt;", len);
+				if (format)
+					/* coverity[buffer_size] */
+					strncpy(&tmp[cs], "</replaceable>", len);
+				else
+					/* coverity[buffer_size] */
+					strncpy(&tmp[cs], "&lt;", len);
 
-			cs += len;
-			break;
+				cs += len;
+				break;
 
-		case '\'':
-			ds += 5;
-			tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
+			case '\'':
+				ds += 5;
+				tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
 
-			if (NULL == tmp)
-			{
-				fprintf(stderr, "Could not reallocate string buffer.\n");
-				exit(-5);
-			}
+				if (NULL == tmp)
+				{
+					fprintf(stderr, "Could not reallocate string buffer.\n");
+					exit(-5);
+				}
 
-			tmp[cs++] = '&';
-			tmp[cs++] = 'a';
-			tmp[cs++] = 'p';
-			tmp[cs++] = 'o';
-			tmp[cs++] = 's';
-			tmp[cs++] = ';';
-			break;
+				tmp[cs++] = '&';
+				tmp[cs++] = 'a';
+				tmp[cs++] = 'p';
+				tmp[cs++] = 'o';
+				tmp[cs++] = 's';
+				tmp[cs++] = ';';
+				break;
 
-		case '"':
-			ds += 5;
-			tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
+			case '"':
+				ds += 5;
+				tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
 
-			if (NULL == tmp)
-			{
-				fprintf(stderr, "Could not reallocate string buffer.\n");
-				exit(-6);
-			}
+				if (NULL == tmp)
+				{
+					fprintf(stderr, "Could not reallocate string buffer.\n");
+					exit(-6);
+				}
 
-			tmp[cs++] = '&';
-			tmp[cs++] = 'q';
-			tmp[cs++] = 'u';
-			tmp[cs++] = 'o';
-			tmp[cs++] = 't';
-			tmp[cs++] = ';';
-			break;
+				tmp[cs++] = '&';
+				tmp[cs++] = 'q';
+				tmp[cs++] = 'u';
+				tmp[cs++] = 'o';
+				tmp[cs++] = 't';
+				tmp[cs++] = ';';
+				break;
 
-		case '&':
-			ds += 4;
-			tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
+			case '&':
+				ds += 4;
+				tmp = (LPSTR)realloc(tmp, ds * sizeof(CHAR));
 
-			if (NULL == tmp)
-			{
-				fprintf(stderr, "Could not reallocate string buffer.\n");
-				exit(-7);
-			}
+				if (NULL == tmp)
+				{
+					fprintf(stderr, "Could not reallocate string buffer.\n");
+					exit(-7);
+				}
 
-			tmp[cs++] = '&';
-			tmp[cs++] = 'a';
-			tmp[cs++] = 'm';
-			tmp[cs++] = 'p';
-			tmp[cs++] = ';';
-			break;
+				tmp[cs++] = '&';
+				tmp[cs++] = 'a';
+				tmp[cs++] = 'm';
+				tmp[cs++] = 'p';
+				tmp[cs++] = ';';
+				break;
 
-		default:
-			tmp[cs++] = arg[x];
-			break;
+			default:
+				tmp[cs++] = arg[x];
+				break;
 		}
 
 		/* Assure, the string is '\0' terminated. */

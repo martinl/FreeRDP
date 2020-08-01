@@ -24,7 +24,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -177,35 +177,35 @@ static UINT rail_send_client_sysparam(RailClientContext* context, RAIL_SYSPARAM_
 
 	switch (sysparam->param)
 	{
-	case SPI_SET_DRAG_FULL_WINDOWS:
-	case SPI_SET_KEYBOARD_CUES:
-	case SPI_SET_KEYBOARD_PREF:
-	case SPI_SET_MOUSE_BUTTON_SWAP:
-		length += 1;
-		break;
+		case SPI_SET_DRAG_FULL_WINDOWS:
+		case SPI_SET_KEYBOARD_CUES:
+		case SPI_SET_KEYBOARD_PREF:
+		case SPI_SET_MOUSE_BUTTON_SWAP:
+			length += 1;
+			break;
 
-	case SPI_SET_WORK_AREA:
-	case SPI_DISPLAY_CHANGE:
-	case SPI_TASKBAR_POS:
-		length += 8;
-		break;
+		case SPI_SET_WORK_AREA:
+		case SPI_DISPLAY_CHANGE:
+		case SPI_TASKBAR_POS:
+			length += 8;
+			break;
 
-	case SPI_SET_HIGH_CONTRAST:
-		length += sysparam->highContrast.colorSchemeLength + 10;
-		break;
+		case SPI_SET_HIGH_CONTRAST:
+			length += sysparam->highContrast.colorSchemeLength + 10;
+			break;
 
-	case SPI_SETFILTERKEYS:
-		length += 20;
-		break;
+		case SPI_SETFILTERKEYS:
+			length += 20;
+			break;
 
-	case SPI_SETSTICKYKEYS:
-	case SPI_SETCARETWIDTH:
-	case SPI_SETTOGGLEKEYS:
-		length += 4;
-		break;
+		case SPI_SETSTICKYKEYS:
+		case SPI_SETCARETWIDTH:
+		case SPI_SETTOGGLEKEYS:
+			length += 4;
+			break;
 
-	default:
-		return ERROR_BAD_ARGUMENTS;
+		default:
+			return ERROR_BAD_ARGUMENTS;
 	}
 
 	s = rail_pdu_init(length);
@@ -688,19 +688,20 @@ static VOID VCAPITYPE rail_virtual_channel_open_event_ex(LPVOID lpUserParam, DWO
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_DATA_RECEIVED:
-		if ((error = rail_virtual_channel_event_data_received(rail, pData, dataLength, totalLength,
-		                                                      dataFlags)))
-			WLog_ERR(TAG, "rail_virtual_channel_event_data_received failed with error %" PRIu32 "!",
-			         error);
+		case CHANNEL_EVENT_DATA_RECEIVED:
+			if ((error = rail_virtual_channel_event_data_received(rail, pData, dataLength,
+			                                                      totalLength, dataFlags)))
+				WLog_ERR(TAG,
+				         "rail_virtual_channel_event_data_received failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_WRITE_COMPLETE:
-		break;
+		case CHANNEL_EVENT_WRITE_COMPLETE:
+			break;
 
-	case CHANNEL_EVENT_USER:
-		break;
+		case CHANNEL_EVENT_USER:
+			break;
 	}
 
 	if (error && rail->rdpcontext)
@@ -862,28 +863,29 @@ static VOID VCAPITYPE rail_virtual_channel_init_event_ex(LPVOID lpUserParam, LPV
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_CONNECTED:
-		if ((error = rail_virtual_channel_event_connected(rail, pData, dataLength)))
-			WLog_ERR(TAG, "rail_virtual_channel_event_connected failed with error %" PRIu32 "!",
-			         error);
+		case CHANNEL_EVENT_CONNECTED:
+			if ((error = rail_virtual_channel_event_connected(rail, pData, dataLength)))
+				WLog_ERR(TAG, "rail_virtual_channel_event_connected failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_DISCONNECTED:
-		if ((error = rail_virtual_channel_event_disconnected(rail)))
-			WLog_ERR(TAG, "rail_virtual_channel_event_disconnected failed with error %" PRIu32 "!",
-			         error);
+		case CHANNEL_EVENT_DISCONNECTED:
+			if ((error = rail_virtual_channel_event_disconnected(rail)))
+				WLog_ERR(TAG,
+				         "rail_virtual_channel_event_disconnected failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_TERMINATED:
-		rail_virtual_channel_event_terminated(rail);
-		break;
+		case CHANNEL_EVENT_TERMINATED:
+			rail_virtual_channel_event_terminated(rail);
+			break;
 
-	case CHANNEL_EVENT_ATTACHED:
-	case CHANNEL_EVENT_DETACHED:
-	default:
-		break;
+		case CHANNEL_EVENT_ATTACHED:
+		case CHANNEL_EVENT_DETACHED:
+		default:
+			break;
 	}
 
 	if (error && rail->rdpcontext)

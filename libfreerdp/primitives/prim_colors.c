@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/types.h>
@@ -28,7 +28,7 @@
 #include "prim_internal.h"
 
 #ifndef MINMAX
-#	define MINMAX(_v_, _l_, _h_) ((_v_) < (_l_) ? (_l_) : ((_v_) > (_h_) ? (_h_) : (_v_)))
+#define MINMAX(_v_, _l_, _h_) ((_v_) < (_l_) ? (_l_) : ((_v_) > (_h_) ? (_h_) : (_v_)))
 #endif /* !MINMAX */
 /* ------------------------------------------------------------------------- */
 static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R_BGRX(const INT16* pSrc[3], UINT32 srcStep,
@@ -120,13 +120,14 @@ static pstatus_t general_yCbCrToRGB_16s8u_P3AC4R(const INT16* pSrc[3], UINT32 sr
 {
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return general_yCbCrToRGB_16s8u_P3AC4R_BGRX(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return general_yCbCrToRGB_16s8u_P3AC4R_BGRX(pSrc, srcStep, pDst, dstStep, DstFormat,
+			                                            roi);
 
-	default:
-		return general_yCbCrToRGB_16s8u_P3AC4R_general(pSrc, srcStep, pDst, dstStep, DstFormat,
-		                                               roi);
+		default:
+			return general_yCbCrToRGB_16s8u_P3AC4R_general(pSrc, srcStep, pDst, dstStep, DstFormat,
+			                                               roi);
 	}
 }
 
@@ -407,30 +408,30 @@ static INLINE fkt_writeScanline getScanlineWriteFunction(DWORD format)
 {
 	switch (format)
 	{
-	case PIXEL_FORMAT_ARGB32:
-	case PIXEL_FORMAT_XRGB32:
-		return writeScanlineXRGB;
+		case PIXEL_FORMAT_ARGB32:
+		case PIXEL_FORMAT_XRGB32:
+			return writeScanlineXRGB;
 
-	case PIXEL_FORMAT_ABGR32:
-	case PIXEL_FORMAT_XBGR32:
-		return writeScanlineXBGR;
+		case PIXEL_FORMAT_ABGR32:
+		case PIXEL_FORMAT_XBGR32:
+			return writeScanlineXBGR;
 
-	case PIXEL_FORMAT_RGBA32:
-	case PIXEL_FORMAT_RGBX32:
-		return writeScanlineRGBX;
+		case PIXEL_FORMAT_RGBA32:
+		case PIXEL_FORMAT_RGBX32:
+			return writeScanlineRGBX;
 
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return writeScanlineBGRX;
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return writeScanlineBGRX;
 
-	case PIXEL_FORMAT_BGR24:
-		return writeScanlineBGR;
+		case PIXEL_FORMAT_BGR24:
+			return writeScanlineBGR;
 
-	case PIXEL_FORMAT_RGB24:
-		return writeScanlineRGB;
+		case PIXEL_FORMAT_RGB24:
+			return writeScanlineRGB;
 
-	default:
-		return writeScanlineGeneric;
+		default:
+			return writeScanlineGeneric;
 	}
 }
 
@@ -499,12 +500,13 @@ general_RGBToRGB_16s8u_P3AC4R(const INT16* const pSrc[3], /* 16-bit R,G, and B a
 {
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return general_RGBToRGB_16s8u_P3AC4R_BGRX(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return general_RGBToRGB_16s8u_P3AC4R_BGRX(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
 
-	default:
-		return general_RGBToRGB_16s8u_P3AC4R_general(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		default:
+			return general_RGBToRGB_16s8u_P3AC4R_general(pSrc, srcStep, pDst, dstStep, DstFormat,
+			                                             roi);
 	}
 }
 /* ------------------------------------------------------------------------- */

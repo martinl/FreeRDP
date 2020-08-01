@@ -69,9 +69,10 @@
 #define VK_PAUSE 0x13   /* PAUSE key */
 #define VK_CAPITAL 0x14 /* CAPS LOCK key */
 #define VK_KANA 0x15    /* Input Method Editor (IME) Kana mode */
-#define VK_HANGUEL 0x15 /* IME Hanguel mode (maintained for compatibility; use #define VK_HANGUL) \
-	                     */
-#define VK_HANGUL 0x15  /* IME Hangul mode */
+#define VK_HANGUEL                                                                               \
+	0x15               /* IME Hanguel mode (maintained for compatibility; use #define VK_HANGUL) \
+	                    */
+#define VK_HANGUL 0x15 /* IME Hangul mode */
 
 /* 0x16 is undefined */
 
@@ -304,8 +305,9 @@
 
 /* 0xE3 and 0xE4 are OEM specific */
 
-#define VK_PROCESSKEY 0xE5 /* Windows 95/98/Me, Windows NT 4.0, Windows 2000/XP: IME PROCESS key \
-	                        */
+#define VK_PROCESSKEY                                                          \
+	0xE5 /* Windows 95/98/Me, Windows NT 4.0, Windows 2000/XP: IME PROCESS key \
+	      */
 
 /* 0xE6 is OEM specific */
 

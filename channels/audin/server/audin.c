@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -472,63 +472,67 @@ static DWORD WINAPI audin_server_thread_func(LPVOID arg)
 
 		switch (MessageId)
 		{
-		case MSG_SNDIN_VERSION:
-			if ((error = audin_server_recv_version(audin, s, BytesReturned)))
-			{
-				WLog_ERR(TAG, "audin_server_recv_version failed with error %" PRIu32 "!", error);
-				goto out_capacity;
-			}
+			case MSG_SNDIN_VERSION:
+				if ((error = audin_server_recv_version(audin, s, BytesReturned)))
+				{
+					WLog_ERR(TAG, "audin_server_recv_version failed with error %" PRIu32 "!",
+					         error);
+					goto out_capacity;
+				}
 
-			if ((error = audin_server_send_formats(audin, s)))
-			{
-				WLog_ERR(TAG, "audin_server_send_formats failed with error %" PRIu32 "!", error);
-				goto out_capacity;
-			}
+				if ((error = audin_server_send_formats(audin, s)))
+				{
+					WLog_ERR(TAG, "audin_server_send_formats failed with error %" PRIu32 "!",
+					         error);
+					goto out_capacity;
+				}
 
-			break;
+				break;
 
-		case MSG_SNDIN_FORMATS:
-			if ((error = audin_server_recv_formats(audin, s, BytesReturned)))
-			{
-				WLog_ERR(TAG, "audin_server_recv_formats failed with error %" PRIu32 "!", error);
-				goto out_capacity;
-			}
+			case MSG_SNDIN_FORMATS:
+				if ((error = audin_server_recv_formats(audin, s, BytesReturned)))
+				{
+					WLog_ERR(TAG, "audin_server_recv_formats failed with error %" PRIu32 "!",
+					         error);
+					goto out_capacity;
+				}
 
-			if ((error = audin_server_send_open(audin, s)))
-			{
-				WLog_ERR(TAG, "audin_server_send_open failed with error %" PRIu32 "!", error);
-				goto out_capacity;
-			}
+				if ((error = audin_server_send_open(audin, s)))
+				{
+					WLog_ERR(TAG, "audin_server_send_open failed with error %" PRIu32 "!", error);
+					goto out_capacity;
+				}
 
-			break;
+				break;
 
-		case MSG_SNDIN_OPEN_REPLY:
-			if ((error = audin_server_recv_open_reply(audin, s, BytesReturned)))
-			{
-				WLog_ERR(TAG, "audin_server_recv_open_reply failed with error %" PRIu32 "!", error);
-				goto out_capacity;
-			}
+			case MSG_SNDIN_OPEN_REPLY:
+				if ((error = audin_server_recv_open_reply(audin, s, BytesReturned)))
+				{
+					WLog_ERR(TAG, "audin_server_recv_open_reply failed with error %" PRIu32 "!",
+					         error);
+					goto out_capacity;
+				}
 
-			break;
+				break;
 
-		case MSG_SNDIN_DATA_INCOMING:
-			break;
+			case MSG_SNDIN_DATA_INCOMING:
+				break;
 
-		case MSG_SNDIN_DATA:
-			if ((error = audin_server_recv_data(audin, s, BytesReturned)))
-			{
-				WLog_ERR(TAG, "audin_server_recv_data failed with error %" PRIu32 "!", error);
-				goto out_capacity;
-			};
+			case MSG_SNDIN_DATA:
+				if ((error = audin_server_recv_data(audin, s, BytesReturned)))
+				{
+					WLog_ERR(TAG, "audin_server_recv_data failed with error %" PRIu32 "!", error);
+					goto out_capacity;
+				};
 
-			break;
+				break;
 
-		case MSG_SNDIN_FORMATCHANGE:
-			break;
+			case MSG_SNDIN_FORMATCHANGE:
+				break;
 
-		default:
-			WLog_ERR(TAG, "audin_server_thread_func: unknown MessageId %" PRIu8 "", MessageId);
-			break;
+			default:
+				WLog_ERR(TAG, "audin_server_thread_func: unknown MessageId %" PRIu8 "", MessageId);
+				break;
 		}
 	}
 

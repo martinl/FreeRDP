@@ -77,33 +77,33 @@ extern "C"
 		HANDLE hStdError;
 	} STARTUPINFOW, *LPSTARTUPINFOW;
 
-#	ifdef UNICODE
+#ifdef UNICODE
 	typedef STARTUPINFOW STARTUPINFO;
 	typedef LPSTARTUPINFOW LPSTARTUPINFO;
-#	else
+#else
 	typedef STARTUPINFOA STARTUPINFO;
 	typedef LPSTARTUPINFOA LPSTARTUPINFO;
-#	endif
+#endif
 
-#	define STARTF_USESHOWWINDOW 0x00000001
-#	define STARTF_USESIZE 0x00000002
-#	define STARTF_USEPOSITION 0x00000004
-#	define STARTF_USECOUNTCHARS 0x00000008
-#	define STARTF_USEFILLATTRIBUTE 0x00000010
-#	define STARTF_RUNFULLSCREEN 0x00000020
-#	define STARTF_FORCEONFEEDBACK 0x00000040
-#	define STARTF_FORCEOFFFEEDBACK 0x00000080
-#	define STARTF_USESTDHANDLES 0x00000100
-#	define STARTF_USEHOTKEY 0x00000200
-#	define STARTF_TITLEISLINKNAME 0x00000800
-#	define STARTF_TITLEISAPPID 0x00001000
-#	define STARTF_PREVENTPINNING 0x00002000
+#define STARTF_USESHOWWINDOW 0x00000001
+#define STARTF_USESIZE 0x00000002
+#define STARTF_USEPOSITION 0x00000004
+#define STARTF_USECOUNTCHARS 0x00000008
+#define STARTF_USEFILLATTRIBUTE 0x00000010
+#define STARTF_RUNFULLSCREEN 0x00000020
+#define STARTF_FORCEONFEEDBACK 0x00000040
+#define STARTF_FORCEOFFFEEDBACK 0x00000080
+#define STARTF_USESTDHANDLES 0x00000100
+#define STARTF_USEHOTKEY 0x00000200
+#define STARTF_TITLEISLINKNAME 0x00000800
+#define STARTF_TITLEISAPPID 0x00001000
+#define STARTF_PREVENTPINNING 0x00002000
 
 	/* Process */
 
-#	define LOGON_WITH_PROFILE 0x00000001
-#	define LOGON_NETCREDENTIALS_ONLY 0x00000002
-#	define LOGON_ZERO_PASSWORD_BUFFER 0x80000000
+#define LOGON_WITH_PROFILE 0x00000001
+#define LOGON_NETCREDENTIALS_ONLY 0x00000002
+#define LOGON_ZERO_PASSWORD_BUFFER 0x80000000
 
 	WINPR_API BOOL CreateProcessA(LPCSTR lpApplicationName, LPSTR lpCommandLine,
 	                              LPSECURITY_ATTRIBUTES lpProcessAttributes,
@@ -163,17 +163,17 @@ extern "C"
 	                                       LPCWSTR lpCurrentDirectory, LPSTARTUPINFOW lpStartupInfo,
 	                                       LPPROCESS_INFORMATION lpProcessInformation);
 
-#	ifdef UNICODE
-#		define CreateProcess CreateProcessW
-#		define CreateProcessAsUser CreateProcessAsUserW
-#		define CreateProcessWithLogon CreateProcessWithLogonW
-#		define CreateProcessWithToken CreateProcessWithTokenW
-#	else
-#		define CreateProcess CreateProcessA
-#		define CreateProcessAsUser CreateProcessAsUserA
-#		define CreateProcessWithLogon CreateProcessWithLogonA
-#		define CreateProcessWithToken CreateProcessWithTokenA
-#	endif
+#ifdef UNICODE
+#define CreateProcess CreateProcessW
+#define CreateProcessAsUser CreateProcessAsUserW
+#define CreateProcessWithLogon CreateProcessWithLogonW
+#define CreateProcessWithToken CreateProcessWithTokenW
+#else
+#define CreateProcess CreateProcessA
+#define CreateProcessAsUser CreateProcessAsUserA
+#define CreateProcessWithLogon CreateProcessWithLogonA
+#define CreateProcessWithToken CreateProcessWithTokenA
+#endif
 
 	DECLSPEC_NORETURN WINPR_API VOID ExitProcess(UINT uExitCode);
 	WINPR_API BOOL GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode);
@@ -187,16 +187,16 @@ extern "C"
 
 	WINPR_API LPWSTR* CommandLineToArgvW(LPCWSTR lpCmdLine, int* pNumArgs);
 
-#	ifdef UNICODE
-#		define CommandLineToArgv CommandLineToArgvW
-#	else
-#		define CommandLineToArgv CommandLineToArgvA
-#	endif
+#ifdef UNICODE
+#define CommandLineToArgv CommandLineToArgvW
+#else
+#define CommandLineToArgv CommandLineToArgvA
+#endif
 
 	/* Thread */
 
-#	define CREATE_SUSPENDED 0x00000004
-#	define STACK_SIZE_PARAM_IS_A_RESERVATION 0x00010000
+#define CREATE_SUSPENDED 0x00000004
+#define STACK_SIZE_PARAM_IS_A_RESERVATION 0x00010000
 
 	WINPR_API HANDLE CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize,
 	                              LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter,
@@ -225,7 +225,7 @@ extern "C"
 
 	/* Thread-Local Storage */
 
-#	define TLS_OUT_OF_INDEXES ((DWORD)0xFFFFFFFF)
+#define TLS_OUT_OF_INDEXES ((DWORD)0xFFFFFFFF)
 
 	WINPR_API DWORD TlsAlloc(void);
 	WINPR_API LPVOID TlsGetValue(DWORD dwTlsIndex);
@@ -237,8 +237,8 @@ extern "C"
 /*
  * GetCurrentProcess / GetCurrentThread cause a conflict on Mac OS X
  */
-#	define _GetCurrentProcess GetCurrentProcess
-#	define _GetCurrentThread GetCurrentThread
+#define _GetCurrentProcess GetCurrentProcess
+#define _GetCurrentThread GetCurrentThread
 
 #endif
 

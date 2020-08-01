@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crypto.h>
@@ -482,36 +482,36 @@ static BOOL autodetect_recv_netchar_result(rdpRdp* rdp, wStream* s,
 
 	switch (autodetectReqPdu->requestType)
 	{
-	case 0x0840:
+		case 0x0840:
 
-		/* baseRTT and averageRTT fields are present (bandwidth field is not) */
-		if ((autodetectReqPdu->headerLength != 0x0E) || (Stream_GetRemainingLength(s) < 8))
-			return FALSE;
+			/* baseRTT and averageRTT fields are present (bandwidth field is not) */
+			if ((autodetectReqPdu->headerLength != 0x0E) || (Stream_GetRemainingLength(s) < 8))
+				return FALSE;
 
-		Stream_Read_UINT32(s, rdp->autodetect->netCharBaseRTT);    /* baseRTT (4 bytes) */
-		Stream_Read_UINT32(s, rdp->autodetect->netCharAverageRTT); /* averageRTT (4 bytes) */
-		break;
+			Stream_Read_UINT32(s, rdp->autodetect->netCharBaseRTT);    /* baseRTT (4 bytes) */
+			Stream_Read_UINT32(s, rdp->autodetect->netCharAverageRTT); /* averageRTT (4 bytes) */
+			break;
 
-	case 0x0880:
+		case 0x0880:
 
-		/* bandwidth and averageRTT fields are present (baseRTT field is not) */
-		if ((autodetectReqPdu->headerLength != 0x0E) || (Stream_GetRemainingLength(s) < 8))
-			return FALSE;
+			/* bandwidth and averageRTT fields are present (baseRTT field is not) */
+			if ((autodetectReqPdu->headerLength != 0x0E) || (Stream_GetRemainingLength(s) < 8))
+				return FALSE;
 
-		Stream_Read_UINT32(s, rdp->autodetect->netCharBandwidth);  /* bandwidth (4 bytes) */
-		Stream_Read_UINT32(s, rdp->autodetect->netCharAverageRTT); /* averageRTT (4 bytes) */
-		break;
+			Stream_Read_UINT32(s, rdp->autodetect->netCharBandwidth);  /* bandwidth (4 bytes) */
+			Stream_Read_UINT32(s, rdp->autodetect->netCharAverageRTT); /* averageRTT (4 bytes) */
+			break;
 
-	case 0x08C0:
+		case 0x08C0:
 
-		/* baseRTT, bandwidth, and averageRTT fields are present */
-		if ((autodetectReqPdu->headerLength != 0x12) || (Stream_GetRemainingLength(s) < 12))
-			return FALSE;
+			/* baseRTT, bandwidth, and averageRTT fields are present */
+			if ((autodetectReqPdu->headerLength != 0x12) || (Stream_GetRemainingLength(s) < 12))
+				return FALSE;
 
-		Stream_Read_UINT32(s, rdp->autodetect->netCharBaseRTT);    /* baseRTT (4 bytes) */
-		Stream_Read_UINT32(s, rdp->autodetect->netCharBandwidth);  /* bandwidth (4 bytes) */
-		Stream_Read_UINT32(s, rdp->autodetect->netCharAverageRTT); /* averageRTT (4 bytes) */
-		break;
+			Stream_Read_UINT32(s, rdp->autodetect->netCharBaseRTT);    /* baseRTT (4 bytes) */
+			Stream_Read_UINT32(s, rdp->autodetect->netCharBandwidth);  /* bandwidth (4 bytes) */
+			Stream_Read_UINT32(s, rdp->autodetect->netCharAverageRTT); /* averageRTT (4 bytes) */
+			break;
 	}
 
 	WLog_VRB(AUTODETECT_TAG,
@@ -547,40 +547,40 @@ int rdp_recv_autodetect_request_packet(rdpRdp* rdp, wStream* s)
 
 	switch (autodetectReqPdu.requestType)
 	{
-	case RDP_RTT_REQUEST_TYPE_CONTINUOUS:
-	case RDP_RTT_REQUEST_TYPE_CONNECTTIME:
-		/* RTT Measure Request (RDP_RTT_REQUEST) - MS-RDPBCGR 2.2.14.1.1 */
-		success = autodetect_recv_rtt_measure_request(rdp, s, &autodetectReqPdu);
-		break;
+		case RDP_RTT_REQUEST_TYPE_CONTINUOUS:
+		case RDP_RTT_REQUEST_TYPE_CONNECTTIME:
+			/* RTT Measure Request (RDP_RTT_REQUEST) - MS-RDPBCGR 2.2.14.1.1 */
+			success = autodetect_recv_rtt_measure_request(rdp, s, &autodetectReqPdu);
+			break;
 
-	case RDP_BW_START_REQUEST_TYPE_CONTINUOUS:
-	case RDP_BW_START_REQUEST_TYPE_TUNNEL:
-	case RDP_BW_START_REQUEST_TYPE_CONNECTTIME:
-		/* Bandwidth Measure Start (RDP_BW_START) - MS-RDPBCGR 2.2.14.1.2 */
-		success = autodetect_recv_bandwidth_measure_start(rdp, s, &autodetectReqPdu);
-		break;
+		case RDP_BW_START_REQUEST_TYPE_CONTINUOUS:
+		case RDP_BW_START_REQUEST_TYPE_TUNNEL:
+		case RDP_BW_START_REQUEST_TYPE_CONNECTTIME:
+			/* Bandwidth Measure Start (RDP_BW_START) - MS-RDPBCGR 2.2.14.1.2 */
+			success = autodetect_recv_bandwidth_measure_start(rdp, s, &autodetectReqPdu);
+			break;
 
-	case RDP_BW_PAYLOAD_REQUEST_TYPE:
-		/* Bandwidth Measure Payload (RDP_BW_PAYLOAD) - MS-RDPBCGR 2.2.14.1.3 */
-		success = autodetect_recv_bandwidth_measure_payload(rdp, s, &autodetectReqPdu);
-		break;
+		case RDP_BW_PAYLOAD_REQUEST_TYPE:
+			/* Bandwidth Measure Payload (RDP_BW_PAYLOAD) - MS-RDPBCGR 2.2.14.1.3 */
+			success = autodetect_recv_bandwidth_measure_payload(rdp, s, &autodetectReqPdu);
+			break;
 
-	case RDP_BW_STOP_REQUEST_TYPE_CONNECTTIME:
-	case RDP_BW_STOP_REQUEST_TYPE_CONTINUOUS:
-	case RDP_BW_STOP_REQUEST_TYPE_TUNNEL:
-		/* Bandwidth Measure Stop (RDP_BW_STOP) - MS-RDPBCGR 2.2.14.1.4 */
-		success = autodetect_recv_bandwidth_measure_stop(rdp, s, &autodetectReqPdu);
-		break;
+		case RDP_BW_STOP_REQUEST_TYPE_CONNECTTIME:
+		case RDP_BW_STOP_REQUEST_TYPE_CONTINUOUS:
+		case RDP_BW_STOP_REQUEST_TYPE_TUNNEL:
+			/* Bandwidth Measure Stop (RDP_BW_STOP) - MS-RDPBCGR 2.2.14.1.4 */
+			success = autodetect_recv_bandwidth_measure_stop(rdp, s, &autodetectReqPdu);
+			break;
 
-	case 0x0840:
-	case 0x0880:
-	case 0x08C0:
-		/* Network Characteristics Result (RDP_NETCHAR_RESULT) - MS-RDPBCGR 2.2.14.1.5 */
-		success = autodetect_recv_netchar_result(rdp, s, &autodetectReqPdu);
-		break;
+		case 0x0840:
+		case 0x0880:
+		case 0x08C0:
+			/* Network Characteristics Result (RDP_NETCHAR_RESULT) - MS-RDPBCGR 2.2.14.1.5 */
+			success = autodetect_recv_netchar_result(rdp, s, &autodetectReqPdu);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return success ? 0 : -1;
@@ -609,19 +609,19 @@ int rdp_recv_autodetect_response_packet(rdpRdp* rdp, wStream* s)
 
 	switch (autodetectRspPdu.responseType)
 	{
-	case RDP_RTT_RESPONSE_TYPE:
-		/* RTT Measure Response (RDP_RTT_RESPONSE) - MS-RDPBCGR 2.2.14.2.1 */
-		success = autodetect_recv_rtt_measure_response(rdp, s, &autodetectRspPdu);
-		break;
+		case RDP_RTT_RESPONSE_TYPE:
+			/* RTT Measure Response (RDP_RTT_RESPONSE) - MS-RDPBCGR 2.2.14.2.1 */
+			success = autodetect_recv_rtt_measure_response(rdp, s, &autodetectRspPdu);
+			break;
 
-	case RDP_BW_RESULTS_RESPONSE_TYPE_CONNECTTIME:
-	case RDP_BW_RESULTS_RESPONSE_TYPE_CONTINUOUS:
-		/* Bandwidth Measure Results (RDP_BW_RESULTS) - MS-RDPBCGR 2.2.14.2.2 */
-		success = autodetect_recv_bandwidth_measure_results(rdp, s, &autodetectRspPdu);
-		break;
+		case RDP_BW_RESULTS_RESPONSE_TYPE_CONNECTTIME:
+		case RDP_BW_RESULTS_RESPONSE_TYPE_CONTINUOUS:
+			/* Bandwidth Measure Results (RDP_BW_RESULTS) - MS-RDPBCGR 2.2.14.2.2 */
+			success = autodetect_recv_bandwidth_measure_results(rdp, s, &autodetectRspPdu);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return success ? 0 : -1;

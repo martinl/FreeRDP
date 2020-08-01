@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -226,12 +226,12 @@ UINT disp_recv_pdu(DISP_CHANNEL_CALLBACK* callback, wStream* s)
 
 	switch (header.type)
 	{
-	case DISPLAY_CONTROL_PDU_TYPE_CAPS:
-		return disp_recv_display_control_caps_pdu(callback, s);
+		case DISPLAY_CONTROL_PDU_TYPE_CAPS:
+			return disp_recv_display_control_caps_pdu(callback, s);
 
-	default:
-		WLog_ERR(TAG, "Type %" PRIu32 " not recognized!", header.type);
-		return ERROR_INTERNAL_ERROR;
+		default:
+			WLog_ERR(TAG, "Type %" PRIu32 " not recognized!", header.type);
+			return ERROR_INTERNAL_ERROR;
 	}
 }
 
@@ -345,9 +345,9 @@ UINT disp_send_monitor_layout(DispClientContext* context, UINT32 NumMonitors,
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define DVCPluginEntry disp_DVCPluginEntry
+#define DVCPluginEntry disp_DVCPluginEntry
 #else
-#	define DVCPluginEntry FREERDP_API DVCPluginEntry
+#define DVCPluginEntry FREERDP_API DVCPluginEntry
 #endif
 
 /**

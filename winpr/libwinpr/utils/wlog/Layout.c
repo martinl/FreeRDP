@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -35,8 +35,8 @@
 #include "wlog/Layout.h"
 
 #if defined __linux__ && !defined ANDROID
-#	include <unistd.h>
-#	include <sys/syscall.h>
+#include <unistd.h>
+#include <sys/syscall.h>
 #endif
 
 extern const char* WLOG_LEVELS[7];
@@ -236,88 +236,90 @@ BOOL WLog_Layout_GetMessagePrefix(wLog* log, wLogLayout* layout, wLogMessage* me
 
 	switch (argc)
 	{
-	case 0:
-		WLog_PrintMessagePrefix(log, message, format);
-		break;
+		case 0:
+			WLog_PrintMessagePrefix(log, message, format);
+			break;
 
-	case 1:
-		WLog_PrintMessagePrefix(log, message, format, args[0]);
-		break;
+		case 1:
+			WLog_PrintMessagePrefix(log, message, format, args[0]);
+			break;
 
-	case 2:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1]);
-		break;
+		case 2:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1]);
+			break;
 
-	case 3:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2]);
-		break;
+		case 3:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2]);
+			break;
 
-	case 4:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3]);
-		break;
+		case 4:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3]);
+			break;
 
-	case 5:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3], args[4]);
-		break;
+		case 5:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3],
+			                        args[4]);
+			break;
 
-	case 6:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3], args[4],
-		                        args[5]);
-		break;
+		case 6:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3],
+			                        args[4], args[5]);
+			break;
 
-	case 7:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3], args[4],
-		                        args[5], args[6]);
-		break;
+		case 7:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3],
+			                        args[4], args[5], args[6]);
+			break;
 
-	case 8:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3], args[4],
-		                        args[5], args[6], args[7]);
-		break;
+		case 8:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3],
+			                        args[4], args[5], args[6], args[7]);
+			break;
 
-	case 9:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3], args[4],
-		                        args[5], args[6], args[7], args[8]);
-		break;
+		case 9:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3],
+			                        args[4], args[5], args[6], args[7], args[8]);
+			break;
 
-	case 10:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3], args[4],
-		                        args[5], args[6], args[7], args[8], args[9]);
-		break;
+		case 10:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3],
+			                        args[4], args[5], args[6], args[7], args[8], args[9]);
+			break;
 
-	case 11:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3], args[4],
-		                        args[5], args[6], args[7], args[8], args[9], args[10]);
-		break;
+		case 11:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3],
+			                        args[4], args[5], args[6], args[7], args[8], args[9], args[10]);
+			break;
 
-	case 12:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3], args[4],
-		                        args[5], args[6], args[7], args[8], args[9], args[10], args[11]);
-		break;
+		case 12:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3],
+			                        args[4], args[5], args[6], args[7], args[8], args[9], args[10],
+			                        args[11]);
+			break;
 
-	case 13:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3], args[4],
-		                        args[5], args[6], args[7], args[8], args[9], args[10], args[11],
-		                        args[12]);
-		break;
+		case 13:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3],
+			                        args[4], args[5], args[6], args[7], args[8], args[9], args[10],
+			                        args[11], args[12]);
+			break;
 
-	case 14:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3], args[4],
-		                        args[5], args[6], args[7], args[8], args[9], args[10], args[11],
-		                        args[12], args[13]);
-		break;
+		case 14:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3],
+			                        args[4], args[5], args[6], args[7], args[8], args[9], args[10],
+			                        args[11], args[12], args[13]);
+			break;
 
-	case 15:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3], args[4],
-		                        args[5], args[6], args[7], args[8], args[9], args[10], args[11],
-		                        args[12], args[13], args[14]);
-		break;
+		case 15:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3],
+			                        args[4], args[5], args[6], args[7], args[8], args[9], args[10],
+			                        args[11], args[12], args[13], args[14]);
+			break;
 
-	case 16:
-		WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3], args[4],
-		                        args[5], args[6], args[7], args[8], args[9], args[10], args[11],
-		                        args[12], args[13], args[14], args[15]);
-		break;
+		case 16:
+			WLog_PrintMessagePrefix(log, message, format, args[0], args[1], args[2], args[3],
+			                        args[4], args[5], args[6], args[7], args[8], args[9], args[10],
+			                        args[11], args[12], args[13], args[14], args[15]);
+			break;
 	}
 
 	return TRUE;

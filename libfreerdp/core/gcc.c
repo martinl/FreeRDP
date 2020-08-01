@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -39,21 +39,21 @@ static DWORD rdp_version_common(DWORD serverVersion, DWORD clientVersion)
 
 	switch (version)
 	{
-	case RDP_VERSION_4:
-	case RDP_VERSION_5_PLUS:
-	case RDP_VERSION_10_0:
-	case RDP_VERSION_10_1:
-	case RDP_VERSION_10_2:
-	case RDP_VERSION_10_3:
-	case RDP_VERSION_10_4:
-	case RDP_VERSION_10_5:
-	case RDP_VERSION_10_6:
-		return version;
+		case RDP_VERSION_4:
+		case RDP_VERSION_5_PLUS:
+		case RDP_VERSION_10_0:
+		case RDP_VERSION_10_1:
+		case RDP_VERSION_10_2:
+		case RDP_VERSION_10_3:
+		case RDP_VERSION_10_4:
+		case RDP_VERSION_10_5:
+		case RDP_VERSION_10_6:
+			return version;
 
-	default:
-		WLog_ERR(TAG, "Invalid client [%" PRId32 "] and server [%" PRId32 "] versions",
-		         serverVersion, clientVersion);
-		return version;
+		default:
+			WLog_ERR(TAG, "Invalid client [%" PRId32 "] and server [%" PRId32 "] versions",
+			         serverVersion, clientVersion);
+			return version;
 	}
 }
 
@@ -363,59 +363,59 @@ BOOL gcc_read_client_data_blocks(wStream* s, rdpMcs* mcs, int length)
 
 		switch (type)
 		{
-		case CS_CORE:
-			if (!gcc_read_client_core_data(s, mcs, blockLength - 4))
-				return FALSE;
+			case CS_CORE:
+				if (!gcc_read_client_core_data(s, mcs, blockLength - 4))
+					return FALSE;
 
-			break;
+				break;
 
-		case CS_SECURITY:
-			if (!gcc_read_client_security_data(s, mcs, blockLength - 4))
-				return FALSE;
+			case CS_SECURITY:
+				if (!gcc_read_client_security_data(s, mcs, blockLength - 4))
+					return FALSE;
 
-			break;
+				break;
 
-		case CS_NET:
-			if (!gcc_read_client_network_data(s, mcs, blockLength - 4))
-				return FALSE;
+			case CS_NET:
+				if (!gcc_read_client_network_data(s, mcs, blockLength - 4))
+					return FALSE;
 
-			break;
+				break;
 
-		case CS_CLUSTER:
-			if (!gcc_read_client_cluster_data(s, mcs, blockLength - 4))
-				return FALSE;
+			case CS_CLUSTER:
+				if (!gcc_read_client_cluster_data(s, mcs, blockLength - 4))
+					return FALSE;
 
-			break;
+				break;
 
-		case CS_MONITOR:
-			if (!gcc_read_client_monitor_data(s, mcs, blockLength - 4))
-				return FALSE;
+			case CS_MONITOR:
+				if (!gcc_read_client_monitor_data(s, mcs, blockLength - 4))
+					return FALSE;
 
-			break;
+				break;
 
-		case CS_MCS_MSGCHANNEL:
-			if (!gcc_read_client_message_channel_data(s, mcs, blockLength - 4))
-				return FALSE;
+			case CS_MCS_MSGCHANNEL:
+				if (!gcc_read_client_message_channel_data(s, mcs, blockLength - 4))
+					return FALSE;
 
-			break;
+				break;
 
-		case CS_MONITOR_EX:
-			if (!gcc_read_client_monitor_extended_data(s, mcs, blockLength - 4))
-				return FALSE;
+			case CS_MONITOR_EX:
+				if (!gcc_read_client_monitor_extended_data(s, mcs, blockLength - 4))
+					return FALSE;
 
-			break;
+				break;
 
-		case 0xC009:
-		case CS_MULTITRANSPORT:
-			if (!gcc_read_client_multitransport_channel_data(s, mcs, blockLength - 4))
-				return FALSE;
+			case 0xC009:
+			case CS_MULTITRANSPORT:
+				if (!gcc_read_client_multitransport_channel_data(s, mcs, blockLength - 4))
+					return FALSE;
 
-			break;
+				break;
 
-		default:
-			WLog_ERR(TAG, "Unknown GCC client data block: 0x%04" PRIX16 "", type);
-			Stream_Seek(s, blockLength - 4);
-			break;
+			default:
+				WLog_ERR(TAG, "Unknown GCC client data block: 0x%04" PRIX16 "", type);
+				Stream_Seek(s, blockLength - 4);
+				break;
 		}
 
 		endPos = Stream_GetPosition(s);
@@ -495,57 +495,59 @@ BOOL gcc_read_server_data_blocks(wStream* s, rdpMcs* mcs, int length)
 
 		switch (type)
 		{
-		case SC_CORE:
-			if (!gcc_read_server_core_data(s, mcs))
-			{
-				WLog_ERR(TAG, "gcc_read_server_data_blocks: gcc_read_server_core_data failed");
-				return FALSE;
-			}
+			case SC_CORE:
+				if (!gcc_read_server_core_data(s, mcs))
+				{
+					WLog_ERR(TAG, "gcc_read_server_data_blocks: gcc_read_server_core_data failed");
+					return FALSE;
+				}
 
-			break;
+				break;
 
-		case SC_SECURITY:
-			if (!gcc_read_server_security_data(s, mcs))
-			{
-				WLog_ERR(TAG, "gcc_read_server_data_blocks: gcc_read_server_security_data failed");
-				return FALSE;
-			}
+			case SC_SECURITY:
+				if (!gcc_read_server_security_data(s, mcs))
+				{
+					WLog_ERR(TAG,
+					         "gcc_read_server_data_blocks: gcc_read_server_security_data failed");
+					return FALSE;
+				}
 
-			break;
+				break;
 
-		case SC_NET:
-			if (!gcc_read_server_network_data(s, mcs))
-			{
-				WLog_ERR(TAG, "gcc_read_server_data_blocks: gcc_read_server_network_data failed");
-				return FALSE;
-			}
+			case SC_NET:
+				if (!gcc_read_server_network_data(s, mcs))
+				{
+					WLog_ERR(TAG,
+					         "gcc_read_server_data_blocks: gcc_read_server_network_data failed");
+					return FALSE;
+				}
 
-			break;
+				break;
 
-		case SC_MCS_MSGCHANNEL:
-			if (!gcc_read_server_message_channel_data(s, mcs))
-			{
-				WLog_ERR(
-				    TAG,
-				    "gcc_read_server_data_blocks: gcc_read_server_message_channel_data failed");
-				return FALSE;
-			}
+			case SC_MCS_MSGCHANNEL:
+				if (!gcc_read_server_message_channel_data(s, mcs))
+				{
+					WLog_ERR(
+					    TAG,
+					    "gcc_read_server_data_blocks: gcc_read_server_message_channel_data failed");
+					return FALSE;
+				}
 
-			break;
+				break;
 
-		case SC_MULTITRANSPORT:
-			if (!gcc_read_server_multitransport_channel_data(s, mcs))
-			{
-				WLog_ERR(TAG, "gcc_read_server_data_blocks: "
-				              "gcc_read_server_multitransport_channel_data failed");
-				return FALSE;
-			}
+			case SC_MULTITRANSPORT:
+				if (!gcc_read_server_multitransport_channel_data(s, mcs))
+				{
+					WLog_ERR(TAG, "gcc_read_server_data_blocks: "
+					              "gcc_read_server_multitransport_channel_data failed");
+					return FALSE;
+				}
 
-			break;
+				break;
 
-		default:
-			WLog_ERR(TAG, "gcc_read_server_data_blocks: ignoring type=%" PRIu16 "", type);
-			break;
+			default:
+				WLog_ERR(TAG, "gcc_read_server_data_blocks: ignoring type=%" PRIu16 "", type);
+				break;
 		}
 
 		offset += blockLength;
@@ -771,44 +773,44 @@ BOOL gcc_read_client_core_data(wStream* s, rdpMcs* mcs, UINT16 blockLength)
 	{
 		switch (postBeta2ColorDepth)
 		{
-		case RNS_UD_COLOR_4BPP:
-			clientColorDepth = 4;
-			break;
+			case RNS_UD_COLOR_4BPP:
+				clientColorDepth = 4;
+				break;
 
-		case RNS_UD_COLOR_8BPP:
-			clientColorDepth = 8;
-			break;
+			case RNS_UD_COLOR_8BPP:
+				clientColorDepth = 8;
+				break;
 
-		case RNS_UD_COLOR_16BPP_555:
-			clientColorDepth = 15;
-			break;
+			case RNS_UD_COLOR_16BPP_555:
+				clientColorDepth = 15;
+				break;
 
-		case RNS_UD_COLOR_16BPP_565:
-			clientColorDepth = 16;
-			break;
+			case RNS_UD_COLOR_16BPP_565:
+				clientColorDepth = 16;
+				break;
 
-		case RNS_UD_COLOR_24BPP:
-			clientColorDepth = 24;
-			break;
+			case RNS_UD_COLOR_24BPP:
+				clientColorDepth = 24;
+				break;
 
-		default:
-			return FALSE;
+			default:
+				return FALSE;
 		}
 	}
 	else
 	{
 		switch (colorDepth)
 		{
-		case RNS_UD_COLOR_4BPP:
-			clientColorDepth = 4;
-			break;
+			case RNS_UD_COLOR_4BPP:
+				clientColorDepth = 4;
+				break;
 
-		case RNS_UD_COLOR_8BPP:
-			clientColorDepth = 8;
-			break;
+			case RNS_UD_COLOR_8BPP:
+				clientColorDepth = 8;
+				break;
 
-		default:
-			return FALSE;
+			default:
+				return FALSE;
 		}
 	}
 
@@ -1081,29 +1083,30 @@ BOOL gcc_read_server_security_data(wStream* s, rdpMcs* mcs)
 	/* Only accept valid/known encryption methods */
 	switch (serverEncryptionMethod)
 	{
-	case ENCRYPTION_METHOD_NONE:
-		WLog_DBG(TAG, "Server rdp encryption method: NONE");
-		break;
+		case ENCRYPTION_METHOD_NONE:
+			WLog_DBG(TAG, "Server rdp encryption method: NONE");
+			break;
 
-	case ENCRYPTION_METHOD_40BIT:
-		WLog_DBG(TAG, "Server rdp encryption method: 40BIT");
-		break;
+		case ENCRYPTION_METHOD_40BIT:
+			WLog_DBG(TAG, "Server rdp encryption method: 40BIT");
+			break;
 
-	case ENCRYPTION_METHOD_56BIT:
-		WLog_DBG(TAG, "Server rdp encryption method: 56BIT");
-		break;
+		case ENCRYPTION_METHOD_56BIT:
+			WLog_DBG(TAG, "Server rdp encryption method: 56BIT");
+			break;
 
-	case ENCRYPTION_METHOD_128BIT:
-		WLog_DBG(TAG, "Server rdp encryption method: 128BIT");
-		break;
+		case ENCRYPTION_METHOD_128BIT:
+			WLog_DBG(TAG, "Server rdp encryption method: 128BIT");
+			break;
 
-	case ENCRYPTION_METHOD_FIPS:
-		WLog_DBG(TAG, "Server rdp encryption method: FIPS");
-		break;
+		case ENCRYPTION_METHOD_FIPS:
+			WLog_DBG(TAG, "Server rdp encryption method: FIPS");
+			break;
 
-	default:
-		WLog_ERR(TAG, "Received unknown encryption method %08" PRIX32 "", serverEncryptionMethod);
-		return FALSE;
+		default:
+			WLog_ERR(TAG, "Received unknown encryption method %08" PRIX32 "",
+			         serverEncryptionMethod);
+			return FALSE;
 	}
 
 	if (settings->UseRdpSecurityLayer && !(settings->EncryptionMethods & serverEncryptionMethod))
@@ -1118,38 +1121,38 @@ BOOL gcc_read_server_security_data(wStream* s, rdpMcs* mcs)
 	/* Verify encryption level/method combinations according to MS-RDPBCGR Section 5.3.2 */
 	switch (settings->EncryptionLevel)
 	{
-	case ENCRYPTION_LEVEL_NONE:
-		if (settings->EncryptionMethods == ENCRYPTION_METHOD_NONE)
-		{
-			validCryptoConfig = TRUE;
-		}
+		case ENCRYPTION_LEVEL_NONE:
+			if (settings->EncryptionMethods == ENCRYPTION_METHOD_NONE)
+			{
+				validCryptoConfig = TRUE;
+			}
 
-		break;
+			break;
 
-	case ENCRYPTION_LEVEL_FIPS:
-		if (settings->EncryptionMethods == ENCRYPTION_METHOD_FIPS)
-		{
-			validCryptoConfig = TRUE;
-		}
+		case ENCRYPTION_LEVEL_FIPS:
+			if (settings->EncryptionMethods == ENCRYPTION_METHOD_FIPS)
+			{
+				validCryptoConfig = TRUE;
+			}
 
-		break;
+			break;
 
-	case ENCRYPTION_LEVEL_LOW:
-	case ENCRYPTION_LEVEL_HIGH:
-	case ENCRYPTION_LEVEL_CLIENT_COMPATIBLE:
-		if (settings->EncryptionMethods == ENCRYPTION_METHOD_40BIT ||
-		    settings->EncryptionMethods == ENCRYPTION_METHOD_56BIT ||
-		    settings->EncryptionMethods == ENCRYPTION_METHOD_128BIT ||
-		    settings->EncryptionMethods == ENCRYPTION_METHOD_FIPS)
-		{
-			validCryptoConfig = TRUE;
-		}
+		case ENCRYPTION_LEVEL_LOW:
+		case ENCRYPTION_LEVEL_HIGH:
+		case ENCRYPTION_LEVEL_CLIENT_COMPATIBLE:
+			if (settings->EncryptionMethods == ENCRYPTION_METHOD_40BIT ||
+			    settings->EncryptionMethods == ENCRYPTION_METHOD_56BIT ||
+			    settings->EncryptionMethods == ENCRYPTION_METHOD_128BIT ||
+			    settings->EncryptionMethods == ENCRYPTION_METHOD_FIPS)
+			{
+				validCryptoConfig = TRUE;
+			}
 
-		break;
+			break;
 
-	default:
-		WLog_ERR(TAG, "Received unknown encryption level 0x%08" PRIX32 "",
-		         settings->EncryptionLevel);
+		default:
+			WLog_ERR(TAG, "Received unknown encryption level 0x%08" PRIX32 "",
+			         settings->EncryptionLevel);
 	}
 
 	if (!validCryptoConfig)
@@ -1275,114 +1278,115 @@ BOOL gcc_write_server_security_data(wStream* s, rdpMcs* mcs)
 	/* verify server encryption level value */
 	switch (settings->EncryptionLevel)
 	{
-	case ENCRYPTION_LEVEL_NONE:
-		WLog_INFO(TAG, "Active rdp encryption level: NONE");
-		break;
+		case ENCRYPTION_LEVEL_NONE:
+			WLog_INFO(TAG, "Active rdp encryption level: NONE");
+			break;
 
-	case ENCRYPTION_LEVEL_FIPS:
-		WLog_INFO(TAG, "Active rdp encryption level: FIPS Compliant");
-		break;
+		case ENCRYPTION_LEVEL_FIPS:
+			WLog_INFO(TAG, "Active rdp encryption level: FIPS Compliant");
+			break;
 
-	case ENCRYPTION_LEVEL_HIGH:
-		WLog_INFO(TAG, "Active rdp encryption level: HIGH");
-		break;
+		case ENCRYPTION_LEVEL_HIGH:
+			WLog_INFO(TAG, "Active rdp encryption level: HIGH");
+			break;
 
-	case ENCRYPTION_LEVEL_LOW:
-		WLog_INFO(TAG, "Active rdp encryption level: LOW");
-		break;
+		case ENCRYPTION_LEVEL_LOW:
+			WLog_INFO(TAG, "Active rdp encryption level: LOW");
+			break;
 
-	case ENCRYPTION_LEVEL_CLIENT_COMPATIBLE:
-		WLog_INFO(TAG, "Active rdp encryption level: CLIENT-COMPATIBLE");
-		break;
+		case ENCRYPTION_LEVEL_CLIENT_COMPATIBLE:
+			WLog_INFO(TAG, "Active rdp encryption level: CLIENT-COMPATIBLE");
+			break;
 
-	default:
-		WLog_ERR(TAG, "Invalid server encryption level 0x%08" PRIX32 "", settings->EncryptionLevel);
-		WLog_ERR(TAG, "Switching to encryption level CLIENT-COMPATIBLE");
-		settings->EncryptionLevel = ENCRYPTION_LEVEL_CLIENT_COMPATIBLE;
+		default:
+			WLog_ERR(TAG, "Invalid server encryption level 0x%08" PRIX32 "",
+			         settings->EncryptionLevel);
+			WLog_ERR(TAG, "Switching to encryption level CLIENT-COMPATIBLE");
+			settings->EncryptionLevel = ENCRYPTION_LEVEL_CLIENT_COMPATIBLE;
 	}
 
 	/* choose rdp encryption method based on server level and client methods */
 	switch (settings->EncryptionLevel)
 	{
-	case ENCRYPTION_LEVEL_NONE:
-		/* The only valid method is NONE in this case */
-		settings->EncryptionMethods = ENCRYPTION_METHOD_NONE;
-		break;
+		case ENCRYPTION_LEVEL_NONE:
+			/* The only valid method is NONE in this case */
+			settings->EncryptionMethods = ENCRYPTION_METHOD_NONE;
+			break;
 
-	case ENCRYPTION_LEVEL_FIPS:
+		case ENCRYPTION_LEVEL_FIPS:
 
-		/* The only valid method is FIPS in this case */
-		if (!(settings->EncryptionMethods & ENCRYPTION_METHOD_FIPS))
-		{
-			WLog_WARN(TAG, "client does not support FIPS as required by server configuration");
-		}
+			/* The only valid method is FIPS in this case */
+			if (!(settings->EncryptionMethods & ENCRYPTION_METHOD_FIPS))
+			{
+				WLog_WARN(TAG, "client does not support FIPS as required by server configuration");
+			}
 
-		settings->EncryptionMethods = ENCRYPTION_METHOD_FIPS;
-		break;
-
-	case ENCRYPTION_LEVEL_HIGH:
-
-		/* Maximum key strength supported by the server must be used (128 bit)*/
-		if (!(settings->EncryptionMethods & ENCRYPTION_METHOD_128BIT))
-		{
-			WLog_WARN(TAG, "client does not support 128 bit encryption method as required by "
-			               "server configuration");
-		}
-
-		settings->EncryptionMethods = ENCRYPTION_METHOD_128BIT;
-		break;
-
-	case ENCRYPTION_LEVEL_LOW:
-	case ENCRYPTION_LEVEL_CLIENT_COMPATIBLE:
-
-		/* Maximum key strength supported by the client must be used */
-		if (settings->EncryptionMethods & ENCRYPTION_METHOD_128BIT)
-			settings->EncryptionMethods = ENCRYPTION_METHOD_128BIT;
-		else if (settings->EncryptionMethods & ENCRYPTION_METHOD_56BIT)
-			settings->EncryptionMethods = ENCRYPTION_METHOD_56BIT;
-		else if (settings->EncryptionMethods & ENCRYPTION_METHOD_40BIT)
-			settings->EncryptionMethods = ENCRYPTION_METHOD_40BIT;
-		else if (settings->EncryptionMethods & ENCRYPTION_METHOD_FIPS)
 			settings->EncryptionMethods = ENCRYPTION_METHOD_FIPS;
-		else
-		{
-			WLog_WARN(TAG, "client has not announced any supported encryption methods");
+			break;
+
+		case ENCRYPTION_LEVEL_HIGH:
+
+			/* Maximum key strength supported by the server must be used (128 bit)*/
+			if (!(settings->EncryptionMethods & ENCRYPTION_METHOD_128BIT))
+			{
+				WLog_WARN(TAG, "client does not support 128 bit encryption method as required by "
+				               "server configuration");
+			}
+
 			settings->EncryptionMethods = ENCRYPTION_METHOD_128BIT;
-		}
+			break;
 
-		break;
+		case ENCRYPTION_LEVEL_LOW:
+		case ENCRYPTION_LEVEL_CLIENT_COMPATIBLE:
 
-	default:
-		WLog_ERR(TAG, "internal error: unknown encryption level");
-		return FALSE;
+			/* Maximum key strength supported by the client must be used */
+			if (settings->EncryptionMethods & ENCRYPTION_METHOD_128BIT)
+				settings->EncryptionMethods = ENCRYPTION_METHOD_128BIT;
+			else if (settings->EncryptionMethods & ENCRYPTION_METHOD_56BIT)
+				settings->EncryptionMethods = ENCRYPTION_METHOD_56BIT;
+			else if (settings->EncryptionMethods & ENCRYPTION_METHOD_40BIT)
+				settings->EncryptionMethods = ENCRYPTION_METHOD_40BIT;
+			else if (settings->EncryptionMethods & ENCRYPTION_METHOD_FIPS)
+				settings->EncryptionMethods = ENCRYPTION_METHOD_FIPS;
+			else
+			{
+				WLog_WARN(TAG, "client has not announced any supported encryption methods");
+				settings->EncryptionMethods = ENCRYPTION_METHOD_128BIT;
+			}
+
+			break;
+
+		default:
+			WLog_ERR(TAG, "internal error: unknown encryption level");
+			return FALSE;
 	}
 
 	/* log selected encryption method */
 	switch (settings->EncryptionMethods)
 	{
-	case ENCRYPTION_METHOD_NONE:
-		WLog_INFO(TAG, "Selected rdp encryption method: NONE");
-		break;
+		case ENCRYPTION_METHOD_NONE:
+			WLog_INFO(TAG, "Selected rdp encryption method: NONE");
+			break;
 
-	case ENCRYPTION_METHOD_40BIT:
-		WLog_INFO(TAG, "Selected rdp encryption method: 40BIT");
-		break;
+		case ENCRYPTION_METHOD_40BIT:
+			WLog_INFO(TAG, "Selected rdp encryption method: 40BIT");
+			break;
 
-	case ENCRYPTION_METHOD_56BIT:
-		WLog_INFO(TAG, "Selected rdp encryption method: 56BIT");
-		break;
+		case ENCRYPTION_METHOD_56BIT:
+			WLog_INFO(TAG, "Selected rdp encryption method: 56BIT");
+			break;
 
-	case ENCRYPTION_METHOD_128BIT:
-		WLog_INFO(TAG, "Selected rdp encryption method: 128BIT");
-		break;
+		case ENCRYPTION_METHOD_128BIT:
+			WLog_INFO(TAG, "Selected rdp encryption method: 128BIT");
+			break;
 
-	case ENCRYPTION_METHOD_FIPS:
-		WLog_INFO(TAG, "Selected rdp encryption method: FIPS");
-		break;
+		case ENCRYPTION_METHOD_FIPS:
+			WLog_INFO(TAG, "Selected rdp encryption method: FIPS");
+			break;
 
-	default:
-		WLog_ERR(TAG, "internal error: unknown encryption method");
-		return FALSE;
+		default:
+			WLog_ERR(TAG, "internal error: unknown encryption method");
+			return FALSE;
 	}
 
 	headerLen = 12;

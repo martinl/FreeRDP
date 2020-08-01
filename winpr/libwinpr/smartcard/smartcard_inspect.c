@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -1017,9 +1017,9 @@ SCardApiFunctionTable Inspect_SCardApiFunctionTable = {
 };
 
 #ifndef _WIN32
-#	define SMARTCARD_INSPECT_FILEPATH "/tmp"
+#define SMARTCARD_INSPECT_FILEPATH "/tmp"
 #else
-#	define SMARTCARD_INSPECT_FILEPATH "C:\\Windows\\Temp"
+#define SMARTCARD_INSPECT_FILEPATH "C:\\Windows\\Temp"
 #endif
 
 void Inspect_InitLog()

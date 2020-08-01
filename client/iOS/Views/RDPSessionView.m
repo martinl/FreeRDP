@@ -12,16 +12,19 @@
 
 @implementation RDPSessionView
 
-- (void)setSession:(RDPSession *)session {
+- (void)setSession:(RDPSession *)session
+{
 	_session = session;
 }
 
-- (void)awakeFromNib {
+- (void)awakeFromNib
+{
 	[super awakeFromNib];
 	_session = nil;
 }
 
-- (void)drawRect:(CGRect)rect {
+- (void)drawRect:(CGRect)rect
+{
 	if (_session != nil && [_session bitmapContext])
 	{
 		CGContextRef context = UIGraphicsGetCurrentContext();
@@ -47,7 +50,8 @@
 	}
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[super dealloc];
 }
 

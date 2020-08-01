@@ -54,15 +54,15 @@ struct _wClipboardDelegate
 	char* basePath;
 
 	UINT (*ClientRequestFileSize)(wClipboardDelegate*, const wClipboardFileSizeRequest*);
-	UINT (*ClipboardFileSizeSuccess)
+	UINT(*ClipboardFileSizeSuccess)
 	(wClipboardDelegate*, const wClipboardFileSizeRequest*, UINT64 fileSize);
-	UINT (*ClipboardFileSizeFailure)
+	UINT(*ClipboardFileSizeFailure)
 	(wClipboardDelegate*, const wClipboardFileSizeRequest*, UINT errorCode);
 
 	UINT (*ClientRequestFileRange)(wClipboardDelegate*, const wClipboardFileRangeRequest*);
-	UINT (*ClipboardFileRangeSuccess)
+	UINT(*ClipboardFileRangeSuccess)
 	(wClipboardDelegate*, const wClipboardFileRangeRequest*, const BYTE* data, UINT32 size);
-	UINT (*ClipboardFileRangeFailure)
+	UINT(*ClipboardFileRangeFailure)
 	(wClipboardDelegate*, const wClipboardFileRangeRequest*, UINT errorCode);
 };
 

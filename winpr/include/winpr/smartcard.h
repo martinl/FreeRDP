@@ -27,80 +27,80 @@
 #include <winpr/error.h>
 
 #ifndef _WINSCARD_H_
-#	define _WINSCARD_H_ /* do not include winscard.h */
+#define _WINSCARD_H_ /* do not include winscard.h */
 #endif
 
 #ifndef SCARD_S_SUCCESS
 
-#	define SCARD_S_SUCCESS NO_ERROR
+#define SCARD_S_SUCCESS NO_ERROR
 
-#	define SCARD_F_INTERNAL_ERROR (HRESULT)(0x80100001L)
-#	define SCARD_E_CANCELLED (HRESULT)(0x80100002L)
-#	define SCARD_E_INVALID_HANDLE (HRESULT)(0x80100003L)
-#	define SCARD_E_INVALID_PARAMETER (HRESULT)(0x80100004L)
-#	define SCARD_E_INVALID_TARGET (HRESULT)(0x80100005L)
-#	define SCARD_E_NO_MEMORY (HRESULT)(0x80100006L)
-#	define SCARD_F_WAITED_TOO_LONG (HRESULT)(0x80100007L)
-#	define SCARD_E_INSUFFICIENT_BUFFER (HRESULT)(0x80100008L)
-#	define SCARD_E_UNKNOWN_READER (HRESULT)(0x80100009L)
-#	define SCARD_E_TIMEOUT (HRESULT)(0x8010000AL)
-#	define SCARD_E_SHARING_VIOLATION (HRESULT)(0x8010000BL)
-#	define SCARD_E_NO_SMARTCARD (HRESULT)(0x8010000CL)
-#	define SCARD_E_UNKNOWN_CARD (HRESULT)(0x8010000DL)
-#	define SCARD_E_CANT_DISPOSE (HRESULT)(0x8010000EL)
-#	define SCARD_E_PROTO_MISMATCH (HRESULT)(0x8010000FL)
-#	define SCARD_E_NOT_READY (HRESULT)(0x80100010L)
-#	define SCARD_E_INVALID_VALUE (HRESULT)(0x80100011L)
-#	define SCARD_E_SYSTEM_CANCELLED (HRESULT)(0x80100012L)
-#	define SCARD_F_COMM_ERROR (HRESULT)(0x80100013L)
-#	define SCARD_F_UNKNOWN_ERROR (HRESULT)(0x80100014L)
-#	define SCARD_E_INVALID_ATR (HRESULT)(0x80100015L)
-#	define SCARD_E_NOT_TRANSACTED (HRESULT)(0x80100016L)
-#	define SCARD_E_READER_UNAVAILABLE (HRESULT)(0x80100017L)
-#	define SCARD_P_SHUTDOWN (HRESULT)(0x80100018L)
-#	define SCARD_E_PCI_TOO_SMALL (HRESULT)(0x80100019L)
-#	define SCARD_E_READER_UNSUPPORTED (HRESULT)(0x8010001AL)
-#	define SCARD_E_DUPLICATE_READER (HRESULT)(0x8010001BL)
-#	define SCARD_E_CARD_UNSUPPORTED (HRESULT)(0x8010001CL)
-#	define SCARD_E_NO_SERVICE (HRESULT)(0x8010001DL)
-#	define SCARD_E_SERVICE_STOPPED (HRESULT)(0x8010001EL)
-#	define SCARD_E_UNEXPECTED (HRESULT)(0x8010001FL)
-#	define SCARD_E_ICC_INSTALLATION (HRESULT)(0x80100020L)
-#	define SCARD_E_ICC_CREATEORDER (HRESULT)(0x80100021L)
-#	define SCARD_E_UNSUPPORTED_FEATURE (HRESULT)(0x80100022L)
-#	define SCARD_E_DIR_NOT_FOUND (HRESULT)(0x80100023L)
-#	define SCARD_E_FILE_NOT_FOUND (HRESULT)(0x80100024L)
-#	define SCARD_E_NO_DIR (HRESULT)(0x80100025L)
-#	define SCARD_E_NO_FILE (HRESULT)(0x80100026L)
-#	define SCARD_E_NO_ACCESS (HRESULT)(0x80100027L)
-#	define SCARD_E_WRITE_TOO_MANY (HRESULT)(0x80100028L)
-#	define SCARD_E_BAD_SEEK (HRESULT)(0x80100029L)
-#	define SCARD_E_INVALID_CHV (HRESULT)(0x8010002AL)
-#	define SCARD_E_UNKNOWN_RES_MNG (HRESULT)(0x8010002BL)
-#	define SCARD_E_NO_SUCH_CERTIFICATE (HRESULT)(0x8010002CL)
-#	define SCARD_E_CERTIFICATE_UNAVAILABLE (HRESULT)(0x8010002DL)
-#	define SCARD_E_NO_READERS_AVAILABLE (HRESULT)(0x8010002EL)
-#	define SCARD_E_COMM_DATA_LOST (HRESULT)(0x8010002FL)
-#	define SCARD_E_NO_KEY_CONTAINER (HRESULT)(0x80100030L)
-#	define SCARD_E_SERVER_TOO_BUSY (HRESULT)(0x80100031L)
-#	define SCARD_E_PIN_CACHE_EXPIRED (HRESULT)(0x80100032L)
-#	define SCARD_E_NO_PIN_CACHE (HRESULT)(0x80100033L)
-#	define SCARD_E_READ_ONLY_CARD (HRESULT)(0x80100034L)
+#define SCARD_F_INTERNAL_ERROR (HRESULT)(0x80100001L)
+#define SCARD_E_CANCELLED (HRESULT)(0x80100002L)
+#define SCARD_E_INVALID_HANDLE (HRESULT)(0x80100003L)
+#define SCARD_E_INVALID_PARAMETER (HRESULT)(0x80100004L)
+#define SCARD_E_INVALID_TARGET (HRESULT)(0x80100005L)
+#define SCARD_E_NO_MEMORY (HRESULT)(0x80100006L)
+#define SCARD_F_WAITED_TOO_LONG (HRESULT)(0x80100007L)
+#define SCARD_E_INSUFFICIENT_BUFFER (HRESULT)(0x80100008L)
+#define SCARD_E_UNKNOWN_READER (HRESULT)(0x80100009L)
+#define SCARD_E_TIMEOUT (HRESULT)(0x8010000AL)
+#define SCARD_E_SHARING_VIOLATION (HRESULT)(0x8010000BL)
+#define SCARD_E_NO_SMARTCARD (HRESULT)(0x8010000CL)
+#define SCARD_E_UNKNOWN_CARD (HRESULT)(0x8010000DL)
+#define SCARD_E_CANT_DISPOSE (HRESULT)(0x8010000EL)
+#define SCARD_E_PROTO_MISMATCH (HRESULT)(0x8010000FL)
+#define SCARD_E_NOT_READY (HRESULT)(0x80100010L)
+#define SCARD_E_INVALID_VALUE (HRESULT)(0x80100011L)
+#define SCARD_E_SYSTEM_CANCELLED (HRESULT)(0x80100012L)
+#define SCARD_F_COMM_ERROR (HRESULT)(0x80100013L)
+#define SCARD_F_UNKNOWN_ERROR (HRESULT)(0x80100014L)
+#define SCARD_E_INVALID_ATR (HRESULT)(0x80100015L)
+#define SCARD_E_NOT_TRANSACTED (HRESULT)(0x80100016L)
+#define SCARD_E_READER_UNAVAILABLE (HRESULT)(0x80100017L)
+#define SCARD_P_SHUTDOWN (HRESULT)(0x80100018L)
+#define SCARD_E_PCI_TOO_SMALL (HRESULT)(0x80100019L)
+#define SCARD_E_READER_UNSUPPORTED (HRESULT)(0x8010001AL)
+#define SCARD_E_DUPLICATE_READER (HRESULT)(0x8010001BL)
+#define SCARD_E_CARD_UNSUPPORTED (HRESULT)(0x8010001CL)
+#define SCARD_E_NO_SERVICE (HRESULT)(0x8010001DL)
+#define SCARD_E_SERVICE_STOPPED (HRESULT)(0x8010001EL)
+#define SCARD_E_UNEXPECTED (HRESULT)(0x8010001FL)
+#define SCARD_E_ICC_INSTALLATION (HRESULT)(0x80100020L)
+#define SCARD_E_ICC_CREATEORDER (HRESULT)(0x80100021L)
+#define SCARD_E_UNSUPPORTED_FEATURE (HRESULT)(0x80100022L)
+#define SCARD_E_DIR_NOT_FOUND (HRESULT)(0x80100023L)
+#define SCARD_E_FILE_NOT_FOUND (HRESULT)(0x80100024L)
+#define SCARD_E_NO_DIR (HRESULT)(0x80100025L)
+#define SCARD_E_NO_FILE (HRESULT)(0x80100026L)
+#define SCARD_E_NO_ACCESS (HRESULT)(0x80100027L)
+#define SCARD_E_WRITE_TOO_MANY (HRESULT)(0x80100028L)
+#define SCARD_E_BAD_SEEK (HRESULT)(0x80100029L)
+#define SCARD_E_INVALID_CHV (HRESULT)(0x8010002AL)
+#define SCARD_E_UNKNOWN_RES_MNG (HRESULT)(0x8010002BL)
+#define SCARD_E_NO_SUCH_CERTIFICATE (HRESULT)(0x8010002CL)
+#define SCARD_E_CERTIFICATE_UNAVAILABLE (HRESULT)(0x8010002DL)
+#define SCARD_E_NO_READERS_AVAILABLE (HRESULT)(0x8010002EL)
+#define SCARD_E_COMM_DATA_LOST (HRESULT)(0x8010002FL)
+#define SCARD_E_NO_KEY_CONTAINER (HRESULT)(0x80100030L)
+#define SCARD_E_SERVER_TOO_BUSY (HRESULT)(0x80100031L)
+#define SCARD_E_PIN_CACHE_EXPIRED (HRESULT)(0x80100032L)
+#define SCARD_E_NO_PIN_CACHE (HRESULT)(0x80100033L)
+#define SCARD_E_READ_ONLY_CARD (HRESULT)(0x80100034L)
 
-#	define SCARD_W_UNSUPPORTED_CARD (HRESULT)(0x80100065L)
-#	define SCARD_W_UNRESPONSIVE_CARD (HRESULT)(0x80100066L)
-#	define SCARD_W_UNPOWERED_CARD (HRESULT)(0x80100067L)
-#	define SCARD_W_RESET_CARD (HRESULT)(0x80100068L)
-#	define SCARD_W_REMOVED_CARD (HRESULT)(0x80100069L)
-#	define SCARD_W_SECURITY_VIOLATION (HRESULT)(0x8010006AL)
-#	define SCARD_W_WRONG_CHV (HRESULT)(0x8010006BL)
-#	define SCARD_W_CHV_BLOCKED (HRESULT)(0x8010006CL)
-#	define SCARD_W_EOF (HRESULT)(0x8010006DL)
-#	define SCARD_W_CANCELLED_BY_USER (HRESULT)(0x8010006EL)
-#	define SCARD_W_CARD_NOT_AUTHENTICATED (HRESULT)(0x8010006FL)
-#	define SCARD_W_CACHE_ITEM_NOT_FOUND (HRESULT)(0x80100070L)
-#	define SCARD_W_CACHE_ITEM_STALE (HRESULT)(0x80100071L)
-#	define SCARD_W_CACHE_ITEM_TOO_BIG (HRESULT)(0x80100072L)
+#define SCARD_W_UNSUPPORTED_CARD (HRESULT)(0x80100065L)
+#define SCARD_W_UNRESPONSIVE_CARD (HRESULT)(0x80100066L)
+#define SCARD_W_UNPOWERED_CARD (HRESULT)(0x80100067L)
+#define SCARD_W_RESET_CARD (HRESULT)(0x80100068L)
+#define SCARD_W_REMOVED_CARD (HRESULT)(0x80100069L)
+#define SCARD_W_SECURITY_VIOLATION (HRESULT)(0x8010006AL)
+#define SCARD_W_WRONG_CHV (HRESULT)(0x8010006BL)
+#define SCARD_W_CHV_BLOCKED (HRESULT)(0x8010006CL)
+#define SCARD_W_EOF (HRESULT)(0x8010006DL)
+#define SCARD_W_CANCELLED_BY_USER (HRESULT)(0x8010006EL)
+#define SCARD_W_CARD_NOT_AUTHENTICATED (HRESULT)(0x8010006FL)
+#define SCARD_W_CACHE_ITEM_NOT_FOUND (HRESULT)(0x80100070L)
+#define SCARD_W_CACHE_ITEM_STALE (HRESULT)(0x80100071L)
+#define SCARD_W_CACHE_ITEM_TOO_BIG (HRESULT)(0x80100072L)
 
 #endif
 
@@ -208,11 +208,11 @@
 #define SCARD_PERF_TRANSMISSION_TIME SCARD_ATTR_VALUE(SCARD_CLASS_PERF, 0x0003)
 
 #ifdef UNICODE
-#	define SCARD_ATTR_DEVICE_FRIENDLY_NAME SCARD_ATTR_DEVICE_FRIENDLY_NAME_W
-#	define SCARD_ATTR_DEVICE_SYSTEM_NAME SCARD_ATTR_DEVICE_SYSTEM_NAME_W
+#define SCARD_ATTR_DEVICE_FRIENDLY_NAME SCARD_ATTR_DEVICE_FRIENDLY_NAME_W
+#define SCARD_ATTR_DEVICE_SYSTEM_NAME SCARD_ATTR_DEVICE_SYSTEM_NAME_W
 #else
-#	define SCARD_ATTR_DEVICE_FRIENDLY_NAME SCARD_ATTR_DEVICE_FRIENDLY_NAME_A
-#	define SCARD_ATTR_DEVICE_SYSTEM_NAME SCARD_ATTR_DEVICE_SYSTEM_NAME_A
+#define SCARD_ATTR_DEVICE_FRIENDLY_NAME SCARD_ATTR_DEVICE_FRIENDLY_NAME_A
+#define SCARD_ATTR_DEVICE_SYSTEM_NAME SCARD_ATTR_DEVICE_SYSTEM_NAME_A
 #endif
 
 #define SCARD_T0_HEADER_LENGTH 7
@@ -248,7 +248,8 @@ typedef struct
 {
 	SCARD_IO_REQUEST ioRequest;
 	BYTE bSw1, bSw2;
-	union {
+	union
+	{
 		SCARD_T0_COMMAND CmdBytes;
 		BYTE rgbHeader[5];
 	} DUMMYUNIONNAME;
@@ -279,7 +280,7 @@ typedef SCARD_T1_REQUEST *PSCARD_T1_REQUEST, *LPSCARD_T1_REQUEST;
 #define SCARD_READER_TYPE_VENDOR 0xF0
 
 #ifndef WINSCARDAPI
-#	define WINSCARDAPI WINPR_API
+#define WINSCARDAPI WINPR_API
 #endif
 
 typedef ULONG_PTR SCARDCONTEXT;
@@ -470,7 +471,8 @@ typedef struct
 	DWORD dwShareMode;
 	DWORD dwPreferredProtocols;
 	READER_SEL_REQUEST_MATCH_TYPE MatchType;
-	union {
+	union
+	{
 		struct
 		{
 			DWORD cbReaderNameOffset;
@@ -554,33 +556,33 @@ typedef struct
 #pragma pack(pop)
 
 #ifdef UNICODE
-#	define LPOCNCONNPROC LPOCNCONNPROCW
-#	define SCARD_READERSTATE SCARD_READERSTATEW
-#	define PSCARD_READERSTATE PSCARD_READERSTATEW
-#	define LPSCARD_READERSTATE LPSCARD_READERSTATEW
-#	define OPENCARD_SEARCH_CRITERIA OPENCARD_SEARCH_CRITERIAW
-#	define LOPENCARD_SEARCH_CRITERIA LOPENCARD_SEARCH_CRITERIAW
-#	define LPOPENCARD_SEARCH_CRITERIA LPOPENCARD_SEARCH_CRITERIAW
-#	define OPENCARDNAME_EX OPENCARDNAME_EXW
-#	define LOPENCARDNAME_EX LOPENCARDNAME_EXW
-#	define LPOPENCARDNAME_EX LPOPENCARDNAME_EXW
-#	define OPENCARDNAME OPENCARDNAMEW
-#	define LOPENCARDNAME LOPENCARDNAMEW
-#	define LPOPENCARDNAME LPOPENCARDNAMEW
+#define LPOCNCONNPROC LPOCNCONNPROCW
+#define SCARD_READERSTATE SCARD_READERSTATEW
+#define PSCARD_READERSTATE PSCARD_READERSTATEW
+#define LPSCARD_READERSTATE LPSCARD_READERSTATEW
+#define OPENCARD_SEARCH_CRITERIA OPENCARD_SEARCH_CRITERIAW
+#define LOPENCARD_SEARCH_CRITERIA LOPENCARD_SEARCH_CRITERIAW
+#define LPOPENCARD_SEARCH_CRITERIA LPOPENCARD_SEARCH_CRITERIAW
+#define OPENCARDNAME_EX OPENCARDNAME_EXW
+#define LOPENCARDNAME_EX LOPENCARDNAME_EXW
+#define LPOPENCARDNAME_EX LPOPENCARDNAME_EXW
+#define OPENCARDNAME OPENCARDNAMEW
+#define LOPENCARDNAME LOPENCARDNAMEW
+#define LPOPENCARDNAME LPOPENCARDNAMEW
 #else
-#	define LPOCNCONNPROC LPOCNCONNPROCA
-#	define SCARD_READERSTATE SCARD_READERSTATEA
-#	define PSCARD_READERSTATE PSCARD_READERSTATEA
-#	define LPSCARD_READERSTATE LPSCARD_READERSTATEA
-#	define OPENCARD_SEARCH_CRITERIA OPENCARD_SEARCH_CRITERIAA
-#	define LOPENCARD_SEARCH_CRITERIA LOPENCARD_SEARCH_CRITERIAA
-#	define LPOPENCARD_SEARCH_CRITERIA LPOPENCARD_SEARCH_CRITERIAA
-#	define OPENCARDNAME_EX OPENCARDNAME_EXA
-#	define LOPENCARDNAME_EX LOPENCARDNAME_EXA
-#	define LPOPENCARDNAME_EX LPOPENCARDNAME_EXA
-#	define OPENCARDNAME OPENCARDNAMEA
-#	define LOPENCARDNAME LOPENCARDNAMEA
-#	define LPOPENCARDNAME LPOPENCARDNAMEA
+#define LPOCNCONNPROC LPOCNCONNPROCA
+#define SCARD_READERSTATE SCARD_READERSTATEA
+#define PSCARD_READERSTATE PSCARD_READERSTATEA
+#define LPSCARD_READERSTATE LPSCARD_READERSTATEA
+#define OPENCARD_SEARCH_CRITERIA OPENCARD_SEARCH_CRITERIAA
+#define LOPENCARD_SEARCH_CRITERIA LOPENCARD_SEARCH_CRITERIAA
+#define LPOPENCARD_SEARCH_CRITERIA LPOPENCARD_SEARCH_CRITERIAA
+#define OPENCARDNAME_EX OPENCARDNAME_EXA
+#define LOPENCARDNAME_EX LOPENCARDNAME_EXA
+#define LPOPENCARDNAME_EX LPOPENCARDNAME_EXA
+#define OPENCARDNAME OPENCARDNAMEA
+#define LOPENCARDNAME LOPENCARDNAMEA
+#define LPOPENCARDNAME LPOPENCARDNAMEA
 #endif
 
 #ifdef __cplusplus
@@ -809,63 +811,63 @@ extern "C"
 	WINSCARDAPI LONG WINAPI SCardAudit(SCARDCONTEXT hContext, DWORD dwEvent);
 
 #ifdef UNICODE
-#	define SCardListReaderGroups SCardListReaderGroupsW
-#	define SCardListReaders SCardListReadersW
-#	define SCardListCards SCardListCardsW
-#	define SCardListInterfaces SCardListInterfacesW
-#	define SCardGetProviderId SCardGetProviderIdW
-#	define SCardGetCardTypeProviderName SCardGetCardTypeProviderNameW
-#	define SCardIntroduceReaderGroup SCardIntroduceReaderGroupW
-#	define SCardForgetReaderGroup SCardForgetReaderGroupW
-#	define SCardIntroduceReader SCardIntroduceReaderW
-#	define SCardForgetReader SCardForgetReaderW
-#	define SCardAddReaderToGroup SCardAddReaderToGroupW
-#	define SCardRemoveReaderFromGroup SCardRemoveReaderFromGroupW
-#	define SCardIntroduceCardType SCardIntroduceCardTypeW
-#	define SCardSetCardTypeProviderName SCardSetCardTypeProviderNameW
-#	define SCardForgetCardType SCardForgetCardTypeW
-#	define SCardLocateCards SCardLocateCardsW
-#	define SCardLocateCardsByATR SCardLocateCardsByATRW
-#	define SCardGetStatusChange SCardGetStatusChangeW
-#	define SCardConnect SCardConnectW
-#	define SCardStatus SCardStatusW
-#	define SCardUIDlgSelectCard SCardUIDlgSelectCardW
-#	define GetOpenCardName GetOpenCardNameW
-#	define SCardReadCache SCardReadCacheW
-#	define SCardWriteCache SCardWriteCacheW
-#	define SCardGetReaderIcon SCardGetReaderIconW
-#	define SCardGetDeviceTypeId SCardGetDeviceTypeIdW
-#	define SCardGetReaderDeviceInstanceId SCardGetReaderDeviceInstanceIdW
-#	define SCardListReadersWithDeviceInstanceId SCardListReadersWithDeviceInstanceIdW
+#define SCardListReaderGroups SCardListReaderGroupsW
+#define SCardListReaders SCardListReadersW
+#define SCardListCards SCardListCardsW
+#define SCardListInterfaces SCardListInterfacesW
+#define SCardGetProviderId SCardGetProviderIdW
+#define SCardGetCardTypeProviderName SCardGetCardTypeProviderNameW
+#define SCardIntroduceReaderGroup SCardIntroduceReaderGroupW
+#define SCardForgetReaderGroup SCardForgetReaderGroupW
+#define SCardIntroduceReader SCardIntroduceReaderW
+#define SCardForgetReader SCardForgetReaderW
+#define SCardAddReaderToGroup SCardAddReaderToGroupW
+#define SCardRemoveReaderFromGroup SCardRemoveReaderFromGroupW
+#define SCardIntroduceCardType SCardIntroduceCardTypeW
+#define SCardSetCardTypeProviderName SCardSetCardTypeProviderNameW
+#define SCardForgetCardType SCardForgetCardTypeW
+#define SCardLocateCards SCardLocateCardsW
+#define SCardLocateCardsByATR SCardLocateCardsByATRW
+#define SCardGetStatusChange SCardGetStatusChangeW
+#define SCardConnect SCardConnectW
+#define SCardStatus SCardStatusW
+#define SCardUIDlgSelectCard SCardUIDlgSelectCardW
+#define GetOpenCardName GetOpenCardNameW
+#define SCardReadCache SCardReadCacheW
+#define SCardWriteCache SCardWriteCacheW
+#define SCardGetReaderIcon SCardGetReaderIconW
+#define SCardGetDeviceTypeId SCardGetDeviceTypeIdW
+#define SCardGetReaderDeviceInstanceId SCardGetReaderDeviceInstanceIdW
+#define SCardListReadersWithDeviceInstanceId SCardListReadersWithDeviceInstanceIdW
 #else
-#	define SCardListReaderGroups SCardListReaderGroupsA
-#	define SCardListReaders SCardListReadersA
-#	define SCardListCards SCardListCardsA
-#	define SCardListInterfaces SCardListInterfacesA
-#	define SCardGetProviderId SCardGetProviderIdA
-#	define SCardGetCardTypeProviderName SCardGetCardTypeProviderNameA
-#	define SCardIntroduceReaderGroup SCardIntroduceReaderGroupA
-#	define SCardForgetReaderGroup SCardForgetReaderGroupA
-#	define SCardIntroduceReader SCardIntroduceReaderA
-#	define SCardForgetReader SCardForgetReaderA
-#	define SCardAddReaderToGroup SCardAddReaderToGroupA
-#	define SCardRemoveReaderFromGroup SCardRemoveReaderFromGroupA
-#	define SCardIntroduceCardType SCardIntroduceCardTypeA
-#	define SCardSetCardTypeProviderName SCardSetCardTypeProviderNameA
-#	define SCardForgetCardType SCardForgetCardTypeA
-#	define SCardLocateCards SCardLocateCardsA
-#	define SCardLocateCardsByATR SCardLocateCardsByATRA
-#	define SCardGetStatusChange SCardGetStatusChangeA
-#	define SCardConnect SCardConnectA
-#	define SCardStatus SCardStatusA
-#	define SCardUIDlgSelectCard SCardUIDlgSelectCardA
-#	define GetOpenCardName GetOpenCardNameA
-#	define SCardReadCache SCardReadCacheA
-#	define SCardWriteCache SCardWriteCacheA
-#	define SCardGetReaderIcon SCardGetReaderIconA
-#	define SCardGetDeviceTypeId SCardGetDeviceTypeIdA
-#	define SCardGetReaderDeviceInstanceId SCardGetReaderDeviceInstanceIdA
-#	define SCardListReadersWithDeviceInstanceId SCardListReadersWithDeviceInstanceIdA
+#define SCardListReaderGroups SCardListReaderGroupsA
+#define SCardListReaders SCardListReadersA
+#define SCardListCards SCardListCardsA
+#define SCardListInterfaces SCardListInterfacesA
+#define SCardGetProviderId SCardGetProviderIdA
+#define SCardGetCardTypeProviderName SCardGetCardTypeProviderNameA
+#define SCardIntroduceReaderGroup SCardIntroduceReaderGroupA
+#define SCardForgetReaderGroup SCardForgetReaderGroupA
+#define SCardIntroduceReader SCardIntroduceReaderA
+#define SCardForgetReader SCardForgetReaderA
+#define SCardAddReaderToGroup SCardAddReaderToGroupA
+#define SCardRemoveReaderFromGroup SCardRemoveReaderFromGroupA
+#define SCardIntroduceCardType SCardIntroduceCardTypeA
+#define SCardSetCardTypeProviderName SCardSetCardTypeProviderNameA
+#define SCardForgetCardType SCardForgetCardTypeA
+#define SCardLocateCards SCardLocateCardsA
+#define SCardLocateCardsByATR SCardLocateCardsByATRA
+#define SCardGetStatusChange SCardGetStatusChangeA
+#define SCardConnect SCardConnectA
+#define SCardStatus SCardStatusA
+#define SCardUIDlgSelectCard SCardUIDlgSelectCardA
+#define GetOpenCardName GetOpenCardNameA
+#define SCardReadCache SCardReadCacheA
+#define SCardWriteCache SCardWriteCacheA
+#define SCardGetReaderIcon SCardGetReaderIconA
+#define SCardGetDeviceTypeId SCardGetDeviceTypeIdA
+#define SCardGetReaderDeviceInstanceId SCardGetReaderDeviceInstanceIdA
+#define SCardListReadersWithDeviceInstanceId SCardListReadersWithDeviceInstanceIdA
 #endif
 
 #ifdef __cplusplus

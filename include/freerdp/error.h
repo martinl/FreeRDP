@@ -174,8 +174,9 @@ extern "C"
 #define POSTCONNECTERROR ERRORSTART + 3
 #define DNSERROR ERRORSTART + 4        /* general DNS ERROR */
 #define DNSNAMENOTFOUND ERRORSTART + 5 /* EAI_NONAME */
-#define CONNECTERROR ERRORSTART + 6 /* a connect error if errno is not define during tcp connect \
-	                                 */
+#define CONNECTERROR                                                            \
+	ERRORSTART + 6 /* a connect error if errno is not define during tcp connect \
+	                */
 #define MCSCONNECTINITIALERROR ERRORSTART + 7
 #define TLSCONNECTERROR ERRORSTART + 8
 #define AUTHENTICATIONERROR ERRORSTART + 9

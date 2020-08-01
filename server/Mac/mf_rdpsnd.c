@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/server/rdpsnd.h>
@@ -77,17 +77,17 @@ static void mf_peer_rdpsnd_activated(RdpsndServerContext* context)
 
 	switch (agreedFormat->wFormatTag)
 	{
-	case WAVE_FORMAT_ALAW:
-		recorderState.dataFormat.mFormatID = kAudioFormatDVIIntelIMA;
-		break;
+		case WAVE_FORMAT_ALAW:
+			recorderState.dataFormat.mFormatID = kAudioFormatDVIIntelIMA;
+			break;
 
-	case WAVE_FORMAT_PCM:
-		recorderState.dataFormat.mFormatID = kAudioFormatLinearPCM;
-		break;
+		case WAVE_FORMAT_PCM:
+			recorderState.dataFormat.mFormatID = kAudioFormatLinearPCM;
+			break;
 
-	default:
-		recorderState.dataFormat.mFormatID = kAudioFormatLinearPCM;
-		break;
+		default:
+			recorderState.dataFormat.mFormatID = kAudioFormatLinearPCM;
+			break;
 	}
 
 	recorderState.dataFormat.mSampleRate = agreedFormat->nSamplesPerSec;

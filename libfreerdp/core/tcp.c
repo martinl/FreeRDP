@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <time.h>
@@ -32,50 +32,50 @@
 
 #if !defined(_WIN32)
 
-#	include <netdb.h>
-#	include <unistd.h>
-#	include <sys/ioctl.h>
-#	include <sys/socket.h>
-#	include <netinet/in.h>
-#	include <netinet/tcp.h>
-#	include <net/if.h>
-#	include <sys/types.h>
-#	include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <net/if.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
 
-#	ifdef HAVE_POLL_H
-#		include <poll.h>
-#	else
-#		include <time.h>
-#		include <sys/select.h>
-#	endif
+#ifdef HAVE_POLL_H
+#include <poll.h>
+#else
+#include <time.h>
+#include <sys/select.h>
+#endif
 
-#	ifdef HAVE_SYS_FILIO_H
-#		include <sys/filio.h>
-#	endif
+#ifdef HAVE_SYS_FILIO_H
+#include <sys/filio.h>
+#endif
 
-#	if defined(__FreeBSD__) || defined(__OpenBSD__)
-#		ifndef SOL_TCP
-#			define SOL_TCP IPPROTO_TCP
-#		endif
-#	endif
+#if defined(__FreeBSD__) || defined(__OpenBSD__)
+#ifndef SOL_TCP
+#define SOL_TCP IPPROTO_TCP
+#endif
+#endif
 
-#	ifdef __APPLE__
-#		ifndef SOL_TCP
-#			define SOL_TCP IPPROTO_TCP
-#		endif
-#		ifndef TCP_KEEPIDLE
-#			define TCP_KEEPIDLE TCP_KEEPALIVE
-#		endif
-#	endif
+#ifdef __APPLE__
+#ifndef SOL_TCP
+#define SOL_TCP IPPROTO_TCP
+#endif
+#ifndef TCP_KEEPIDLE
+#define TCP_KEEPIDLE TCP_KEEPALIVE
+#endif
+#endif
 
 #else
 
-#	include <winpr/windows.h>
+#include <winpr/windows.h>
 
-#	include <winpr/crt.h>
+#include <winpr/crt.h>
 
-#	define SHUT_RDWR SD_BOTH
-#	define close(_fd) closesocket(_fd)
+#define SHUT_RDWR SD_BOTH
+#define close(_fd) closesocket(_fd)
 
 #endif
 
@@ -302,47 +302,47 @@ static long transport_bio_simple_ctrl(BIO* bio, int cmd, long arg1, void* arg2)
 
 	switch (cmd)
 	{
-	case BIO_C_SET_FD:
-		if (arg2)
-		{
-			transport_bio_simple_uninit(bio);
-			transport_bio_simple_init(bio, (SOCKET) * ((int*)arg2), (int)arg1);
-			status = 1;
-		}
-
-		break;
-
-	case BIO_C_GET_FD:
-		if (BIO_get_init(bio))
-		{
+		case BIO_C_SET_FD:
 			if (arg2)
-				*((int*)arg2) = (int)ptr->socket;
+			{
+				transport_bio_simple_uninit(bio);
+				transport_bio_simple_init(bio, (SOCKET) * ((int*)arg2), (int)arg1);
+				status = 1;
+			}
 
-			status = (int)ptr->socket;
-		}
+			break;
 
-		break;
+		case BIO_C_GET_FD:
+			if (BIO_get_init(bio))
+			{
+				if (arg2)
+					*((int*)arg2) = (int)ptr->socket;
 
-	case BIO_CTRL_GET_CLOSE:
-		status = BIO_get_shutdown(bio);
-		break;
+				status = (int)ptr->socket;
+			}
 
-	case BIO_CTRL_SET_CLOSE:
-		BIO_set_shutdown(bio, (int)arg1);
-		status = 1;
-		break;
+			break;
 
-	case BIO_CTRL_DUP:
-		status = 1;
-		break;
+		case BIO_CTRL_GET_CLOSE:
+			status = BIO_get_shutdown(bio);
+			break;
 
-	case BIO_CTRL_FLUSH:
-		status = 1;
-		break;
+		case BIO_CTRL_SET_CLOSE:
+			BIO_set_shutdown(bio, (int)arg1);
+			status = 1;
+			break;
 
-	default:
-		status = 0;
-		break;
+		case BIO_CTRL_DUP:
+			status = 1;
+			break;
+
+		case BIO_CTRL_FLUSH:
+			status = 1;
+			break;
+
+		default:
+			status = 0;
+			break;
 	}
 
 	return status;
@@ -573,33 +573,33 @@ static long transport_bio_buffered_ctrl(BIO* bio, int cmd, long arg1, void* arg2
 
 	switch (cmd)
 	{
-	case BIO_CTRL_FLUSH:
-		if (!ringbuffer_used(&ptr->xmitBuffer))
-			status = 1;
-		else
-			status = (transport_bio_buffered_write(bio, NULL, 0) >= 0) ? 1 : -1;
+		case BIO_CTRL_FLUSH:
+			if (!ringbuffer_used(&ptr->xmitBuffer))
+				status = 1;
+			else
+				status = (transport_bio_buffered_write(bio, NULL, 0) >= 0) ? 1 : -1;
 
-		break;
+			break;
 
-	case BIO_CTRL_WPENDING:
-		status = ringbuffer_used(&ptr->xmitBuffer);
-		break;
+		case BIO_CTRL_WPENDING:
+			status = ringbuffer_used(&ptr->xmitBuffer);
+			break;
 
-	case BIO_CTRL_PENDING:
-		status = 0;
-		break;
+		case BIO_CTRL_PENDING:
+			status = 0;
+			break;
 
-	case BIO_C_READ_BLOCKED:
-		status = (int)ptr->readBlocked;
-		break;
+		case BIO_C_READ_BLOCKED:
+			status = (int)ptr->readBlocked;
+			break;
 
-	case BIO_C_WRITE_BLOCKED:
-		status = (int)ptr->writeBlocked;
-		break;
+		case BIO_C_WRITE_BLOCKED:
+			status = (int)ptr->writeBlocked;
+			break;
 
-	default:
-		status = BIO_ctrl(BIO_next(bio), cmd, arg1, arg2);
-		break;
+		default:
+			status = BIO_ctrl(BIO_next(bio), cmd, arg1, arg2);
+			break;
 	}
 
 	return status;
@@ -672,26 +672,26 @@ char* freerdp_tcp_address_to_string(const struct sockaddr_storage* addr, BOOL* p
 
 	switch (sockaddr_ipv4->sin_family)
 	{
-	case AF_INET:
-		if (!inet_ntop(sockaddr_ipv4->sin_family, &sockaddr_ipv4->sin_addr, ipAddress,
-		               sizeof(ipAddress)))
+		case AF_INET:
+			if (!inet_ntop(sockaddr_ipv4->sin_family, &sockaddr_ipv4->sin_addr, ipAddress,
+			               sizeof(ipAddress)))
+				return NULL;
+
+			break;
+
+		case AF_INET6:
+			if (!inet_ntop(sockaddr_ipv6->sin6_family, &sockaddr_ipv6->sin6_addr, ipAddress,
+			               sizeof(ipAddress)))
+				return NULL;
+
+			break;
+
+		case AF_UNIX:
+			sprintf_s(ipAddress, ARRAYSIZE(ipAddress), "127.0.0.1");
+			break;
+
+		default:
 			return NULL;
-
-		break;
-
-	case AF_INET6:
-		if (!inet_ntop(sockaddr_ipv6->sin6_family, &sockaddr_ipv6->sin6_addr, ipAddress,
-		               sizeof(ipAddress)))
-			return NULL;
-
-		break;
-
-	case AF_UNIX:
-		sprintf_s(ipAddress, ARRAYSIZE(ipAddress), "127.0.0.1");
-		break;
-
-	default:
-		return NULL;
 	}
 
 	if (pIPv6 != NULL)
@@ -834,12 +834,12 @@ static BOOL freerdp_tcp_connect_timeout(rdpContext* context, int sockfd, struct 
 
 		switch (status)
 		{
-		case WSAEINPROGRESS:
-		case WSAEWOULDBLOCK:
-			break;
+			case WSAEINPROGRESS:
+			case WSAEWOULDBLOCK:
+				break;
 
-		default:
-			goto fail;
+			default:
+				goto fail;
 		}
 	}
 
@@ -1002,7 +1002,7 @@ BOOL freerdp_tcp_set_keep_alive_mode(int sockfd)
 		WLog_WARN(TAG, "setsockopt() SOL_SOCKET, SO_KEEPALIVE");
 	}
 
-#	ifdef TCP_KEEPIDLE
+#ifdef TCP_KEEPIDLE
 	optval = 5;
 	optlen = sizeof(optval);
 
@@ -1011,12 +1011,12 @@ BOOL freerdp_tcp_set_keep_alive_mode(int sockfd)
 		WLog_WARN(TAG, "setsockopt() IPPROTO_TCP, TCP_KEEPIDLE");
 	}
 
-#	endif
-#	ifndef SOL_TCP
+#endif
+#ifndef SOL_TCP
 	/* "tcp" from /etc/protocols as getprotobyname(3C) */
-#		define SOL_TCP 6
-#	endif
-#	ifdef TCP_KEEPCNT
+#define SOL_TCP 6
+#endif
+#ifdef TCP_KEEPCNT
 	optval = 3;
 	optlen = sizeof(optval);
 
@@ -1025,8 +1025,8 @@ BOOL freerdp_tcp_set_keep_alive_mode(int sockfd)
 		WLog_WARN(TAG, "setsockopt() SOL_TCP, TCP_KEEPCNT");
 	}
 
-#	endif
-#	ifdef TCP_KEEPINTVL
+#endif
+#ifdef TCP_KEEPINTVL
 	optval = 2;
 	optlen = sizeof(optval);
 
@@ -1035,7 +1035,7 @@ BOOL freerdp_tcp_set_keep_alive_mode(int sockfd)
 		WLog_WARN(TAG, "setsockopt() SOL_TCP, TCP_KEEPINTVL");
 	}
 
-#	endif
+#endif
 #endif
 #if defined(__MACOSX__) || defined(__IOS__)
 	optval = 1;

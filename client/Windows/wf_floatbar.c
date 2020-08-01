@@ -236,25 +236,25 @@ static int button_hit(Button* const button)
 
 	switch (button->type)
 	{
-	case BUTTON_LOCKPIN:
-		floatbar->locked = !floatbar->locked;
-		update_locked_state(floatbar);
-		break;
+		case BUTTON_LOCKPIN:
+			floatbar->locked = !floatbar->locked;
+			update_locked_state(floatbar);
+			break;
 
-	case BUTTON_MINIMIZE:
-		ShowWindow(floatbar->parent, SW_MINIMIZE);
-		break;
+		case BUTTON_MINIMIZE:
+			ShowWindow(floatbar->parent, SW_MINIMIZE);
+			break;
 
-	case BUTTON_RESTORE:
-		wf_toggle_fullscreen(floatbar->wfc);
-		break;
+		case BUTTON_RESTORE:
+			wf_toggle_fullscreen(floatbar->wfc);
+			break;
 
-	case BUTTON_CLOSE:
-		SendMessage(floatbar->parent, WM_DESTROY, 0, 0);
-		break;
+		case BUTTON_CLOSE:
+			SendMessage(floatbar->parent, WM_DESTROY, 0, 0);
+			break;
 
-	default:
-		return 0;
+		default:
+			return 0;
 	}
 
 	return 0;
@@ -421,89 +421,117 @@ static LRESULT CALLBACK floatbar_proc(const HWND hWnd, const UINT Msg, const WPA
 
 	switch (Msg)
 	{
-	case WM_CREATE:
-		floatbar = ((wfFloatBar*)((CREATESTRUCT*)lParam)->lpCreateParams);
-		floatbar->hwnd = hWnd;
-		GetWindowRect(floatbar->hwnd, &floatbar->rect);
-		floatbar->width = floatbar->rect.right - floatbar->rect.left;
-		floatbar->height = floatbar->rect.bottom - floatbar->rect.top;
-		hdc = GetDC(hWnd);
-		floatbar->hdcmem = CreateCompatibleDC(hdc);
-		ReleaseDC(hWnd, hdc);
-		tme.cbSize = sizeof(TRACKMOUSEEVENT);
-		tme.dwFlags = TME_LEAVE;
-		tme.hwndTrack = hWnd;
-		tme.dwHoverTime = HOVER_DEFAULT;
-		// Use caption font, white, draw transparent
-		GetClientRect(hWnd, &floatbar->textRect);
-		InflateRect(&floatbar->textRect, -TEXT_X, 0);
-		SetBkMode(hdc, TRANSPARENT);
-		SetTextColor(hdc, RGB(255, 255, 255));
-		ncm.cbSize = sizeof(NONCLIENTMETRICS);
-		SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
-		SelectObject(hdc, CreateFontIndirect(&ncm.lfCaptionFont));
-		floatbar_trigger_hide(floatbar);
-		break;
+		case WM_CREATE:
+			floatbar = ((wfFloatBar*)((CREATESTRUCT*)lParam)->lpCreateParams);
+			floatbar->hwnd = hWnd;
+			GetWindowRect(floatbar->hwnd, &floatbar->rect);
+			floatbar->width = floatbar->rect.right - floatbar->rect.left;
+			floatbar->height = floatbar->rect.bottom - floatbar->rect.top;
+			hdc = GetDC(hWnd);
+			floatbar->hdcmem = CreateCompatibleDC(hdc);
+			ReleaseDC(hWnd, hdc);
+			tme.cbSize = sizeof(TRACKMOUSEEVENT);
+			tme.dwFlags = TME_LEAVE;
+			tme.hwndTrack = hWnd;
+			tme.dwHoverTime = HOVER_DEFAULT;
+			// Use caption font, white, draw transparent
+			GetClientRect(hWnd, &floatbar->textRect);
+			InflateRect(&floatbar->textRect, -TEXT_X, 0);
+			SetBkMode(hdc, TRANSPARENT);
+			SetTextColor(hdc, RGB(255, 255, 255));
+			ncm.cbSize = sizeof(NONCLIENTMETRICS);
+			SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
+			SelectObject(hdc, CreateFontIndirect(&ncm.lfCaptionFont));
+			floatbar_trigger_hide(floatbar);
+			break;
 
-	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-		floatbar_paint(floatbar, hdc);
-		EndPaint(hWnd, &ps);
-		break;
+		case WM_PAINT:
+			hdc = BeginPaint(hWnd, &ps);
+			floatbar_paint(floatbar, hdc);
+			EndPaint(hWnd, &ps);
+			break;
 
-	case WM_LBUTTONDOWN:
-		pos_x = lParam & 0xffff;
-		pos_y = (lParam >> 16) & 0xffff;
-		button = floatbar_get_button(floatbar, pos_x, pos_y);
-
-		if (!button)
-		{
-			SetCapture(hWnd);
-			dragging = TRUE;
-			btn_dwn_x = lParam & 0xffff;
-		}
-		else
-			lbtn_dwn = TRUE;
-
-		break;
-
-	case WM_LBUTTONUP:
-		pos_x = lParam & 0xffff;
-		pos_y = (lParam >> 16) & 0xffff;
-		ReleaseCapture();
-		dragging = FALSE;
-
-		if (lbtn_dwn)
-		{
+		case WM_LBUTTONDOWN:
+			pos_x = lParam & 0xffff;
+			pos_y = (lParam >> 16) & 0xffff;
 			button = floatbar_get_button(floatbar, pos_x, pos_y);
 
-			if (button)
-				button_hit(button);
+			if (!button)
+			{
+				SetCapture(hWnd);
+				dragging = TRUE;
+				btn_dwn_x = lParam & 0xffff;
+			}
+			else
+				lbtn_dwn = TRUE;
 
-			lbtn_dwn = FALSE;
-		}
+			break;
 
-		break;
+		case WM_LBUTTONUP:
+			pos_x = lParam & 0xffff;
+			pos_y = (lParam >> 16) & 0xffff;
+			ReleaseCapture();
+			dragging = FALSE;
 
-	case WM_MOUSEMOVE:
-		pos_x = lParam & 0xffff;
-		pos_y = (lParam >> 16) & 0xffff;
+			if (lbtn_dwn)
+			{
+				button = floatbar_get_button(floatbar, pos_x, pos_y);
 
-		if (!floatbar->locked)
-			floatbar_animation(floatbar, TRUE);
+				if (button)
+					button_hit(button);
 
-		if (dragging)
-		{
-			floatbar->rect.left = floatbar->rect.left + (lParam & 0xffff) - btn_dwn_x;
+				lbtn_dwn = FALSE;
+			}
 
-			if (floatbar->rect.left < 0)
-				floatbar->rect.left = 0;
-			else if (floatbar->rect.left > xScreen - floatbar->width)
-				floatbar->rect.left = xScreen - floatbar->width;
+			break;
 
-			MoveWindow(hWnd, floatbar->rect.left, 0, floatbar->width, floatbar->height, TRUE);
-		}
-		else
+		case WM_MOUSEMOVE:
+			pos_x = lParam & 0xffff;
+			pos_y = (lParam >> 16) & 0xffff;
+
+			if (!floatbar->locked)
+				floatbar_animation(floatbar, TRUE);
+
+			if (dragging)
+			{
+				floatbar->rect.left = floatbar->rect.left + (lParam & 0xffff) - btn_dwn_x;
+
+				if (floatbar->rect.left < 0)
+					floatbar->rect.left = 0;
+				else if (floatbar->rect.left > xScreen - floatbar->width)
+					floatbar->rect.left = xScreen - floatbar->width;
+
+				MoveWindow(hWnd, floatbar->rect.left, 0, floatbar->width, floatbar->height, TRUE);
+			}
+			else
+			{
+				int i;
+
+				for (i = 0; i < BTN_MAX; i++)
+				{
+					if (floatbar->buttons[i] != NULL)
+					{
+						floatbar->buttons[i]->active = FALSE;
+					}
+				}
+
+				button = floatbar_get_button(floatbar, pos_x, pos_y);
+
+				if (button)
+					button->active = TRUE;
+
+				InvalidateRect(hWnd, NULL, FALSE);
+				UpdateWindow(hWnd);
+			}
+
+			TrackMouseEvent(&tme);
+			break;
+
+		case WM_CAPTURECHANGED:
+			dragging = FALSE;
+			break;
+
+		case WM_MOUSELEAVE:
 		{
 			int i;
 
@@ -515,84 +543,56 @@ static LRESULT CALLBACK floatbar_proc(const HWND hWnd, const UINT Msg, const WPA
 				}
 			}
 
-			button = floatbar_get_button(floatbar, pos_x, pos_y);
-
-			if (button)
-				button->active = TRUE;
-
 			InvalidateRect(hWnd, NULL, FALSE);
 			UpdateWindow(hWnd);
+			floatbar_trigger_hide(floatbar);
+			break;
 		}
 
-		TrackMouseEvent(&tme);
-		break;
-
-	case WM_CAPTURECHANGED:
-		dragging = FALSE;
-		break;
-
-	case WM_MOUSELEAVE:
-	{
-		int i;
-
-		for (i = 0; i < BTN_MAX; i++)
-		{
-			if (floatbar->buttons[i] != NULL)
+		case WM_TIMER:
+			switch (wParam)
 			{
-				floatbar->buttons[i]->active = FALSE;
+				case TIMER_HIDE:
+					floatbar_animation(floatbar, FALSE);
+					break;
+
+				case TIMER_ANIMAT_SHOW:
+				{
+					floatbar->offset--;
+					MoveWindow(floatbar->hwnd, floatbar->rect.left, -floatbar->offset,
+					           floatbar->width, floatbar->height, TRUE);
+
+					if (floatbar->offset <= 0)
+						floatbar_show(floatbar);
+
+					break;
+				}
+
+				case TIMER_ANIMAT_HIDE:
+				{
+					floatbar->offset++;
+					MoveWindow(floatbar->hwnd, floatbar->rect.left, -floatbar->offset,
+					           floatbar->width, floatbar->height, TRUE);
+
+					if (floatbar->offset >= floatbar->height - 2)
+						floatbar_hide(floatbar);
+
+					break;
+				}
+
+				default:
+					break;
 			}
-		}
-
-		InvalidateRect(hWnd, NULL, FALSE);
-		UpdateWindow(hWnd);
-		floatbar_trigger_hide(floatbar);
-		break;
-	}
-
-	case WM_TIMER:
-		switch (wParam)
-		{
-		case TIMER_HIDE:
-			floatbar_animation(floatbar, FALSE);
-			break;
-
-		case TIMER_ANIMAT_SHOW:
-		{
-			floatbar->offset--;
-			MoveWindow(floatbar->hwnd, floatbar->rect.left, -floatbar->offset, floatbar->width,
-			           floatbar->height, TRUE);
-
-			if (floatbar->offset <= 0)
-				floatbar_show(floatbar);
 
 			break;
-		}
 
-		case TIMER_ANIMAT_HIDE:
-		{
-			floatbar->offset++;
-			MoveWindow(floatbar->hwnd, floatbar->rect.left, -floatbar->offset, floatbar->width,
-			           floatbar->height, TRUE);
-
-			if (floatbar->offset >= floatbar->height - 2)
-				floatbar_hide(floatbar);
-
+		case WM_DESTROY:
+			DeleteDC(floatbar->hdcmem);
+			PostQuitMessage(0);
 			break;
-		}
 
 		default:
-			break;
-		}
-
-		break;
-
-	case WM_DESTROY:
-		DeleteDC(floatbar->hdcmem);
-		PostQuitMessage(0);
-		break;
-
-	default:
-		return DefWindowProc(hWnd, Msg, wParam, lParam);
+			return DefWindowProc(hWnd, Msg, wParam, lParam);
 	}
 
 	return 0;

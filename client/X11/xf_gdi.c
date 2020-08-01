@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <X11/Xlib.h>
@@ -86,124 +86,124 @@ static BOOL xf_set_rop3(xfContext* xfc, UINT32 rop3)
 
 	switch (rop3)
 	{
-	case GDI_BLACKNESS:
-		function = GXclear;
-		break;
+		case GDI_BLACKNESS:
+			function = GXclear;
+			break;
 
-	case GDI_DPon:
-		function = GXnor;
-		break;
+		case GDI_DPon:
+			function = GXnor;
+			break;
 
-	case GDI_DPna:
-		function = GXandInverted;
-		break;
+		case GDI_DPna:
+			function = GXandInverted;
+			break;
 
-	case GDI_Pn:
-		function = GXcopyInverted;
-		break;
+		case GDI_Pn:
+			function = GXcopyInverted;
+			break;
 
-	case GDI_NOTSRCERASE:
-		function = GXnor;
-		break;
+		case GDI_NOTSRCERASE:
+			function = GXnor;
+			break;
 
-	case GDI_DSna:
-		function = GXandInverted;
-		break;
+		case GDI_DSna:
+			function = GXandInverted;
+			break;
 
-	case GDI_NOTSRCCOPY:
-		function = GXcopyInverted;
-		break;
+		case GDI_NOTSRCCOPY:
+			function = GXcopyInverted;
+			break;
 
-	case GDI_SRCERASE:
-		function = GXandReverse;
-		break;
+		case GDI_SRCERASE:
+			function = GXandReverse;
+			break;
 
-	case GDI_PDna:
-		function = GXandReverse;
-		break;
+		case GDI_PDna:
+			function = GXandReverse;
+			break;
 
-	case GDI_DSTINVERT:
-		function = GXinvert;
-		break;
+		case GDI_DSTINVERT:
+			function = GXinvert;
+			break;
 
-	case GDI_PATINVERT:
-		function = GXxor;
-		break;
+		case GDI_PATINVERT:
+			function = GXxor;
+			break;
 
-	case GDI_DPan:
-		function = GXnand;
-		break;
+		case GDI_DPan:
+			function = GXnand;
+			break;
 
-	case GDI_SRCINVERT:
-		function = GXxor;
-		break;
+		case GDI_SRCINVERT:
+			function = GXxor;
+			break;
 
-	case GDI_DSan:
-		function = GXnand;
-		break;
+		case GDI_DSan:
+			function = GXnand;
+			break;
 
-	case GDI_SRCAND:
-		function = GXand;
-		break;
+		case GDI_SRCAND:
+			function = GXand;
+			break;
 
-	case GDI_DSxn:
-		function = GXequiv;
-		break;
+		case GDI_DSxn:
+			function = GXequiv;
+			break;
 
-	case GDI_DPa:
-		function = GXand;
-		break;
+		case GDI_DPa:
+			function = GXand;
+			break;
 
-	case GDI_PDxn:
-		function = GXequiv;
-		break;
+		case GDI_PDxn:
+			function = GXequiv;
+			break;
 
-	case GDI_DSTCOPY:
-		function = GXnoop;
-		break;
+		case GDI_DSTCOPY:
+			function = GXnoop;
+			break;
 
-	case GDI_DPno:
-		function = GXorInverted;
-		break;
+		case GDI_DPno:
+			function = GXorInverted;
+			break;
 
-	case GDI_MERGEPAINT:
-		function = GXorInverted;
-		break;
+		case GDI_MERGEPAINT:
+			function = GXorInverted;
+			break;
 
-	case GDI_SRCCOPY:
-		function = GXcopy;
-		break;
+		case GDI_SRCCOPY:
+			function = GXcopy;
+			break;
 
-	case GDI_SDno:
-		function = GXorReverse;
-		break;
+		case GDI_SDno:
+			function = GXorReverse;
+			break;
 
-	case GDI_SRCPAINT:
-		function = GXor;
-		break;
+		case GDI_SRCPAINT:
+			function = GXor;
+			break;
 
-	case GDI_PATCOPY:
-		function = GXcopy;
-		break;
+		case GDI_PATCOPY:
+			function = GXcopy;
+			break;
 
-	case GDI_PDno:
-		function = GXorReverse;
-		break;
+		case GDI_PDno:
+			function = GXorReverse;
+			break;
 
-	case GDI_DPo:
-		function = GXor;
-		break;
+		case GDI_DPo:
+			function = GXor;
+			break;
 
-	case GDI_WHITENESS:
-		function = GXset;
-		break;
+		case GDI_WHITENESS:
+			function = GXset;
+			break;
 
-	case GDI_PSDPxax:
-		function = GXand;
-		break;
+		case GDI_PSDPxax:
+			function = GXand;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	if (function < 0)
@@ -337,50 +337,20 @@ static BOOL xf_gdi_patblt(rdpContext* context, PATBLT_ORDER* patblt)
 
 	switch (brush->style)
 	{
-	case GDI_BS_SOLID:
-		XSetFillStyle(xfc->display, xfc->gc, FillSolid);
-		XSetBackground(xfc->display, xfc->gc, xbg.pixel);
-		XSetForeground(xfc->display, xfc->gc, xfg.pixel);
-		XFillRectangle(xfc->display, xfc->drawing, xfc->gc, patblt->nLeftRect, patblt->nTopRect,
-		               patblt->nWidth, patblt->nHeight);
-		break;
-
-	case GDI_BS_HATCHED:
-	{
-		Pixmap pattern = xf_mono_bitmap_new(xfc, 8, 8, &GDI_BS_HATCHED_PATTERNS[8 * brush->hatch]);
-		XSetBackground(xfc->display, xfc->gc, xbg.pixel);
-		XSetForeground(xfc->display, xfc->gc, xfg.pixel);
-		XSetFillStyle(xfc->display, xfc->gc, FillOpaqueStippled);
-		XSetStipple(xfc->display, xfc->gc, pattern);
-		XSetTSOrigin(xfc->display, xfc->gc, brush->x, brush->y);
-		XFillRectangle(xfc->display, xfc->drawing, xfc->gc, patblt->nLeftRect, patblt->nTopRect,
-		               patblt->nWidth, patblt->nHeight);
-		XFreePixmap(xfc->display, pattern);
-	}
-	break;
-
-	case GDI_BS_PATTERN:
-		if (brush->bpp > 1)
-		{
-			UINT32 bpp = brush->bpp;
-
-			if ((bpp == 16) && (context->settings->ColorDepth == 15))
-				bpp = 15;
-
-			Pixmap pattern = xf_brush_new(xfc, 8, 8, bpp, brush->data);
-			XSetFillStyle(xfc->display, xfc->gc, FillTiled);
-			XSetTile(xfc->display, xfc->gc, pattern);
-			XSetTSOrigin(xfc->display, xfc->gc, brush->x, brush->y);
+		case GDI_BS_SOLID:
+			XSetFillStyle(xfc->display, xfc->gc, FillSolid);
+			XSetBackground(xfc->display, xfc->gc, xbg.pixel);
+			XSetForeground(xfc->display, xfc->gc, xfg.pixel);
 			XFillRectangle(xfc->display, xfc->drawing, xfc->gc, patblt->nLeftRect, patblt->nTopRect,
 			               patblt->nWidth, patblt->nHeight);
-			XSetTile(xfc->display, xfc->gc, xfc->primary);
-			XFreePixmap(xfc->display, pattern);
-		}
-		else
+			break;
+
+		case GDI_BS_HATCHED:
 		{
-			Pixmap pattern = xf_mono_bitmap_new(xfc, 8, 8, brush->data);
-			XSetBackground(xfc->display, xfc->gc, xfg.pixel);
-			XSetForeground(xfc->display, xfc->gc, xbg.pixel);
+			Pixmap pattern =
+			    xf_mono_bitmap_new(xfc, 8, 8, &GDI_BS_HATCHED_PATTERNS[8 * brush->hatch]);
+			XSetBackground(xfc->display, xfc->gc, xbg.pixel);
+			XSetForeground(xfc->display, xfc->gc, xfg.pixel);
 			XSetFillStyle(xfc->display, xfc->gc, FillOpaqueStippled);
 			XSetStipple(xfc->display, xfc->gc, pattern);
 			XSetTSOrigin(xfc->display, xfc->gc, brush->x, brush->y);
@@ -388,12 +358,43 @@ static BOOL xf_gdi_patblt(rdpContext* context, PATBLT_ORDER* patblt)
 			               patblt->nWidth, patblt->nHeight);
 			XFreePixmap(xfc->display, pattern);
 		}
-
 		break;
 
-	default:
-		WLog_ERR(TAG, "unimplemented brush style:%" PRIu32 "", brush->style);
-		goto fail;
+		case GDI_BS_PATTERN:
+			if (brush->bpp > 1)
+			{
+				UINT32 bpp = brush->bpp;
+
+				if ((bpp == 16) && (context->settings->ColorDepth == 15))
+					bpp = 15;
+
+				Pixmap pattern = xf_brush_new(xfc, 8, 8, bpp, brush->data);
+				XSetFillStyle(xfc->display, xfc->gc, FillTiled);
+				XSetTile(xfc->display, xfc->gc, pattern);
+				XSetTSOrigin(xfc->display, xfc->gc, brush->x, brush->y);
+				XFillRectangle(xfc->display, xfc->drawing, xfc->gc, patblt->nLeftRect,
+				               patblt->nTopRect, patblt->nWidth, patblt->nHeight);
+				XSetTile(xfc->display, xfc->gc, xfc->primary);
+				XFreePixmap(xfc->display, pattern);
+			}
+			else
+			{
+				Pixmap pattern = xf_mono_bitmap_new(xfc, 8, 8, brush->data);
+				XSetBackground(xfc->display, xfc->gc, xfg.pixel);
+				XSetForeground(xfc->display, xfc->gc, xbg.pixel);
+				XSetFillStyle(xfc->display, xfc->gc, FillOpaqueStippled);
+				XSetStipple(xfc->display, xfc->gc, pattern);
+				XSetTSOrigin(xfc->display, xfc->gc, brush->x, brush->y);
+				XFillRectangle(xfc->display, xfc->drawing, xfc->gc, patblt->nLeftRect,
+				               patblt->nTopRect, patblt->nWidth, patblt->nHeight);
+				XFreePixmap(xfc->display, pattern);
+			}
+
+			break;
+
+		default:
+			WLog_ERR(TAG, "unimplemented brush style:%" PRIu32 "", brush->style);
+			goto fail;
 	}
 
 	ret = TRUE;
@@ -666,41 +667,41 @@ static BOOL xf_gdi_mem3blt(rdpContext* context, MEM3BLT_ORDER* mem3blt)
 
 	switch (brush->style)
 	{
-	case GDI_BS_PATTERN:
-		if (brush->bpp > 1)
-		{
-			UINT32 bpp = brush->bpp;
+		case GDI_BS_PATTERN:
+			if (brush->bpp > 1)
+			{
+				UINT32 bpp = brush->bpp;
 
-			if ((bpp == 16) && (context->settings->ColorDepth == 15))
-				bpp = 15;
+				if ((bpp == 16) && (context->settings->ColorDepth == 15))
+					bpp = 15;
 
-			pattern = xf_brush_new(xfc, 8, 8, bpp, brush->data);
-			XSetFillStyle(xfc->display, xfc->gc, FillTiled);
-			XSetTile(xfc->display, xfc->gc, pattern);
-			XSetTSOrigin(xfc->display, xfc->gc, brush->x, brush->y);
-		}
-		else
-		{
-			pattern = xf_mono_bitmap_new(xfc, 8, 8, brush->data);
+				pattern = xf_brush_new(xfc, 8, 8, bpp, brush->data);
+				XSetFillStyle(xfc->display, xfc->gc, FillTiled);
+				XSetTile(xfc->display, xfc->gc, pattern);
+				XSetTSOrigin(xfc->display, xfc->gc, brush->x, brush->y);
+			}
+			else
+			{
+				pattern = xf_mono_bitmap_new(xfc, 8, 8, brush->data);
+				XSetBackground(xfc->display, xfc->gc, backColor.pixel);
+				XSetForeground(xfc->display, xfc->gc, foreColor.pixel);
+				XSetFillStyle(xfc->display, xfc->gc, FillOpaqueStippled);
+				XSetStipple(xfc->display, xfc->gc, pattern);
+				XSetTSOrigin(xfc->display, xfc->gc, brush->x, brush->y);
+			}
+
+			break;
+
+		case GDI_BS_SOLID:
+			XSetFillStyle(xfc->display, xfc->gc, FillSolid);
 			XSetBackground(xfc->display, xfc->gc, backColor.pixel);
 			XSetForeground(xfc->display, xfc->gc, foreColor.pixel);
-			XSetFillStyle(xfc->display, xfc->gc, FillOpaqueStippled);
-			XSetStipple(xfc->display, xfc->gc, pattern);
 			XSetTSOrigin(xfc->display, xfc->gc, brush->x, brush->y);
-		}
+			break;
 
-		break;
-
-	case GDI_BS_SOLID:
-		XSetFillStyle(xfc->display, xfc->gc, FillSolid);
-		XSetBackground(xfc->display, xfc->gc, backColor.pixel);
-		XSetForeground(xfc->display, xfc->gc, foreColor.pixel);
-		XSetTSOrigin(xfc->display, xfc->gc, brush->x, brush->y);
-		break;
-
-	default:
-		WLog_ERR(TAG, "Mem3Blt unimplemented brush style:%" PRIu32 "", brush->style);
-		goto fail;
+		default:
+			WLog_ERR(TAG, "Mem3Blt unimplemented brush style:%" PRIu32 "", brush->style);
+			goto fail;
 	}
 
 	XCopyArea(xfc->display, bitmap->pixmap, xfc->drawing, xfc->gc, mem3blt->nXSrc, mem3blt->nYSrc,
@@ -757,17 +758,17 @@ static BOOL xf_gdi_polygon_sc(rdpContext* context, const POLYGON_SC_ORDER* polyg
 
 	switch (polygon_sc->fillMode)
 	{
-	case 1: /* alternate */
-		XSetFillRule(xfc->display, xfc->gc, EvenOddRule);
-		break;
+		case 1: /* alternate */
+			XSetFillRule(xfc->display, xfc->gc, EvenOddRule);
+			break;
 
-	case 2: /* winding */
-		XSetFillRule(xfc->display, xfc->gc, WindingRule);
-		break;
+		case 2: /* winding */
+			XSetFillRule(xfc->display, xfc->gc, WindingRule);
+			break;
 
-	default:
-		WLog_ERR(TAG, "PolygonSC unknown fillMode: %" PRIu32 "", polygon_sc->fillMode);
-		break;
+		default:
+			WLog_ERR(TAG, "PolygonSC unknown fillMode: %" PRIu32 "", polygon_sc->fillMode);
+			break;
 	}
 
 	XSetFillStyle(xfc->display, xfc->gc, FillSolid);
@@ -827,17 +828,17 @@ static BOOL xf_gdi_polygon_cb(rdpContext* context, POLYGON_CB_ORDER* polygon_cb)
 
 	switch (polygon_cb->fillMode)
 	{
-	case GDI_FILL_ALTERNATE: /* alternate */
-		XSetFillRule(xfc->display, xfc->gc, EvenOddRule);
-		break;
+		case GDI_FILL_ALTERNATE: /* alternate */
+			XSetFillRule(xfc->display, xfc->gc, EvenOddRule);
+			break;
 
-	case GDI_FILL_WINDING: /* winding */
-		XSetFillRule(xfc->display, xfc->gc, WindingRule);
-		break;
+		case GDI_FILL_WINDING: /* winding */
+			XSetFillRule(xfc->display, xfc->gc, WindingRule);
+			break;
 
-	default:
-		WLog_ERR(TAG, "PolygonCB unknown fillMode: %" PRIu32 "", polygon_cb->fillMode);
-		break;
+		default:
+			WLog_ERR(TAG, "PolygonCB unknown fillMode: %" PRIu32 "", polygon_cb->fillMode);
+			break;
 	}
 
 	if (brush->style == GDI_BS_PATTERN)
@@ -902,29 +903,29 @@ static BOOL xf_gdi_surface_frame_marker(rdpContext* context,
 
 	switch (surface_frame_marker->frameAction)
 	{
-	case SURFACECMD_FRAMEACTION_BEGIN:
-		xfc->frame_begin = TRUE;
-		xfc->frame_x1 = 0;
-		xfc->frame_y1 = 0;
-		xfc->frame_x2 = 0;
-		xfc->frame_y2 = 0;
-		break;
+		case SURFACECMD_FRAMEACTION_BEGIN:
+			xfc->frame_begin = TRUE;
+			xfc->frame_x1 = 0;
+			xfc->frame_y1 = 0;
+			xfc->frame_x2 = 0;
+			xfc->frame_y2 = 0;
+			break;
 
-	case SURFACECMD_FRAMEACTION_END:
-		xfc->frame_begin = FALSE;
+		case SURFACECMD_FRAMEACTION_END:
+			xfc->frame_begin = FALSE;
 
-		if ((xfc->frame_x2 > xfc->frame_x1) && (xfc->frame_y2 > xfc->frame_y1))
-			ret =
-			    gdi_InvalidateRegion(xfc->hdc, xfc->frame_x1, xfc->frame_y1,
-			                         xfc->frame_x2 - xfc->frame_x1, xfc->frame_y2 - xfc->frame_y1);
+			if ((xfc->frame_x2 > xfc->frame_x1) && (xfc->frame_y2 > xfc->frame_y1))
+				ret = gdi_InvalidateRegion(xfc->hdc, xfc->frame_x1, xfc->frame_y1,
+				                           xfc->frame_x2 - xfc->frame_x1,
+				                           xfc->frame_y2 - xfc->frame_y1);
 
-		if (settings->FrameAcknowledge > 0)
-		{
-			IFCALL(xfc->context.update->SurfaceFrameAcknowledge, context,
-			       surface_frame_marker->frameId);
-		}
+			if (settings->FrameAcknowledge > 0)
+			{
+				IFCALL(xfc->context.update->SurfaceFrameAcknowledge, context,
+				       surface_frame_marker->frameId);
+			}
 
-		break;
+			break;
 	}
 
 	xf_unlock_x11(xfc, FALSE);
@@ -1041,41 +1042,42 @@ static BOOL xf_gdi_surface_bits(rdpContext* context, const SURFACE_BITS_COMMAND*
 
 	switch (cmd->bmp.codecID)
 	{
-	case RDP_CODEC_ID_REMOTEFX:
-		if (!rfx_process_message(context->codecs->rfx, cmd->bmp.bitmapData,
-		                         cmd->bmp.bitmapDataLength, cmd->destLeft, cmd->destTop,
-		                         gdi->primary_buffer, gdi->dstFormat, gdi->stride, gdi->height,
-		                         &region))
+		case RDP_CODEC_ID_REMOTEFX:
+			if (!rfx_process_message(context->codecs->rfx, cmd->bmp.bitmapData,
+			                         cmd->bmp.bitmapDataLength, cmd->destLeft, cmd->destTop,
+			                         gdi->primary_buffer, gdi->dstFormat, gdi->stride, gdi->height,
+			                         &region))
+				goto fail;
+
+			break;
+
+		case RDP_CODEC_ID_NSCODEC:
+			if (!nsc_process_message(context->codecs->nsc, cmd->bmp.bpp, cmd->bmp.width,
+			                         cmd->bmp.height, cmd->bmp.bitmapData,
+			                         cmd->bmp.bitmapDataLength, gdi->primary_buffer, gdi->dstFormat,
+			                         gdi->stride, 0, 0, cmd->bmp.width, cmd->bmp.height,
+			                         FREERDP_FLIP_VERTICAL))
+				goto fail;
+
+			region16_union_rect(&region, &region, &cmdRect);
+			break;
+
+		case RDP_CODEC_ID_NONE:
+			pSrcData = cmd->bmp.bitmapData;
+			format = gdi_get_pixel_format(cmd->bmp.bpp);
+
+			if (!freerdp_image_copy(gdi->primary_buffer, gdi->dstFormat, gdi->stride, cmd->destLeft,
+			                        cmd->destTop, cmd->bmp.width, cmd->bmp.height, pSrcData, format,
+			                        0, 0, 0, &xfc->context.gdi->palette, FREERDP_FLIP_VERTICAL))
+				goto fail;
+
+			region16_union_rect(&region, &region, &cmdRect);
+			break;
+
+		default:
+			WLog_ERR(TAG, "Unsupported codecID %" PRIu16 "", cmd->bmp.codecID);
+			ret = TRUE;
 			goto fail;
-
-		break;
-
-	case RDP_CODEC_ID_NSCODEC:
-		if (!nsc_process_message(context->codecs->nsc, cmd->bmp.bpp, cmd->bmp.width,
-		                         cmd->bmp.height, cmd->bmp.bitmapData, cmd->bmp.bitmapDataLength,
-		                         gdi->primary_buffer, gdi->dstFormat, gdi->stride, 0, 0,
-		                         cmd->bmp.width, cmd->bmp.height, FREERDP_FLIP_VERTICAL))
-			goto fail;
-
-		region16_union_rect(&region, &region, &cmdRect);
-		break;
-
-	case RDP_CODEC_ID_NONE:
-		pSrcData = cmd->bmp.bitmapData;
-		format = gdi_get_pixel_format(cmd->bmp.bpp);
-
-		if (!freerdp_image_copy(gdi->primary_buffer, gdi->dstFormat, gdi->stride, cmd->destLeft,
-		                        cmd->destTop, cmd->bmp.width, cmd->bmp.height, pSrcData, format, 0,
-		                        0, 0, &xfc->context.gdi->palette, FREERDP_FLIP_VERTICAL))
-			goto fail;
-
-		region16_union_rect(&region, &region, &cmdRect);
-		break;
-
-	default:
-		WLog_ERR(TAG, "Unsupported codecID %" PRIu16 "", cmd->bmp.codecID);
-		ret = TRUE;
-		goto fail;
 	}
 
 	ret = xf_gdi_update_screen(xfc, gdi->primary_buffer, gdi->stride, &region);

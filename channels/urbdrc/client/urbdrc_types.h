@@ -22,7 +22,7 @@
 #define FREERDP_CHANNEL_URBDRC_CLIENT_TYPES_H
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/dvc.h>
@@ -38,12 +38,12 @@
 
 #define TAG CHANNELS_TAG("urbdrc.client")
 #ifdef WITH_DEBUG_DVC
-#	define DEBUG_DVC(...) WLog_DBG(TAG, __VA_ARGS__)
+#define DEBUG_DVC(...) WLog_DBG(TAG, __VA_ARGS__)
 #else
-#	define DEBUG_DVC(...) \
-		do                 \
-		{                  \
-		} while (0)
+#define DEBUG_DVC(...) \
+	do                 \
+	{                  \
+	} while (0)
 #endif
 
 #define CAPABILITIES_NEGOTIATOR 0x00000000

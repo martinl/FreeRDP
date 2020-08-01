@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -608,36 +608,36 @@ int nego_recv(rdpTransport* transport, wStream* s, void* extra)
 
 		switch (type)
 		{
-		case TYPE_RDP_NEG_RSP:
-			nego_process_negotiation_response(nego, s);
-			WLog_DBG(TAG, "selected_protocol: %" PRIu32 "", nego->SelectedProtocol);
+			case TYPE_RDP_NEG_RSP:
+				nego_process_negotiation_response(nego, s);
+				WLog_DBG(TAG, "selected_protocol: %" PRIu32 "", nego->SelectedProtocol);
 
-			/* enhanced security selected ? */
+				/* enhanced security selected ? */
 
-			if (nego->SelectedProtocol)
-			{
-				if ((nego->SelectedProtocol == PROTOCOL_HYBRID) &&
-				    (!nego->EnabledProtocols[PROTOCOL_HYBRID]))
+				if (nego->SelectedProtocol)
+				{
+					if ((nego->SelectedProtocol == PROTOCOL_HYBRID) &&
+					    (!nego->EnabledProtocols[PROTOCOL_HYBRID]))
+					{
+						nego->state = NEGO_STATE_FAIL;
+					}
+
+					if ((nego->SelectedProtocol == PROTOCOL_SSL) &&
+					    (!nego->EnabledProtocols[PROTOCOL_SSL]))
+					{
+						nego->state = NEGO_STATE_FAIL;
+					}
+				}
+				else if (!nego->EnabledProtocols[PROTOCOL_RDP])
 				{
 					nego->state = NEGO_STATE_FAIL;
 				}
 
-				if ((nego->SelectedProtocol == PROTOCOL_SSL) &&
-				    (!nego->EnabledProtocols[PROTOCOL_SSL]))
-				{
-					nego->state = NEGO_STATE_FAIL;
-				}
-			}
-			else if (!nego->EnabledProtocols[PROTOCOL_RDP])
-			{
-				nego->state = NEGO_STATE_FAIL;
-			}
+				break;
 
-			break;
-
-		case TYPE_RDP_NEG_FAILURE:
-			nego_process_negotiation_failure(nego, s);
-			break;
+			case TYPE_RDP_NEG_FAILURE:
+				nego_process_negotiation_failure(nego, s);
+				break;
 		}
 	}
 	else if (li == 6)
@@ -958,31 +958,31 @@ void nego_process_negotiation_failure(rdpNego* nego, wStream* s)
 
 	switch (failureCode)
 	{
-	case SSL_REQUIRED_BY_SERVER:
-		WLog_WARN(TAG, "Error: SSL_REQUIRED_BY_SERVER");
-		break;
+		case SSL_REQUIRED_BY_SERVER:
+			WLog_WARN(TAG, "Error: SSL_REQUIRED_BY_SERVER");
+			break;
 
-	case SSL_NOT_ALLOWED_BY_SERVER:
-		WLog_WARN(TAG, "Error: SSL_NOT_ALLOWED_BY_SERVER");
-		nego->sendNegoData = TRUE;
-		break;
+		case SSL_NOT_ALLOWED_BY_SERVER:
+			WLog_WARN(TAG, "Error: SSL_NOT_ALLOWED_BY_SERVER");
+			nego->sendNegoData = TRUE;
+			break;
 
-	case SSL_CERT_NOT_ON_SERVER:
-		WLog_ERR(TAG, "Error: SSL_CERT_NOT_ON_SERVER");
-		nego->sendNegoData = TRUE;
-		break;
+		case SSL_CERT_NOT_ON_SERVER:
+			WLog_ERR(TAG, "Error: SSL_CERT_NOT_ON_SERVER");
+			nego->sendNegoData = TRUE;
+			break;
 
-	case INCONSISTENT_FLAGS:
-		WLog_ERR(TAG, "Error: INCONSISTENT_FLAGS");
-		break;
+		case INCONSISTENT_FLAGS:
+			WLog_ERR(TAG, "Error: INCONSISTENT_FLAGS");
+			break;
 
-	case HYBRID_REQUIRED_BY_SERVER:
-		WLog_WARN(TAG, "Error: HYBRID_REQUIRED_BY_SERVER");
-		break;
+		case HYBRID_REQUIRED_BY_SERVER:
+			WLog_WARN(TAG, "Error: HYBRID_REQUIRED_BY_SERVER");
+			break;
 
-	default:
-		WLog_ERR(TAG, "Error: Unknown protocol security error %" PRIu32 "", failureCode);
-		break;
+		default:
+			WLog_ERR(TAG, "Error: Unknown protocol security error %" PRIu32 "", failureCode);
+			break;
 	}
 
 	nego->state = NEGO_STATE_FAIL;

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -28,7 +28,7 @@
 #include <winpr/file.h>
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include "../log.h"
@@ -36,15 +36,15 @@
 
 #ifndef _WIN32
 
-#	ifdef ANDROID
-#		include <sys/vfs.h>
-#	else
-#		include <sys/statvfs.h>
-#	endif
+#ifdef ANDROID
+#include <sys/vfs.h>
+#else
+#include <sys/statvfs.h>
+#endif
 
-#	include "../handle/handle.h"
+#include "../handle/handle.h"
 
-#	include "../pipe/pipe.h"
+#include "../pipe/pipe.h"
 
 static HANDLE_CREATOR _NamedPipeClientHandleCreator;
 
@@ -223,13 +223,13 @@ static HANDLE NamedPipeClientCreateFileA(LPCSTR lpFileName, DWORD dwDesiredAcces
 
 	if (dwFlagsAndAttributes & FILE_FLAG_OVERLAPPED)
 	{
-#	if 0
+#if 0
 		int flags = fcntl(pNamedPipe->clientfd, F_GETFL);
 
 		if (flags != -1)
 			fcntl(pNamedPipe->clientfd, F_SETFL, flags | O_NONBLOCK);
 
-#	endif
+#endif
 	}
 
 	return hNamedPipe;

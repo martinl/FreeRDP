@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -28,8 +28,8 @@
 
 #ifndef _WIN32
 
-#	include "ndr_string.h"
-#	include "ndr_private.h"
+#include "ndr_string.h"
+#include "ndr_private.h"
 
 void NdrConformantStringBufferSize(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory,
                                    PFORMAT_STRING pFormat)

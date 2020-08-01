@@ -37,10 +37,10 @@ static int bppFromShmFormat(enum wl_shm_format format)
 {
 	switch (format)
 	{
-	case WL_SHM_FORMAT_ARGB8888:
-	case WL_SHM_FORMAT_XRGB8888:
-	default:
-		return 4;
+		case WL_SHM_FORMAT_ARGB8888:
+		case WL_SHM_FORMAT_XRGB8888:
+		default:
+			return 4;
 	}
 }
 
@@ -87,24 +87,24 @@ static void xdg_handle_configure(void* data, struct xdg_toplevel* xdg_toplevel, 
 	{
 		switch (*state)
 		{
-		case XDG_TOPLEVEL_STATE_MAXIMIZED:
-			surfaceState |= UWAC_WINDOW_MAXIMIZED;
-			break;
+			case XDG_TOPLEVEL_STATE_MAXIMIZED:
+				surfaceState |= UWAC_WINDOW_MAXIMIZED;
+				break;
 
-		case XDG_TOPLEVEL_STATE_FULLSCREEN:
-			surfaceState |= UWAC_WINDOW_FULLSCREEN;
-			break;
+			case XDG_TOPLEVEL_STATE_FULLSCREEN:
+				surfaceState |= UWAC_WINDOW_FULLSCREEN;
+				break;
 
-		case XDG_TOPLEVEL_STATE_ACTIVATED:
-			surfaceState |= UWAC_WINDOW_ACTIVATED;
-			break;
+			case XDG_TOPLEVEL_STATE_ACTIVATED:
+				surfaceState |= UWAC_WINDOW_ACTIVATED;
+				break;
 
-		case XDG_TOPLEVEL_STATE_RESIZING:
-			surfaceState |= UWAC_WINDOW_RESIZING;
-			break;
+			case XDG_TOPLEVEL_STATE_RESIZING:
+				surfaceState |= UWAC_WINDOW_RESIZING;
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 	window->surfaceStates = surfaceState;
@@ -592,28 +592,28 @@ static void UwacSubmitBufferPtr(UwacWindow* window, UwacBuffer* buffer)
 {
 #if 0
 	UINT32 nrects, i;
-#	ifdef HAVE_PIXMAN_REGION
+#ifdef HAVE_PIXMAN_REGION
 	const pixman_box32_t* box;
-#	else
+#else
 	const RECTANGLE_16* box;
-#	endif
+#endif
 #endif
 	wl_surface_attach(window->surface, buffer->wayland_buffer, 0, 0);
 #if 0
-#	ifdef HAVE_PIXMAN_REGION
+#ifdef HAVE_PIXMAN_REGION
 	box = pixman_region32_rectangles(&buffer->damage, &nrects);
 
 	for (i = 0; i < nrects; i++, box++)
 		wl_surface_damage(window->surface, box->x1, box->y1, (box->x2 - box->x1), (box->y2 - box->y1));
 
-#	else
+#else
 	box = region16_rects(&buffer->damage, &nrects);
 
 	for (i = 0; i < nrects; i++, box++)
 		wl_surface_damage(window->surface, box->left, box->top, (box->right - box->left),
 		                  (box->bottom - box->top));
 
-#	endif
+#endif
 #else
 	wl_surface_damage(window->surface, 0, 0, window->width, window->height);
 #endif

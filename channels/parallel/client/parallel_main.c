@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -29,21 +29,21 @@
 #include <string.h>
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include <fcntl.h>
 #include <errno.h>
 
 #ifndef _WIN32
-#	include <termios.h>
-#	include <strings.h>
-#	include <sys/ioctl.h>
+#include <termios.h>
+#include <strings.h>
+#include <sys/ioctl.h>
 #endif
 
 #ifdef __LINUX__
-#	include <linux/ppdev.h>
-#	include <linux/parport.h>
+#include <linux/ppdev.h>
+#include <linux/parport.h>
 #endif
 
 #include <winpr/crt.h>
@@ -248,56 +248,56 @@ static UINT parallel_process_irp(PARALLEL_DEVICE* parallel, IRP* irp)
 
 	switch (irp->MajorFunction)
 	{
-	case IRP_MJ_CREATE:
-		if ((error = parallel_process_irp_create(parallel, irp)))
-		{
-			WLog_ERR(TAG, "parallel_process_irp_create failed with error %" PRIu32 "!", error);
-			return error;
-		}
+		case IRP_MJ_CREATE:
+			if ((error = parallel_process_irp_create(parallel, irp)))
+			{
+				WLog_ERR(TAG, "parallel_process_irp_create failed with error %" PRIu32 "!", error);
+				return error;
+			}
 
-		break;
+			break;
 
-	case IRP_MJ_CLOSE:
-		if ((error = parallel_process_irp_close(parallel, irp)))
-		{
-			WLog_ERR(TAG, "parallel_process_irp_close failed with error %" PRIu32 "!", error);
-			return error;
-		}
+		case IRP_MJ_CLOSE:
+			if ((error = parallel_process_irp_close(parallel, irp)))
+			{
+				WLog_ERR(TAG, "parallel_process_irp_close failed with error %" PRIu32 "!", error);
+				return error;
+			}
 
-		break;
+			break;
 
-	case IRP_MJ_READ:
-		if ((error = parallel_process_irp_read(parallel, irp)))
-		{
-			WLog_ERR(TAG, "parallel_process_irp_read failed with error %" PRIu32 "!", error);
-			return error;
-		}
+		case IRP_MJ_READ:
+			if ((error = parallel_process_irp_read(parallel, irp)))
+			{
+				WLog_ERR(TAG, "parallel_process_irp_read failed with error %" PRIu32 "!", error);
+				return error;
+			}
 
-		break;
+			break;
 
-	case IRP_MJ_WRITE:
-		if ((error = parallel_process_irp_write(parallel, irp)))
-		{
-			WLog_ERR(TAG, "parallel_process_irp_write failed with error %" PRIu32 "!", error);
-			return error;
-		}
+		case IRP_MJ_WRITE:
+			if ((error = parallel_process_irp_write(parallel, irp)))
+			{
+				WLog_ERR(TAG, "parallel_process_irp_write failed with error %" PRIu32 "!", error);
+				return error;
+			}
 
-		break;
+			break;
 
-	case IRP_MJ_DEVICE_CONTROL:
-		if ((error = parallel_process_irp_device_control(parallel, irp)))
-		{
-			WLog_ERR(TAG, "parallel_process_irp_device_control failed with error %" PRIu32 "!",
-			         error);
-			return error;
-		}
+		case IRP_MJ_DEVICE_CONTROL:
+			if ((error = parallel_process_irp_device_control(parallel, irp)))
+			{
+				WLog_ERR(TAG, "parallel_process_irp_device_control failed with error %" PRIu32 "!",
+				         error);
+				return error;
+			}
 
-		break;
+			break;
 
-	default:
-		irp->IoStatus = STATUS_NOT_SUPPORTED;
-		return irp->Complete(irp);
-		break;
+		default:
+			irp->IoStatus = STATUS_NOT_SUPPORTED;
+			return irp->Complete(irp);
+			break;
 	}
 
 	return CHANNEL_RC_OK;
@@ -389,9 +389,9 @@ static UINT parallel_free(DEVICE* device)
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define DeviceServiceEntry parallel_DeviceServiceEntry
+#define DeviceServiceEntry parallel_DeviceServiceEntry
 #else
-#	define DeviceServiceEntry FREERDP_API DeviceServiceEntry
+#define DeviceServiceEntry FREERDP_API DeviceServiceEntry
 #endif
 
 /**

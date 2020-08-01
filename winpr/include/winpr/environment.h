@@ -27,10 +27,10 @@
 
 #ifndef _WIN32
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-#	endif
+#endif
 
 	WINPR_API DWORD GetCurrentDirectoryA(DWORD nBufferLength, LPSTR lpBuffer);
 	WINPR_API DWORD GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer);
@@ -49,32 +49,32 @@ extern "C"
 	WINPR_API BOOL NeedCurrentDirectoryForExePathA(LPCSTR ExeName);
 	WINPR_API BOOL NeedCurrentDirectoryForExePathW(LPCWSTR ExeName);
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 }
-#	endif
+#endif
 
-#	ifdef UNICODE
-#		define GetCurrentDirectory GetCurrentDirectoryW
-#		define SetCurrentDirectory SetCurrentDirectoryW
-#		define SearchPath SearchPathW
-#		define GetCommandLine GetCommandLineW
-#		define NeedCurrentDirectoryForExePath NeedCurrentDirectoryForExePathW
-#	else
-#		define GetCurrentDirectory GetCurrentDirectoryA
-#		define SetCurrentDirectory SetCurrentDirectoryA
-#		define SearchPath SearchPathA
-#		define GetCommandLine GetCommandLineA
-#		define NeedCurrentDirectoryForExePath NeedCurrentDirectoryForExePathA
-#	endif
+#ifdef UNICODE
+#define GetCurrentDirectory GetCurrentDirectoryW
+#define SetCurrentDirectory SetCurrentDirectoryW
+#define SearchPath SearchPathW
+#define GetCommandLine GetCommandLineW
+#define NeedCurrentDirectoryForExePath NeedCurrentDirectoryForExePathW
+#else
+#define GetCurrentDirectory GetCurrentDirectoryA
+#define SetCurrentDirectory SetCurrentDirectoryA
+#define SearchPath SearchPathA
+#define GetCommandLine GetCommandLineA
+#define NeedCurrentDirectoryForExePath NeedCurrentDirectoryForExePathA
+#endif
 
 #endif
 
 #if !defined(_WIN32) || defined(_UWP)
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-#	endif
+#endif
 
 	WINPR_API DWORD GetEnvironmentVariableA(LPCSTR lpName, LPSTR lpBuffer, DWORD nSize);
 	WINPR_API DWORD GetEnvironmentVariableW(LPCWSTR lpName, LPWSTR lpBuffer, DWORD nSize);
@@ -99,25 +99,25 @@ extern "C"
 	WINPR_API BOOL FreeEnvironmentStringsA(LPCH lpszEnvironmentBlock);
 	WINPR_API BOOL FreeEnvironmentStringsW(LPWCH lpszEnvironmentBlock);
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 }
-#	endif
+#endif
 
-#	ifdef UNICODE
-#		define GetEnvironmentVariable GetEnvironmentVariableW
-#		define SetEnvironmentVariable SetEnvironmentVariableW
-#		define GetEnvironmentStrings GetEnvironmentStringsW
-#		define SetEnvironmentStrings SetEnvironmentStringsW
-#		define ExpandEnvironmentStrings ExpandEnvironmentStringsW
-#		define FreeEnvironmentStrings FreeEnvironmentStringsW
-#	else
-#		define GetEnvironmentVariable GetEnvironmentVariableA
-#		define SetEnvironmentVariable SetEnvironmentVariableA
-#		define GetEnvironmentStringsA GetEnvironmentStrings
-#		define SetEnvironmentStrings SetEnvironmentStringsA
-#		define ExpandEnvironmentStrings ExpandEnvironmentStringsA
-#		define FreeEnvironmentStrings FreeEnvironmentStringsA
-#	endif
+#ifdef UNICODE
+#define GetEnvironmentVariable GetEnvironmentVariableW
+#define SetEnvironmentVariable SetEnvironmentVariableW
+#define GetEnvironmentStrings GetEnvironmentStringsW
+#define SetEnvironmentStrings SetEnvironmentStringsW
+#define ExpandEnvironmentStrings ExpandEnvironmentStringsW
+#define FreeEnvironmentStrings FreeEnvironmentStringsW
+#else
+#define GetEnvironmentVariable GetEnvironmentVariableA
+#define SetEnvironmentVariable SetEnvironmentVariableA
+#define GetEnvironmentStringsA GetEnvironmentStrings
+#define SetEnvironmentStrings SetEnvironmentStringsA
+#define ExpandEnvironmentStrings ExpandEnvironmentStringsA
+#define FreeEnvironmentStrings FreeEnvironmentStringsA
+#endif
 
 #endif
 

@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -61,10 +61,10 @@ VOID _InitializeObjectAttributes(POBJECT_ATTRIBUTES InitializedAttributes,
 
 #ifndef _WIN32
 
-#	include <pthread.h>
-#	include <winpr/crt.h>
+#include <pthread.h>
+#include <winpr/crt.h>
 
-#	include "../handle/handle.h"
+#include "../handle/handle.h"
 
 struct winpr_nt_file
 {
@@ -231,10 +231,10 @@ NTSTATUS _NtCreateFile(PHANDLE FileHandle, ACCESS_MASK DesiredAccess,
                        PLARGE_INTEGER AllocationSize, ULONG FileAttributes, ULONG ShareAccess,
                        ULONG CreateDisposition, ULONG CreateOptions, PVOID EaBuffer, ULONG EaLength)
 {
-#	if 1
+#if 1
 	WLog_ERR(TAG, "%s: Not implemented", __FUNCTION__);
 	return STATUS_NOT_SUPPORTED;
-#	else
+#else
 	WINPR_NT_FILE* pFileHandle;
 	pFileHandle = (WINPR_NT_FILE*)calloc(1, sizeof(WINPR_NT_FILE));
 
@@ -252,7 +252,7 @@ NTSTATUS _NtCreateFile(PHANDLE FileHandle, ACCESS_MASK DesiredAccess,
 	// STATUS_OBJECT_PATH_NOT_FOUND
 	// STATUS_OBJECT_NAME_NOT_FOUND
 	return STATUS_SUCCESS;
-#	endif
+#endif
 }
 
 /**
@@ -264,10 +264,10 @@ NTSTATUS _NtOpenFile(PHANDLE FileHandle, ACCESS_MASK DesiredAccess,
                      POBJECT_ATTRIBUTES ObjectAttributes, PIO_STATUS_BLOCK IoStatusBlock,
                      ULONG ShareAccess, ULONG OpenOptions)
 {
-#	if 1
+#if 1
 	WLog_ERR(TAG, "%s: Not implemented", __FUNCTION__);
 	return STATUS_NOT_SUPPORTED;
-#	else
+#else
 	WINPR_NT_FILE* pFileHandle;
 	pFileHandle = (WINPR_NT_FILE*)calloc(1, sizeof(WINPR_NT_FILE));
 
@@ -278,7 +278,7 @@ NTSTATUS _NtOpenFile(PHANDLE FileHandle, ACCESS_MASK DesiredAccess,
 	pFileHandle->ShareAccess = ShareAccess;
 	*((PULONG_PTR)FileHandle) = (ULONG_PTR)pFileHandle;
 	return STATUS_SUCCESS;
-#	endif
+#endif
 }
 
 /**
@@ -290,12 +290,12 @@ NTSTATUS _NtReadFile(HANDLE FileHandle, HANDLE Event, PIO_APC_ROUTINE ApcRoutine
                      PIO_STATUS_BLOCK IoStatusBlock, PVOID Buffer, ULONG Length,
                      PLARGE_INTEGER ByteOffset, PULONG Key)
 {
-#	if 1
+#if 1
 	WLog_ERR(TAG, "%s: Not implemented", __FUNCTION__);
 	return STATUS_NOT_SUPPORTED;
-#	else
+#else
 	return STATUS_SUCCESS;
-#	endif
+#endif
 }
 
 /**
@@ -307,12 +307,12 @@ NTSTATUS _NtWriteFile(HANDLE FileHandle, HANDLE Event, PIO_APC_ROUTINE ApcRoutin
                       PIO_STATUS_BLOCK IoStatusBlock, PVOID Buffer, ULONG Length,
                       PLARGE_INTEGER ByteOffset, PULONG Key)
 {
-#	if 1
+#if 1
 	WLog_ERR(TAG, "%s: Not implemented", __FUNCTION__);
 	return STATUS_NOT_SUPPORTED;
-#	else
+#else
 	return STATUS_SUCCESS;
-#	endif
+#endif
 }
 
 /**
@@ -325,12 +325,12 @@ NTSTATUS _NtDeviceIoControlFile(HANDLE FileHandle, HANDLE Event, PIO_APC_ROUTINE
                                 ULONG IoControlCode, PVOID InputBuffer, ULONG InputBufferLength,
                                 PVOID OutputBuffer, ULONG OutputBufferLength)
 {
-#	if 1
+#if 1
 	WLog_ERR(TAG, "%s: Not implemented", __FUNCTION__);
 	return STATUS_NOT_SUPPORTED;
-#	else
+#else
 	return STATUS_SUCCESS;
-#	endif
+#endif
 }
 
 /**
@@ -340,10 +340,10 @@ NTSTATUS _NtDeviceIoControlFile(HANDLE FileHandle, HANDLE Event, PIO_APC_ROUTINE
 
 NTSTATUS _NtClose(HANDLE Handle)
 {
-#	if 1
+#if 1
 	WLog_ERR(TAG, "%s: Not implemented", __FUNCTION__);
 	return STATUS_NOT_SUPPORTED;
-#	else
+#else
 	WINPR_NT_FILE* pFileHandle;
 
 	if (!Handle)
@@ -352,7 +352,7 @@ NTSTATUS _NtClose(HANDLE Handle)
 	pFileHandle = (WINPR_NT_FILE*)Handle;
 	free(pFileHandle);
 	return STATUS_SUCCESS;
-#	endif
+#endif
 }
 
 /**
@@ -362,17 +362,17 @@ NTSTATUS _NtClose(HANDLE Handle)
 
 NTSTATUS _NtWaitForSingleObject(HANDLE Handle, BOOLEAN Alertable, PLARGE_INTEGER Timeout)
 {
-#	if 1
+#if 1
 	WLog_ERR(TAG, "%s: Not implemented", __FUNCTION__);
 	return STATUS_NOT_SUPPORTED;
-#	else
+#else
 	return STATUS_SUCCESS;
-#	endif
+#endif
 }
 
 #else
 
-#	include <winpr/synch.h>
+#include <winpr/synch.h>
 
 typedef VOID(WINAPI* RTL_INIT_ANSI_STRING_FN)(PANSI_STRING DestinationString, PCSZ SourceString);
 

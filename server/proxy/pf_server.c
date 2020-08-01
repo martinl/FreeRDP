@@ -331,28 +331,28 @@ static DWORD WINAPI pf_server_handle_client(LPVOID arg)
 
 		switch (WTSVirtualChannelManagerGetDrdynvcState(ps->vcm))
 		{
-		/* Dynamic channel status may have been changed after processing */
-		case DRDYNVC_STATE_NONE:
+			/* Dynamic channel status may have been changed after processing */
+			case DRDYNVC_STATE_NONE:
 
-			/* Initialize drdynvc channel */
-			if (!WTSVirtualChannelManagerCheckFileDescriptor(ps->vcm))
-			{
-				WLog_ERR(TAG, "Failed to initialize drdynvc channel");
-				goto fail;
-			}
+				/* Initialize drdynvc channel */
+				if (!WTSVirtualChannelManagerCheckFileDescriptor(ps->vcm))
+				{
+					WLog_ERR(TAG, "Failed to initialize drdynvc channel");
+					goto fail;
+				}
 
-			break;
+				break;
 
-		case DRDYNVC_STATE_READY:
-			if (WaitForSingleObject(ps->dynvcReady, 0) == WAIT_TIMEOUT)
-			{
-				SetEvent(ps->dynvcReady);
-			}
+			case DRDYNVC_STATE_READY:
+				if (WaitForSingleObject(ps->dynvcReady, 0) == WAIT_TIMEOUT)
+				{
+					SetEvent(ps->dynvcReady);
+				}
 
-			break;
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 

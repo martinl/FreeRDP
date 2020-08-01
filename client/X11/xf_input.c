@@ -18,18 +18,18 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
 #ifdef WITH_XCURSOR
-#	include <X11/Xcursor/Xcursor.h>
+#include <X11/Xcursor/Xcursor.h>
 #endif
 
 #ifdef WITH_XI
-#	include <X11/extensions/XInput2.h>
+#include <X11/extensions/XInput2.h>
 #endif
 
 #include <math.h>
@@ -42,12 +42,12 @@
 
 #ifdef WITH_XI
 
-#	define MAX_CONTACTS 2
+#define MAX_CONTACTS 2
 
-#	define PAN_THRESHOLD 50
-#	define ZOOM_THRESHOLD 10
+#define PAN_THRESHOLD 50
+#define ZOOM_THRESHOLD 10
 
-#	define MIN_FINGER_DIST 5
+#define MIN_FINGER_DIST 5
 
 typedef struct touch_contact
 {
@@ -441,30 +441,30 @@ static int xf_input_handle_event_local(xfContext* xfc, XEvent* event)
 	{
 		switch (cookie->evtype)
 		{
-		case XI_TouchBegin:
-			if (xf_input_is_duplicate(cookie) == FALSE)
-				xf_input_touch_begin(xfc, cookie->data);
+			case XI_TouchBegin:
+				if (xf_input_is_duplicate(cookie) == FALSE)
+					xf_input_touch_begin(xfc, cookie->data);
 
-			xf_input_save_last_event(cookie);
-			break;
+				xf_input_save_last_event(cookie);
+				break;
 
-		case XI_TouchUpdate:
-			if (xf_input_is_duplicate(cookie) == FALSE)
-				xf_input_touch_update(xfc, cookie->data);
+			case XI_TouchUpdate:
+				if (xf_input_is_duplicate(cookie) == FALSE)
+					xf_input_touch_update(xfc, cookie->data);
 
-			xf_input_save_last_event(cookie);
-			break;
+				xf_input_save_last_event(cookie);
+				break;
 
-		case XI_TouchEnd:
-			if (xf_input_is_duplicate(cookie) == FALSE)
-				xf_input_touch_end(xfc, cookie->data);
+			case XI_TouchEnd:
+				if (xf_input_is_duplicate(cookie) == FALSE)
+					xf_input_touch_end(xfc, cookie->data);
 
-			xf_input_save_last_event(cookie);
-			break;
+				xf_input_save_last_event(cookie);
+				break;
 
-		default:
-			WLog_ERR(TAG, "unhandled xi type= %d", cookie->evtype);
-			break;
+			default:
+				WLog_ERR(TAG, "unhandled xi type= %d", cookie->evtype);
+				break;
 		}
 	}
 
@@ -472,7 +472,7 @@ static int xf_input_handle_event_local(xfContext* xfc, XEvent* event)
 	return 0;
 }
 
-#	ifdef WITH_DEBUG_X11
+#ifdef WITH_DEBUG_X11
 static char* xf_input_touch_state_string(DWORD flags)
 {
 	if (flags & CONTACT_FLAG_DOWN)
@@ -484,11 +484,11 @@ static char* xf_input_touch_state_string(DWORD flags)
 	else
 		return "TouchUnknown";
 }
-#	endif
+#endif
 
 static void xf_input_hide_cursor(xfContext* xfc)
 {
-#	ifdef WITH_XCURSOR
+#ifdef WITH_XCURSOR
 
 	if (!xfc->cursorHidden)
 	{
@@ -511,12 +511,12 @@ static void xf_input_hide_cursor(xfContext* xfc)
 		xf_unlock_x11(xfc, FALSE);
 	}
 
-#	endif
+#endif
 }
 
 static void xf_input_show_cursor(xfContext* xfc)
 {
-#	ifdef WITH_XCURSOR
+#ifdef WITH_XCURSOR
 	xf_lock_x11(xfc, FALSE);
 
 	if (xfc->cursorHidden)
@@ -533,7 +533,7 @@ static void xf_input_show_cursor(xfContext* xfc)
 	}
 
 	xf_unlock_x11(xfc, FALSE);
-#	endif
+#endif
 }
 
 static int xf_input_touch_remote(xfContext* xfc, XIDeviceEvent* event, int evtype)
@@ -577,20 +577,20 @@ static int xf_input_event(xfContext* xfc, XIDeviceEvent* event, int evtype)
 
 	switch (evtype)
 	{
-	case XI_ButtonPress:
-		xf_generic_ButtonEvent(xfc, (int)event->event_x, (int)event->event_y, event->detail,
-		                       event->event, xfc->remote_app, TRUE);
-		break;
+		case XI_ButtonPress:
+			xf_generic_ButtonEvent(xfc, (int)event->event_x, (int)event->event_y, event->detail,
+			                       event->event, xfc->remote_app, TRUE);
+			break;
 
-	case XI_ButtonRelease:
-		xf_generic_ButtonEvent(xfc, (int)event->event_x, (int)event->event_y, event->detail,
-		                       event->event, xfc->remote_app, FALSE);
-		break;
+		case XI_ButtonRelease:
+			xf_generic_ButtonEvent(xfc, (int)event->event_x, (int)event->event_y, event->detail,
+			                       event->event, xfc->remote_app, FALSE);
+			break;
 
-	case XI_Motion:
-		xf_generic_MotionNotify(xfc, (int)event->event_x, (int)event->event_y, event->detail,
-		                        event->event, xfc->remote_app);
-		break;
+		case XI_Motion:
+			xf_generic_MotionNotify(xfc, (int)event->event_x, (int)event->event_y, event->detail,
+			                        event->event, xfc->remote_app);
+			break;
 	}
 
 	return 0;
@@ -605,21 +605,21 @@ static int xf_input_handle_event_remote(xfContext* xfc, XEvent* event)
 	{
 		switch (cookie->evtype)
 		{
-		case XI_TouchBegin:
-			xf_input_touch_remote(xfc, cookie->data, XI_TouchBegin);
-			break;
+			case XI_TouchBegin:
+				xf_input_touch_remote(xfc, cookie->data, XI_TouchBegin);
+				break;
 
-		case XI_TouchUpdate:
-			xf_input_touch_remote(xfc, cookie->data, XI_TouchUpdate);
-			break;
+			case XI_TouchUpdate:
+				xf_input_touch_remote(xfc, cookie->data, XI_TouchUpdate);
+				break;
 
-		case XI_TouchEnd:
-			xf_input_touch_remote(xfc, cookie->data, XI_TouchEnd);
-			break;
+			case XI_TouchEnd:
+				xf_input_touch_remote(xfc, cookie->data, XI_TouchEnd);
+				break;
 
-		default:
-			xf_input_event(xfc, cookie->data, cookie->evtype);
-			break;
+			default:
+				xf_input_event(xfc, cookie->data, cookie->evtype);
+				break;
 		}
 	}
 

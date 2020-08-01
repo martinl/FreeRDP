@@ -21,7 +21,8 @@ static UIFont *buttonFont = nil;
 
 #pragma mark - init
 
-+ (void)initialize {
++ (void)initialize
+{
 	if (self == [BlockAlertView class])
 	{
 		background = [UIImage imageNamed:kAlertViewBackground];
@@ -40,18 +41,21 @@ static UIFont *buttonFont = nil;
 	}
 }
 
-+ (BlockAlertView *)alertWithTitle:(NSString *)title message:(NSString *)message {
++ (BlockAlertView *)alertWithTitle:(NSString *)title message:(NSString *)message
+{
 	return [[[BlockAlertView alloc] initWithTitle:title message:message] autorelease];
 }
 
-+ (void)showInfoAlertWithTitle:(NSString *)title message:(NSString *)message {
++ (void)showInfoAlertWithTitle:(NSString *)title message:(NSString *)message
+{
 	BlockAlertView *alert = [[BlockAlertView alloc] initWithTitle:title message:message];
 	[alert setCancelButtonWithTitle:NSLocalizedString(@"Dismiss", nil) block:nil];
 	[alert show];
 	[alert release];
 }
 
-+ (void)showErrorAlert:(NSError *)error {
++ (void)showErrorAlert:(NSError *)error
+{
 	BlockAlertView *alert = [[BlockAlertView alloc]
 	    initWithTitle:NSLocalizedString(@"Operation Failed", nil)
 	          message:[NSString
@@ -67,7 +71,8 @@ static UIFont *buttonFont = nil;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - NSObject
 
-- (void)addComponents:(CGRect)frame {
+- (void)addComponents:(CGRect)frame
+{
 	if (_title)
 	{
 		CGSize size = [_title sizeWithFont:titleFont
@@ -118,7 +123,8 @@ static UIFont *buttonFont = nil;
 	}
 }
 
-- (void)setupDisplay {
+- (void)setupDisplay
+{
 	[[_view subviews] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 		[obj removeFromSuperview];
 	}];
@@ -150,7 +156,8 @@ static UIFont *buttonFont = nil;
 		[self show];
 }
 
-- (id)initWithTitle:(NSString *)title message:(NSString *)message {
+- (id)initWithTitle:(NSString *)title message:(NSString *)message
+{
 	self = [super init];
 
 	if (self)
@@ -181,7 +188,8 @@ static UIFont *buttonFont = nil;
 	return self;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[_title release];
 	[_message release];
 	[_backgroundImage release];
@@ -193,24 +201,29 @@ static UIFont *buttonFont = nil;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Public
 
-- (void)addButtonWithTitle:(NSString *)title color:(NSString *)color block:(void (^)())block {
+- (void)addButtonWithTitle:(NSString *)title color:(NSString *)color block:(void (^)())block
+{
 	[_blocks addObject:[NSArray arrayWithObjects:block ? [[block copy] autorelease] : [NSNull null],
 	                                             title, color, nil]];
 }
 
-- (void)addButtonWithTitle:(NSString *)title block:(void (^)())block {
+- (void)addButtonWithTitle:(NSString *)title block:(void (^)())block
+{
 	[self addButtonWithTitle:title color:@"gray" block:block];
 }
 
-- (void)setCancelButtonWithTitle:(NSString *)title block:(void (^)())block {
+- (void)setCancelButtonWithTitle:(NSString *)title block:(void (^)())block
+{
 	[self addButtonWithTitle:title color:@"black" block:block];
 }
 
-- (void)setDestructiveButtonWithTitle:(NSString *)title block:(void (^)())block {
+- (void)setDestructiveButtonWithTitle:(NSString *)title block:(void (^)())block
+{
 	[self addButtonWithTitle:title color:@"red" block:block];
 }
 
-- (void)show {
+- (void)show
+{
 	_shown = YES;
 
 	BOOL isSecondButton = NO;
@@ -397,7 +410,8 @@ static UIFont *buttonFont = nil;
 	[self retain];
 }
 
-- (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated {
+- (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated
+{
 	_shown = NO;
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -451,7 +465,8 @@ static UIFont *buttonFont = nil;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Action
 
-- (void)buttonClicked:(id)sender {
+- (void)buttonClicked:(id)sender
+{
 	/* Run the button's block */
 	int buttonIndex = [sender tag] - 1;
 	[self dismissWithClickedButtonIndex:buttonIndex animated:YES];

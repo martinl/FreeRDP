@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/synch.h>
@@ -30,18 +30,18 @@
 
 #ifndef _WIN32
 
-#	include <stdio.h>
-#	include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 VOID InitializeSListHead(WINPR_PSLIST_HEADER ListHead)
 {
-#	ifdef _WIN64
+#ifdef _WIN64
 	ListHead->s.Alignment = 0;
 	ListHead->s.Region = 0;
 	ListHead->Header8.Init = 1;
-#	else
+#else
 	ListHead->Alignment = 0;
-#	endif
+#endif
 }
 
 WINPR_PSLIST_ENTRY InterlockedPushEntrySList(WINPR_PSLIST_HEADER ListHead,
@@ -49,7 +49,7 @@ WINPR_PSLIST_ENTRY InterlockedPushEntrySList(WINPR_PSLIST_HEADER ListHead,
 {
 	WINPR_SLIST_HEADER old;
 	WINPR_SLIST_HEADER newHeader;
-#	ifdef _WIN64
+#ifdef _WIN64
 	newHeader.HeaderX64.NextEntry = (((ULONG_PTR)ListEntry) >> 4);
 
 	while (1)
@@ -69,7 +69,7 @@ WINPR_PSLIST_ENTRY InterlockedPushEntrySList(WINPR_PSLIST_HEADER ListHead,
 	}
 
 	return (PSLIST_ENTRY)((ULONG_PTR)old.HeaderX64.NextEntry << 4);
-#	else
+#else
 	newHeader.s.Next.Next = ListEntry;
 
 	do
@@ -92,15 +92,15 @@ WINPR_PSLIST_ENTRY InterlockedPushEntrySList(WINPR_PSLIST_HEADER ListHead,
 	                                      (LONGLONG)old.Alignment) != (LONGLONG)old.Alignment);
 
 	return old.s.Next.Next;
-#	endif
+#endif
 }
 
 WINPR_PSLIST_ENTRY InterlockedPushListSListEx(WINPR_PSLIST_HEADER ListHead, WINPR_PSLIST_ENTRY List,
                                               WINPR_PSLIST_ENTRY ListEnd, ULONG Count)
 {
-#	ifdef _WIN64
-#	else
-#	endif
+#ifdef _WIN64
+#else
+#endif
 	return NULL;
 }
 
@@ -109,7 +109,7 @@ WINPR_PSLIST_ENTRY InterlockedPopEntrySList(WINPR_PSLIST_HEADER ListHead)
 	WINPR_SLIST_HEADER old;
 	WINPR_SLIST_HEADER newHeader;
 	WINPR_PSLIST_ENTRY entry;
-#	ifdef _WIN64
+#ifdef _WIN64
 
 	while (1)
 	{
@@ -132,7 +132,7 @@ WINPR_PSLIST_ENTRY InterlockedPopEntrySList(WINPR_PSLIST_HEADER ListHead)
 		}
 	}
 
-#	else
+#else
 
 	do
 	{
@@ -158,7 +158,7 @@ WINPR_PSLIST_ENTRY InterlockedPopEntrySList(WINPR_PSLIST_HEADER ListHead)
 	                                      (LONGLONG)newHeader.Alignment,
 	                                      (LONGLONG)old.Alignment) != (LONGLONG)old.Alignment);
 
-#	endif
+#endif
 	return entry;
 }
 
@@ -170,7 +170,7 @@ WINPR_PSLIST_ENTRY InterlockedFlushSList(WINPR_PSLIST_HEADER ListHead)
 	if (!QueryDepthSList(ListHead))
 		return NULL;
 
-#	ifdef _WIN64
+#ifdef _WIN64
 	newHeader.s.Alignment = 0;
 	newHeader.s.Region = 0;
 	newHeader.HeaderX64.HeaderType = 1;
@@ -190,7 +190,7 @@ WINPR_PSLIST_ENTRY InterlockedFlushSList(WINPR_PSLIST_HEADER ListHead)
 	}
 
 	return (PSLIST_ENTRY)(((ULONG_PTR)old.HeaderX64.NextEntry) << 4);
-#	else
+#else
 	newHeader.Alignment = 0;
 
 	do
@@ -211,71 +211,71 @@ WINPR_PSLIST_ENTRY InterlockedFlushSList(WINPR_PSLIST_HEADER ListHead)
 	                                      (LONGLONG)old.Alignment) != (LONGLONG)old.Alignment);
 
 	return old.s.Next.Next;
-#	endif
+#endif
 }
 
 USHORT QueryDepthSList(WINPR_PSLIST_HEADER ListHead)
 {
-#	ifdef _WIN64
+#ifdef _WIN64
 	return ListHead->HeaderX64.Depth;
-#	else
+#else
 	return ListHead->s.Depth;
-#	endif
+#endif
 }
 
 LONG InterlockedIncrement(LONG volatile* Addend)
 {
-#	ifdef __GNUC__
+#ifdef __GNUC__
 	return __sync_add_and_fetch(Addend, 1);
-#	else
+#else
 	return 0;
-#	endif
+#endif
 }
 
 LONG InterlockedDecrement(LONG volatile* Addend)
 {
-#	ifdef __GNUC__
+#ifdef __GNUC__
 	return __sync_sub_and_fetch(Addend, 1);
-#	else
+#else
 	return 0;
-#	endif
+#endif
 }
 
 LONG InterlockedExchange(LONG volatile* Target, LONG Value)
 {
-#	ifdef __GNUC__
+#ifdef __GNUC__
 	return __sync_val_compare_and_swap(Target, *Target, Value);
-#	else
+#else
 	return 0;
-#	endif
+#endif
 }
 
 LONG InterlockedExchangeAdd(LONG volatile* Addend, LONG Value)
 {
-#	ifdef __GNUC__
+#ifdef __GNUC__
 	return __sync_fetch_and_add(Addend, Value);
-#	else
+#else
 	return 0;
-#	endif
+#endif
 }
 
 LONG InterlockedCompareExchange(LONG volatile* Destination, LONG Exchange, LONG Comperand)
 {
-#	ifdef __GNUC__
+#ifdef __GNUC__
 	return __sync_val_compare_and_swap(Destination, Comperand, Exchange);
-#	else
+#else
 	return 0;
-#	endif
+#endif
 }
 
 PVOID InterlockedCompareExchangePointer(PVOID volatile* Destination, PVOID Exchange,
                                         PVOID Comperand)
 {
-#	ifdef __GNUC__
+#ifdef __GNUC__
 	return __sync_val_compare_and_swap(Destination, Comperand, Exchange);
-#	else
+#else
 	return 0;
-#	endif
+#endif
 }
 
 #endif /* _WIN32 */
@@ -325,7 +325,7 @@ LONGLONG InterlockedCompareExchange64(LONGLONG volatile* Destination, LONGLONG E
 #elif (defined(ANDROID) && ANDROID) || \
     (defined(__GNUC__) && !defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8))
 
-#	include <pthread.h>
+#include <pthread.h>
 
 static pthread_mutex_t mutex;
 
@@ -348,11 +348,11 @@ LONGLONG InterlockedCompareExchange64(LONGLONG volatile* Destination, LONGLONG E
 LONGLONG InterlockedCompareExchange64(LONGLONG volatile* Destination, LONGLONG Exchange,
                                       LONGLONG Comperand)
 {
-#	ifdef __GNUC__
+#ifdef __GNUC__
 	return __sync_val_compare_and_swap(Destination, Comperand, Exchange);
-#	else
+#else
 	return 0;
-#	endif
+#endif
 }
 
 #endif

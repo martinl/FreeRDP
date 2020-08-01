@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "window.h"
@@ -121,42 +121,42 @@ static BOOL check_alt_order_supported(wLog* log, rdpSettings* settings, BYTE ord
 
 	switch (orderType)
 	{
-	case ORDER_TYPE_CREATE_OFFSCREEN_BITMAP:
-	case ORDER_TYPE_SWITCH_SURFACE:
-		condition = settings->OffscreenSupportLevel != 0;
-		break;
+		case ORDER_TYPE_CREATE_OFFSCREEN_BITMAP:
+		case ORDER_TYPE_SWITCH_SURFACE:
+			condition = settings->OffscreenSupportLevel != 0;
+			break;
 
-	case ORDER_TYPE_CREATE_NINE_GRID_BITMAP:
-		condition = settings->DrawNineGridEnabled;
-		break;
+		case ORDER_TYPE_CREATE_NINE_GRID_BITMAP:
+			condition = settings->DrawNineGridEnabled;
+			break;
 
-	case ORDER_TYPE_FRAME_MARKER:
-		condition = settings->FrameMarkerCommandEnabled;
-		break;
+		case ORDER_TYPE_FRAME_MARKER:
+			condition = settings->FrameMarkerCommandEnabled;
+			break;
 
-	case ORDER_TYPE_GDIPLUS_FIRST:
-	case ORDER_TYPE_GDIPLUS_NEXT:
-	case ORDER_TYPE_GDIPLUS_END:
-	case ORDER_TYPE_GDIPLUS_CACHE_FIRST:
-	case ORDER_TYPE_GDIPLUS_CACHE_NEXT:
-	case ORDER_TYPE_GDIPLUS_CACHE_END:
-		condition = settings->DrawGdiPlusCacheEnabled;
-		break;
+		case ORDER_TYPE_GDIPLUS_FIRST:
+		case ORDER_TYPE_GDIPLUS_NEXT:
+		case ORDER_TYPE_GDIPLUS_END:
+		case ORDER_TYPE_GDIPLUS_CACHE_FIRST:
+		case ORDER_TYPE_GDIPLUS_CACHE_NEXT:
+		case ORDER_TYPE_GDIPLUS_CACHE_END:
+			condition = settings->DrawGdiPlusCacheEnabled;
+			break;
 
-	case ORDER_TYPE_WINDOW:
-		condition = settings->RemoteWndSupportLevel != WINDOW_LEVEL_NOT_SUPPORTED;
-		break;
+		case ORDER_TYPE_WINDOW:
+			condition = settings->RemoteWndSupportLevel != WINDOW_LEVEL_NOT_SUPPORTED;
+			break;
 
-	case ORDER_TYPE_STREAM_BITMAP_FIRST:
-	case ORDER_TYPE_STREAM_BITMAP_NEXT:
-	case ORDER_TYPE_COMPDESK_FIRST:
-		condition = TRUE;
-		break;
+		case ORDER_TYPE_STREAM_BITMAP_FIRST:
+		case ORDER_TYPE_STREAM_BITMAP_NEXT:
+		case ORDER_TYPE_COMPDESK_FIRST:
+			condition = TRUE;
+			break;
 
-	default:
-		WLog_Print(log, WLOG_WARN, "%s - Alternate Secondary Drawing Order UNKNOWN", orderName);
-		condition = FALSE;
-		break;
+		default:
+			WLog_Print(log, WLOG_WARN, "%s - Alternate Secondary Drawing Order UNKNOWN", orderName);
+			condition = FALSE;
+			break;
 	}
 
 	return check_order_activated(log, settings, orderName, condition);
@@ -169,50 +169,50 @@ static BOOL check_secondary_order_supported(wLog* log, rdpSettings* settings, BY
 
 	switch (orderType)
 	{
-	case ORDER_TYPE_BITMAP_UNCOMPRESSED:
-	case ORDER_TYPE_CACHE_BITMAP_COMPRESSED:
-		condition = settings->BitmapCacheEnabled;
-		break;
+		case ORDER_TYPE_BITMAP_UNCOMPRESSED:
+		case ORDER_TYPE_CACHE_BITMAP_COMPRESSED:
+			condition = settings->BitmapCacheEnabled;
+			break;
 
-	case ORDER_TYPE_BITMAP_UNCOMPRESSED_V2:
-	case ORDER_TYPE_BITMAP_COMPRESSED_V2:
-		condition = settings->BitmapCacheEnabled;
-		break;
+		case ORDER_TYPE_BITMAP_UNCOMPRESSED_V2:
+		case ORDER_TYPE_BITMAP_COMPRESSED_V2:
+			condition = settings->BitmapCacheEnabled;
+			break;
 
-	case ORDER_TYPE_BITMAP_COMPRESSED_V3:
-		condition = settings->BitmapCacheV3Enabled;
-		break;
+		case ORDER_TYPE_BITMAP_COMPRESSED_V3:
+			condition = settings->BitmapCacheV3Enabled;
+			break;
 
-	case ORDER_TYPE_CACHE_COLOR_TABLE:
-		condition =
-		    (settings->OrderSupport[NEG_MEMBLT_INDEX] || settings->OrderSupport[NEG_MEM3BLT_INDEX]);
-		break;
+		case ORDER_TYPE_CACHE_COLOR_TABLE:
+			condition = (settings->OrderSupport[NEG_MEMBLT_INDEX] ||
+			             settings->OrderSupport[NEG_MEM3BLT_INDEX]);
+			break;
 
-	case ORDER_TYPE_CACHE_GLYPH:
-	{
-		switch (settings->GlyphSupportLevel)
+		case ORDER_TYPE_CACHE_GLYPH:
 		{
-		case GLYPH_SUPPORT_PARTIAL:
-		case GLYPH_SUPPORT_FULL:
-		case GLYPH_SUPPORT_ENCODE:
+			switch (settings->GlyphSupportLevel)
+			{
+				case GLYPH_SUPPORT_PARTIAL:
+				case GLYPH_SUPPORT_FULL:
+				case GLYPH_SUPPORT_ENCODE:
+					condition = TRUE;
+					break;
+
+				case GLYPH_SUPPORT_NONE:
+				default:
+					condition = FALSE;
+					break;
+			}
+		}
+		break;
+
+		case ORDER_TYPE_CACHE_BRUSH:
 			condition = TRUE;
 			break;
 
-		case GLYPH_SUPPORT_NONE:
 		default:
-			condition = FALSE;
+			WLog_Print(log, WLOG_WARN, "SECONDARY ORDER %s not supported", orderName);
 			break;
-		}
-	}
-	break;
-
-	case ORDER_TYPE_CACHE_BRUSH:
-		condition = TRUE;
-		break;
-
-	default:
-		WLog_Print(log, WLOG_WARN, "SECONDARY ORDER %s not supported", orderName);
-		break;
 	}
 
 	return check_order_activated(log, settings, orderName, condition);
@@ -225,97 +225,97 @@ static BOOL check_primary_order_supported(wLog* log, rdpSettings* settings, UINT
 
 	switch (orderType)
 	{
-	case ORDER_TYPE_DSTBLT:
-		condition = settings->OrderSupport[NEG_DSTBLT_INDEX];
-		break;
+		case ORDER_TYPE_DSTBLT:
+			condition = settings->OrderSupport[NEG_DSTBLT_INDEX];
+			break;
 
-	case ORDER_TYPE_SCRBLT:
-		condition = settings->OrderSupport[NEG_SCRBLT_INDEX];
-		break;
+		case ORDER_TYPE_SCRBLT:
+			condition = settings->OrderSupport[NEG_SCRBLT_INDEX];
+			break;
 
-	case ORDER_TYPE_DRAW_NINE_GRID:
-		condition = settings->OrderSupport[NEG_DRAWNINEGRID_INDEX];
-		break;
+		case ORDER_TYPE_DRAW_NINE_GRID:
+			condition = settings->OrderSupport[NEG_DRAWNINEGRID_INDEX];
+			break;
 
-	case ORDER_TYPE_MULTI_DRAW_NINE_GRID:
-		condition = settings->OrderSupport[NEG_MULTI_DRAWNINEGRID_INDEX];
-		break;
+		case ORDER_TYPE_MULTI_DRAW_NINE_GRID:
+			condition = settings->OrderSupport[NEG_MULTI_DRAWNINEGRID_INDEX];
+			break;
 
-	case ORDER_TYPE_LINE_TO:
-		condition = settings->OrderSupport[NEG_LINETO_INDEX];
-		break;
+		case ORDER_TYPE_LINE_TO:
+			condition = settings->OrderSupport[NEG_LINETO_INDEX];
+			break;
 
-	/* [MS-RDPEGDI] 2.2.2.2.1.1.2.5 OpaqueRect (OPAQUERECT_ORDER)
-	 * suggests that PatBlt and OpaqueRect imply each other. */
-	case ORDER_TYPE_PATBLT:
-	case ORDER_TYPE_OPAQUE_RECT:
-		condition = settings->OrderSupport[NEG_OPAQUE_RECT_INDEX] ||
-		            settings->OrderSupport[NEG_PATBLT_INDEX];
-		break;
+		/* [MS-RDPEGDI] 2.2.2.2.1.1.2.5 OpaqueRect (OPAQUERECT_ORDER)
+		 * suggests that PatBlt and OpaqueRect imply each other. */
+		case ORDER_TYPE_PATBLT:
+		case ORDER_TYPE_OPAQUE_RECT:
+			condition = settings->OrderSupport[NEG_OPAQUE_RECT_INDEX] ||
+			            settings->OrderSupport[NEG_PATBLT_INDEX];
+			break;
 
-	case ORDER_TYPE_SAVE_BITMAP:
-		condition = settings->OrderSupport[NEG_SAVEBITMAP_INDEX];
-		break;
+		case ORDER_TYPE_SAVE_BITMAP:
+			condition = settings->OrderSupport[NEG_SAVEBITMAP_INDEX];
+			break;
 
-	case ORDER_TYPE_MEMBLT:
-		condition = settings->OrderSupport[NEG_MEMBLT_INDEX];
-		break;
+		case ORDER_TYPE_MEMBLT:
+			condition = settings->OrderSupport[NEG_MEMBLT_INDEX];
+			break;
 
-	case ORDER_TYPE_MEM3BLT:
-		condition = settings->OrderSupport[NEG_MEM3BLT_INDEX];
-		break;
+		case ORDER_TYPE_MEM3BLT:
+			condition = settings->OrderSupport[NEG_MEM3BLT_INDEX];
+			break;
 
-	case ORDER_TYPE_MULTI_DSTBLT:
-		condition = settings->OrderSupport[NEG_MULTIDSTBLT_INDEX];
-		break;
+		case ORDER_TYPE_MULTI_DSTBLT:
+			condition = settings->OrderSupport[NEG_MULTIDSTBLT_INDEX];
+			break;
 
-	case ORDER_TYPE_MULTI_PATBLT:
-		condition = settings->OrderSupport[NEG_MULTIPATBLT_INDEX];
-		break;
+		case ORDER_TYPE_MULTI_PATBLT:
+			condition = settings->OrderSupport[NEG_MULTIPATBLT_INDEX];
+			break;
 
-	case ORDER_TYPE_MULTI_SCRBLT:
-		condition = settings->OrderSupport[NEG_MULTIDSTBLT_INDEX];
-		break;
+		case ORDER_TYPE_MULTI_SCRBLT:
+			condition = settings->OrderSupport[NEG_MULTIDSTBLT_INDEX];
+			break;
 
-	case ORDER_TYPE_MULTI_OPAQUE_RECT:
-		condition = settings->OrderSupport[NEG_MULTIOPAQUERECT_INDEX];
-		break;
+		case ORDER_TYPE_MULTI_OPAQUE_RECT:
+			condition = settings->OrderSupport[NEG_MULTIOPAQUERECT_INDEX];
+			break;
 
-	case ORDER_TYPE_FAST_INDEX:
-		condition = settings->OrderSupport[NEG_FAST_INDEX_INDEX];
-		break;
+		case ORDER_TYPE_FAST_INDEX:
+			condition = settings->OrderSupport[NEG_FAST_INDEX_INDEX];
+			break;
 
-	case ORDER_TYPE_POLYGON_SC:
-		condition = settings->OrderSupport[NEG_POLYGON_SC_INDEX];
-		break;
+		case ORDER_TYPE_POLYGON_SC:
+			condition = settings->OrderSupport[NEG_POLYGON_SC_INDEX];
+			break;
 
-	case ORDER_TYPE_POLYGON_CB:
-		condition = settings->OrderSupport[NEG_POLYGON_CB_INDEX];
-		break;
+		case ORDER_TYPE_POLYGON_CB:
+			condition = settings->OrderSupport[NEG_POLYGON_CB_INDEX];
+			break;
 
-	case ORDER_TYPE_POLYLINE:
-		condition = settings->OrderSupport[NEG_POLYLINE_INDEX];
-		break;
+		case ORDER_TYPE_POLYLINE:
+			condition = settings->OrderSupport[NEG_POLYLINE_INDEX];
+			break;
 
-	case ORDER_TYPE_FAST_GLYPH:
-		condition = settings->OrderSupport[NEG_FAST_GLYPH_INDEX];
-		break;
+		case ORDER_TYPE_FAST_GLYPH:
+			condition = settings->OrderSupport[NEG_FAST_GLYPH_INDEX];
+			break;
 
-	case ORDER_TYPE_ELLIPSE_SC:
-		condition = settings->OrderSupport[NEG_ELLIPSE_SC_INDEX];
-		break;
+		case ORDER_TYPE_ELLIPSE_SC:
+			condition = settings->OrderSupport[NEG_ELLIPSE_SC_INDEX];
+			break;
 
-	case ORDER_TYPE_ELLIPSE_CB:
-		condition = settings->OrderSupport[NEG_ELLIPSE_CB_INDEX];
-		break;
+		case ORDER_TYPE_ELLIPSE_CB:
+			condition = settings->OrderSupport[NEG_ELLIPSE_CB_INDEX];
+			break;
 
-	case ORDER_TYPE_GLYPH_INDEX:
-		condition = settings->OrderSupport[NEG_GLYPH_INDEX_INDEX];
-		break;
+		case ORDER_TYPE_GLYPH_INDEX:
+			condition = settings->OrderSupport[NEG_GLYPH_INDEX_INDEX];
+			break;
 
-	default:
-		WLog_Print(log, WLOG_WARN, "%s Primary Drawing Order not supported", orderName);
-		break;
+		default:
+			WLog_Print(log, WLOG_WARN, "%s Primary Drawing Order not supported", orderName);
+			break;
 	}
 
 	return check_order_activated(log, settings, orderName, condition);
@@ -614,36 +614,36 @@ static INLINE BOOL update_read_4byte_unsigned(wStream* s, UINT32* value)
 
 	switch (count)
 	{
-	case 0:
-		*value = (byte & 0x3F);
-		break;
+		case 0:
+			*value = (byte & 0x3F);
+			break;
 
-	case 1:
-		*value = (byte & 0x3F) << 8;
-		Stream_Read_UINT8(s, byte);
-		*value |= byte;
-		break;
+		case 1:
+			*value = (byte & 0x3F) << 8;
+			Stream_Read_UINT8(s, byte);
+			*value |= byte;
+			break;
 
-	case 2:
-		*value = (byte & 0x3F) << 16;
-		Stream_Read_UINT8(s, byte);
-		*value |= (byte << 8);
-		Stream_Read_UINT8(s, byte);
-		*value |= byte;
-		break;
+		case 2:
+			*value = (byte & 0x3F) << 16;
+			Stream_Read_UINT8(s, byte);
+			*value |= (byte << 8);
+			Stream_Read_UINT8(s, byte);
+			*value |= byte;
+			break;
 
-	case 3:
-		*value = (byte & 0x3F) << 24;
-		Stream_Read_UINT8(s, byte);
-		*value |= (byte << 16);
-		Stream_Read_UINT8(s, byte);
-		*value |= (byte << 8);
-		Stream_Read_UINT8(s, byte);
-		*value |= byte;
-		break;
+		case 3:
+			*value = (byte & 0x3F) << 24;
+			Stream_Read_UINT8(s, byte);
+			*value |= (byte << 16);
+			Stream_Read_UINT8(s, byte);
+			*value |= (byte << 8);
+			Stream_Read_UINT8(s, byte);
+			*value |= byte;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return TRUE;
@@ -3112,98 +3112,100 @@ static BOOL read_primary_order(wLog* log, const char* orderName, wStream* s,
 
 	switch (orderInfo->orderType)
 	{
-	case ORDER_TYPE_DSTBLT:
-		rc = update_read_dstblt_order(s, orderInfo, &(primary->dstblt));
-		break;
+		case ORDER_TYPE_DSTBLT:
+			rc = update_read_dstblt_order(s, orderInfo, &(primary->dstblt));
+			break;
 
-	case ORDER_TYPE_PATBLT:
-		rc = update_read_patblt_order(s, orderInfo, &(primary->patblt));
-		break;
+		case ORDER_TYPE_PATBLT:
+			rc = update_read_patblt_order(s, orderInfo, &(primary->patblt));
+			break;
 
-	case ORDER_TYPE_SCRBLT:
-		rc = update_read_scrblt_order(s, orderInfo, &(primary->scrblt));
-		break;
+		case ORDER_TYPE_SCRBLT:
+			rc = update_read_scrblt_order(s, orderInfo, &(primary->scrblt));
+			break;
 
-	case ORDER_TYPE_OPAQUE_RECT:
-		rc = update_read_opaque_rect_order(s, orderInfo, &(primary->opaque_rect));
-		break;
+		case ORDER_TYPE_OPAQUE_RECT:
+			rc = update_read_opaque_rect_order(s, orderInfo, &(primary->opaque_rect));
+			break;
 
-	case ORDER_TYPE_DRAW_NINE_GRID:
-		rc = update_read_draw_nine_grid_order(s, orderInfo, &(primary->draw_nine_grid));
-		break;
+		case ORDER_TYPE_DRAW_NINE_GRID:
+			rc = update_read_draw_nine_grid_order(s, orderInfo, &(primary->draw_nine_grid));
+			break;
 
-	case ORDER_TYPE_MULTI_DSTBLT:
-		rc = update_read_multi_dstblt_order(s, orderInfo, &(primary->multi_dstblt));
-		break;
+		case ORDER_TYPE_MULTI_DSTBLT:
+			rc = update_read_multi_dstblt_order(s, orderInfo, &(primary->multi_dstblt));
+			break;
 
-	case ORDER_TYPE_MULTI_PATBLT:
-		rc = update_read_multi_patblt_order(s, orderInfo, &(primary->multi_patblt));
-		break;
+		case ORDER_TYPE_MULTI_PATBLT:
+			rc = update_read_multi_patblt_order(s, orderInfo, &(primary->multi_patblt));
+			break;
 
-	case ORDER_TYPE_MULTI_SCRBLT:
-		rc = update_read_multi_scrblt_order(s, orderInfo, &(primary->multi_scrblt));
-		break;
+		case ORDER_TYPE_MULTI_SCRBLT:
+			rc = update_read_multi_scrblt_order(s, orderInfo, &(primary->multi_scrblt));
+			break;
 
-	case ORDER_TYPE_MULTI_OPAQUE_RECT:
-		rc = update_read_multi_opaque_rect_order(s, orderInfo, &(primary->multi_opaque_rect));
-		break;
+		case ORDER_TYPE_MULTI_OPAQUE_RECT:
+			rc = update_read_multi_opaque_rect_order(s, orderInfo, &(primary->multi_opaque_rect));
+			break;
 
-	case ORDER_TYPE_MULTI_DRAW_NINE_GRID:
-		rc = update_read_multi_draw_nine_grid_order(s, orderInfo, &(primary->multi_draw_nine_grid));
-		break;
+		case ORDER_TYPE_MULTI_DRAW_NINE_GRID:
+			rc = update_read_multi_draw_nine_grid_order(s, orderInfo,
+			                                            &(primary->multi_draw_nine_grid));
+			break;
 
-	case ORDER_TYPE_LINE_TO:
-		rc = update_read_line_to_order(s, orderInfo, &(primary->line_to));
-		break;
+		case ORDER_TYPE_LINE_TO:
+			rc = update_read_line_to_order(s, orderInfo, &(primary->line_to));
+			break;
 
-	case ORDER_TYPE_POLYLINE:
-		rc = update_read_polyline_order(s, orderInfo, &(primary->polyline));
-		break;
+		case ORDER_TYPE_POLYLINE:
+			rc = update_read_polyline_order(s, orderInfo, &(primary->polyline));
+			break;
 
-	case ORDER_TYPE_MEMBLT:
-		rc = update_read_memblt_order(s, orderInfo, &(primary->memblt));
-		break;
+		case ORDER_TYPE_MEMBLT:
+			rc = update_read_memblt_order(s, orderInfo, &(primary->memblt));
+			break;
 
-	case ORDER_TYPE_MEM3BLT:
-		rc = update_read_mem3blt_order(s, orderInfo, &(primary->mem3blt));
-		break;
+		case ORDER_TYPE_MEM3BLT:
+			rc = update_read_mem3blt_order(s, orderInfo, &(primary->mem3blt));
+			break;
 
-	case ORDER_TYPE_SAVE_BITMAP:
-		rc = update_read_save_bitmap_order(s, orderInfo, &(primary->save_bitmap));
-		break;
+		case ORDER_TYPE_SAVE_BITMAP:
+			rc = update_read_save_bitmap_order(s, orderInfo, &(primary->save_bitmap));
+			break;
 
-	case ORDER_TYPE_GLYPH_INDEX:
-		rc = update_read_glyph_index_order(s, orderInfo, &(primary->glyph_index));
-		break;
+		case ORDER_TYPE_GLYPH_INDEX:
+			rc = update_read_glyph_index_order(s, orderInfo, &(primary->glyph_index));
+			break;
 
-	case ORDER_TYPE_FAST_INDEX:
-		rc = update_read_fast_index_order(s, orderInfo, &(primary->fast_index));
-		break;
+		case ORDER_TYPE_FAST_INDEX:
+			rc = update_read_fast_index_order(s, orderInfo, &(primary->fast_index));
+			break;
 
-	case ORDER_TYPE_FAST_GLYPH:
-		rc = update_read_fast_glyph_order(s, orderInfo, &(primary->fast_glyph));
-		break;
+		case ORDER_TYPE_FAST_GLYPH:
+			rc = update_read_fast_glyph_order(s, orderInfo, &(primary->fast_glyph));
+			break;
 
-	case ORDER_TYPE_POLYGON_SC:
-		rc = update_read_polygon_sc_order(s, orderInfo, &(primary->polygon_sc));
-		break;
+		case ORDER_TYPE_POLYGON_SC:
+			rc = update_read_polygon_sc_order(s, orderInfo, &(primary->polygon_sc));
+			break;
 
-	case ORDER_TYPE_POLYGON_CB:
-		rc = update_read_polygon_cb_order(s, orderInfo, &(primary->polygon_cb));
-		break;
+		case ORDER_TYPE_POLYGON_CB:
+			rc = update_read_polygon_cb_order(s, orderInfo, &(primary->polygon_cb));
+			break;
 
-	case ORDER_TYPE_ELLIPSE_SC:
-		rc = update_read_ellipse_sc_order(s, orderInfo, &(primary->ellipse_sc));
-		break;
+		case ORDER_TYPE_ELLIPSE_SC:
+			rc = update_read_ellipse_sc_order(s, orderInfo, &(primary->ellipse_sc));
+			break;
 
-	case ORDER_TYPE_ELLIPSE_CB:
-		rc = update_read_ellipse_cb_order(s, orderInfo, &(primary->ellipse_cb));
-		break;
+		case ORDER_TYPE_ELLIPSE_CB:
+			rc = update_read_ellipse_cb_order(s, orderInfo, &(primary->ellipse_cb));
+			break;
 
-	default:
-		WLog_Print(log, WLOG_WARN, "Primary Drawing Order %s not supported, ignoring", orderName);
-		rc = TRUE;
-		break;
+		default:
+			WLog_Print(log, WLOG_WARN, "Primary Drawing Order %s not supported, ignoring",
+			           orderName);
+			rc = TRUE;
+			break;
 	}
 
 	if (!rc)
@@ -3271,180 +3273,181 @@ static BOOL update_recv_primary_order(rdpUpdate* update, wStream* s, BYTE flags)
 
 	switch (orderInfo->orderType)
 	{
-	case ORDER_TYPE_DSTBLT:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
-		           orderName, gdi_rop3_code_string(primary->dstblt.bRop),
-		           gdi_rop3_code(primary->dstblt.bRop));
-		rc = IFCALLRESULT(FALSE, primary->DstBlt, context, &primary->dstblt);
-	}
-	break;
-
-	case ORDER_TYPE_PATBLT:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
-		           orderName, gdi_rop3_code_string(primary->patblt.bRop),
-		           gdi_rop3_code(primary->patblt.bRop));
-		rc = IFCALLRESULT(FALSE, primary->PatBlt, context, &primary->patblt);
-	}
-	break;
-
-	case ORDER_TYPE_SCRBLT:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
-		           orderName, gdi_rop3_code_string(primary->scrblt.bRop),
-		           gdi_rop3_code(primary->scrblt.bRop));
-		rc = IFCALLRESULT(FALSE, primary->ScrBlt, context, &primary->scrblt);
-	}
-	break;
-
-	case ORDER_TYPE_OPAQUE_RECT:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->OpaqueRect, context, &primary->opaque_rect);
-	}
-	break;
-
-	case ORDER_TYPE_DRAW_NINE_GRID:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->DrawNineGrid, context, &primary->draw_nine_grid);
-	}
-	break;
-
-	case ORDER_TYPE_MULTI_DSTBLT:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
-		           orderName, gdi_rop3_code_string(primary->multi_dstblt.bRop),
-		           gdi_rop3_code(primary->multi_dstblt.bRop));
-		rc = IFCALLRESULT(FALSE, primary->MultiDstBlt, context, &primary->multi_dstblt);
-	}
-	break;
-
-	case ORDER_TYPE_MULTI_PATBLT:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
-		           orderName, gdi_rop3_code_string(primary->multi_patblt.bRop),
-		           gdi_rop3_code(primary->multi_patblt.bRop));
-		rc = IFCALLRESULT(FALSE, primary->MultiPatBlt, context, &primary->multi_patblt);
-	}
-	break;
-
-	case ORDER_TYPE_MULTI_SCRBLT:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
-		           orderName, gdi_rop3_code_string(primary->multi_scrblt.bRop),
-		           gdi_rop3_code(primary->multi_scrblt.bRop));
-		rc = IFCALLRESULT(FALSE, primary->MultiScrBlt, context, &primary->multi_scrblt);
-	}
-	break;
-
-	case ORDER_TYPE_MULTI_OPAQUE_RECT:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->MultiOpaqueRect, context, &primary->multi_opaque_rect);
-	}
-	break;
-
-	case ORDER_TYPE_MULTI_DRAW_NINE_GRID:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->MultiDrawNineGrid, context,
-		                  &primary->multi_draw_nine_grid);
-	}
-	break;
-
-	case ORDER_TYPE_LINE_TO:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->LineTo, context, &primary->line_to);
-	}
-	break;
-
-	case ORDER_TYPE_POLYLINE:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->Polyline, context, &primary->polyline);
-	}
-	break;
-
-	case ORDER_TYPE_MEMBLT:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
-		           orderName, gdi_rop3_code_string(primary->memblt.bRop),
-		           gdi_rop3_code(primary->memblt.bRop));
-		rc = IFCALLRESULT(FALSE, primary->MemBlt, context, &primary->memblt);
-	}
-	break;
-
-	case ORDER_TYPE_MEM3BLT:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
-		           orderName, gdi_rop3_code_string(primary->mem3blt.bRop),
-		           gdi_rop3_code(primary->mem3blt.bRop));
-		rc = IFCALLRESULT(FALSE, primary->Mem3Blt, context, &primary->mem3blt);
-	}
-	break;
-
-	case ORDER_TYPE_SAVE_BITMAP:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->SaveBitmap, context, &primary->save_bitmap);
-	}
-	break;
-
-	case ORDER_TYPE_GLYPH_INDEX:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->GlyphIndex, context, &primary->glyph_index);
-	}
-	break;
-
-	case ORDER_TYPE_FAST_INDEX:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->FastIndex, context, &primary->fast_index);
-	}
-	break;
-
-	case ORDER_TYPE_FAST_GLYPH:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->FastGlyph, context, &primary->fast_glyph);
-	}
-	break;
-
-	case ORDER_TYPE_POLYGON_SC:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->PolygonSC, context, &primary->polygon_sc);
-	}
-	break;
-
-	case ORDER_TYPE_POLYGON_CB:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->PolygonCB, context, &primary->polygon_cb);
-	}
-	break;
-
-	case ORDER_TYPE_ELLIPSE_SC:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->EllipseSC, context, &primary->ellipse_sc);
-	}
-	break;
-
-	case ORDER_TYPE_ELLIPSE_CB:
-	{
-		WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
-		rc = IFCALLRESULT(FALSE, primary->EllipseCB, context, &primary->ellipse_cb);
-	}
-	break;
-
-	default:
-		WLog_Print(update->log, WLOG_WARN, "Primary Drawing Order %s not supported", orderName);
+		case ORDER_TYPE_DSTBLT:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
+			           orderName, gdi_rop3_code_string(primary->dstblt.bRop),
+			           gdi_rop3_code(primary->dstblt.bRop));
+			rc = IFCALLRESULT(FALSE, primary->DstBlt, context, &primary->dstblt);
+		}
 		break;
+
+		case ORDER_TYPE_PATBLT:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
+			           orderName, gdi_rop3_code_string(primary->patblt.bRop),
+			           gdi_rop3_code(primary->patblt.bRop));
+			rc = IFCALLRESULT(FALSE, primary->PatBlt, context, &primary->patblt);
+		}
+		break;
+
+		case ORDER_TYPE_SCRBLT:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
+			           orderName, gdi_rop3_code_string(primary->scrblt.bRop),
+			           gdi_rop3_code(primary->scrblt.bRop));
+			rc = IFCALLRESULT(FALSE, primary->ScrBlt, context, &primary->scrblt);
+		}
+		break;
+
+		case ORDER_TYPE_OPAQUE_RECT:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->OpaqueRect, context, &primary->opaque_rect);
+		}
+		break;
+
+		case ORDER_TYPE_DRAW_NINE_GRID:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->DrawNineGrid, context, &primary->draw_nine_grid);
+		}
+		break;
+
+		case ORDER_TYPE_MULTI_DSTBLT:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
+			           orderName, gdi_rop3_code_string(primary->multi_dstblt.bRop),
+			           gdi_rop3_code(primary->multi_dstblt.bRop));
+			rc = IFCALLRESULT(FALSE, primary->MultiDstBlt, context, &primary->multi_dstblt);
+		}
+		break;
+
+		case ORDER_TYPE_MULTI_PATBLT:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
+			           orderName, gdi_rop3_code_string(primary->multi_patblt.bRop),
+			           gdi_rop3_code(primary->multi_patblt.bRop));
+			rc = IFCALLRESULT(FALSE, primary->MultiPatBlt, context, &primary->multi_patblt);
+		}
+		break;
+
+		case ORDER_TYPE_MULTI_SCRBLT:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
+			           orderName, gdi_rop3_code_string(primary->multi_scrblt.bRop),
+			           gdi_rop3_code(primary->multi_scrblt.bRop));
+			rc = IFCALLRESULT(FALSE, primary->MultiScrBlt, context, &primary->multi_scrblt);
+		}
+		break;
+
+		case ORDER_TYPE_MULTI_OPAQUE_RECT:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc =
+			    IFCALLRESULT(FALSE, primary->MultiOpaqueRect, context, &primary->multi_opaque_rect);
+		}
+		break;
+
+		case ORDER_TYPE_MULTI_DRAW_NINE_GRID:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->MultiDrawNineGrid, context,
+			                  &primary->multi_draw_nine_grid);
+		}
+		break;
+
+		case ORDER_TYPE_LINE_TO:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->LineTo, context, &primary->line_to);
+		}
+		break;
+
+		case ORDER_TYPE_POLYLINE:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->Polyline, context, &primary->polyline);
+		}
+		break;
+
+		case ORDER_TYPE_MEMBLT:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
+			           orderName, gdi_rop3_code_string(primary->memblt.bRop),
+			           gdi_rop3_code(primary->memblt.bRop));
+			rc = IFCALLRESULT(FALSE, primary->MemBlt, context, &primary->memblt);
+		}
+		break;
+
+		case ORDER_TYPE_MEM3BLT:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s rop=%s [0x%08" PRIx32 "]",
+			           orderName, gdi_rop3_code_string(primary->mem3blt.bRop),
+			           gdi_rop3_code(primary->mem3blt.bRop));
+			rc = IFCALLRESULT(FALSE, primary->Mem3Blt, context, &primary->mem3blt);
+		}
+		break;
+
+		case ORDER_TYPE_SAVE_BITMAP:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->SaveBitmap, context, &primary->save_bitmap);
+		}
+		break;
+
+		case ORDER_TYPE_GLYPH_INDEX:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->GlyphIndex, context, &primary->glyph_index);
+		}
+		break;
+
+		case ORDER_TYPE_FAST_INDEX:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->FastIndex, context, &primary->fast_index);
+		}
+		break;
+
+		case ORDER_TYPE_FAST_GLYPH:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->FastGlyph, context, &primary->fast_glyph);
+		}
+		break;
+
+		case ORDER_TYPE_POLYGON_SC:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->PolygonSC, context, &primary->polygon_sc);
+		}
+		break;
+
+		case ORDER_TYPE_POLYGON_CB:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->PolygonCB, context, &primary->polygon_cb);
+		}
+		break;
+
+		case ORDER_TYPE_ELLIPSE_SC:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->EllipseSC, context, &primary->ellipse_sc);
+		}
+		break;
+
+		case ORDER_TYPE_ELLIPSE_CB:
+		{
+			WLog_Print(update->log, WLOG_DEBUG, "Primary Drawing Order %s", orderName);
+			rc = IFCALLRESULT(FALSE, primary->EllipseCB, context, &primary->ellipse_cb);
+		}
+		break;
+
+		default:
+			WLog_Print(update->log, WLOG_WARN, "Primary Drawing Order %s not supported", orderName);
+			break;
 	}
 
 	if (!rc)
@@ -3491,112 +3494,114 @@ static BOOL update_recv_secondary_order(rdpUpdate* update, wStream* s, BYTE flag
 
 	switch (orderType)
 	{
-	case ORDER_TYPE_BITMAP_UNCOMPRESSED:
-	case ORDER_TYPE_CACHE_BITMAP_COMPRESSED:
-	{
-		const BOOL compressed = (orderType == ORDER_TYPE_CACHE_BITMAP_COMPRESSED);
-		CACHE_BITMAP_ORDER* order =
-		    update_read_cache_bitmap_order(update, s, compressed, extraFlags);
-
-		if (order)
+		case ORDER_TYPE_BITMAP_UNCOMPRESSED:
+		case ORDER_TYPE_CACHE_BITMAP_COMPRESSED:
 		{
-			rc = IFCALLRESULT(FALSE, secondary->CacheBitmap, context, order);
-			free_cache_bitmap_order(context, order);
-		}
-	}
-	break;
-
-	case ORDER_TYPE_BITMAP_UNCOMPRESSED_V2:
-	case ORDER_TYPE_BITMAP_COMPRESSED_V2:
-	{
-		const BOOL compressed = (orderType == ORDER_TYPE_BITMAP_COMPRESSED_V2);
-		CACHE_BITMAP_V2_ORDER* order =
-		    update_read_cache_bitmap_v2_order(update, s, compressed, extraFlags);
-
-		if (order)
-		{
-			rc = IFCALLRESULT(FALSE, secondary->CacheBitmapV2, context, order);
-			free_cache_bitmap_v2_order(context, order);
-		}
-	}
-	break;
-
-	case ORDER_TYPE_BITMAP_COMPRESSED_V3:
-	{
-		CACHE_BITMAP_V3_ORDER* order = update_read_cache_bitmap_v3_order(update, s, extraFlags);
-
-		if (order)
-		{
-			rc = IFCALLRESULT(FALSE, secondary->CacheBitmapV3, context, order);
-			free_cache_bitmap_v3_order(context, order);
-		}
-	}
-	break;
-
-	case ORDER_TYPE_CACHE_COLOR_TABLE:
-	{
-		CACHE_COLOR_TABLE_ORDER* order = update_read_cache_color_table_order(update, s, extraFlags);
-
-		if (order)
-		{
-			rc = IFCALLRESULT(FALSE, secondary->CacheColorTable, context, order);
-			free_cache_color_table_order(context, order);
-		}
-	}
-	break;
-
-	case ORDER_TYPE_CACHE_GLYPH:
-	{
-		switch (settings->GlyphSupportLevel)
-		{
-		case GLYPH_SUPPORT_PARTIAL:
-		case GLYPH_SUPPORT_FULL:
-		{
-			CACHE_GLYPH_ORDER* order = update_read_cache_glyph_order(update, s, extraFlags);
+			const BOOL compressed = (orderType == ORDER_TYPE_CACHE_BITMAP_COMPRESSED);
+			CACHE_BITMAP_ORDER* order =
+			    update_read_cache_bitmap_order(update, s, compressed, extraFlags);
 
 			if (order)
 			{
-				rc = IFCALLRESULT(FALSE, secondary->CacheGlyph, context, order);
-				free_cache_glyph_order(context, order);
+				rc = IFCALLRESULT(FALSE, secondary->CacheBitmap, context, order);
+				free_cache_bitmap_order(context, order);
 			}
 		}
 		break;
 
-		case GLYPH_SUPPORT_ENCODE:
+		case ORDER_TYPE_BITMAP_UNCOMPRESSED_V2:
+		case ORDER_TYPE_BITMAP_COMPRESSED_V2:
 		{
-			CACHE_GLYPH_V2_ORDER* order = update_read_cache_glyph_v2_order(update, s, extraFlags);
+			const BOOL compressed = (orderType == ORDER_TYPE_BITMAP_COMPRESSED_V2);
+			CACHE_BITMAP_V2_ORDER* order =
+			    update_read_cache_bitmap_v2_order(update, s, compressed, extraFlags);
 
 			if (order)
 			{
-				rc = IFCALLRESULT(FALSE, secondary->CacheGlyphV2, context, order);
-				free_cache_glyph_v2_order(context, order);
+				rc = IFCALLRESULT(FALSE, secondary->CacheBitmapV2, context, order);
+				free_cache_bitmap_v2_order(context, order);
 			}
 		}
 		break;
 
-		case GLYPH_SUPPORT_NONE:
-		default:
+		case ORDER_TYPE_BITMAP_COMPRESSED_V3:
+		{
+			CACHE_BITMAP_V3_ORDER* order = update_read_cache_bitmap_v3_order(update, s, extraFlags);
+
+			if (order)
+			{
+				rc = IFCALLRESULT(FALSE, secondary->CacheBitmapV3, context, order);
+				free_cache_bitmap_v3_order(context, order);
+			}
+		}
+		break;
+
+		case ORDER_TYPE_CACHE_COLOR_TABLE:
+		{
+			CACHE_COLOR_TABLE_ORDER* order =
+			    update_read_cache_color_table_order(update, s, extraFlags);
+
+			if (order)
+			{
+				rc = IFCALLRESULT(FALSE, secondary->CacheColorTable, context, order);
+				free_cache_color_table_order(context, order);
+			}
+		}
+		break;
+
+		case ORDER_TYPE_CACHE_GLYPH:
+		{
+			switch (settings->GlyphSupportLevel)
+			{
+				case GLYPH_SUPPORT_PARTIAL:
+				case GLYPH_SUPPORT_FULL:
+				{
+					CACHE_GLYPH_ORDER* order = update_read_cache_glyph_order(update, s, extraFlags);
+
+					if (order)
+					{
+						rc = IFCALLRESULT(FALSE, secondary->CacheGlyph, context, order);
+						free_cache_glyph_order(context, order);
+					}
+				}
+				break;
+
+				case GLYPH_SUPPORT_ENCODE:
+				{
+					CACHE_GLYPH_V2_ORDER* order =
+					    update_read_cache_glyph_v2_order(update, s, extraFlags);
+
+					if (order)
+					{
+						rc = IFCALLRESULT(FALSE, secondary->CacheGlyphV2, context, order);
+						free_cache_glyph_v2_order(context, order);
+					}
+				}
+				break;
+
+				case GLYPH_SUPPORT_NONE:
+				default:
+					break;
+			}
+		}
+		break;
+
+		case ORDER_TYPE_CACHE_BRUSH:
+			/* [MS-RDPEGDI] 2.2.2.2.1.2.7 Cache Brush (CACHE_BRUSH_ORDER) */
+			{
+				CACHE_BRUSH_ORDER* order = update_read_cache_brush_order(update, s, extraFlags);
+
+				if (order)
+				{
+					rc = IFCALLRESULT(FALSE, secondary->CacheBrush, context, order);
+					free_cache_brush_order(context, order);
+				}
+			}
 			break;
-		}
-	}
-	break;
 
-	case ORDER_TYPE_CACHE_BRUSH:
-		/* [MS-RDPEGDI] 2.2.2.2.1.2.7 Cache Brush (CACHE_BRUSH_ORDER) */
-		{
-			CACHE_BRUSH_ORDER* order = update_read_cache_brush_order(update, s, extraFlags);
-
-			if (order)
-			{
-				rc = IFCALLRESULT(FALSE, secondary->CacheBrush, context, order);
-				free_cache_brush_order(context, order);
-			}
-		}
-		break;
-
-	default:
-		WLog_Print(update->log, WLOG_WARN, "SECONDARY ORDER %s not supported", name);
-		break;
+		default:
+			WLog_Print(update->log, WLOG_WARN, "SECONDARY ORDER %s not supported", name);
+			break;
 	}
 
 	if (!rc)
@@ -3614,65 +3619,65 @@ static BOOL read_altsec_order(wStream* s, BYTE orderType, rdpAltSecUpdate* altse
 
 	switch (orderType)
 	{
-	case ORDER_TYPE_CREATE_OFFSCREEN_BITMAP:
-		rc = update_read_create_offscreen_bitmap_order(s, &(altsec->create_offscreen_bitmap));
-		break;
+		case ORDER_TYPE_CREATE_OFFSCREEN_BITMAP:
+			rc = update_read_create_offscreen_bitmap_order(s, &(altsec->create_offscreen_bitmap));
+			break;
 
-	case ORDER_TYPE_SWITCH_SURFACE:
-		rc = update_read_switch_surface_order(s, &(altsec->switch_surface));
-		break;
+		case ORDER_TYPE_SWITCH_SURFACE:
+			rc = update_read_switch_surface_order(s, &(altsec->switch_surface));
+			break;
 
-	case ORDER_TYPE_CREATE_NINE_GRID_BITMAP:
-		rc = update_read_create_nine_grid_bitmap_order(s, &(altsec->create_nine_grid_bitmap));
-		break;
+		case ORDER_TYPE_CREATE_NINE_GRID_BITMAP:
+			rc = update_read_create_nine_grid_bitmap_order(s, &(altsec->create_nine_grid_bitmap));
+			break;
 
-	case ORDER_TYPE_FRAME_MARKER:
-		rc = update_read_frame_marker_order(s, &(altsec->frame_marker));
-		break;
+		case ORDER_TYPE_FRAME_MARKER:
+			rc = update_read_frame_marker_order(s, &(altsec->frame_marker));
+			break;
 
-	case ORDER_TYPE_STREAM_BITMAP_FIRST:
-		rc = update_read_stream_bitmap_first_order(s, &(altsec->stream_bitmap_first));
-		break;
+		case ORDER_TYPE_STREAM_BITMAP_FIRST:
+			rc = update_read_stream_bitmap_first_order(s, &(altsec->stream_bitmap_first));
+			break;
 
-	case ORDER_TYPE_STREAM_BITMAP_NEXT:
-		rc = update_read_stream_bitmap_next_order(s, &(altsec->stream_bitmap_next));
-		break;
+		case ORDER_TYPE_STREAM_BITMAP_NEXT:
+			rc = update_read_stream_bitmap_next_order(s, &(altsec->stream_bitmap_next));
+			break;
 
-	case ORDER_TYPE_GDIPLUS_FIRST:
-		rc = update_read_draw_gdiplus_first_order(s, &(altsec->draw_gdiplus_first));
-		break;
+		case ORDER_TYPE_GDIPLUS_FIRST:
+			rc = update_read_draw_gdiplus_first_order(s, &(altsec->draw_gdiplus_first));
+			break;
 
-	case ORDER_TYPE_GDIPLUS_NEXT:
-		rc = update_read_draw_gdiplus_next_order(s, &(altsec->draw_gdiplus_next));
-		break;
+		case ORDER_TYPE_GDIPLUS_NEXT:
+			rc = update_read_draw_gdiplus_next_order(s, &(altsec->draw_gdiplus_next));
+			break;
 
-	case ORDER_TYPE_GDIPLUS_END:
-		rc = update_read_draw_gdiplus_end_order(s, &(altsec->draw_gdiplus_end));
-		break;
+		case ORDER_TYPE_GDIPLUS_END:
+			rc = update_read_draw_gdiplus_end_order(s, &(altsec->draw_gdiplus_end));
+			break;
 
-	case ORDER_TYPE_GDIPLUS_CACHE_FIRST:
-		rc = update_read_draw_gdiplus_cache_first_order(s, &(altsec->draw_gdiplus_cache_first));
-		break;
+		case ORDER_TYPE_GDIPLUS_CACHE_FIRST:
+			rc = update_read_draw_gdiplus_cache_first_order(s, &(altsec->draw_gdiplus_cache_first));
+			break;
 
-	case ORDER_TYPE_GDIPLUS_CACHE_NEXT:
-		rc = update_read_draw_gdiplus_cache_next_order(s, &(altsec->draw_gdiplus_cache_next));
-		break;
+		case ORDER_TYPE_GDIPLUS_CACHE_NEXT:
+			rc = update_read_draw_gdiplus_cache_next_order(s, &(altsec->draw_gdiplus_cache_next));
+			break;
 
-	case ORDER_TYPE_GDIPLUS_CACHE_END:
-		rc = update_read_draw_gdiplus_cache_end_order(s, &(altsec->draw_gdiplus_cache_end));
-		break;
+		case ORDER_TYPE_GDIPLUS_CACHE_END:
+			rc = update_read_draw_gdiplus_cache_end_order(s, &(altsec->draw_gdiplus_cache_end));
+			break;
 
-	case ORDER_TYPE_WINDOW:
-		/* This order is handled elsewhere. */
-		rc = TRUE;
-		break;
+		case ORDER_TYPE_WINDOW:
+			/* This order is handled elsewhere. */
+			rc = TRUE;
+			break;
 
-	case ORDER_TYPE_COMPDESK_FIRST:
-		rc = TRUE;
-		break;
+		case ORDER_TYPE_COMPDESK_FIRST:
+			rc = TRUE;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return rc;
@@ -3696,64 +3701,68 @@ static BOOL update_recv_altsec_order(rdpUpdate* update, wStream* s, BYTE flags)
 
 	switch (orderType)
 	{
-	case ORDER_TYPE_CREATE_OFFSCREEN_BITMAP:
-		IFCALLRET(altsec->CreateOffscreenBitmap, rc, context, &(altsec->create_offscreen_bitmap));
-		break;
+		case ORDER_TYPE_CREATE_OFFSCREEN_BITMAP:
+			IFCALLRET(altsec->CreateOffscreenBitmap, rc, context,
+			          &(altsec->create_offscreen_bitmap));
+			break;
 
-	case ORDER_TYPE_SWITCH_SURFACE:
-		IFCALLRET(altsec->SwitchSurface, rc, context, &(altsec->switch_surface));
-		break;
+		case ORDER_TYPE_SWITCH_SURFACE:
+			IFCALLRET(altsec->SwitchSurface, rc, context, &(altsec->switch_surface));
+			break;
 
-	case ORDER_TYPE_CREATE_NINE_GRID_BITMAP:
-		IFCALLRET(altsec->CreateNineGridBitmap, rc, context, &(altsec->create_nine_grid_bitmap));
-		break;
+		case ORDER_TYPE_CREATE_NINE_GRID_BITMAP:
+			IFCALLRET(altsec->CreateNineGridBitmap, rc, context,
+			          &(altsec->create_nine_grid_bitmap));
+			break;
 
-	case ORDER_TYPE_FRAME_MARKER:
-		IFCALLRET(altsec->FrameMarker, rc, context, &(altsec->frame_marker));
-		break;
+		case ORDER_TYPE_FRAME_MARKER:
+			IFCALLRET(altsec->FrameMarker, rc, context, &(altsec->frame_marker));
+			break;
 
-	case ORDER_TYPE_STREAM_BITMAP_FIRST:
-		IFCALLRET(altsec->StreamBitmapFirst, rc, context, &(altsec->stream_bitmap_first));
-		break;
+		case ORDER_TYPE_STREAM_BITMAP_FIRST:
+			IFCALLRET(altsec->StreamBitmapFirst, rc, context, &(altsec->stream_bitmap_first));
+			break;
 
-	case ORDER_TYPE_STREAM_BITMAP_NEXT:
-		IFCALLRET(altsec->StreamBitmapNext, rc, context, &(altsec->stream_bitmap_next));
-		break;
+		case ORDER_TYPE_STREAM_BITMAP_NEXT:
+			IFCALLRET(altsec->StreamBitmapNext, rc, context, &(altsec->stream_bitmap_next));
+			break;
 
-	case ORDER_TYPE_GDIPLUS_FIRST:
-		IFCALLRET(altsec->DrawGdiPlusFirst, rc, context, &(altsec->draw_gdiplus_first));
-		break;
+		case ORDER_TYPE_GDIPLUS_FIRST:
+			IFCALLRET(altsec->DrawGdiPlusFirst, rc, context, &(altsec->draw_gdiplus_first));
+			break;
 
-	case ORDER_TYPE_GDIPLUS_NEXT:
-		IFCALLRET(altsec->DrawGdiPlusNext, rc, context, &(altsec->draw_gdiplus_next));
-		break;
+		case ORDER_TYPE_GDIPLUS_NEXT:
+			IFCALLRET(altsec->DrawGdiPlusNext, rc, context, &(altsec->draw_gdiplus_next));
+			break;
 
-	case ORDER_TYPE_GDIPLUS_END:
-		IFCALLRET(altsec->DrawGdiPlusEnd, rc, context, &(altsec->draw_gdiplus_end));
-		break;
+		case ORDER_TYPE_GDIPLUS_END:
+			IFCALLRET(altsec->DrawGdiPlusEnd, rc, context, &(altsec->draw_gdiplus_end));
+			break;
 
-	case ORDER_TYPE_GDIPLUS_CACHE_FIRST:
-		IFCALLRET(altsec->DrawGdiPlusCacheFirst, rc, context, &(altsec->draw_gdiplus_cache_first));
-		break;
+		case ORDER_TYPE_GDIPLUS_CACHE_FIRST:
+			IFCALLRET(altsec->DrawGdiPlusCacheFirst, rc, context,
+			          &(altsec->draw_gdiplus_cache_first));
+			break;
 
-	case ORDER_TYPE_GDIPLUS_CACHE_NEXT:
-		IFCALLRET(altsec->DrawGdiPlusCacheNext, rc, context, &(altsec->draw_gdiplus_cache_next));
-		break;
+		case ORDER_TYPE_GDIPLUS_CACHE_NEXT:
+			IFCALLRET(altsec->DrawGdiPlusCacheNext, rc, context,
+			          &(altsec->draw_gdiplus_cache_next));
+			break;
 
-	case ORDER_TYPE_GDIPLUS_CACHE_END:
-		IFCALLRET(altsec->DrawGdiPlusCacheEnd, rc, context, &(altsec->draw_gdiplus_cache_end));
-		break;
+		case ORDER_TYPE_GDIPLUS_CACHE_END:
+			IFCALLRET(altsec->DrawGdiPlusCacheEnd, rc, context, &(altsec->draw_gdiplus_cache_end));
+			break;
 
-	case ORDER_TYPE_WINDOW:
-		rc = update_recv_altsec_window_order(update, s);
-		break;
+		case ORDER_TYPE_WINDOW:
+			rc = update_recv_altsec_window_order(update, s);
+			break;
 
-	case ORDER_TYPE_COMPDESK_FIRST:
-		rc = TRUE;
-		break;
+		case ORDER_TYPE_COMPDESK_FIRST:
+			rc = TRUE;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	if (!rc)

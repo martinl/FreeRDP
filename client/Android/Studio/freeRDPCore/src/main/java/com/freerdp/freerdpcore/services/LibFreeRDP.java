@@ -235,17 +235,17 @@ public class LibFreeRDP
 
 		switch (advanced.getSecurity())
 		{
-		case 3: // NLA
-			args.add("/sec-nla");
-			break;
-		case 2: // TLS
-			args.add("/sec-tls");
-			break;
-		case 1: // RDP
-			args.add("/sec-rdp");
-			break;
-		default:
-			break;
+			case 3: // NLA
+				args.add("/sec-nla");
+				break;
+			case 2: // TLS
+				args.add("/sec-tls");
+				break;
+			case 1: // RDP
+				args.add("/sec-rdp");
+				break;
+			default:
+				break;
 		}
 
 		if (!certName.isEmpty())

@@ -15,7 +15,8 @@
 
 static BlockBackground *_sharedInstance = nil;
 
-+ (BlockBackground *)sharedInstance {
++ (BlockBackground *)sharedInstance
+{
 	if (_sharedInstance != nil)
 	{
 		return _sharedInstance;
@@ -32,7 +33,8 @@ static BlockBackground *_sharedInstance = nil;
 	return _sharedInstance;
 }
 
-+ (id)allocWithZone:(NSZone *)zone {
++ (id)allocWithZone:(NSZone *)zone
+{
 	@synchronized(self)
 	{
 		if (_sharedInstance == nil)
@@ -45,26 +47,32 @@ static BlockBackground *_sharedInstance = nil;
 	return nil;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (id)copyWithZone:(NSZone *)zone
+{
 	return self;
 }
 
-- (id)retain {
+- (id)retain
+{
 	return self;
 }
 
-- (unsigned)retainCount {
+- (unsigned)retainCount
+{
 	return UINT_MAX;
 }
 
-- (oneway void)release {
+- (oneway void)release
+{
 }
 
-- (id)autorelease {
+- (id)autorelease
+{
 	return self;
 }
 
-- (void)setRotation:(NSNotification *)notification {
+- (void)setRotation:(NSNotification *)notification
+{
 	UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
 
 	CGRect orientationFrame = [UIScreen mainScreen].bounds;
@@ -90,22 +98,22 @@ static BlockBackground *_sharedInstance = nil;
 
 	switch (orientation)
 	{
-	case UIInterfaceOrientationPortraitUpsideDown:
-		rotateAngle = M_PI;
-		newCenter = CGPointMake(posX, orientationFrame.size.height - posY);
-		break;
-	case UIInterfaceOrientationLandscapeLeft:
-		rotateAngle = -M_PI / 2.0f;
-		newCenter = CGPointMake(posY, posX);
-		break;
-	case UIInterfaceOrientationLandscapeRight:
-		rotateAngle = M_PI / 2.0f;
-		newCenter = CGPointMake(orientationFrame.size.height - posY, posX);
-		break;
-	default: // UIInterfaceOrientationPortrait
-		rotateAngle = 0.0;
-		newCenter = CGPointMake(posX, posY);
-		break;
+		case UIInterfaceOrientationPortraitUpsideDown:
+			rotateAngle = M_PI;
+			newCenter = CGPointMake(posX, orientationFrame.size.height - posY);
+			break;
+		case UIInterfaceOrientationLandscapeLeft:
+			rotateAngle = -M_PI / 2.0f;
+			newCenter = CGPointMake(posY, posX);
+			break;
+		case UIInterfaceOrientationLandscapeRight:
+			rotateAngle = M_PI / 2.0f;
+			newCenter = CGPointMake(orientationFrame.size.height - posY, posX);
+			break;
+		default: // UIInterfaceOrientationPortrait
+			rotateAngle = 0.0;
+			newCenter = CGPointMake(posX, posY);
+			break;
 	}
 
 	self.transform = CGAffineTransformMakeRotation(rotateAngle);
@@ -115,7 +123,8 @@ static BlockBackground *_sharedInstance = nil;
 	[self layoutSubviews];
 }
 
-- (id)init {
+- (id)init
+{
 	self = [super initWithFrame:[[UIScreen mainScreen] bounds]];
 	if (self)
 	{
@@ -135,7 +144,8 @@ static BlockBackground *_sharedInstance = nil;
 	return self;
 }
 
-- (void)addToMainWindow:(UIView *)view {
+- (void)addToMainWindow:(UIView *)view
+{
 	[self setRotation:nil];
 
 	if ([self.subviews containsObject:view])
@@ -169,7 +179,8 @@ static BlockBackground *_sharedInstance = nil;
 	[self addSubview:view];
 }
 
-- (void)reduceAlphaIfEmpty {
+- (void)reduceAlphaIfEmpty
+{
 	if (self.subviews.count == 1 ||
 	    (self.subviews.count == 2 &&
 	     [[self.subviews objectAtIndex:0] isKindOfClass:[UIImageView class]]))
@@ -179,7 +190,8 @@ static BlockBackground *_sharedInstance = nil;
 	}
 }
 
-- (void)removeView:(UIView *)view {
+- (void)removeView:(UIView *)view
+{
 	[view removeFromSuperview];
 
 	UIView *topView = [self.subviews lastObject];
@@ -202,7 +214,8 @@ static BlockBackground *_sharedInstance = nil;
 	}
 }
 
-- (void)drawRect:(CGRect)rect {
+- (void)drawRect:(CGRect)rect
+{
 	if (_backgroundImage || !_vignetteBackground)
 		return;
 	CGContextRef context = UIGraphicsGetCurrentContext();

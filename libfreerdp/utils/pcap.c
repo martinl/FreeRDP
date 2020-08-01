@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -32,11 +32,11 @@
 #define TAG FREERDP_TAG("utils")
 
 #ifndef _WIN32
-#	include <sys/time.h>
+#include <sys/time.h>
 #else
-#	include <time.h>
-#	include <sys/timeb.h>
-#	include <winpr/windows.h>
+#include <time.h>
+#include <sys/timeb.h>
+#include <winpr/windows.h>
 
 int gettimeofday(struct timeval* tp, void* tz)
 {

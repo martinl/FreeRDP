@@ -9,7 +9,7 @@
 
 HRESULT PATH_CCH_ADD_EXTENSION(PWSTR pszPath, size_t cchPath, PCWSTR pszExt)
 {
-#	ifdef _WIN32
+#ifdef _WIN32
 	LPWSTR pDot;
 	BOOL bExtDot;
 	LPWSTR pBackslash;
@@ -44,7 +44,7 @@ HRESULT PATH_CCH_ADD_EXTENSION(PWSTR pszPath, size_t cchPath, PCWSTR pszExt)
 		return S_OK;
 	}
 
-#	endif
+#endif
 	return HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
 }
 

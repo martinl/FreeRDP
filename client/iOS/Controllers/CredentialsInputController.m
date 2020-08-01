@@ -17,7 +17,8 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil
                bundle:(NSBundle *)nibBundleOrNil
               session:(RDPSession *)session
-               params:(NSMutableDictionary *)params {
+               params:(NSMutableDictionary *)params
+{
 	self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
 	if (self)
 	{
@@ -43,7 +44,8 @@
 	return self;
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
 	[super viewDidLoad];
 
 	// set localized strings
@@ -71,21 +73,25 @@
 	[_textfield_domain setText:[_params valueForKey:@"domain"]];
 }
 
-- (void)viewDidUnload {
+- (void)viewDidUnload
+{
 	[super viewDidUnload];
 }
 
-- (void)viewDidDisappear:(BOOL)animated {
+- (void)viewDidDisappear:(BOOL)animated
+{
 	[super viewDidDisappear:animated];
 	// set signal
 	[[_session uiRequestCompleted] signal];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
 	return YES;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[super dealloc];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -93,7 +99,8 @@
 #pragma mark -
 #pragma mark iOS Keyboard Notification Handlers
 
-- (void)keyboardWillShow:(NSNotification *)notification {
+- (void)keyboardWillShow:(NSNotification *)notification
+{
 	CGRect keyboardEndFrame =
 	    [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 	CGRect keyboardFrame = [[self view] convertRect:keyboardEndFrame toView:nil];
@@ -110,7 +117,8 @@
 	[UIView commitAnimations];
 }
 
-- (void)keyboardWillHide:(NSNotification *)notification {
+- (void)keyboardWillHide:(NSNotification *)notification
+{
 	CGRect keyboardEndFrame =
 	    [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 	CGRect keyboardFrame = [[self view] convertRect:keyboardEndFrame toView:nil];
@@ -129,7 +137,8 @@
 
 #pragma mark - Action handlers
 
-- (IBAction)loginPressed:(id)sender {
+- (IBAction)loginPressed:(id)sender
+{
 	// read input back in
 	[_params setValue:[_textfield_username text] forKey:@"username"];
 	[_params setValue:[_textfield_password text] forKey:@"password"];
@@ -140,7 +149,8 @@
 	[self dismissModalViewControllerAnimated:YES];
 }
 
-- (IBAction)cancelPressed:(id)sender {
+- (IBAction)cancelPressed:(id)sender
+{
 	[_params setValue:[NSNumber numberWithBool:NO] forKey:@"result"];
 
 	// dismiss controller

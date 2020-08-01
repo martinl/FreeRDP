@@ -31,8 +31,8 @@
 
 #ifndef _WIN32
 
-#	include <stdio.h>
-#	include "../handle/handle.h"
+#include <stdio.h>
+#include "../handle/handle.h"
 
 struct winpr_file
 {

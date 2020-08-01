@@ -13,15 +13,15 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "prim_test.h"
 
 #ifndef _WIN32
-#	include <fcntl.h>
-#	include <sys/types.h>
-#	include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #endif
 
 #include <winpr/sysinfo.h>
@@ -29,7 +29,7 @@
 #include <winpr/crypto.h>
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 primitives_t* generic = NULL;

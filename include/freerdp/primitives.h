@@ -14,47 +14,47 @@
  */
 
 #ifdef __GNUC__
-#	pragma once
+#pragma once
 #endif
 
 #ifndef FREERDP_PRIMITIVES_H
-#	define FREERDP_PRIMITIVES_H
+#define FREERDP_PRIMITIVES_H
 
-#	include <freerdp/api.h>
-#	include <freerdp/types.h>
-#	include <freerdp/codec/color.h>
+#include <freerdp/api.h>
+#include <freerdp/types.h>
+#include <freerdp/codec/color.h>
 
-#	include <winpr/platform.h>
+#include <winpr/platform.h>
 
-typedef INT32 pstatus_t;           /* match IppStatus. */
-#	define PRIMITIVES_SUCCESS (0) /* match ippStsNoErr */
+typedef INT32 pstatus_t;       /* match IppStatus. */
+#define PRIMITIVES_SUCCESS (0) /* match ippStsNoErr */
 
 /* Simple macro for address of an x,y location in 2d 4-byte memory block */
-#	define PIXMAP4_ADDR(_dst_, _x_, _y_, _span_) \
-		((void*)(((BYTE*)(_dst_)) + (((_x_) + (_y_) * (_span_)) << 2)))
+#define PIXMAP4_ADDR(_dst_, _x_, _y_, _span_) \
+	((void*)(((BYTE*)(_dst_)) + (((_x_) + (_y_) * (_span_)) << 2)))
 
-#	define PRIM_X86_MMX_AVAILABLE (1U << 0)
-#	define PRIM_X86_3DNOW_AVAILABLE (1U << 1)
-#	define PRIM_X86_3DNOW_PREFETCH_AVAILABLE (1U << 2)
-#	define PRIM_X86_SSE_AVAILABLE (1U << 3)
-#	define PRIM_X86_SSE2_AVAILABLE (1U << 4)
-#	define PRIM_X86_SSE3_AVAILABLE (1U << 5)
-#	define PRIM_X86_SSSE3_AVAILABLE (1U << 6)
-#	define PRIM_X86_SSE41_AVAILABLE (1U << 7)
-#	define PRIM_X86_SSE42_AVAILABLE (1U << 8)
-#	define PRIM_X86_AVX_AVAILABLE (1U << 9)
-#	define PRIM_X86_FMA_AVAILABLE (1U << 10)
-#	define PRIM_X86_AVX_AES_AVAILABLE (1U << 11)
-#	define PRIM_X86_AVX2_AVAILABLE (1U << 12)
+#define PRIM_X86_MMX_AVAILABLE (1U << 0)
+#define PRIM_X86_3DNOW_AVAILABLE (1U << 1)
+#define PRIM_X86_3DNOW_PREFETCH_AVAILABLE (1U << 2)
+#define PRIM_X86_SSE_AVAILABLE (1U << 3)
+#define PRIM_X86_SSE2_AVAILABLE (1U << 4)
+#define PRIM_X86_SSE3_AVAILABLE (1U << 5)
+#define PRIM_X86_SSSE3_AVAILABLE (1U << 6)
+#define PRIM_X86_SSE41_AVAILABLE (1U << 7)
+#define PRIM_X86_SSE42_AVAILABLE (1U << 8)
+#define PRIM_X86_AVX_AVAILABLE (1U << 9)
+#define PRIM_X86_FMA_AVAILABLE (1U << 10)
+#define PRIM_X86_AVX_AES_AVAILABLE (1U << 11)
+#define PRIM_X86_AVX2_AVAILABLE (1U << 12)
 
-#	define PRIM_ARM_VFP1_AVAILABLE (1U << 0)
-#	define PRIM_ARM_VFP2_AVAILABLE (1U << 1)
-#	define PRIM_ARM_VFP3_AVAILABLE (1U << 2)
-#	define PRIM_ARM_VFP4_AVAILABLE (1U << 3)
-#	define PRIM_ARM_FPA_AVAILABLE (1U << 4)
-#	define PRIM_ARM_FPE_AVAILABLE (1U << 5)
-#	define PRIM_ARM_IWMMXT_AVAILABLE (1U << 6)
-#	define PRIM_ARM_NEON_AVAILABLE (1U << 7)
+#define PRIM_ARM_VFP1_AVAILABLE (1U << 0)
+#define PRIM_ARM_VFP2_AVAILABLE (1U << 1)
+#define PRIM_ARM_VFP3_AVAILABLE (1U << 2)
+#define PRIM_ARM_VFP4_AVAILABLE (1U << 3)
+#define PRIM_ARM_FPA_AVAILABLE (1U << 4)
+#define PRIM_ARM_FPE_AVAILABLE (1U << 5)
+#define PRIM_ARM_IWMMXT_AVAILABLE (1U << 6)
+#define PRIM_ARM_NEON_AVAILABLE (1U << 7)
 
 /* Structures compatible with IPP */
 typedef struct
@@ -177,16 +177,16 @@ typedef struct
 	__RGBToAVC444YUV_t RGBToAVC444YUVv2;
 } primitives_t;
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-#	endif
+#endif
 
 	FREERDP_API primitives_t* primitives_get(void);
 	FREERDP_API primitives_t* primitives_get_generic(void);
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 }
-#	endif
+#endif
 
 #endif /* FREERDP_PRIMITIVES_H */

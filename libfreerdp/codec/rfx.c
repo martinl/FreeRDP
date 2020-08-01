@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -56,10 +56,10 @@
 #define TAG FREERDP_TAG("codec")
 
 #ifndef RFX_INIT_SIMD
-#	define RFX_INIT_SIMD(_rfx_context) \
-		do                              \
-		{                               \
-		} while (0)
+#define RFX_INIT_SIMD(_rfx_context) \
+	do                              \
+	{                               \
+	} while (0)
 #endif
 
 #define RFX_KEY "Software\\" FREERDP_VENDOR_STRING "\\" FREERDP_PRODUCT_STRING "\\RemoteFX"
@@ -578,19 +578,19 @@ static BOOL rfx_process_message_context(RFX_CONTEXT* context, wStream* s)
 
 	switch ((properties & 0x1E00) >> 9)
 	{
-	case CLW_ENTROPY_RLGR1:
-		context->mode = RLGR1;
-		WLog_Print(context->priv->log, WLOG_DEBUG, "RLGR1.");
-		break;
+		case CLW_ENTROPY_RLGR1:
+			context->mode = RLGR1;
+			WLog_Print(context->priv->log, WLOG_DEBUG, "RLGR1.");
+			break;
 
-	case CLW_ENTROPY_RLGR3:
-		context->mode = RLGR3;
-		WLog_Print(context->priv->log, WLOG_DEBUG, "RLGR3.");
-		break;
+		case CLW_ENTROPY_RLGR3:
+			context->mode = RLGR3;
+			WLog_Print(context->priv->log, WLOG_DEBUG, "RLGR3.");
+			break;
 
-	default:
-		WLog_ERR(TAG, "unknown RLGR algorithm.");
-		return FALSE;
+		default:
+			WLog_ERR(TAG, "unknown RLGR algorithm.");
+			return FALSE;
 	}
 
 	context->decodedHeaderBlocks |= _RFX_DECODED_CONTEXT;
@@ -1095,56 +1095,56 @@ BOOL rfx_process_message(RFX_CONTEXT* context, const BYTE* data, UINT32 length, 
 
 		switch (blockType)
 		{
-		/* Header messages:
-		 * The stream MUST start with the header messages and any of these headers can appear
-		 * in the stream at a later stage. The header messages can be repeated.
-		 */
-		case WBT_SYNC:
-			ok = rfx_process_message_sync(context, &subStream);
-			break;
-
-		case WBT_CONTEXT:
-			ok = rfx_process_message_context(context, &subStream);
-			break;
-
-		case WBT_CODEC_VERSIONS:
-			ok = rfx_process_message_codec_versions(context, &subStream);
-			break;
-
-		case WBT_CHANNELS:
-			ok = rfx_process_message_channels(context, &subStream);
-			break;
-
-			/* Data messages:
-			 * The data associated with each encoded frame or image is always bracketed by the
-			 * TS_RFX_FRAME_BEGIN (section 2.2.2.3.1) and TS_RFX_FRAME_END (section 2.2.2.3.2)
-			 * messages. There MUST only be one TS_RFX_REGION (section 2.2.2.3.3) message per frame
-			 * and one TS_RFX_TILESET (section 2.2.2.3.4) message per TS_RFX_REGION.
+			/* Header messages:
+			 * The stream MUST start with the header messages and any of these headers can appear
+			 * in the stream at a later stage. The header messages can be repeated.
 			 */
+			case WBT_SYNC:
+				ok = rfx_process_message_sync(context, &subStream);
+				break;
 
-		case WBT_FRAME_BEGIN:
-			ok = rfx_process_message_frame_begin(context, message, &subStream,
-			                                     &context->expectedDataBlockType);
-			break;
+			case WBT_CONTEXT:
+				ok = rfx_process_message_context(context, &subStream);
+				break;
 
-		case WBT_REGION:
-			ok = rfx_process_message_region(context, message, &subStream,
-			                                &context->expectedDataBlockType);
-			break;
+			case WBT_CODEC_VERSIONS:
+				ok = rfx_process_message_codec_versions(context, &subStream);
+				break;
 
-		case WBT_EXTENSION:
-			ok = rfx_process_message_tileset(context, message, &subStream,
-			                                 &context->expectedDataBlockType);
-			break;
+			case WBT_CHANNELS:
+				ok = rfx_process_message_channels(context, &subStream);
+				break;
 
-		case WBT_FRAME_END:
-			ok = rfx_process_message_frame_end(context, message, &subStream,
-			                                   &context->expectedDataBlockType);
-			break;
+				/* Data messages:
+				 * The data associated with each encoded frame or image is always bracketed by the
+				 * TS_RFX_FRAME_BEGIN (section 2.2.2.3.1) and TS_RFX_FRAME_END (section 2.2.2.3.2)
+				 * messages. There MUST only be one TS_RFX_REGION (section 2.2.2.3.3) message per
+				 * frame and one TS_RFX_TILESET (section 2.2.2.3.4) message per TS_RFX_REGION.
+				 */
 
-		default:
-			WLog_ERR(TAG, "%s: unknown blockType 0x%" PRIX32 "", __FUNCTION__, blockType);
-			return FALSE;
+			case WBT_FRAME_BEGIN:
+				ok = rfx_process_message_frame_begin(context, message, &subStream,
+				                                     &context->expectedDataBlockType);
+				break;
+
+			case WBT_REGION:
+				ok = rfx_process_message_region(context, message, &subStream,
+				                                &context->expectedDataBlockType);
+				break;
+
+			case WBT_EXTENSION:
+				ok = rfx_process_message_tileset(context, message, &subStream,
+				                                 &context->expectedDataBlockType);
+				break;
+
+			case WBT_FRAME_END:
+				ok = rfx_process_message_frame_end(context, message, &subStream,
+				                                   &context->expectedDataBlockType);
+				break;
+
+			default:
+				WLog_ERR(TAG, "%s: unknown blockType 0x%" PRIX32 "", __FUNCTION__, blockType);
+				return FALSE;
 		}
 	}
 

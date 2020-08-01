@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -320,32 +320,32 @@ static BOOL fastpath_recv_update_common(rdpFastPath* fastpath, wStream* s)
 
 	switch (updateType)
 	{
-	case UPDATE_TYPE_BITMAP:
-	{
-		BITMAP_UPDATE* bitmap_update = update_read_bitmap_update(update, s);
+		case UPDATE_TYPE_BITMAP:
+		{
+			BITMAP_UPDATE* bitmap_update = update_read_bitmap_update(update, s);
 
-		if (!bitmap_update)
-			return FALSE;
+			if (!bitmap_update)
+				return FALSE;
 
-		rc = IFCALLRESULT(FALSE, update->BitmapUpdate, context, bitmap_update);
-		free_bitmap_update(context, bitmap_update);
-	}
-	break;
-
-	case UPDATE_TYPE_PALETTE:
-	{
-		PALETTE_UPDATE* palette_update = update_read_palette(update, s);
-
-		if (!palette_update)
-			return FALSE;
-
-		rc = IFCALLRESULT(FALSE, update->Palette, context, palette_update);
-		free_palette_update(context, palette_update);
-	}
-	break;
-
-	default:
+			rc = IFCALLRESULT(FALSE, update->BitmapUpdate, context, bitmap_update);
+			free_bitmap_update(context, bitmap_update);
+		}
 		break;
+
+		case UPDATE_TYPE_PALETTE:
+		{
+			PALETTE_UPDATE* palette_update = update_read_palette(update, s);
+
+			if (!palette_update)
+				return FALSE;
+
+			rc = IFCALLRESULT(FALSE, update->Palette, context, palette_update);
+			free_palette_update(context, palette_update);
+		}
+		break;
+
+		default:
+			break;
 	}
 
 	return rc;
@@ -384,94 +384,94 @@ static int fastpath_recv_update(rdpFastPath* fastpath, BYTE updateCode, wStream*
 
 	switch (updateCode)
 	{
-	case FASTPATH_UPDATETYPE_ORDERS:
-		rc = fastpath_recv_orders(fastpath, s);
-		break;
+		case FASTPATH_UPDATETYPE_ORDERS:
+			rc = fastpath_recv_orders(fastpath, s);
+			break;
 
-	case FASTPATH_UPDATETYPE_BITMAP:
-	case FASTPATH_UPDATETYPE_PALETTE:
-		rc = fastpath_recv_update_common(fastpath, s);
-		break;
+		case FASTPATH_UPDATETYPE_BITMAP:
+		case FASTPATH_UPDATETYPE_PALETTE:
+			rc = fastpath_recv_update_common(fastpath, s);
+			break;
 
-	case FASTPATH_UPDATETYPE_SYNCHRONIZE:
-		if (!fastpath_recv_update_synchronize(fastpath, s))
-			WLog_ERR(TAG, "fastpath_recv_update_synchronize failure but we continue");
-		else
-			rc = IFCALLRESULT(TRUE, update->Synchronize, context);
+		case FASTPATH_UPDATETYPE_SYNCHRONIZE:
+			if (!fastpath_recv_update_synchronize(fastpath, s))
+				WLog_ERR(TAG, "fastpath_recv_update_synchronize failure but we continue");
+			else
+				rc = IFCALLRESULT(TRUE, update->Synchronize, context);
 
-		break;
+			break;
 
-	case FASTPATH_UPDATETYPE_SURFCMDS:
-		status = update_recv_surfcmds(update, s);
-		rc = (status < 0) ? FALSE : TRUE;
-		break;
+		case FASTPATH_UPDATETYPE_SURFCMDS:
+			status = update_recv_surfcmds(update, s);
+			rc = (status < 0) ? FALSE : TRUE;
+			break;
 
-	case FASTPATH_UPDATETYPE_PTR_NULL:
-	{
-		POINTER_SYSTEM_UPDATE pointer_system;
-		pointer_system.type = SYSPTR_NULL;
-		rc = IFCALLRESULT(FALSE, pointer->PointerSystem, context, &pointer_system);
-	}
-	break;
-
-	case FASTPATH_UPDATETYPE_PTR_DEFAULT:
-	{
-		POINTER_SYSTEM_UPDATE pointer_system;
-		pointer_system.type = SYSPTR_DEFAULT;
-		rc = IFCALLRESULT(FALSE, pointer->PointerSystem, context, &pointer_system);
-	}
-	break;
-
-	case FASTPATH_UPDATETYPE_PTR_POSITION:
-	{
-		POINTER_POSITION_UPDATE* pointer_position = update_read_pointer_position(update, s);
-
-		if (pointer_position)
+		case FASTPATH_UPDATETYPE_PTR_NULL:
 		{
-			rc = IFCALLRESULT(FALSE, pointer->PointerPosition, context, pointer_position);
-			free_pointer_position_update(context, pointer_position);
+			POINTER_SYSTEM_UPDATE pointer_system;
+			pointer_system.type = SYSPTR_NULL;
+			rc = IFCALLRESULT(FALSE, pointer->PointerSystem, context, &pointer_system);
 		}
-	}
-	break;
-
-	case FASTPATH_UPDATETYPE_COLOR:
-	{
-		POINTER_COLOR_UPDATE* pointer_color = update_read_pointer_color(update, s, 24);
-
-		if (pointer_color)
-		{
-			rc = IFCALLRESULT(FALSE, pointer->PointerColor, context, pointer_color);
-			free_pointer_color_update(context, pointer_color);
-		}
-	}
-	break;
-
-	case FASTPATH_UPDATETYPE_CACHED:
-	{
-		POINTER_CACHED_UPDATE* pointer_cached = update_read_pointer_cached(update, s);
-
-		if (pointer_cached)
-		{
-			rc = IFCALLRESULT(FALSE, pointer->PointerCached, context, pointer_cached);
-			free_pointer_cached_update(context, pointer_cached);
-		}
-	}
-	break;
-
-	case FASTPATH_UPDATETYPE_POINTER:
-	{
-		POINTER_NEW_UPDATE* pointer_new = update_read_pointer_new(update, s);
-
-		if (pointer_new)
-		{
-			rc = IFCALLRESULT(FALSE, pointer->PointerNew, context, pointer_new);
-			free_pointer_new_update(context, pointer_new);
-		}
-	}
-	break;
-
-	default:
 		break;
+
+		case FASTPATH_UPDATETYPE_PTR_DEFAULT:
+		{
+			POINTER_SYSTEM_UPDATE pointer_system;
+			pointer_system.type = SYSPTR_DEFAULT;
+			rc = IFCALLRESULT(FALSE, pointer->PointerSystem, context, &pointer_system);
+		}
+		break;
+
+		case FASTPATH_UPDATETYPE_PTR_POSITION:
+		{
+			POINTER_POSITION_UPDATE* pointer_position = update_read_pointer_position(update, s);
+
+			if (pointer_position)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerPosition, context, pointer_position);
+				free_pointer_position_update(context, pointer_position);
+			}
+		}
+		break;
+
+		case FASTPATH_UPDATETYPE_COLOR:
+		{
+			POINTER_COLOR_UPDATE* pointer_color = update_read_pointer_color(update, s, 24);
+
+			if (pointer_color)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerColor, context, pointer_color);
+				free_pointer_color_update(context, pointer_color);
+			}
+		}
+		break;
+
+		case FASTPATH_UPDATETYPE_CACHED:
+		{
+			POINTER_CACHED_UPDATE* pointer_cached = update_read_pointer_cached(update, s);
+
+			if (pointer_cached)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerCached, context, pointer_cached);
+				free_pointer_cached_update(context, pointer_cached);
+			}
+		}
+		break;
+
+		case FASTPATH_UPDATETYPE_POINTER:
+		{
+			POINTER_NEW_UPDATE* pointer_new = update_read_pointer_new(update, s);
+
+			if (pointer_new)
+			{
+				rc = IFCALLRESULT(FALSE, pointer->PointerNew, context, pointer_new);
+				free_pointer_new_update(context, pointer_new);
+			}
+		}
+		break;
+
+		default:
+			break;
 	}
 
 	if (!rc)
@@ -798,39 +798,39 @@ static BOOL fastpath_recv_input_event(rdpFastPath* fastpath, wStream* s)
 
 	switch (eventCode)
 	{
-	case FASTPATH_INPUT_EVENT_SCANCODE:
-		if (!fastpath_recv_input_event_scancode(fastpath, s, eventFlags))
-			return FALSE;
+		case FASTPATH_INPUT_EVENT_SCANCODE:
+			if (!fastpath_recv_input_event_scancode(fastpath, s, eventFlags))
+				return FALSE;
 
-		break;
+			break;
 
-	case FASTPATH_INPUT_EVENT_MOUSE:
-		if (!fastpath_recv_input_event_mouse(fastpath, s, eventFlags))
-			return FALSE;
+		case FASTPATH_INPUT_EVENT_MOUSE:
+			if (!fastpath_recv_input_event_mouse(fastpath, s, eventFlags))
+				return FALSE;
 
-		break;
+			break;
 
-	case FASTPATH_INPUT_EVENT_MOUSEX:
-		if (!fastpath_recv_input_event_mousex(fastpath, s, eventFlags))
-			return FALSE;
+		case FASTPATH_INPUT_EVENT_MOUSEX:
+			if (!fastpath_recv_input_event_mousex(fastpath, s, eventFlags))
+				return FALSE;
 
-		break;
+			break;
 
-	case FASTPATH_INPUT_EVENT_SYNC:
-		if (!fastpath_recv_input_event_sync(fastpath, s, eventFlags))
-			return FALSE;
+		case FASTPATH_INPUT_EVENT_SYNC:
+			if (!fastpath_recv_input_event_sync(fastpath, s, eventFlags))
+				return FALSE;
 
-		break;
+			break;
 
-	case FASTPATH_INPUT_EVENT_UNICODE:
-		if (!fastpath_recv_input_event_unicode(fastpath, s, eventFlags))
-			return FALSE;
+		case FASTPATH_INPUT_EVENT_UNICODE:
+			if (!fastpath_recv_input_event_unicode(fastpath, s, eventFlags))
+				return FALSE;
 
-		break;
+			break;
 
-	default:
-		WLog_ERR(TAG, "Unknown eventCode %" PRIu8 "", eventCode);
-		break;
+		default:
+			WLog_ERR(TAG, "Unknown eventCode %" PRIu8 "", eventCode);
+			break;
 	}
 
 	return TRUE;

@@ -19,14 +19,14 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "nonehandle.h"
 
 #ifndef _WIN32
 
-#	include <pthread.h>
+#include <pthread.h>
 
 static BOOL NoneHandleCloseHandle(HANDLE handle)
 {

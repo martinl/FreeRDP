@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "mfreerdp.h"
@@ -176,28 +176,28 @@ void mf_press_mouse_button(void *context, rdpInput *input, int button, int x, in
 
 	switch (button)
 	{
-	case 0:
-		mf_scale_mouse_event(context, input, flags | PTR_FLAGS_BUTTON1, x, y);
-		break;
+		case 0:
+			mf_scale_mouse_event(context, input, flags | PTR_FLAGS_BUTTON1, x, y);
+			break;
 
-	case 1:
-		mf_scale_mouse_event(context, input, flags | PTR_FLAGS_BUTTON2, x, y);
-		break;
+		case 1:
+			mf_scale_mouse_event(context, input, flags | PTR_FLAGS_BUTTON2, x, y);
+			break;
 
-	case 2:
-		mf_scale_mouse_event(context, input, flags | PTR_FLAGS_BUTTON3, x, y);
-		break;
+		case 2:
+			mf_scale_mouse_event(context, input, flags | PTR_FLAGS_BUTTON3, x, y);
+			break;
 
-	case 3:
-		mf_scale_mouse_event_ex(context, input, xflags | PTR_XFLAGS_BUTTON1, x, y);
-		break;
+		case 3:
+			mf_scale_mouse_event_ex(context, input, xflags | PTR_XFLAGS_BUTTON1, x, y);
+			break;
 
-	case 4:
-		mf_scale_mouse_event_ex(context, input, xflags | PTR_XFLAGS_BUTTON2, x, y);
-		break;
+		case 4:
+			mf_scale_mouse_event_ex(context, input, xflags | PTR_XFLAGS_BUTTON2, x, y);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 }
 

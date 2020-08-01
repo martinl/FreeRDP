@@ -61,15 +61,15 @@ void pf_filters_unregister_all(filters_list* list);
 	{                                                                             \
 		switch (pf_filters_run_by_type(_filters, _type, _conn_info, _event_info)) \
 		{                                                                         \
-		case FILTER_PASS:                                                         \
-			_ret = _cb(__VA_ARGS__);                                              \
-			break;                                                                \
-		case FILTER_IGNORE:                                                       \
-			_ret = TRUE;                                                          \
-			break;                                                                \
-		case FILTER_DROP:                                                         \
-		default:                                                                  \
-			_ret = FALSE;                                                         \
+			case FILTER_PASS:                                                     \
+				_ret = _cb(__VA_ARGS__);                                          \
+				break;                                                            \
+			case FILTER_IGNORE:                                                   \
+				_ret = TRUE;                                                      \
+				break;                                                            \
+			case FILTER_DROP:                                                     \
+			default:                                                              \
+				_ret = FALSE;                                                     \
 		}                                                                         \
 	} while (0)
 

@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -29,18 +29,18 @@
 
 #ifndef _WIN32
 
-#	include "ndr_array.h"
-#	include "ndr_context.h"
-#	include "ndr_pointer.h"
-#	include "ndr_simple.h"
-#	include "ndr_string.h"
-#	include "ndr_structure.h"
-#	include "ndr_union.h"
+#include "ndr_array.h"
+#include "ndr_context.h"
+#include "ndr_pointer.h"
+#include "ndr_simple.h"
+#include "ndr_string.h"
+#include "ndr_structure.h"
+#include "ndr_union.h"
 
-#	include "ndr_private.h"
+#include "ndr_private.h"
 
-#	include "../log.h"
-#	define TAG WINPR_TAG("rpc")
+#include "../log.h"
+#define TAG WINPR_TAG("rpc")
 
 /**
  * MSRPC NDR Types Technical Overview:
@@ -157,12 +157,12 @@ void NdrProcessParams(PMIDL_STUB_MESSAGE pStubMsg, PFORMAT_STRING pFormat, NDR_P
 
 	for (i = 0; i < numberParams; i++)
 	{
-#	ifdef __x86_64__
+#ifdef __x86_64__
 		float tmp;
-#	endif
+#endif
 		arg = pStubMsg->StackTop + params[i].StackOffset;
 		fmt = (PFORMAT_STRING)&pStubMsg->StubDesc->pFormatTypes[params[i].Type.Offset];
-#	ifdef __x86_64__
+#ifdef __x86_64__
 
 		if ((params[i].Attributes.IsBasetype) && !(params[i].Attributes.IsSimpleRef) &&
 		    ((params[i].Type.FormatChar) == FC_FLOAT) && !fpuArgs)
@@ -171,7 +171,7 @@ void NdrProcessParams(PMIDL_STUB_MESSAGE pStubMsg, PFORMAT_STRING pFormat, NDR_P
 			arg = (unsigned char*)&tmp;
 		}
 
-#	endif
+#endif
 		type = (params[i].Attributes.IsBasetype) ? params[i].Type.FormatChar : *fmt;
 		WLog_INFO(TAG, "'\t#%u\ttype %s (0x%02X) ", i, FC_TYPE_STRINGS[type], type);
 		NdrPrintParamAttributes(params[i].Attributes);
@@ -307,7 +307,7 @@ CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING
 		extFlags = extensions->Flags2;
 		WLog_DBG(TAG, "Extensions: Size: %hhu, flags2: 0x%02X", extensions->Size,
 		         *((unsigned char*)&extensions->Flags2));
-#	ifdef __x86_64__
+#ifdef __x86_64__
 
 		if (extensions->Size > sizeof(*extensions) && fpuStack)
 		{
@@ -318,18 +318,18 @@ CLIENT_CALL_RETURN NdrClientCall(PMIDL_STUB_DESC pStubDescriptor, PFORMAT_STRING
 			{
 				switch (fpuMask & 3)
 				{
-				case 1:
-					*(float*)&stackTop[i] = *(float*)&fpuStack[i];
-					break;
+					case 1:
+						*(float*)&stackTop[i] = *(float*)&fpuStack[i];
+						break;
 
-				case 2:
-					*(double*)&stackTop[i] = *(double*)&fpuStack[i];
-					break;
+					case 2:
+						*(double*)&stackTop[i] = *(double*)&fpuStack[i];
+						break;
 				}
 			}
 		}
 
-#	endif
+#endif
 		WLog_INFO(TAG, "ExtFlags: ");
 		NdrPrintExtFlags(extFlags);
 	}

@@ -18,29 +18,29 @@
 #define FREERDP_LIB_PRIM_INTERNAL_H
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/primitives.h>
 #include <freerdp/api.h>
 
 #ifdef __GNUC__
-#	define PRIM_ALIGN_128 __attribute__((aligned(16)))
+#define PRIM_ALIGN_128 __attribute__((aligned(16)))
 #else
-#	ifdef _WIN32
-#		define PRIM_ALIGN_128 __declspec(align(16))
-#	endif
+#ifdef _WIN32
+#define PRIM_ALIGN_128 __declspec(align(16))
+#endif
 #endif
 
 #if defined(WITH_SSE2) || defined(WITH_NEON)
-#	define HAVE_OPTIMIZED_PRIMITIVES 1
+#define HAVE_OPTIMIZED_PRIMITIVES 1
 #endif
 
 #if defined(WITH_SSE2)
 /* Use lddqu for unaligned; load for 16-byte aligned. */
-#	define LOAD_SI128(_ptr_)                                           \
-		(((ULONG_PTR)(_ptr_)&0x0f) ? _mm_lddqu_si128((__m128i*)(_ptr_)) \
-		                           : _mm_load_si128((__m128i*)(_ptr_)))
+#define LOAD_SI128(_ptr_)                                           \
+	(((ULONG_PTR)(_ptr_)&0x0f) ? _mm_lddqu_si128((__m128i*)(_ptr_)) \
+	                           : _mm_load_si128((__m128i*)(_ptr_)))
 #endif
 
 static INLINE BYTE* writePixelBGRX(BYTE* dst, DWORD formatSize, UINT32 format, BYTE R, BYTE G,
@@ -105,24 +105,24 @@ static INLINE fkt_writePixel getPixelWriteFunction(DWORD format)
 {
 	switch (format)
 	{
-	case PIXEL_FORMAT_ARGB32:
-	case PIXEL_FORMAT_XRGB32:
-		return writePixelXRGB;
+		case PIXEL_FORMAT_ARGB32:
+		case PIXEL_FORMAT_XRGB32:
+			return writePixelXRGB;
 
-	case PIXEL_FORMAT_ABGR32:
-	case PIXEL_FORMAT_XBGR32:
-		return writePixelXBGR;
+		case PIXEL_FORMAT_ABGR32:
+		case PIXEL_FORMAT_XBGR32:
+			return writePixelXBGR;
 
-	case PIXEL_FORMAT_RGBA32:
-	case PIXEL_FORMAT_RGBX32:
-		return writePixelRGBX;
+		case PIXEL_FORMAT_RGBA32:
+		case PIXEL_FORMAT_RGBX32:
+			return writePixelRGBX;
 
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return writePixelBGRX;
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return writePixelBGRX;
 
-	default:
-		return writePixelGeneric;
+		default:
+			return writePixelGeneric;
 	}
 }
 

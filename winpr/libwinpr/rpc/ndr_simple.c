@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -28,8 +28,8 @@
 
 #ifndef _WIN32
 
-#	include "ndr_simple.h"
-#	include "ndr_private.h"
+#include "ndr_simple.h"
+#include "ndr_private.h"
 
 const unsigned char SimpleTypeAlignment[] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x03, 0x03, 0x03, 0x07, 0x07, 0x01, 0x03, 0x03,
@@ -132,52 +132,52 @@ void NdrSimpleTypeBufferSize(PMIDL_STUB_MESSAGE pStubMsg, unsigned char* pMemory
 {
 	switch (*pFormat)
 	{
-	case FC_BYTE:
-	case FC_CHAR:
-	case FC_SMALL:
-	case FC_USMALL:
-		NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(BYTE));
-		break;
+		case FC_BYTE:
+		case FC_CHAR:
+		case FC_SMALL:
+		case FC_USMALL:
+			NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(BYTE));
+			break;
 
-	case FC_WCHAR:
-	case FC_SHORT:
-	case FC_USHORT:
-	case FC_ENUM16:
-		NdrpAlignLength(&(pStubMsg->BufferLength), sizeof(USHORT));
-		NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(USHORT));
-		break;
+		case FC_WCHAR:
+		case FC_SHORT:
+		case FC_USHORT:
+		case FC_ENUM16:
+			NdrpAlignLength(&(pStubMsg->BufferLength), sizeof(USHORT));
+			NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(USHORT));
+			break;
 
-	case FC_LONG:
-	case FC_ULONG:
-	case FC_ENUM32:
-	case FC_INT3264:
-	case FC_UINT3264:
-		NdrpAlignLength(&(pStubMsg->BufferLength), sizeof(ULONG));
-		NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(ULONG));
-		break;
+		case FC_LONG:
+		case FC_ULONG:
+		case FC_ENUM32:
+		case FC_INT3264:
+		case FC_UINT3264:
+			NdrpAlignLength(&(pStubMsg->BufferLength), sizeof(ULONG));
+			NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(ULONG));
+			break;
 
-	case FC_FLOAT:
-		NdrpAlignLength(&(pStubMsg->BufferLength), sizeof(FLOAT));
-		NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(FLOAT));
-		break;
+		case FC_FLOAT:
+			NdrpAlignLength(&(pStubMsg->BufferLength), sizeof(FLOAT));
+			NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(FLOAT));
+			break;
 
-	case FC_DOUBLE:
-		NdrpAlignLength(&(pStubMsg->BufferLength), sizeof(DOUBLE));
-		NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(DOUBLE));
-		break;
+		case FC_DOUBLE:
+			NdrpAlignLength(&(pStubMsg->BufferLength), sizeof(DOUBLE));
+			NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(DOUBLE));
+			break;
 
-	case FC_HYPER:
-		NdrpAlignLength(&(pStubMsg->BufferLength), sizeof(ULONGLONG));
-		NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(ULONGLONG));
-		break;
+		case FC_HYPER:
+			NdrpAlignLength(&(pStubMsg->BufferLength), sizeof(ULONGLONG));
+			NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(ULONGLONG));
+			break;
 
-	case FC_ERROR_STATUS_T:
-		NdrpAlignLength(&(pStubMsg->BufferLength), sizeof(error_status_t));
-		NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(error_status_t));
-		break;
+		case FC_ERROR_STATUS_T:
+			NdrpAlignLength(&(pStubMsg->BufferLength), sizeof(error_status_t));
+			NdrpIncrementLength(&(pStubMsg->BufferLength), sizeof(error_status_t));
+			break;
 
-	case FC_IGNORE:
-		break;
+		case FC_IGNORE:
+			break;
 	}
 }
 

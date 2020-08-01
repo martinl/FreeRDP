@@ -78,17 +78,17 @@ void (^streamHandler)(CGDisplayStreamFrameStatus, uint64_t, IOSurfaceRef,
   {
 	  switch (status)
 	  {
-	  case kCGDisplayStreamFrameStatusFrameIdle:
-		  break;
+		  case kCGDisplayStreamFrameStatusFrameIdle:
+			  break;
 
-	  case kCGDisplayStreamFrameStatusStopped:
-		  break;
+		  case kCGDisplayStreamFrameStatusStopped:
+			  break;
 
-	  case kCGDisplayStreamFrameStatusFrameBlank:
-		  break;
+		  case kCGDisplayStreamFrameStatusFrameBlank:
+			  break;
 
-	  default:
-		  break;
+		  default:
+			  break;
 	  }
   }
   else if (lastUpdate == NULL)

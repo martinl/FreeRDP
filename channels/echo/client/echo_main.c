@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -151,9 +151,9 @@ static UINT echo_plugin_terminated(IWTSPlugin* pPlugin)
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define DVCPluginEntry echo_DVCPluginEntry
+#define DVCPluginEntry echo_DVCPluginEntry
 #else
-#	define DVCPluginEntry FREERDP_API DVCPluginEntry
+#define DVCPluginEntry FREERDP_API DVCPluginEntry
 #endif
 
 /**

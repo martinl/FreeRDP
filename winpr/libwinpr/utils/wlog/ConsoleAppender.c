@@ -18,14 +18,14 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "ConsoleAppender.h"
 #include "Message.h"
 
 #ifdef ANDROID
-#	include <android/log.h>
+#include <android/log.h>
 #endif
 
 #define WLOG_CONSOLE_DEFAULT 0
@@ -82,37 +82,37 @@ static BOOL WLog_ConsoleAppender_WriteMessage(wLog* log, wLogAppender* appender,
 
 	switch (message->Level)
 	{
-	case WLOG_TRACE:
-		level = ANDROID_LOG_VERBOSE;
-		break;
+		case WLOG_TRACE:
+			level = ANDROID_LOG_VERBOSE;
+			break;
 
-	case WLOG_DEBUG:
-		level = ANDROID_LOG_DEBUG;
-		break;
+		case WLOG_DEBUG:
+			level = ANDROID_LOG_DEBUG;
+			break;
 
-	case WLOG_INFO:
-		level = ANDROID_LOG_INFO;
-		break;
+		case WLOG_INFO:
+			level = ANDROID_LOG_INFO;
+			break;
 
-	case WLOG_WARN:
-		level = ANDROID_LOG_WARN;
-		break;
+		case WLOG_WARN:
+			level = ANDROID_LOG_WARN;
+			break;
 
-	case WLOG_ERROR:
-		level = ANDROID_LOG_ERROR;
-		break;
+		case WLOG_ERROR:
+			level = ANDROID_LOG_ERROR;
+			break;
 
-	case WLOG_FATAL:
-		level = ANDROID_LOG_FATAL;
-		break;
+		case WLOG_FATAL:
+			level = ANDROID_LOG_FATAL;
+			break;
 
-	case WLOG_OFF:
-		level = ANDROID_LOG_SILENT;
-		break;
+		case WLOG_OFF:
+			level = ANDROID_LOG_SILENT;
+			break;
 
-	default:
-		level = ANDROID_LOG_FATAL;
-		break;
+		default:
+			level = ANDROID_LOG_FATAL;
+			break;
 	}
 
 	if (level != ANDROID_LOG_SILENT)
@@ -122,29 +122,29 @@ static BOOL WLog_ConsoleAppender_WriteMessage(wLog* log, wLogAppender* appender,
 
 	switch (consoleAppender->outputStream)
 	{
-	case WLOG_CONSOLE_STDOUT:
-		fp = stdout;
-		break;
-
-	case WLOG_CONSOLE_STDERR:
-		fp = stderr;
-		break;
-
-	default:
-		switch (message->Level)
-		{
-		case WLOG_TRACE:
-		case WLOG_DEBUG:
-		case WLOG_INFO:
+		case WLOG_CONSOLE_STDOUT:
 			fp = stdout;
 			break;
 
-		default:
+		case WLOG_CONSOLE_STDERR:
 			fp = stderr;
 			break;
-		}
 
-		break;
+		default:
+			switch (message->Level)
+			{
+				case WLOG_TRACE:
+				case WLOG_DEBUG:
+				case WLOG_INFO:
+					fp = stdout;
+					break;
+
+				default:
+					fp = stderr;
+					break;
+			}
+
+			break;
 	}
 
 	if (message->Level != WLOG_OFF)

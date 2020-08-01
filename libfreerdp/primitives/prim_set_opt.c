@@ -15,7 +15,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <string.h>
@@ -24,10 +24,10 @@
 #include <winpr/sysinfo.h>
 
 #ifdef WITH_SSE2
-#	include <emmintrin.h>
+#include <emmintrin.h>
 #endif /* WITH_SSE2 */
 #ifdef WITH_IPP
-#	include <ipps.h>
+#include <ipps.h>
 #endif /* WITH_IPP */
 
 #include "prim_internal.h"
@@ -36,7 +36,7 @@ static primitives_t* generic = NULL;
 
 /* ========================================================================= */
 #ifdef WITH_SSE2
-#	if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
+#if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
 static pstatus_t sse2_set_8u(BYTE val, BYTE* pDst, UINT32 len)
 {
 	BYTE byte, *dptr;
@@ -117,12 +117,12 @@ static pstatus_t sse2_set_8u(BYTE val, BYTE* pDst, UINT32 len)
 
 	return PRIMITIVES_SUCCESS;
 }
-#	endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
-#endif     /* WITH_SSE2 */
+#endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
+#endif /* WITH_SSE2 */
 
 /* ------------------------------------------------------------------------- */
 #ifdef WITH_SSE2
-#	if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
+#if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
 static pstatus_t sse2_set_32u(UINT32 val, UINT32* pDst, UINT32 len)
 {
 	const primitives_t* prim = primitives_get_generic();
@@ -220,8 +220,8 @@ static pstatus_t sse2_set_32s(INT32 val, INT32* pDst, UINT32 len)
 	UINT32 uval = *((UINT32*)&val);
 	return sse2_set_32u(uval, (UINT32*)pDst, len);
 }
-#	endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
-#endif     /* WITH_SSE2 */
+#endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
+#endif /* WITH_SSE2 */
 
 #ifdef WITH_IPP
 /* ------------------------------------------------------------------------- */

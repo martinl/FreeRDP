@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -33,7 +33,7 @@
 #include <winpr/wtsapi.h>
 
 #ifdef _WIN32
-#	include "wtsapi_win32.h"
+#include "wtsapi_win32.h"
 #endif
 
 #include "../log.h"
@@ -576,71 +576,71 @@ const CHAR* WTSErrorToString(UINT error)
 {
 	switch (error)
 	{
-	case CHANNEL_RC_OK:
-		return "CHANNEL_RC_OK";
+		case CHANNEL_RC_OK:
+			return "CHANNEL_RC_OK";
 
-	case CHANNEL_RC_ALREADY_INITIALIZED:
-		return "CHANNEL_RC_ALREADY_INITIALIZED";
+		case CHANNEL_RC_ALREADY_INITIALIZED:
+			return "CHANNEL_RC_ALREADY_INITIALIZED";
 
-	case CHANNEL_RC_NOT_INITIALIZED:
-		return "CHANNEL_RC_NOT_INITIALIZED";
+		case CHANNEL_RC_NOT_INITIALIZED:
+			return "CHANNEL_RC_NOT_INITIALIZED";
 
-	case CHANNEL_RC_ALREADY_CONNECTED:
-		return "CHANNEL_RC_ALREADY_CONNECTED";
+		case CHANNEL_RC_ALREADY_CONNECTED:
+			return "CHANNEL_RC_ALREADY_CONNECTED";
 
-	case CHANNEL_RC_NOT_CONNECTED:
-		return "CHANNEL_RC_NOT_CONNECTED";
+		case CHANNEL_RC_NOT_CONNECTED:
+			return "CHANNEL_RC_NOT_CONNECTED";
 
-	case CHANNEL_RC_TOO_MANY_CHANNELS:
-		return "CHANNEL_RC_TOO_MANY_CHANNELS";
+		case CHANNEL_RC_TOO_MANY_CHANNELS:
+			return "CHANNEL_RC_TOO_MANY_CHANNELS";
 
-	case CHANNEL_RC_BAD_CHANNEL:
-		return "CHANNEL_RC_BAD_CHANNEL";
+		case CHANNEL_RC_BAD_CHANNEL:
+			return "CHANNEL_RC_BAD_CHANNEL";
 
-	case CHANNEL_RC_BAD_CHANNEL_HANDLE:
-		return "CHANNEL_RC_BAD_CHANNEL_HANDLE";
+		case CHANNEL_RC_BAD_CHANNEL_HANDLE:
+			return "CHANNEL_RC_BAD_CHANNEL_HANDLE";
 
-	case CHANNEL_RC_NO_BUFFER:
-		return "CHANNEL_RC_NO_BUFFER";
+		case CHANNEL_RC_NO_BUFFER:
+			return "CHANNEL_RC_NO_BUFFER";
 
-	case CHANNEL_RC_BAD_INIT_HANDLE:
-		return "CHANNEL_RC_BAD_INIT_HANDLE";
+		case CHANNEL_RC_BAD_INIT_HANDLE:
+			return "CHANNEL_RC_BAD_INIT_HANDLE";
 
-	case CHANNEL_RC_NOT_OPEN:
-		return "CHANNEL_RC_NOT_OPEN";
+		case CHANNEL_RC_NOT_OPEN:
+			return "CHANNEL_RC_NOT_OPEN";
 
-	case CHANNEL_RC_BAD_PROC:
-		return "CHANNEL_RC_BAD_PROC";
+		case CHANNEL_RC_BAD_PROC:
+			return "CHANNEL_RC_BAD_PROC";
 
-	case CHANNEL_RC_NO_MEMORY:
-		return "CHANNEL_RC_NO_MEMORY";
+		case CHANNEL_RC_NO_MEMORY:
+			return "CHANNEL_RC_NO_MEMORY";
 
-	case CHANNEL_RC_UNKNOWN_CHANNEL_NAME:
-		return "CHANNEL_RC_UNKNOWN_CHANNEL_NAME";
+		case CHANNEL_RC_UNKNOWN_CHANNEL_NAME:
+			return "CHANNEL_RC_UNKNOWN_CHANNEL_NAME";
 
-	case CHANNEL_RC_ALREADY_OPEN:
-		return "CHANNEL_RC_ALREADY_OPEN";
+		case CHANNEL_RC_ALREADY_OPEN:
+			return "CHANNEL_RC_ALREADY_OPEN";
 
-	case CHANNEL_RC_NOT_IN_VIRTUALCHANNELENTRY:
-		return "CHANNEL_RC_NOT_IN_VIRTUALCHANNELENTRY";
+		case CHANNEL_RC_NOT_IN_VIRTUALCHANNELENTRY:
+			return "CHANNEL_RC_NOT_IN_VIRTUALCHANNELENTRY";
 
-	case CHANNEL_RC_NULL_DATA:
-		return "CHANNEL_RC_NULL_DATA";
+		case CHANNEL_RC_NULL_DATA:
+			return "CHANNEL_RC_NULL_DATA";
 
-	case CHANNEL_RC_ZERO_LENGTH:
-		return "CHANNEL_RC_ZERO_LENGTH";
+		case CHANNEL_RC_ZERO_LENGTH:
+			return "CHANNEL_RC_ZERO_LENGTH";
 
-	case CHANNEL_RC_INVALID_INSTANCE:
-		return "CHANNEL_RC_INVALID_INSTANCE";
+		case CHANNEL_RC_INVALID_INSTANCE:
+			return "CHANNEL_RC_INVALID_INSTANCE";
 
-	case CHANNEL_RC_UNSUPPORTED_VERSION:
-		return "CHANNEL_RC_UNSUPPORTED_VERSION";
+		case CHANNEL_RC_UNSUPPORTED_VERSION:
+			return "CHANNEL_RC_UNSUPPORTED_VERSION";
 
-	case CHANNEL_RC_INITIALIZATION_ERROR:
-		return "CHANNEL_RC_INITIALIZATION_ERROR";
+		case CHANNEL_RC_INITIALIZATION_ERROR:
+			return "CHANNEL_RC_INITIALIZATION_ERROR";
 
-	default:
-		return "UNKNOWN";
+		default:
+			return "UNKNOWN";
 	}
 }
 
@@ -648,35 +648,35 @@ const CHAR* WTSSessionStateToString(WTS_CONNECTSTATE_CLASS state)
 {
 	switch (state)
 	{
-	case WTSActive:
-		return "WTSActive";
+		case WTSActive:
+			return "WTSActive";
 
-	case WTSConnected:
-		return "WTSConnected";
+		case WTSConnected:
+			return "WTSConnected";
 
-	case WTSConnectQuery:
-		return "WTSConnectQuery";
+		case WTSConnectQuery:
+			return "WTSConnectQuery";
 
-	case WTSShadow:
-		return "WTSShadow";
+		case WTSShadow:
+			return "WTSShadow";
 
-	case WTSDisconnected:
-		return "WTSDisconnected";
+		case WTSDisconnected:
+			return "WTSDisconnected";
 
-	case WTSIdle:
-		return "WTSIdle";
+		case WTSIdle:
+			return "WTSIdle";
 
-	case WTSListen:
-		return "WTSListen";
+		case WTSListen:
+			return "WTSListen";
 
-	case WTSReset:
-		return "WTSReset";
+		case WTSReset:
+			return "WTSReset";
 
-	case WTSDown:
-		return "WTSDown";
+		case WTSDown:
+			return "WTSDown";
 
-	case WTSInit:
-		return "WTSInit";
+		case WTSInit:
+			return "WTSInit";
 	}
 
 	return "INVALID_STATE";

@@ -503,13 +503,13 @@ typedef struct _RDPDR_PARALLEL RDPDR_PARALLEL;
 /* Settings */
 
 #ifdef __GNUC__
-#	define ALIGN64 __attribute__((aligned(8)))
+#define ALIGN64 __attribute__((aligned(8)))
 #else
-#	ifdef _WIN32
-#		define ALIGN64 __declspec(align(8))
-#	else
-#		define ALIGN64
-#	endif
+#ifdef _WIN32
+#define ALIGN64 __declspec(align(8))
+#else
+#define ALIGN64
+#endif
 #endif
 
 /**

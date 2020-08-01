@@ -47,16 +47,16 @@ int main(int argc, char* argv[])
 
 	switch (ld)
 	{
-	case CONFIG_PARSE_SUCCESS:
-		WLog_DBG(TAG, "Configuration parsed successfully");
-		break;
+		case CONFIG_PARSE_SUCCESS:
+			WLog_DBG(TAG, "Configuration parsed successfully");
+			break;
 
-	case CONFIG_PARSE_ERROR:
-		WLog_ERR(TAG, "An error occured while parsing configuration file, exiting...");
-		goto fail;
+		case CONFIG_PARSE_ERROR:
+			WLog_ERR(TAG, "An error occured while parsing configuration file, exiting...");
+			goto fail;
 
-	case CONFIG_INVALID:
-		goto fail;
+		case CONFIG_INVALID:
+			goto fail;
 	}
 
 	if (config->WhitelistMode)

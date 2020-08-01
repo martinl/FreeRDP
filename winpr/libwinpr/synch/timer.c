@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -28,20 +28,20 @@
 #include <winpr/synch.h>
 
 #ifndef _WIN32
-#	include <unistd.h>
-#	include <errno.h>
-#	include <sys/time.h>
-#	include <signal.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/time.h>
+#include <signal.h>
 #endif
 
 #include "synch.h"
 
 #ifndef _WIN32
 
-#	include "../handle/handle.h"
+#include "../handle/handle.h"
 
-#	include "../log.h"
-#	define TAG WINPR_TAG("synch.timer")
+#include "../log.h"
+#define TAG WINPR_TAG("synch.timer")
 
 static BOOL TimerCloseHandle(HANDLE handle);
 
@@ -88,12 +88,12 @@ static DWORD TimerCleanupHandle(HANDLE handle)
 		{
 			switch (errno)
 			{
-			case ETIMEDOUT:
-			case EAGAIN:
-				return WAIT_TIMEOUT;
+				case ETIMEDOUT:
+				case EAGAIN:
+					return WAIT_TIMEOUT;
 
-			default:
-				break;
+				default:
+					break;
 			}
 
 			WLog_ERR(TAG, "timer read() failure [%d] %s", errno, strerror(errno));
@@ -119,21 +119,21 @@ BOOL TimerCloseHandle(HANDLE handle)
 
 	if (!timer->lpArgToCompletionRoutine)
 	{
-#	ifdef HAVE_SYS_TIMERFD_H
+#ifdef HAVE_SYS_TIMERFD_H
 
 		if (timer->fd != -1)
 			close(timer->fd);
 
-#	endif
+#endif
 	}
 	else
 	{
-#	ifdef WITH_POSIX_TIMER
+#ifdef WITH_POSIX_TIMER
 		timer_delete(timer->tid);
-#	endif
+#endif
 	}
 
-#	if defined(__APPLE__)
+#if defined(__APPLE__)
 	dispatch_release(timer->queue);
 	dispatch_release(timer->source);
 
@@ -143,13 +143,13 @@ BOOL TimerCloseHandle(HANDLE handle)
 	if (timer->pipe[1] != -1)
 		close(timer->pipe[1]);
 
-#	endif
+#endif
 	free(timer->name);
 	free(timer);
 	return TRUE;
 }
 
-#	ifdef WITH_POSIX_TIMER
+#ifdef WITH_POSIX_TIMER
 
 static BOOL g_WaitableTimerSignalHandlerInstalled = FALSE;
 
@@ -204,9 +204,9 @@ static int InstallWaitableTimerSignalHandler(void)
 	return 0;
 }
 
-#	endif
+#endif
 
-#	if defined(__APPLE__)
+#if defined(__APPLE__)
 static void WaitableTimerHandler(void* arg)
 {
 	UINT64 data = 1;
@@ -229,7 +229,7 @@ static void WaitableTimerHandler(void* arg)
 		timer->running = FALSE;
 	}
 }
-#	endif
+#endif
 
 static int InitializeWaitableTimer(WINPR_TIMER* timer)
 {
@@ -237,7 +237,7 @@ static int InitializeWaitableTimer(WINPR_TIMER* timer)
 
 	if (!timer->lpArgToCompletionRoutine)
 	{
-#	ifdef HAVE_SYS_TIMERFD_H
+#ifdef HAVE_SYS_TIMERFD_H
 		timer->fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
 
 		if (timer->fd <= 0)
@@ -246,15 +246,15 @@ static int InitializeWaitableTimer(WINPR_TIMER* timer)
 			return -1;
 		}
 
-#	elif defined(__APPLE__)
-#	else
+#elif defined(__APPLE__)
+#else
 		WLog_ERR(TAG, "%s: os specific implementation is missing", __FUNCTION__);
 		result = -1;
-#	endif
+#endif
 	}
 	else
 	{
-#	ifdef WITH_POSIX_TIMER
+#ifdef WITH_POSIX_TIMER
 		struct sigevent sigev;
 		InstallWaitableTimerSignalHandler();
 		ZeroMemory(&sigev, sizeof(struct sigevent));
@@ -268,11 +268,11 @@ static int InitializeWaitableTimer(WINPR_TIMER* timer)
 			return -1;
 		}
 
-#	elif defined(__APPLE__)
-#	else
+#elif defined(__APPLE__)
+#else
 		WLog_ERR(TAG, "%s: os specific implementation is missing", __FUNCTION__);
 		result = -1;
-#	endif
+#endif
 	}
 
 	timer->bInit = TRUE;
@@ -320,7 +320,7 @@ HANDLE CreateWaitableTimerA(LPSECURITY_ATTRIBUTES lpTimerAttributes, BOOL bManua
 			timer->name = strdup(lpTimerName);
 
 		timer->ops = &ops;
-#	if defined(__APPLE__)
+#if defined(__APPLE__)
 
 		if (pipe(timer->pipe) != 0)
 			goto fail;
@@ -342,15 +342,15 @@ HANDLE CreateWaitableTimerA(LPSECURITY_ATTRIBUTES lpTimerAttributes, BOOL bManua
 		if (fcntl(timer->fd, F_SETFL, O_NONBLOCK) < 0)
 			goto fail;
 
-#	endif
+#endif
 	}
 
 	return handle;
-#	if defined(__APPLE__)
+#if defined(__APPLE__)
 fail:
 	TimerCloseHandle(handle);
 	return NULL;
-#	endif
+#endif
 }
 
 HANDLE CreateWaitableTimerW(LPSECURITY_ATTRIBUTES lpTimerAttributes, BOOL bManualReset,
@@ -404,13 +404,13 @@ BOOL SetWaitableTimer(HANDLE hTimer, const LARGE_INTEGER* lpDueTime, LONG lPerio
 	ULONG Type;
 	WINPR_HANDLE* Object;
 	WINPR_TIMER* timer;
-#	if defined(WITH_POSIX_TIMER) || defined(__APPLE__)
+#if defined(WITH_POSIX_TIMER) || defined(__APPLE__)
 	LONGLONG seconds = 0;
 	LONGLONG nanoseconds = 0;
-#		ifdef HAVE_SYS_TIMERFD_H
+#ifdef HAVE_SYS_TIMERFD_H
 	int status = 0;
-#		endif /* HAVE_SYS_TIMERFD_H */
-#	endif     /* WITH_POSIX_TIMER */
+#endif /* HAVE_SYS_TIMERFD_H */
+#endif /* WITH_POSIX_TIMER */
 
 	if (!winpr_Handle_GetInfo(hTimer, &Type, &Object))
 		return FALSE;
@@ -441,7 +441,7 @@ BOOL SetWaitableTimer(HANDLE hTimer, const LARGE_INTEGER* lpDueTime, LONG lPerio
 			return FALSE;
 	}
 
-#	ifdef WITH_POSIX_TIMER
+#ifdef WITH_POSIX_TIMER
 	ZeroMemory(&(timer->timeout), sizeof(struct itimerspec));
 
 	if (lpDueTime->QuadPart < 0)
@@ -480,7 +480,7 @@ BOOL SetWaitableTimer(HANDLE hTimer, const LARGE_INTEGER* lpDueTime, LONG lPerio
 
 	if (!timer->pfnCompletionRoutine)
 	{
-#		ifdef HAVE_SYS_TIMERFD_H
+#ifdef HAVE_SYS_TIMERFD_H
 		status = timerfd_settime(timer->fd, 0, &(timer->timeout), NULL);
 
 		if (status)
@@ -489,7 +489,7 @@ BOOL SetWaitableTimer(HANDLE hTimer, const LARGE_INTEGER* lpDueTime, LONG lPerio
 			return FALSE;
 		}
 
-#		endif
+#endif
 	}
 	else
 	{
@@ -500,7 +500,7 @@ BOOL SetWaitableTimer(HANDLE hTimer, const LARGE_INTEGER* lpDueTime, LONG lPerio
 		}
 	}
 
-#	elif defined(__APPLE__)
+#elif defined(__APPLE__)
 
 	if (lpDueTime->QuadPart < 0)
 	{
@@ -542,7 +542,7 @@ BOOL SetWaitableTimer(HANDLE hTimer, const LARGE_INTEGER* lpDueTime, LONG lPerio
 		timer->running = TRUE;
 	}
 
-#	endif
+#endif
 	return TRUE;
 }
 
@@ -581,13 +581,13 @@ BOOL CancelWaitableTimer(HANDLE hTimer)
 		return FALSE;
 
 	timer = (WINPR_TIMER*)Object;
-#	if defined(__APPLE__)
+#if defined(__APPLE__)
 
 	if (timer->running)
 		dispatch_suspend(timer->source);
 
 	timer->running = FALSE;
-#	endif
+#endif
 	return TRUE;
 }
 

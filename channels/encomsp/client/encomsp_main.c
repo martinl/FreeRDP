@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -793,124 +793,131 @@ static UINT encomsp_process_receive(encomspPlugin* encomsp, wStream* s)
 
 		switch (header.Type)
 		{
-		case ODTYPE_FILTER_STATE_UPDATED:
-			if ((error = encomsp_recv_filter_updated_pdu(encomsp, s, &header)))
-			{
-				WLog_ERR(TAG, "encomsp_recv_filter_updated_pdu failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
+			case ODTYPE_FILTER_STATE_UPDATED:
+				if ((error = encomsp_recv_filter_updated_pdu(encomsp, s, &header)))
+				{
+					WLog_ERR(TAG, "encomsp_recv_filter_updated_pdu failed with error %" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		case ODTYPE_APP_REMOVED:
-			if ((error = encomsp_recv_application_removed_pdu(encomsp, s, &header)))
-			{
-				WLog_ERR(TAG, "encomsp_recv_application_removed_pdu failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
+			case ODTYPE_APP_REMOVED:
+				if ((error = encomsp_recv_application_removed_pdu(encomsp, s, &header)))
+				{
+					WLog_ERR(TAG,
+					         "encomsp_recv_application_removed_pdu failed with error %" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		case ODTYPE_APP_CREATED:
-			if ((error = encomsp_recv_application_created_pdu(encomsp, s, &header)))
-			{
-				WLog_ERR(TAG, "encomsp_recv_application_removed_pdu failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
+			case ODTYPE_APP_CREATED:
+				if ((error = encomsp_recv_application_created_pdu(encomsp, s, &header)))
+				{
+					WLog_ERR(TAG,
+					         "encomsp_recv_application_removed_pdu failed with error %" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		case ODTYPE_WND_REMOVED:
-			if ((error = encomsp_recv_window_removed_pdu(encomsp, s, &header)))
-			{
-				WLog_ERR(TAG, "encomsp_recv_window_removed_pdu failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
+			case ODTYPE_WND_REMOVED:
+				if ((error = encomsp_recv_window_removed_pdu(encomsp, s, &header)))
+				{
+					WLog_ERR(TAG, "encomsp_recv_window_removed_pdu failed with error %" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		case ODTYPE_WND_CREATED:
-			if ((error = encomsp_recv_window_created_pdu(encomsp, s, &header)))
-			{
-				WLog_ERR(TAG, "encomsp_recv_window_created_pdu failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
+			case ODTYPE_WND_CREATED:
+				if ((error = encomsp_recv_window_created_pdu(encomsp, s, &header)))
+				{
+					WLog_ERR(TAG, "encomsp_recv_window_created_pdu failed with error %" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		case ODTYPE_WND_SHOW:
-			if ((error = encomsp_recv_show_window_pdu(encomsp, s, &header)))
-			{
-				WLog_ERR(TAG, "encomsp_recv_show_window_pdu failed with error %" PRIu32 "!", error);
-				return error;
-			}
+			case ODTYPE_WND_SHOW:
+				if ((error = encomsp_recv_show_window_pdu(encomsp, s, &header)))
+				{
+					WLog_ERR(TAG, "encomsp_recv_show_window_pdu failed with error %" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		case ODTYPE_PARTICIPANT_REMOVED:
-			if ((error = encomsp_recv_participant_removed_pdu(encomsp, s, &header)))
-			{
-				WLog_ERR(TAG, "encomsp_recv_participant_removed_pdu failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
+			case ODTYPE_PARTICIPANT_REMOVED:
+				if ((error = encomsp_recv_participant_removed_pdu(encomsp, s, &header)))
+				{
+					WLog_ERR(TAG,
+					         "encomsp_recv_participant_removed_pdu failed with error %" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		case ODTYPE_PARTICIPANT_CREATED:
-			if ((error = encomsp_recv_participant_created_pdu(encomsp, s, &header)))
-			{
-				WLog_ERR(TAG, "encomsp_recv_participant_created_pdu failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
+			case ODTYPE_PARTICIPANT_CREATED:
+				if ((error = encomsp_recv_participant_created_pdu(encomsp, s, &header)))
+				{
+					WLog_ERR(TAG,
+					         "encomsp_recv_participant_created_pdu failed with error %" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		case ODTYPE_PARTICIPANT_CTRL_CHANGED:
-			if ((error = encomsp_recv_change_participant_control_level_pdu(encomsp, s, &header)))
-			{
-				WLog_ERR(
-				    TAG,
-				    "encomsp_recv_change_participant_control_level_pdu failed with error %" PRIu32
-				    "!",
-				    error);
-				return error;
-			}
+			case ODTYPE_PARTICIPANT_CTRL_CHANGED:
+				if ((error =
+				         encomsp_recv_change_participant_control_level_pdu(encomsp, s, &header)))
+				{
+					WLog_ERR(TAG,
+					         "encomsp_recv_change_participant_control_level_pdu failed with error "
+					         "%" PRIu32 "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		case ODTYPE_GRAPHICS_STREAM_PAUSED:
-			if ((error = encomsp_recv_graphics_stream_paused_pdu(encomsp, s, &header)))
-			{
-				WLog_ERR(TAG,
-				         "encomsp_recv_graphics_stream_paused_pdu failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
+			case ODTYPE_GRAPHICS_STREAM_PAUSED:
+				if ((error = encomsp_recv_graphics_stream_paused_pdu(encomsp, s, &header)))
+				{
+					WLog_ERR(TAG,
+					         "encomsp_recv_graphics_stream_paused_pdu failed with error %" PRIu32
+					         "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		case ODTYPE_GRAPHICS_STREAM_RESUMED:
-			if ((error = encomsp_recv_graphics_stream_resumed_pdu(encomsp, s, &header)))
-			{
-				WLog_ERR(TAG,
-				         "encomsp_recv_graphics_stream_resumed_pdu failed with error %" PRIu32 "!",
-				         error);
-				return error;
-			}
+			case ODTYPE_GRAPHICS_STREAM_RESUMED:
+				if ((error = encomsp_recv_graphics_stream_resumed_pdu(encomsp, s, &header)))
+				{
+					WLog_ERR(TAG,
+					         "encomsp_recv_graphics_stream_resumed_pdu failed with error %" PRIu32
+					         "!",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		default:
-			WLog_ERR(TAG, "header.Type %" PRIu16 " not found", header.Type);
-			return ERROR_INVALID_DATA;
-			break;
+			default:
+				WLog_ERR(TAG, "header.Type %" PRIu16 " not found", header.Type);
+				return ERROR_INVALID_DATA;
+				break;
 		}
 	}
 
@@ -997,20 +1004,21 @@ static VOID VCAPITYPE encomsp_virtual_channel_open_event_ex(LPVOID lpUserParam, 
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_DATA_RECEIVED:
-		if ((error = encomsp_virtual_channel_event_data_received(encomsp, pData, dataLength,
-		                                                         totalLength, dataFlags)))
-			WLog_ERR(TAG,
-			         "encomsp_virtual_channel_event_data_received failed with error %" PRIu32 "",
-			         error);
+		case CHANNEL_EVENT_DATA_RECEIVED:
+			if ((error = encomsp_virtual_channel_event_data_received(encomsp, pData, dataLength,
+			                                                         totalLength, dataFlags)))
+				WLog_ERR(TAG,
+				         "encomsp_virtual_channel_event_data_received failed with error %" PRIu32
+				         "",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_WRITE_COMPLETE:
-		break;
+		case CHANNEL_EVENT_WRITE_COMPLETE:
+			break;
 
-	case CHANNEL_EVENT_USER:
-		break;
+		case CHANNEL_EVENT_USER:
+			break;
 	}
 
 	if (error && encomsp->rdpcontext)
@@ -1179,27 +1187,28 @@ static VOID VCAPITYPE encomsp_virtual_channel_init_event_ex(LPVOID lpUserParam, 
 
 	switch (event)
 	{
-	case CHANNEL_EVENT_CONNECTED:
-		if ((error = encomsp_virtual_channel_event_connected(encomsp, pData, dataLength)))
-			WLog_ERR(TAG, "encomsp_virtual_channel_event_connected failed with error %" PRIu32 "",
-			         error);
+		case CHANNEL_EVENT_CONNECTED:
+			if ((error = encomsp_virtual_channel_event_connected(encomsp, pData, dataLength)))
+				WLog_ERR(TAG,
+				         "encomsp_virtual_channel_event_connected failed with error %" PRIu32 "",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_DISCONNECTED:
-		if ((error = encomsp_virtual_channel_event_disconnected(encomsp)))
-			WLog_ERR(TAG,
-			         "encomsp_virtual_channel_event_disconnected failed with error %" PRIu32 "",
-			         error);
+		case CHANNEL_EVENT_DISCONNECTED:
+			if ((error = encomsp_virtual_channel_event_disconnected(encomsp)))
+				WLog_ERR(TAG,
+				         "encomsp_virtual_channel_event_disconnected failed with error %" PRIu32 "",
+				         error);
 
-		break;
+			break;
 
-	case CHANNEL_EVENT_TERMINATED:
-		encomsp_virtual_channel_event_terminated(encomsp);
-		break;
+		case CHANNEL_EVENT_TERMINATED:
+			encomsp_virtual_channel_event_terminated(encomsp);
+			break;
 
-	default:
-		WLog_ERR(TAG, "Unhandled event type %" PRIu32 "", event);
+		default:
+			WLog_ERR(TAG, "Unhandled event type %" PRIu32 "", event);
 	}
 
 	if (error && encomsp->rdpcontext)

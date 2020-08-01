@@ -64,11 +64,13 @@ static NSString *kDurationKey = @"duration";
 #pragma mark -
 #pragma mark Toast Methods
 
-- (void)makeToast:(NSString *)message {
+- (void)makeToast:(NSString *)message
+{
 	[self makeToast:message duration:kDefaultLength position:kDefaultPosition];
 }
 
-- (void)makeToast:(NSString *)message duration:(float)interval position:(id)point {
+- (void)makeToast:(NSString *)message duration:(float)interval position:(id)point
+{
 	UIView *toast = [self makeViewForMessage:message title:nil image:nil];
 	[self showToast:toast duration:interval position:point];
 }
@@ -76,7 +78,8 @@ static NSString *kDurationKey = @"duration";
 - (void)makeToast:(NSString *)message
          duration:(float)interval
          position:(id)point
-            title:(NSString *)title {
+            title:(NSString *)title
+{
 	UIView *toast = [self makeViewForMessage:message title:title image:nil];
 	[self showToast:toast duration:interval position:point];
 }
@@ -84,7 +87,8 @@ static NSString *kDurationKey = @"duration";
 - (void)makeToast:(NSString *)message
          duration:(float)interval
          position:(id)point
-            image:(UIImage *)image {
+            image:(UIImage *)image
+{
 	UIView *toast = [self makeViewForMessage:message title:nil image:image];
 	[self showToast:toast duration:interval position:point];
 }
@@ -93,16 +97,19 @@ static NSString *kDurationKey = @"duration";
          duration:(float)interval
          position:(id)point
             title:(NSString *)title
-            image:(UIImage *)image {
+            image:(UIImage *)image
+{
 	UIView *toast = [self makeViewForMessage:message title:title image:image];
 	[self showToast:toast duration:interval position:point];
 }
 
-- (void)showToast:(UIView *)toast {
+- (void)showToast:(UIView *)toast
+{
 	[self showToast:toast duration:kDefaultLength position:kDefaultPosition];
 }
 
-- (void)showToast:(UIView *)toast duration:(float)interval position:(id)point {
+- (void)showToast:(UIView *)toast duration:(float)interval position:(id)point
+{
 
 	/****************************************************
 	 *                                                  *
@@ -132,7 +139,8 @@ static NSString *kDurationKey = @"duration";
 #pragma mark -
 #pragma mark Animation Delegate Method
 
-- (void)animationDidStop:(NSString *)animationID finished:(BOOL)finished context:(void *)context {
+- (void)animationDidStop:(NSString *)animationID finished:(BOOL)finished context:(void *)context
+{
 
 	UIView *toast = (UIView *)context;
 
@@ -161,7 +169,8 @@ static NSString *kDurationKey = @"duration";
 #pragma mark -
 #pragma mark Private Methods
 
-- (CGPoint)getPositionFor:(id)point toast:(UIView *)toast {
+- (CGPoint)getPositionFor:(id)point toast:(UIView *)toast
+{
 
 	/*************************************************************************************
 	 *                                                                                   *
@@ -198,7 +207,8 @@ static NSString *kDurationKey = @"duration";
 	return [self getPositionFor:kDefaultPosition toast:toast];
 }
 
-- (UIView *)makeViewForMessage:(NSString *)message title:(NSString *)title image:(UIImage *)image {
+- (UIView *)makeViewForMessage:(NSString *)message title:(NSString *)title image:(UIImage *)image
+{
 
 	/***********************************************************************************
 	 *                                                                                 *

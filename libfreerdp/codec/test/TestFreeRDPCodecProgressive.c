@@ -201,33 +201,33 @@ static int test_image_fill_quarter(BYTE* pDstData, int nDstStep, int nWidth, int
 
 	switch (quarter)
 	{
-	case 0:
-		x = 0;
-		y = 0;
-		width = nWidth / 2;
-		height = nHeight / 2;
-		break;
+		case 0:
+			x = 0;
+			y = 0;
+			width = nWidth / 2;
+			height = nHeight / 2;
+			break;
 
-	case 1:
-		x = nWidth / 2;
-		y = nHeight / 2;
-		width = nWidth / 2;
-		height = nHeight / 2;
-		break;
+		case 1:
+			x = nWidth / 2;
+			y = nHeight / 2;
+			width = nWidth / 2;
+			height = nHeight / 2;
+			break;
 
-	case 2:
-		x = 0;
-		y = nHeight / 2;
-		width = nWidth / 2;
-		height = nHeight / 2;
-		break;
+		case 2:
+			x = 0;
+			y = nHeight / 2;
+			width = nWidth / 2;
+			height = nHeight / 2;
+			break;
 
-	case 3:
-		x = nWidth / 2;
-		y = 0;
-		width = nWidth / 2;
-		height = nHeight / 2;
-		break;
+		case 3:
+			x = nWidth / 2;
+			y = 0;
+			width = nWidth / 2;
+			height = nHeight / 2;
+			break;
 	}
 
 	test_image_fill(pDstData, nDstStep, x, y, width, height, 0xFF000000);
@@ -845,33 +845,33 @@ static int test_progressive_decode(PROGRESSIVE_CONTEXT* progressive, EGFX_SAMPLE
 
 		switch (quarter)
 		{
-		case 0:
-			clippingRect.left = 0;
-			clippingRect.top = 0;
-			clippingRect.right = g_Width / 2;
-			clippingRect.bottom = g_Height / 2;
-			break;
+			case 0:
+				clippingRect.left = 0;
+				clippingRect.top = 0;
+				clippingRect.right = g_Width / 2;
+				clippingRect.bottom = g_Height / 2;
+				break;
 
-		case 1:
-			clippingRect.left = g_Width / 2;
-			clippingRect.top = g_Height / 2;
-			clippingRect.right = g_Width;
-			clippingRect.bottom = g_Height;
-			break;
+			case 1:
+				clippingRect.left = g_Width / 2;
+				clippingRect.top = g_Height / 2;
+				clippingRect.right = g_Width;
+				clippingRect.bottom = g_Height;
+				break;
 
-		case 2:
-			clippingRect.left = 0;
-			clippingRect.top = g_Height / 2;
-			clippingRect.right = g_Width / 2;
-			clippingRect.bottom = g_Height;
-			break;
+			case 2:
+				clippingRect.left = 0;
+				clippingRect.top = g_Height / 2;
+				clippingRect.right = g_Width / 2;
+				clippingRect.bottom = g_Height;
+				break;
 
-		case 3:
-			clippingRect.left = g_Width / 2;
-			clippingRect.top = 0;
-			clippingRect.right = g_Width;
-			clippingRect.bottom = g_Height / 2;
-			break;
+			case 3:
+				clippingRect.left = g_Width / 2;
+				clippingRect.top = 0;
+				clippingRect.right = g_Width;
+				clippingRect.bottom = g_Height / 2;
+				break;
 		}
 
 		for (index = 0; index < region->numTiles; index++)

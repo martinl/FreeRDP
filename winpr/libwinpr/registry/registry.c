@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/registry.h>
@@ -31,12 +31,12 @@
 
 #if !defined(_WIN32) || defined(_UWP)
 
-#	include <stdio.h>
-#	include <stdlib.h>
-#	include <string.h>
-#	include <winpr/crt.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <winpr/crt.h>
 
-#	include "registry_reg.h"
+#include "registry_reg.h"
 
 static Reg* instance = NULL;
 

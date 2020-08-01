@@ -10,26 +10,26 @@ static LRESULT CALLBACK TestWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 	switch (uMsg)
 	{
-	case WM_COPYDATA:
-	{
-		pCopyData = (PCOPYDATASTRUCT)lParam;
+		case WM_COPYDATA:
+		{
+			pCopyData = (PCOPYDATASTRUCT)lParam;
 
-		if (!pCopyData)
+			if (!pCopyData)
+				break;
+
+			printf("WM_COPYDATA: cbData: %" PRIu32 " dwData: %" PRIu32 "\n", (int)pCopyData->cbData,
+			       (int)pCopyData->dwData);
+		}
+		break;
+
+		case WM_CLOSE:
+			printf("WM_CLOSE\n");
 			break;
 
-		printf("WM_COPYDATA: cbData: %" PRIu32 " dwData: %" PRIu32 "\n", (int)pCopyData->cbData,
-		       (int)pCopyData->dwData);
-	}
-	break;
-
-	case WM_CLOSE:
-		printf("WM_CLOSE\n");
-		break;
-
-	default:
-		printf("TestWndProc: uMsg: 0x%08" PRIX32 "\n", uMsg);
-		return DefWindowProc(hwnd, uMsg, wParam, lParam);
-		break;
+		default:
+			printf("TestWndProc: uMsg: 0x%08" PRIX32 "\n", uMsg);
+			return DefWindowProc(hwnd, uMsg, wParam, lParam);
+			break;
 	}
 
 	return 0;

@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -27,7 +27,7 @@
 
 #ifdef WINPR_THREAD_POOL
 
-#	ifdef _WIN32
+#ifdef _WIN32
 static INIT_ONCE init_once_module = INIT_ONCE_STATIC_INIT;
 static BOOL(WINAPI* pCallbackMayRunLong)(PTP_CALLBACK_INSTANCE pci);
 
@@ -42,17 +42,17 @@ static BOOL CALLBACK init_module(PINIT_ONCE once, PVOID param, PVOID* context)
 
 	return TRUE;
 }
-#	endif
+#endif
 
 BOOL CallbackMayRunLong(PTP_CALLBACK_INSTANCE pci)
 {
-#	ifdef _WIN32
+#ifdef _WIN32
 	InitOnceExecuteOnce(&init_once_module, init_module, NULL, NULL);
 
 	if (pCallbackMayRunLong)
 		return pCallbackMayRunLong(pci);
 
-#	endif
+#endif
 	/* No default implementation */
 	return FALSE;
 }

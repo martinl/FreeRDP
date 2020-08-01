@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -571,209 +571,209 @@ WINSCARDAPI const char* WINAPI SCardGetErrorString(LONG errorCode)
 {
 	switch (errorCode)
 	{
-	case SCARD_S_SUCCESS:
-		return "SCARD_S_SUCCESS";
+		case SCARD_S_SUCCESS:
+			return "SCARD_S_SUCCESS";
 
-	case SCARD_F_INTERNAL_ERROR:
-		return "SCARD_F_INTERNAL_ERROR";
+		case SCARD_F_INTERNAL_ERROR:
+			return "SCARD_F_INTERNAL_ERROR";
 
-	case SCARD_E_CANCELLED:
-		return "SCARD_E_CANCELLED";
+		case SCARD_E_CANCELLED:
+			return "SCARD_E_CANCELLED";
 
-	case SCARD_E_INVALID_HANDLE:
-		return "SCARD_E_INVALID_HANDLE";
+		case SCARD_E_INVALID_HANDLE:
+			return "SCARD_E_INVALID_HANDLE";
 
-	case SCARD_E_INVALID_PARAMETER:
-		return "SCARD_E_INVALID_PARAMETER";
+		case SCARD_E_INVALID_PARAMETER:
+			return "SCARD_E_INVALID_PARAMETER";
 
-	case SCARD_E_INVALID_TARGET:
-		return "SCARD_E_INVALID_TARGET";
+		case SCARD_E_INVALID_TARGET:
+			return "SCARD_E_INVALID_TARGET";
 
-	case SCARD_E_NO_MEMORY:
-		return "SCARD_E_NO_MEMORY";
+		case SCARD_E_NO_MEMORY:
+			return "SCARD_E_NO_MEMORY";
 
-	case SCARD_F_WAITED_TOO_LONG:
-		return "SCARD_F_WAITED_TOO_LONG";
+		case SCARD_F_WAITED_TOO_LONG:
+			return "SCARD_F_WAITED_TOO_LONG";
 
-	case SCARD_E_INSUFFICIENT_BUFFER:
-		return "SCARD_E_INSUFFICIENT_BUFFER";
+		case SCARD_E_INSUFFICIENT_BUFFER:
+			return "SCARD_E_INSUFFICIENT_BUFFER";
 
-	case SCARD_E_UNKNOWN_READER:
-		return "SCARD_E_UNKNOWN_READER";
+		case SCARD_E_UNKNOWN_READER:
+			return "SCARD_E_UNKNOWN_READER";
 
-	case SCARD_E_TIMEOUT:
-		return "SCARD_E_TIMEOUT";
+		case SCARD_E_TIMEOUT:
+			return "SCARD_E_TIMEOUT";
 
-	case SCARD_E_SHARING_VIOLATION:
-		return "SCARD_E_SHARING_VIOLATION";
+		case SCARD_E_SHARING_VIOLATION:
+			return "SCARD_E_SHARING_VIOLATION";
 
-	case SCARD_E_NO_SMARTCARD:
-		return "SCARD_E_NO_SMARTCARD";
+		case SCARD_E_NO_SMARTCARD:
+			return "SCARD_E_NO_SMARTCARD";
 
-	case SCARD_E_UNKNOWN_CARD:
-		return "SCARD_E_UNKNOWN_CARD";
+		case SCARD_E_UNKNOWN_CARD:
+			return "SCARD_E_UNKNOWN_CARD";
 
-	case SCARD_E_CANT_DISPOSE:
-		return "SCARD_E_CANT_DISPOSE";
+		case SCARD_E_CANT_DISPOSE:
+			return "SCARD_E_CANT_DISPOSE";
 
-	case SCARD_E_PROTO_MISMATCH:
-		return "SCARD_E_PROTO_MISMATCH";
+		case SCARD_E_PROTO_MISMATCH:
+			return "SCARD_E_PROTO_MISMATCH";
 
-	case SCARD_E_NOT_READY:
-		return "SCARD_E_NOT_READY";
+		case SCARD_E_NOT_READY:
+			return "SCARD_E_NOT_READY";
 
-	case SCARD_E_INVALID_VALUE:
-		return "SCARD_E_INVALID_VALUE";
+		case SCARD_E_INVALID_VALUE:
+			return "SCARD_E_INVALID_VALUE";
 
-	case SCARD_E_SYSTEM_CANCELLED:
-		return "SCARD_E_SYSTEM_CANCELLED";
+		case SCARD_E_SYSTEM_CANCELLED:
+			return "SCARD_E_SYSTEM_CANCELLED";
 
-	case SCARD_F_COMM_ERROR:
-		return "SCARD_F_COMM_ERROR";
+		case SCARD_F_COMM_ERROR:
+			return "SCARD_F_COMM_ERROR";
 
-	case SCARD_F_UNKNOWN_ERROR:
-		return "SCARD_F_UNKNOWN_ERROR";
+		case SCARD_F_UNKNOWN_ERROR:
+			return "SCARD_F_UNKNOWN_ERROR";
 
-	case SCARD_E_INVALID_ATR:
-		return "SCARD_E_INVALID_ATR";
+		case SCARD_E_INVALID_ATR:
+			return "SCARD_E_INVALID_ATR";
 
-	case SCARD_E_NOT_TRANSACTED:
-		return "SCARD_E_NOT_TRANSACTED";
+		case SCARD_E_NOT_TRANSACTED:
+			return "SCARD_E_NOT_TRANSACTED";
 
-	case SCARD_E_READER_UNAVAILABLE:
-		return "SCARD_E_READER_UNAVAILABLE";
+		case SCARD_E_READER_UNAVAILABLE:
+			return "SCARD_E_READER_UNAVAILABLE";
 
-	case SCARD_P_SHUTDOWN:
-		return "SCARD_P_SHUTDOWN";
+		case SCARD_P_SHUTDOWN:
+			return "SCARD_P_SHUTDOWN";
 
-	case SCARD_E_PCI_TOO_SMALL:
-		return "SCARD_E_PCI_TOO_SMALL";
+		case SCARD_E_PCI_TOO_SMALL:
+			return "SCARD_E_PCI_TOO_SMALL";
 
-	case SCARD_E_READER_UNSUPPORTED:
-		return "SCARD_E_READER_UNSUPPORTED";
+		case SCARD_E_READER_UNSUPPORTED:
+			return "SCARD_E_READER_UNSUPPORTED";
 
-	case SCARD_E_DUPLICATE_READER:
-		return "SCARD_E_DUPLICATE_READER";
+		case SCARD_E_DUPLICATE_READER:
+			return "SCARD_E_DUPLICATE_READER";
 
-	case SCARD_E_CARD_UNSUPPORTED:
-		return "SCARD_E_CARD_UNSUPPORTED";
+		case SCARD_E_CARD_UNSUPPORTED:
+			return "SCARD_E_CARD_UNSUPPORTED";
 
-	case SCARD_E_NO_SERVICE:
-		return "SCARD_E_NO_SERVICE";
+		case SCARD_E_NO_SERVICE:
+			return "SCARD_E_NO_SERVICE";
 
-	case SCARD_E_SERVICE_STOPPED:
-		return "SCARD_E_SERVICE_STOPPED";
+		case SCARD_E_SERVICE_STOPPED:
+			return "SCARD_E_SERVICE_STOPPED";
 
-	case SCARD_E_UNEXPECTED:
-		return "SCARD_E_UNEXPECTED";
+		case SCARD_E_UNEXPECTED:
+			return "SCARD_E_UNEXPECTED";
 
-	case SCARD_E_ICC_INSTALLATION:
-		return "SCARD_E_ICC_INSTALLATION";
+		case SCARD_E_ICC_INSTALLATION:
+			return "SCARD_E_ICC_INSTALLATION";
 
-	case SCARD_E_ICC_CREATEORDER:
-		return "SCARD_E_ICC_CREATEORDER";
+		case SCARD_E_ICC_CREATEORDER:
+			return "SCARD_E_ICC_CREATEORDER";
 
-	case SCARD_E_UNSUPPORTED_FEATURE:
-		return "SCARD_E_UNSUPPORTED_FEATURE";
+		case SCARD_E_UNSUPPORTED_FEATURE:
+			return "SCARD_E_UNSUPPORTED_FEATURE";
 
-	case SCARD_E_DIR_NOT_FOUND:
-		return "SCARD_E_DIR_NOT_FOUND";
+		case SCARD_E_DIR_NOT_FOUND:
+			return "SCARD_E_DIR_NOT_FOUND";
 
-	case SCARD_E_FILE_NOT_FOUND:
-		return "SCARD_E_FILE_NOT_FOUND";
+		case SCARD_E_FILE_NOT_FOUND:
+			return "SCARD_E_FILE_NOT_FOUND";
 
-	case SCARD_E_NO_DIR:
-		return "SCARD_E_NO_DIR";
+		case SCARD_E_NO_DIR:
+			return "SCARD_E_NO_DIR";
 
-	case SCARD_E_NO_FILE:
-		return "SCARD_E_NO_FILE";
+		case SCARD_E_NO_FILE:
+			return "SCARD_E_NO_FILE";
 
-	case SCARD_E_NO_ACCESS:
-		return "SCARD_E_NO_ACCESS";
+		case SCARD_E_NO_ACCESS:
+			return "SCARD_E_NO_ACCESS";
 
-	case SCARD_E_WRITE_TOO_MANY:
-		return "SCARD_E_WRITE_TOO_MANY";
+		case SCARD_E_WRITE_TOO_MANY:
+			return "SCARD_E_WRITE_TOO_MANY";
 
-	case SCARD_E_BAD_SEEK:
-		return "SCARD_E_BAD_SEEK";
+		case SCARD_E_BAD_SEEK:
+			return "SCARD_E_BAD_SEEK";
 
-	case SCARD_E_INVALID_CHV:
-		return "SCARD_E_INVALID_CHV";
+		case SCARD_E_INVALID_CHV:
+			return "SCARD_E_INVALID_CHV";
 
-	case SCARD_E_UNKNOWN_RES_MNG:
-		return "SCARD_E_UNKNOWN_RES_MNG";
+		case SCARD_E_UNKNOWN_RES_MNG:
+			return "SCARD_E_UNKNOWN_RES_MNG";
 
-	case SCARD_E_NO_SUCH_CERTIFICATE:
-		return "SCARD_E_NO_SUCH_CERTIFICATE";
+		case SCARD_E_NO_SUCH_CERTIFICATE:
+			return "SCARD_E_NO_SUCH_CERTIFICATE";
 
-	case SCARD_E_CERTIFICATE_UNAVAILABLE:
-		return "SCARD_E_CERTIFICATE_UNAVAILABLE";
+		case SCARD_E_CERTIFICATE_UNAVAILABLE:
+			return "SCARD_E_CERTIFICATE_UNAVAILABLE";
 
-	case SCARD_E_NO_READERS_AVAILABLE:
-		return "SCARD_E_NO_READERS_AVAILABLE";
+		case SCARD_E_NO_READERS_AVAILABLE:
+			return "SCARD_E_NO_READERS_AVAILABLE";
 
-	case SCARD_E_COMM_DATA_LOST:
-		return "SCARD_E_COMM_DATA_LOST";
+		case SCARD_E_COMM_DATA_LOST:
+			return "SCARD_E_COMM_DATA_LOST";
 
-	case SCARD_E_NO_KEY_CONTAINER:
-		return "SCARD_E_NO_KEY_CONTAINER";
+		case SCARD_E_NO_KEY_CONTAINER:
+			return "SCARD_E_NO_KEY_CONTAINER";
 
-	case SCARD_E_SERVER_TOO_BUSY:
-		return "SCARD_E_SERVER_TOO_BUSY";
+		case SCARD_E_SERVER_TOO_BUSY:
+			return "SCARD_E_SERVER_TOO_BUSY";
 
-	case SCARD_E_PIN_CACHE_EXPIRED:
-		return "SCARD_E_PIN_CACHE_EXPIRED";
+		case SCARD_E_PIN_CACHE_EXPIRED:
+			return "SCARD_E_PIN_CACHE_EXPIRED";
 
-	case SCARD_E_NO_PIN_CACHE:
-		return "SCARD_E_NO_PIN_CACHE";
+		case SCARD_E_NO_PIN_CACHE:
+			return "SCARD_E_NO_PIN_CACHE";
 
-	case SCARD_E_READ_ONLY_CARD:
-		return "SCARD_E_READ_ONLY_CARD";
+		case SCARD_E_READ_ONLY_CARD:
+			return "SCARD_E_READ_ONLY_CARD";
 
-	case SCARD_W_UNSUPPORTED_CARD:
-		return "SCARD_W_UNSUPPORTED_CARD";
+		case SCARD_W_UNSUPPORTED_CARD:
+			return "SCARD_W_UNSUPPORTED_CARD";
 
-	case SCARD_W_UNRESPONSIVE_CARD:
-		return "SCARD_W_UNRESPONSIVE_CARD";
+		case SCARD_W_UNRESPONSIVE_CARD:
+			return "SCARD_W_UNRESPONSIVE_CARD";
 
-	case SCARD_W_UNPOWERED_CARD:
-		return "SCARD_W_UNPOWERED_CARD";
+		case SCARD_W_UNPOWERED_CARD:
+			return "SCARD_W_UNPOWERED_CARD";
 
-	case SCARD_W_RESET_CARD:
-		return "SCARD_W_RESET_CARD";
+		case SCARD_W_RESET_CARD:
+			return "SCARD_W_RESET_CARD";
 
-	case SCARD_W_REMOVED_CARD:
-		return "SCARD_W_REMOVED_CARD";
+		case SCARD_W_REMOVED_CARD:
+			return "SCARD_W_REMOVED_CARD";
 
-	case SCARD_W_SECURITY_VIOLATION:
-		return "SCARD_W_SECURITY_VIOLATION";
+		case SCARD_W_SECURITY_VIOLATION:
+			return "SCARD_W_SECURITY_VIOLATION";
 
-	case SCARD_W_WRONG_CHV:
-		return "SCARD_W_WRONG_CHV";
+		case SCARD_W_WRONG_CHV:
+			return "SCARD_W_WRONG_CHV";
 
-	case SCARD_W_CHV_BLOCKED:
-		return "SCARD_W_CHV_BLOCKED";
+		case SCARD_W_CHV_BLOCKED:
+			return "SCARD_W_CHV_BLOCKED";
 
-	case SCARD_W_EOF:
-		return "SCARD_W_EOF";
+		case SCARD_W_EOF:
+			return "SCARD_W_EOF";
 
-	case SCARD_W_CANCELLED_BY_USER:
-		return "SCARD_W_CANCELLED_BY_USER";
+		case SCARD_W_CANCELLED_BY_USER:
+			return "SCARD_W_CANCELLED_BY_USER";
 
-	case SCARD_W_CARD_NOT_AUTHENTICATED:
-		return "SCARD_W_CARD_NOT_AUTHENTICATED";
+		case SCARD_W_CARD_NOT_AUTHENTICATED:
+			return "SCARD_W_CARD_NOT_AUTHENTICATED";
 
-	case SCARD_W_CACHE_ITEM_NOT_FOUND:
-		return "SCARD_W_CACHE_ITEM_NOT_FOUND";
+		case SCARD_W_CACHE_ITEM_NOT_FOUND:
+			return "SCARD_W_CACHE_ITEM_NOT_FOUND";
 
-	case SCARD_W_CACHE_ITEM_STALE:
-		return "SCARD_W_CACHE_ITEM_STALE";
+		case SCARD_W_CACHE_ITEM_STALE:
+			return "SCARD_W_CACHE_ITEM_STALE";
 
-	case SCARD_W_CACHE_ITEM_TOO_BIG:
-		return "SCARD_W_CACHE_ITEM_TOO_BIG";
+		case SCARD_W_CACHE_ITEM_TOO_BIG:
+			return "SCARD_W_CACHE_ITEM_TOO_BIG";
 
-	default:
-		return "SCARD_E_UNKNOWN";
+		default:
+			return "SCARD_E_UNKNOWN";
 	}
 
 	return "SCARD_E_UNKNOWN";
@@ -783,181 +783,181 @@ WINSCARDAPI const char* WINAPI SCardGetAttributeString(DWORD dwAttrId)
 {
 	switch (dwAttrId)
 	{
-	case SCARD_ATTR_VENDOR_NAME:
-		return "SCARD_ATTR_VENDOR_NAME";
-		break;
+		case SCARD_ATTR_VENDOR_NAME:
+			return "SCARD_ATTR_VENDOR_NAME";
+			break;
 
-	case SCARD_ATTR_VENDOR_IFD_TYPE:
-		return "SCARD_ATTR_VENDOR_IFD_TYPE";
-		break;
+		case SCARD_ATTR_VENDOR_IFD_TYPE:
+			return "SCARD_ATTR_VENDOR_IFD_TYPE";
+			break;
 
-	case SCARD_ATTR_VENDOR_IFD_VERSION:
-		return "SCARD_ATTR_VENDOR_IFD_VERSION";
-		break;
+		case SCARD_ATTR_VENDOR_IFD_VERSION:
+			return "SCARD_ATTR_VENDOR_IFD_VERSION";
+			break;
 
-	case SCARD_ATTR_VENDOR_IFD_SERIAL_NO:
-		return "SCARD_ATTR_VENDOR_IFD_SERIAL_NO";
-		break;
+		case SCARD_ATTR_VENDOR_IFD_SERIAL_NO:
+			return "SCARD_ATTR_VENDOR_IFD_SERIAL_NO";
+			break;
 
-	case SCARD_ATTR_CHANNEL_ID:
-		return "SCARD_ATTR_CHANNEL_ID";
-		break;
+		case SCARD_ATTR_CHANNEL_ID:
+			return "SCARD_ATTR_CHANNEL_ID";
+			break;
 
-	case SCARD_ATTR_PROTOCOL_TYPES:
-		return "SCARD_ATTR_PROTOCOL_TYPES";
-		break;
+		case SCARD_ATTR_PROTOCOL_TYPES:
+			return "SCARD_ATTR_PROTOCOL_TYPES";
+			break;
 
-	case SCARD_ATTR_DEFAULT_CLK:
-		return "SCARD_ATTR_DEFAULT_CLK";
-		break;
+		case SCARD_ATTR_DEFAULT_CLK:
+			return "SCARD_ATTR_DEFAULT_CLK";
+			break;
 
-	case SCARD_ATTR_MAX_CLK:
-		return "SCARD_ATTR_MAX_CLK";
-		break;
+		case SCARD_ATTR_MAX_CLK:
+			return "SCARD_ATTR_MAX_CLK";
+			break;
 
-	case SCARD_ATTR_DEFAULT_DATA_RATE:
-		return "SCARD_ATTR_DEFAULT_DATA_RATE";
-		break;
+		case SCARD_ATTR_DEFAULT_DATA_RATE:
+			return "SCARD_ATTR_DEFAULT_DATA_RATE";
+			break;
 
-	case SCARD_ATTR_MAX_DATA_RATE:
-		return "SCARD_ATTR_MAX_DATA_RATE";
-		break;
+		case SCARD_ATTR_MAX_DATA_RATE:
+			return "SCARD_ATTR_MAX_DATA_RATE";
+			break;
 
-	case SCARD_ATTR_MAX_IFSD:
-		return "SCARD_ATTR_MAX_IFSD";
-		break;
+		case SCARD_ATTR_MAX_IFSD:
+			return "SCARD_ATTR_MAX_IFSD";
+			break;
 
-	case SCARD_ATTR_POWER_MGMT_SUPPORT:
-		return "SCARD_ATTR_POWER_MGMT_SUPPORT";
-		break;
+		case SCARD_ATTR_POWER_MGMT_SUPPORT:
+			return "SCARD_ATTR_POWER_MGMT_SUPPORT";
+			break;
 
-	case SCARD_ATTR_USER_TO_CARD_AUTH_DEVICE:
-		return "SCARD_ATTR_USER_TO_CARD_AUTH_DEVICE";
-		break;
+		case SCARD_ATTR_USER_TO_CARD_AUTH_DEVICE:
+			return "SCARD_ATTR_USER_TO_CARD_AUTH_DEVICE";
+			break;
 
-	case SCARD_ATTR_USER_AUTH_INPUT_DEVICE:
-		return "SCARD_ATTR_USER_AUTH_INPUT_DEVICE";
-		break;
+		case SCARD_ATTR_USER_AUTH_INPUT_DEVICE:
+			return "SCARD_ATTR_USER_AUTH_INPUT_DEVICE";
+			break;
 
-	case SCARD_ATTR_CHARACTERISTICS:
-		return "SCARD_ATTR_CHARACTERISTICS";
-		break;
+		case SCARD_ATTR_CHARACTERISTICS:
+			return "SCARD_ATTR_CHARACTERISTICS";
+			break;
 
-	case SCARD_ATTR_CURRENT_PROTOCOL_TYPE:
-		return "SCARD_ATTR_CURRENT_PROTOCOL_TYPE";
-		break;
+		case SCARD_ATTR_CURRENT_PROTOCOL_TYPE:
+			return "SCARD_ATTR_CURRENT_PROTOCOL_TYPE";
+			break;
 
-	case SCARD_ATTR_CURRENT_CLK:
-		return "SCARD_ATTR_CURRENT_CLK";
-		break;
+		case SCARD_ATTR_CURRENT_CLK:
+			return "SCARD_ATTR_CURRENT_CLK";
+			break;
 
-	case SCARD_ATTR_CURRENT_F:
-		return "SCARD_ATTR_CURRENT_F";
-		break;
+		case SCARD_ATTR_CURRENT_F:
+			return "SCARD_ATTR_CURRENT_F";
+			break;
 
-	case SCARD_ATTR_CURRENT_D:
-		return "SCARD_ATTR_CURRENT_D";
-		break;
+		case SCARD_ATTR_CURRENT_D:
+			return "SCARD_ATTR_CURRENT_D";
+			break;
 
-	case SCARD_ATTR_CURRENT_N:
-		return "SCARD_ATTR_CURRENT_N";
-		break;
+		case SCARD_ATTR_CURRENT_N:
+			return "SCARD_ATTR_CURRENT_N";
+			break;
 
-	case SCARD_ATTR_CURRENT_W:
-		return "SCARD_ATTR_CURRENT_W";
-		break;
+		case SCARD_ATTR_CURRENT_W:
+			return "SCARD_ATTR_CURRENT_W";
+			break;
 
-	case SCARD_ATTR_CURRENT_IFSC:
-		return "SCARD_ATTR_CURRENT_IFSC";
-		break;
+		case SCARD_ATTR_CURRENT_IFSC:
+			return "SCARD_ATTR_CURRENT_IFSC";
+			break;
 
-	case SCARD_ATTR_CURRENT_IFSD:
-		return "SCARD_ATTR_CURRENT_IFSD";
-		break;
+		case SCARD_ATTR_CURRENT_IFSD:
+			return "SCARD_ATTR_CURRENT_IFSD";
+			break;
 
-	case SCARD_ATTR_CURRENT_BWT:
-		return "SCARD_ATTR_CURRENT_BWT";
-		break;
+		case SCARD_ATTR_CURRENT_BWT:
+			return "SCARD_ATTR_CURRENT_BWT";
+			break;
 
-	case SCARD_ATTR_CURRENT_CWT:
-		return "SCARD_ATTR_CURRENT_CWT";
-		break;
+		case SCARD_ATTR_CURRENT_CWT:
+			return "SCARD_ATTR_CURRENT_CWT";
+			break;
 
-	case SCARD_ATTR_CURRENT_EBC_ENCODING:
-		return "SCARD_ATTR_CURRENT_EBC_ENCODING";
-		break;
+		case SCARD_ATTR_CURRENT_EBC_ENCODING:
+			return "SCARD_ATTR_CURRENT_EBC_ENCODING";
+			break;
 
-	case SCARD_ATTR_EXTENDED_BWT:
-		return "SCARD_ATTR_EXTENDED_BWT";
-		break;
+		case SCARD_ATTR_EXTENDED_BWT:
+			return "SCARD_ATTR_EXTENDED_BWT";
+			break;
 
-	case SCARD_ATTR_ICC_PRESENCE:
-		return "SCARD_ATTR_ICC_PRESENCE";
-		break;
+		case SCARD_ATTR_ICC_PRESENCE:
+			return "SCARD_ATTR_ICC_PRESENCE";
+			break;
 
-	case SCARD_ATTR_ICC_INTERFACE_STATUS:
-		return "SCARD_ATTR_ICC_INTERFACE_STATUS";
-		break;
+		case SCARD_ATTR_ICC_INTERFACE_STATUS:
+			return "SCARD_ATTR_ICC_INTERFACE_STATUS";
+			break;
 
-	case SCARD_ATTR_CURRENT_IO_STATE:
-		return "SCARD_ATTR_CURRENT_IO_STATE";
-		break;
+		case SCARD_ATTR_CURRENT_IO_STATE:
+			return "SCARD_ATTR_CURRENT_IO_STATE";
+			break;
 
-	case SCARD_ATTR_ATR_STRING:
-		return "SCARD_ATTR_ATR_STRING";
-		break;
+		case SCARD_ATTR_ATR_STRING:
+			return "SCARD_ATTR_ATR_STRING";
+			break;
 
-	case SCARD_ATTR_ICC_TYPE_PER_ATR:
-		return "SCARD_ATTR_ICC_TYPE_PER_ATR";
-		break;
+		case SCARD_ATTR_ICC_TYPE_PER_ATR:
+			return "SCARD_ATTR_ICC_TYPE_PER_ATR";
+			break;
 
-	case SCARD_ATTR_ESC_RESET:
-		return "SCARD_ATTR_ESC_RESET";
-		break;
+		case SCARD_ATTR_ESC_RESET:
+			return "SCARD_ATTR_ESC_RESET";
+			break;
 
-	case SCARD_ATTR_ESC_CANCEL:
-		return "SCARD_ATTR_ESC_CANCEL";
-		break;
+		case SCARD_ATTR_ESC_CANCEL:
+			return "SCARD_ATTR_ESC_CANCEL";
+			break;
 
-	case SCARD_ATTR_ESC_AUTHREQUEST:
-		return "SCARD_ATTR_ESC_AUTHREQUEST";
-		break;
+		case SCARD_ATTR_ESC_AUTHREQUEST:
+			return "SCARD_ATTR_ESC_AUTHREQUEST";
+			break;
 
-	case SCARD_ATTR_MAXINPUT:
-		return "SCARD_ATTR_MAXINPUT";
-		break;
+		case SCARD_ATTR_MAXINPUT:
+			return "SCARD_ATTR_MAXINPUT";
+			break;
 
-	case SCARD_ATTR_DEVICE_UNIT:
-		return "SCARD_ATTR_DEVICE_UNIT";
-		break;
+		case SCARD_ATTR_DEVICE_UNIT:
+			return "SCARD_ATTR_DEVICE_UNIT";
+			break;
 
-	case SCARD_ATTR_DEVICE_IN_USE:
-		return "SCARD_ATTR_DEVICE_IN_USE";
-		break;
+		case SCARD_ATTR_DEVICE_IN_USE:
+			return "SCARD_ATTR_DEVICE_IN_USE";
+			break;
 
-	case SCARD_ATTR_DEVICE_FRIENDLY_NAME_A:
-		return "SCARD_ATTR_DEVICE_FRIENDLY_NAME_A";
-		break;
+		case SCARD_ATTR_DEVICE_FRIENDLY_NAME_A:
+			return "SCARD_ATTR_DEVICE_FRIENDLY_NAME_A";
+			break;
 
-	case SCARD_ATTR_DEVICE_SYSTEM_NAME_A:
-		return "SCARD_ATTR_DEVICE_SYSTEM_NAME_A";
-		break;
+		case SCARD_ATTR_DEVICE_SYSTEM_NAME_A:
+			return "SCARD_ATTR_DEVICE_SYSTEM_NAME_A";
+			break;
 
-	case SCARD_ATTR_DEVICE_FRIENDLY_NAME_W:
-		return "SCARD_ATTR_DEVICE_FRIENDLY_NAME_W";
-		break;
+		case SCARD_ATTR_DEVICE_FRIENDLY_NAME_W:
+			return "SCARD_ATTR_DEVICE_FRIENDLY_NAME_W";
+			break;
 
-	case SCARD_ATTR_DEVICE_SYSTEM_NAME_W:
-		return "SCARD_ATTR_DEVICE_SYSTEM_NAME_W";
-		break;
+		case SCARD_ATTR_DEVICE_SYSTEM_NAME_W:
+			return "SCARD_ATTR_DEVICE_SYSTEM_NAME_W";
+			break;
 
-	case SCARD_ATTR_SUPRESS_T1_IFS_REQUEST:
-		return "SCARD_ATTR_SUPRESS_T1_IFS_REQUEST";
-		break;
+		case SCARD_ATTR_SUPRESS_T1_IFS_REQUEST:
+			return "SCARD_ATTR_SUPRESS_T1_IFS_REQUEST";
+			break;
 
-	default:
-		return "SCARD_ATTR_UNKNOWN";
-		break;
+		default:
+			return "SCARD_ATTR_UNKNOWN";
+			break;
 	}
 
 	return "SCARD_ATTR_UNKNOWN";
@@ -999,21 +999,21 @@ WINSCARDAPI const char* WINAPI SCardGetShareModeString(DWORD dwShareMode)
 {
 	switch (dwShareMode)
 	{
-	case SCARD_SHARE_EXCLUSIVE:
-		return "SCARD_SHARE_EXCLUSIVE";
-		break;
+		case SCARD_SHARE_EXCLUSIVE:
+			return "SCARD_SHARE_EXCLUSIVE";
+			break;
 
-	case SCARD_SHARE_SHARED:
-		return "SCARD_SHARE_SHARED";
-		break;
+		case SCARD_SHARE_SHARED:
+			return "SCARD_SHARE_SHARED";
+			break;
 
-	case SCARD_SHARE_DIRECT:
-		return "SCARD_SHARE_DIRECT";
-		break;
+		case SCARD_SHARE_DIRECT:
+			return "SCARD_SHARE_DIRECT";
+			break;
 
-	default:
-		return "SCARD_SHARE_UNKNOWN";
-		break;
+		default:
+			return "SCARD_SHARE_UNKNOWN";
+			break;
 	}
 
 	return "SCARD_SHARE_UNKNOWN";
@@ -1023,21 +1023,21 @@ WINSCARDAPI const char* WINAPI SCardGetDispositionString(DWORD dwDisposition)
 {
 	switch (dwDisposition)
 	{
-	case SCARD_LEAVE_CARD:
-		return "SCARD_LEAVE_CARD";
-		break;
+		case SCARD_LEAVE_CARD:
+			return "SCARD_LEAVE_CARD";
+			break;
 
-	case SCARD_RESET_CARD:
-		return "SCARD_RESET_CARD";
-		break;
+		case SCARD_RESET_CARD:
+			return "SCARD_RESET_CARD";
+			break;
 
-	case SCARD_UNPOWER_CARD:
-		return "SCARD_UNPOWER_CARD";
-		break;
+		case SCARD_UNPOWER_CARD:
+			return "SCARD_UNPOWER_CARD";
+			break;
 
-	default:
-		return "SCARD_UNKNOWN_CARD";
-		break;
+		default:
+			return "SCARD_UNKNOWN_CARD";
+			break;
 	}
 
 	return "SCARD_UNKNOWN_CARD";
@@ -1047,21 +1047,21 @@ WINSCARDAPI const char* WINAPI SCardGetScopeString(DWORD dwScope)
 {
 	switch (dwScope)
 	{
-	case SCARD_SCOPE_USER:
-		return "SCARD_SCOPE_USER";
-		break;
+		case SCARD_SCOPE_USER:
+			return "SCARD_SCOPE_USER";
+			break;
 
-	case SCARD_SCOPE_TERMINAL:
-		return "SCARD_SCOPE_TERMINAL";
-		break;
+		case SCARD_SCOPE_TERMINAL:
+			return "SCARD_SCOPE_TERMINAL";
+			break;
 
-	case SCARD_SCOPE_SYSTEM:
-		return "SCARD_SCOPE_SYSTEM";
-		break;
+		case SCARD_SCOPE_SYSTEM:
+			return "SCARD_SCOPE_SYSTEM";
+			break;
 
-	default:
-		return "SCARD_SCOPE_UNKNOWN";
-		break;
+		default:
+			return "SCARD_SCOPE_UNKNOWN";
+			break;
 	}
 
 	return "SCARD_SCOPE_UNKNOWN";
@@ -1071,37 +1071,37 @@ WINSCARDAPI const char* WINAPI SCardGetCardStateString(DWORD dwCardState)
 {
 	switch (dwCardState)
 	{
-	case SCARD_UNKNOWN:
-		return "SCARD_UNKNOWN";
-		break;
+		case SCARD_UNKNOWN:
+			return "SCARD_UNKNOWN";
+			break;
 
-	case SCARD_ABSENT:
-		return "SCARD_ABSENT";
-		break;
+		case SCARD_ABSENT:
+			return "SCARD_ABSENT";
+			break;
 
-	case SCARD_PRESENT:
-		return "SCARD_PRESENT";
-		break;
+		case SCARD_PRESENT:
+			return "SCARD_PRESENT";
+			break;
 
-	case SCARD_SWALLOWED:
-		return "SCARD_SWALLOWED";
-		break;
+		case SCARD_SWALLOWED:
+			return "SCARD_SWALLOWED";
+			break;
 
-	case SCARD_POWERED:
-		return "SCARD_POWERED";
-		break;
+		case SCARD_POWERED:
+			return "SCARD_POWERED";
+			break;
 
-	case SCARD_NEGOTIABLE:
-		return "SCARD_NEGOTIABLE";
-		break;
+		case SCARD_NEGOTIABLE:
+			return "SCARD_NEGOTIABLE";
+			break;
 
-	case SCARD_SPECIFIC:
-		return "SCARD_SPECIFIC";
-		break;
+		case SCARD_SPECIFIC:
+			return "SCARD_SPECIFIC";
+			break;
 
-	default:
-		return "SCARD_UNKNOWN";
-		break;
+		default:
+			return "SCARD_UNKNOWN";
+			break;
 	}
 
 	return "SCARD_UNKNOWN";

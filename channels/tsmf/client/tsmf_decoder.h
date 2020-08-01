@@ -50,13 +50,13 @@ struct _ITSMFDecoder
 	/* Optional Contol function */
 	BOOL (*Control)(ITSMFDecoder* decoder, ITSMFControlMsg control_msg, UINT32* arg);
 	/* Decode a sample with extended interface. */
-	BOOL (*DecodeEx)
+	BOOL(*DecodeEx)
 	(ITSMFDecoder* decoder, const BYTE* data, UINT32 data_size, UINT32 extensions,
 	 UINT64 start_time, UINT64 end_time, UINT64 duration);
 	/* Get current play time */
 	UINT64 (*GetRunningTime)(ITSMFDecoder* decoder);
 	/* Update Gstreamer Rendering Area */
-	BOOL (*UpdateRenderingArea)
+	BOOL(*UpdateRenderingArea)
 	(ITSMFDecoder* decoder, int newX, int newY, int newWidth, int newHeight, int numRectangles,
 	 RDP_RECT* rectangles);
 	/* Change Gstreamer Audio Volume */

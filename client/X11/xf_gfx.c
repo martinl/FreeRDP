@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/log.h>
@@ -270,19 +270,19 @@ static UINT xf_CreateSurface(RdpgfxClientContext* context,
 
 	switch (createSurface->pixelFormat)
 	{
-	case GFX_PIXEL_FORMAT_ARGB_8888:
-		surface->gdi.format = PIXEL_FORMAT_BGRA32;
-		break;
+		case GFX_PIXEL_FORMAT_ARGB_8888:
+			surface->gdi.format = PIXEL_FORMAT_BGRA32;
+			break;
 
-	case GFX_PIXEL_FORMAT_XRGB_8888:
-		surface->gdi.format = PIXEL_FORMAT_BGRX32;
-		break;
+		case GFX_PIXEL_FORMAT_XRGB_8888:
+			surface->gdi.format = PIXEL_FORMAT_BGRX32;
+			break;
 
-	default:
-		WLog_ERR(TAG, "%s: unknown pixelFormat 0x%" PRIx32 "", __FUNCTION__,
-		         createSurface->pixelFormat);
-		ret = ERROR_INTERNAL_ERROR;
-		goto out_free;
+		default:
+			WLog_ERR(TAG, "%s: unknown pixelFormat 0x%" PRIx32 "", __FUNCTION__,
+			         createSurface->pixelFormat);
+			ret = ERROR_INTERNAL_ERROR;
+			goto out_free;
 	}
 
 	surface->gdi.scanline = surface->gdi.width * GetBytesPerPixel(surface->gdi.format);

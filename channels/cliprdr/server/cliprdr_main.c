@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -530,21 +530,22 @@ static UINT cliprdr_server_receive_capabilities(CliprdrServerContext* context, w
 
 		switch (capabilitySetType)
 		{
-		case CB_CAPSTYPE_GENERAL:
-			if ((error = cliprdr_server_receive_general_capability(context, s)))
-			{
-				WLog_ERR(TAG,
-				         "cliprdr_server_receive_general_capability failed with error %" PRIu32 "",
-				         error);
-				return error;
-			}
+			case CB_CAPSTYPE_GENERAL:
+				if ((error = cliprdr_server_receive_general_capability(context, s)))
+				{
+					WLog_ERR(TAG,
+					         "cliprdr_server_receive_general_capability failed with error %" PRIu32
+					         "",
+					         error);
+					return error;
+				}
 
-			break;
+				break;
 
-		default:
-			WLog_ERR(TAG, "unknown cliprdr capability set: %" PRIu16 "", capabilitySetType);
-			return ERROR_INVALID_DATA;
-			break;
+			default:
+				WLog_ERR(TAG, "unknown cliprdr capability set: %" PRIu16 "", capabilitySetType);
+				return ERROR_INVALID_DATA;
+				break;
 		}
 	}
 
@@ -1023,86 +1024,93 @@ static UINT cliprdr_server_receive_pdu(CliprdrServerContext* context, wStream* s
 
 	switch (header->msgType)
 	{
-	case CB_CLIP_CAPS:
-		if ((error = cliprdr_server_receive_capabilities(context, s, header)))
-			WLog_ERR(TAG, "cliprdr_server_receive_capabilities failed with error %" PRIu32 "!",
-			         error);
+		case CB_CLIP_CAPS:
+			if ((error = cliprdr_server_receive_capabilities(context, s, header)))
+				WLog_ERR(TAG, "cliprdr_server_receive_capabilities failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_TEMP_DIRECTORY:
-		if ((error = cliprdr_server_receive_temporary_directory(context, s, header)))
-			WLog_ERR(TAG,
-			         "cliprdr_server_receive_temporary_directory failed with error %" PRIu32 "!",
-			         error);
+		case CB_TEMP_DIRECTORY:
+			if ((error = cliprdr_server_receive_temporary_directory(context, s, header)))
+				WLog_ERR(TAG,
+				         "cliprdr_server_receive_temporary_directory failed with error %" PRIu32
+				         "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_FORMAT_LIST:
-		if ((error = cliprdr_server_receive_format_list(context, s, header)))
-			WLog_ERR(TAG, "cliprdr_server_receive_format_list failed with error %" PRIu32 "!",
-			         error);
+		case CB_FORMAT_LIST:
+			if ((error = cliprdr_server_receive_format_list(context, s, header)))
+				WLog_ERR(TAG, "cliprdr_server_receive_format_list failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_FORMAT_LIST_RESPONSE:
-		if ((error = cliprdr_server_receive_format_list_response(context, s, header)))
-			WLog_ERR(TAG,
-			         "cliprdr_server_receive_format_list_response failed with error %" PRIu32 "!",
-			         error);
+		case CB_FORMAT_LIST_RESPONSE:
+			if ((error = cliprdr_server_receive_format_list_response(context, s, header)))
+				WLog_ERR(TAG,
+				         "cliprdr_server_receive_format_list_response failed with error %" PRIu32
+				         "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_LOCK_CLIPDATA:
-		if ((error = cliprdr_server_receive_lock_clipdata(context, s, header)))
-			WLog_ERR(TAG, "cliprdr_server_receive_lock_clipdata failed with error %" PRIu32 "!",
-			         error);
+		case CB_LOCK_CLIPDATA:
+			if ((error = cliprdr_server_receive_lock_clipdata(context, s, header)))
+				WLog_ERR(TAG, "cliprdr_server_receive_lock_clipdata failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_UNLOCK_CLIPDATA:
-		if ((error = cliprdr_server_receive_unlock_clipdata(context, s, header)))
-			WLog_ERR(TAG, "cliprdr_server_receive_unlock_clipdata failed with error %" PRIu32 "!",
-			         error);
+		case CB_UNLOCK_CLIPDATA:
+			if ((error = cliprdr_server_receive_unlock_clipdata(context, s, header)))
+				WLog_ERR(TAG,
+				         "cliprdr_server_receive_unlock_clipdata failed with error %" PRIu32 "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_FORMAT_DATA_REQUEST:
-		if ((error = cliprdr_server_receive_format_data_request(context, s, header)))
-			WLog_ERR(TAG,
-			         "cliprdr_server_receive_format_data_request failed with error %" PRIu32 "!",
-			         error);
+		case CB_FORMAT_DATA_REQUEST:
+			if ((error = cliprdr_server_receive_format_data_request(context, s, header)))
+				WLog_ERR(TAG,
+				         "cliprdr_server_receive_format_data_request failed with error %" PRIu32
+				         "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_FORMAT_DATA_RESPONSE:
-		if ((error = cliprdr_server_receive_format_data_response(context, s, header)))
-			WLog_ERR(TAG,
-			         "cliprdr_server_receive_format_data_response failed with error %" PRIu32 "!",
-			         error);
+		case CB_FORMAT_DATA_RESPONSE:
+			if ((error = cliprdr_server_receive_format_data_response(context, s, header)))
+				WLog_ERR(TAG,
+				         "cliprdr_server_receive_format_data_response failed with error %" PRIu32
+				         "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_FILECONTENTS_REQUEST:
-		if ((error = cliprdr_server_receive_filecontents_request(context, s, header)))
-			WLog_ERR(TAG,
-			         "cliprdr_server_receive_filecontents_request failed with error %" PRIu32 "!",
-			         error);
+		case CB_FILECONTENTS_REQUEST:
+			if ((error = cliprdr_server_receive_filecontents_request(context, s, header)))
+				WLog_ERR(TAG,
+				         "cliprdr_server_receive_filecontents_request failed with error %" PRIu32
+				         "!",
+				         error);
 
-		break;
+			break;
 
-	case CB_FILECONTENTS_RESPONSE:
-		if ((error = cliprdr_server_receive_filecontents_response(context, s, header)))
-			WLog_ERR(TAG,
-			         "cliprdr_server_receive_filecontents_response failed with error %" PRIu32 "!",
-			         error);
+		case CB_FILECONTENTS_RESPONSE:
+			if ((error = cliprdr_server_receive_filecontents_response(context, s, header)))
+				WLog_ERR(TAG,
+				         "cliprdr_server_receive_filecontents_response failed with error %" PRIu32
+				         "!",
+				         error);
 
-		break;
+			break;
 
-	default:
-		error = ERROR_INVALID_DATA;
-		WLog_DBG(TAG, "Unexpected clipboard PDU type: %" PRIu16 "", header->msgType);
-		break;
+		default:
+			error = ERROR_INVALID_DATA;
+			WLog_DBG(TAG, "Unexpected clipboard PDU type: %" PRIu16 "", header->msgType);
+			break;
 	}
 
 	return error;

@@ -29,8 +29,8 @@
 
 #ifdef _WIN32
 
-#	include <shlobj.h>
-#	include <userenv.h>
+#include <shlobj.h>
+#include <userenv.h>
 
 #else
 
@@ -53,37 +53,37 @@ struct _FILEDESCRIPTOR
 typedef struct _FILEDESCRIPTOR FILEDESCRIPTOR;
 
 /* FILEDESCRIPTOR.dwFlags */
-#	define FD_ATTRIBUTES 0x00000004
-#	define FD_FILESIZE 0x00000040
-#	define FD_WRITESTIME 0x00000020
-#	define FD_SHOWPROGRESSUI 0x00004000
+#define FD_ATTRIBUTES 0x00000004
+#define FD_FILESIZE 0x00000040
+#define FD_WRITESTIME 0x00000020
+#define FD_SHOWPROGRESSUI 0x00004000
 
 /* FILEDESCRIPTOR.dwFileAttributes */
-#	define FILE_ATTRIBUTE_READONLY 0x00000001
-#	define FILE_ATTRIBUTE_HIDDEN 0x00000002
-#	define FILE_ATTRIBUTE_SYSTEM 0x00000004
-#	define FILE_ATTRIBUTE_DIRECTORY 0x00000010
-#	define FILE_ATTRIBUTE_ARCHIVE 0x00000020
-#	define FILE_ATTRIBUTE_NORMAL 0x00000080
+#define FILE_ATTRIBUTE_READONLY 0x00000001
+#define FILE_ATTRIBUTE_HIDDEN 0x00000002
+#define FILE_ATTRIBUTE_SYSTEM 0x00000004
+#define FILE_ATTRIBUTE_DIRECTORY 0x00000010
+#define FILE_ATTRIBUTE_ARCHIVE 0x00000020
+#define FILE_ATTRIBUTE_NORMAL 0x00000080
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-#	endif
+#endif
 
 	WINPR_API BOOL GetUserProfileDirectoryA(HANDLE hToken, LPSTR lpProfileDir, LPDWORD lpcchSize);
 
 	WINPR_API BOOL GetUserProfileDirectoryW(HANDLE hToken, LPWSTR lpProfileDir, LPDWORD lpcchSize);
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 }
-#	endif
+#endif
 
-#	ifdef UNICODE
-#		define GetUserProfileDirectory GetUserProfileDirectoryW
-#	else
-#		define GetUserProfileDirectory GetUserProfileDirectoryA
-#	endif
+#ifdef UNICODE
+#define GetUserProfileDirectory GetUserProfileDirectoryW
+#else
+#define GetUserProfileDirectory GetUserProfileDirectoryA
+#endif
 
 #endif
 

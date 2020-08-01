@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -32,14 +32,14 @@
 #include <freerdp/log.h>
 
 #ifndef _WIN32
-#	include <netdb.h>
-#	include <unistd.h>
-#	include <sys/un.h>
-#	include <sys/ioctl.h>
-#	include <sys/socket.h>
-#	include <arpa/inet.h>
-#	include <netinet/in.h>
-#	include <net/if.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <sys/un.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <net/if.h>
 #endif
 
 #include <winpr/handle.h>

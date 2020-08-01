@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stddef.h>
@@ -41,7 +41,7 @@ int freerdp_handle_signals(void)
 
 #else
 
-#	include <pthread.h>
+#include <pthread.h>
 
 volatile sig_atomic_t terminal_needs_reset = 0;
 int terminal_fildes = 0;
@@ -70,19 +70,19 @@ static void fatal_handler(int signum)
 const int fatal_signals[] = { SIGABRT,   SIGALRM, SIGBUS,  SIGFPE,  SIGHUP,  SIGILL,
 	                          SIGINT,    SIGKILL, SIGQUIT, SIGSEGV, SIGSTOP, SIGTERM,
 	                          SIGTSTP,   SIGTTIN, SIGTTOU, SIGUSR1, SIGUSR2,
-#	ifdef SIGPOLL
+#ifdef SIGPOLL
 	                          SIGPOLL,
-#	endif
-#	ifdef SIGPROF
+#endif
+#ifdef SIGPROF
 	                          SIGPROF,
-#	endif
-#	ifdef SIGSYS
+#endif
+#ifdef SIGSYS
 	                          SIGSYS,
-#	endif
+#endif
 	                          SIGTRAP,
-#	ifdef SIGVTALRM
+#ifdef SIGVTALRM
 	                          SIGVTALRM,
-#	endif
+#endif
 	                          SIGXCPU,   SIGXFSZ };
 
 int freerdp_handle_signals(void)

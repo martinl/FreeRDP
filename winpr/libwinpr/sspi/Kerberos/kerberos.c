@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -37,7 +37,7 @@
 #include "kerberos.h"
 
 #ifdef WITH_GSSAPI_HEIMDAL
-#	include <krb5-protos.h>
+#include <krb5-protos.h>
 #endif
 
 #include "../sspi.h"
@@ -262,7 +262,7 @@ static krb5_error_code KRB5_CALLCONV acquire_cred(krb5_context ctx, krb5_princip
 	/* Set default options */
 	krb5_get_init_creds_opt_set_forwardable(options, 0);
 	krb5_get_init_creds_opt_set_proxiable(options, 0);
-#	ifdef WITH_GSSAPI_MIT
+#ifdef WITH_GSSAPI_MIT
 
 	/* for MIT we specify ccache output using an option */
 	if ((ret = krb5_get_init_creds_opt_set_out_ccache(ctx, options, ccache)))
@@ -271,7 +271,7 @@ static krb5_error_code KRB5_CALLCONV acquire_cred(krb5_context ctx, krb5_princip
 		goto cleanup;
 	}
 
-#	endif
+#endif
 
 	if ((ret = krb5_init_creds_init(ctx, client, NULL, NULL, starttime, options, &init_ctx)))
 	{
@@ -299,7 +299,7 @@ static krb5_error_code KRB5_CALLCONV acquire_cred(krb5_context ctx, krb5_princip
 		goto cleanup;
 	}
 
-#	ifdef WITH_GSSAPI_HEIMDAL
+#ifdef WITH_GSSAPI_HEIMDAL
 
 	/* For Heimdal, we use this function to store credentials */
 	if ((ret = krb5_init_creds_store(ctx, init_ctx, ccache)))
@@ -308,10 +308,10 @@ static krb5_error_code KRB5_CALLCONV acquire_cred(krb5_context ctx, krb5_princip
 		goto cleanup;
 	}
 
-#	endif
+#endif
 cleanup:
 	krb5_free_cred_contents(ctx, &creds);
-#	ifdef HAVE_AT_LEAST_KRB_V1_13
+#ifdef HAVE_AT_LEAST_KRB_V1_13
 
 	/* MIT Kerberos version 1.13 at minimum.
 	 * For releases 1.12 and previous, krb5_get_init_creds_opt structure
@@ -319,7 +319,7 @@ cleanup:
 	if (options)
 		krb5_get_init_creds_opt_free(ctx, options);
 
-#	endif
+#endif
 
 	if (init_ctx)
 		krb5_init_creds_free(ctx, init_ctx);
@@ -392,9 +392,9 @@ static int init_creds(LPCWSTR username, size_t username_len, LPCWSTR password, s
 
 	/* Set buffer */
 	_snprintf(krb_name, krb_name_len + 1, "%s@%s", lusername, lrealm);
-#	ifdef WITH_DEBUG_NLA
+#ifdef WITH_DEBUG_NLA
 	WLog_DBG(TAG, "copied string is %s\n", krb_name);
-#	endif
+#endif
 	pstr = strchr(lusername, '@');
 
 	if (pstr != NULL)

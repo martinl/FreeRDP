@@ -44,7 +44,8 @@
 
 // The designated initializer.  Override if you create the controller programmatically and want to
 // perform customization that is not appropriate for viewDidLoad.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
 	if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]))
 	{
 		// load bookmarks
@@ -95,19 +96,22 @@
 	return self;
 }
 
-- (void)loadView {
+- (void)loadView
+{
 	[super loadView];
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
 	[super viewDidLoad];
 
 	// set edit button to allow bookmark list editing
 	[[self navigationItem] setRightBarButtonItem:[self editButtonItem]];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
 	[super viewWillAppear:animated];
 
 	// in case we had a search - search again cause the bookmark searchable items could have changed
@@ -118,7 +122,8 @@
 	[_tableView reloadData];
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
 	[super viewWillDisappear:animated];
 
 	// clear any search
@@ -128,25 +133,29 @@
 }
 
 // Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
 	// Return YES for supported orientations
 	return YES;
 }
 
-- (void)didReceiveMemoryWarning {
+- (void)didReceiveMemoryWarning
+{
 	// Releases the view if it doesn't have a superview.
 	[super didReceiveMemoryWarning];
 
 	// Release any cached data, images, etc that aren't in use.
 }
 
-- (void)viewDidUnload {
+- (void)viewDidUnload
+{
 	[super viewDidUnload];
 	// Release any retained subviews of the main view.
 	// e.g. self.myOutlet = nil;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
 	[_temporary_bookmark release];
@@ -164,35 +173,38 @@
 #pragma mark -
 #pragma mark Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
 	// Return the number of sections.
 	return NUM_SECTIONS;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
 
 	switch (section)
 	{
-	case SECTION_SESSIONS:
-		return 0;
+		case SECTION_SESSIONS:
+			return 0;
+			break;
+
+		case SECTION_BOOKMARKS:
+		{
+			// (+1 for Add Bookmark entry)
+			if (_manual_search_result != nil)
+				return ([_manual_search_result count] + [_history_search_result count] + 1);
+			return ([_manual_bookmarks count] + 1);
+		}
 		break;
 
-	case SECTION_BOOKMARKS:
-	{
-		// (+1 for Add Bookmark entry)
-		if (_manual_search_result != nil)
-			return ([_manual_search_result count] + [_history_search_result count] + 1);
-		return ([_manual_bookmarks count] + 1);
-	}
-	break;
-
-	default:
-		break;
+		default:
+			break;
 	}
 	return 0;
 }
 
-- (UITableViewCell *)cellForGenericListEntry {
+- (UITableViewCell *)cellForGenericListEntry
+{
 	static NSString *CellIdentifier = @"BookmarkListCell";
 	UITableViewCell *cell = [[self tableView] dequeueReusableCellWithIdentifier:CellIdentifier];
 	if (cell == nil)
@@ -206,7 +218,8 @@
 	return cell;
 }
 
-- (BookmarkTableCell *)cellForBookmark {
+- (BookmarkTableCell *)cellForBookmark
+{
 	static NSString *BookmarkCellIdentifier = @"BookmarkCell";
 	BookmarkTableCell *cell = (BookmarkTableCell *)[[self tableView]
 	    dequeueReusableCellWithIdentifier:BookmarkCellIdentifier];
@@ -223,94 +236,95 @@
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView
-         cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+         cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 
 	switch ([indexPath section])
 	{
-	case SECTION_SESSIONS:
-	{
-		// get custom session cell
-		static NSString *SessionCellIdentifier = @"SessionCell";
-		SessionTableCell *cell =
-		    (SessionTableCell *)[tableView dequeueReusableCellWithIdentifier:SessionCellIdentifier];
-		if (cell == nil)
+		case SECTION_SESSIONS:
 		{
-			[[NSBundle mainBundle] loadNibNamed:@"SessionTableViewCell" owner:self options:nil];
-			cell = _sessTableCell;
-			_sessTableCell = nil;
-		}
-
-		// set cell data
-		RDPSession *session = [_active_sessions objectAtIndex:[indexPath row]];
-		[[cell title] setText:[session sessionName]];
-		[[cell server] setText:[[session params] StringForKey:@"hostname"]];
-		[[cell username] setText:[[session params] StringForKey:@"username"]];
-		[[cell screenshot]
-		    setImage:[session getScreenshotWithSize:[[cell screenshot] bounds].size]];
-		[[cell disconnectButton] setTag:[indexPath row]];
-		return cell;
-	}
-
-	case SECTION_BOOKMARKS:
-	{
-		// special handling for first cell - quick connect/quick create Bookmark cell
-		if ([indexPath row] == 0)
-		{
-			// if a search text is entered the cell becomes a quick connect/quick create bookmark
-			// cell - otherwise it's just an add bookmark cell
-			UITableViewCell *cell = [self cellForGenericListEntry];
-			if ([[_searchBar text] length] == 0)
+			// get custom session cell
+			static NSString *SessionCellIdentifier = @"SessionCell";
+			SessionTableCell *cell = (SessionTableCell *)[tableView
+			    dequeueReusableCellWithIdentifier:SessionCellIdentifier];
+			if (cell == nil)
 			{
-				[[cell textLabel]
-				    setText:[@"  " stringByAppendingString:NSLocalizedString(
-				                                               @"Add Connection",
-				                                               @"'Add Connection': button label")]];
-				[((UIButton *)[cell accessoryView]) setHidden:YES];
-			}
-			else
-			{
-				[[cell textLabel] setText:[@"  " stringByAppendingString:[_searchBar text]]];
-				[((UIButton *)[cell accessoryView]) setHidden:NO];
+				[[NSBundle mainBundle] loadNibNamed:@"SessionTableViewCell" owner:self options:nil];
+				cell = _sessTableCell;
+				_sessTableCell = nil;
 			}
 
+			// set cell data
+			RDPSession *session = [_active_sessions objectAtIndex:[indexPath row]];
+			[[cell title] setText:[session sessionName]];
+			[[cell server] setText:[[session params] StringForKey:@"hostname"]];
+			[[cell username] setText:[[session params] StringForKey:@"username"]];
+			[[cell screenshot]
+			    setImage:[session getScreenshotWithSize:[[cell screenshot] bounds].size]];
+			[[cell disconnectButton] setTag:[indexPath row]];
 			return cell;
 		}
-		else
+
+		case SECTION_BOOKMARKS:
 		{
-			// do we have a history cell or bookmark cell?
-			if ([self isIndexPathToHistoryItem:indexPath])
+			// special handling for first cell - quick connect/quick create Bookmark cell
+			if ([indexPath row] == 0)
 			{
+				// if a search text is entered the cell becomes a quick connect/quick create
+				// bookmark cell - otherwise it's just an add bookmark cell
 				UITableViewCell *cell = [self cellForGenericListEntry];
-				[[cell textLabel]
-				    setText:[@"  "
-				                stringByAppendingString:
-				                    [_history_search_result
-				                        objectAtIndex:[self historyIndexFromIndexPath:indexPath]]]];
-				[((UIButton *)[cell accessoryView]) setHidden:NO];
+				if ([[_searchBar text] length] == 0)
+				{
+					[[cell textLabel]
+					    setText:[@"  " stringByAppendingString:
+					                       NSLocalizedString(@"Add Connection",
+					                                         @"'Add Connection': button label")]];
+					[((UIButton *)[cell accessoryView]) setHidden:YES];
+				}
+				else
+				{
+					[[cell textLabel] setText:[@"  " stringByAppendingString:[_searchBar text]]];
+					[((UIButton *)[cell accessoryView]) setHidden:NO];
+				}
+
 				return cell;
 			}
 			else
 			{
-				// set cell properties
-				ComputerBookmark *entry;
-				BookmarkTableCell *cell = [self cellForBookmark];
-				if (_manual_search_result == nil)
-					entry = [_manual_bookmarks
-					    objectAtIndex:[self bookmarkIndexFromIndexPath:indexPath]];
+				// do we have a history cell or bookmark cell?
+				if ([self isIndexPathToHistoryItem:indexPath])
+				{
+					UITableViewCell *cell = [self cellForGenericListEntry];
+					[[cell textLabel]
+					    setText:[@"  " stringByAppendingString:
+					                       [_history_search_result
+					                           objectAtIndex:
+					                               [self historyIndexFromIndexPath:indexPath]]]];
+					[((UIButton *)[cell accessoryView]) setHidden:NO];
+					return cell;
+				}
 				else
-					entry = [[_manual_search_result
-					    objectAtIndex:[self bookmarkIndexFromIndexPath:indexPath]]
-					    valueForKey:@"bookmark"];
+				{
+					// set cell properties
+					ComputerBookmark *entry;
+					BookmarkTableCell *cell = [self cellForBookmark];
+					if (_manual_search_result == nil)
+						entry = [_manual_bookmarks
+						    objectAtIndex:[self bookmarkIndexFromIndexPath:indexPath]];
+					else
+						entry = [[_manual_search_result
+						    objectAtIndex:[self bookmarkIndexFromIndexPath:indexPath]]
+						    valueForKey:@"bookmark"];
 
-				[[cell title] setText:[entry label]];
-				[[cell subTitle] setText:[[entry params] StringForKey:@"hostname"]];
-				return cell;
+					[[cell title] setText:[entry label]];
+					[[cell subTitle] setText:[[entry params] StringForKey:@"hostname"]];
+					return cell;
+				}
 			}
 		}
-	}
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	NSAssert(0, @"Failed to create cell");
@@ -318,7 +332,8 @@
 }
 
 // Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	// dont allow to edit Add Bookmark item
 	if ([indexPath section] == SECTION_SESSIONS)
 		return NO;
@@ -330,40 +345,44 @@
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView
     commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
-     forRowAtIndexPath:(NSIndexPath *)indexPath {
+     forRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	if (editingStyle == UITableViewCellEditingStyleDelete)
 	{
 		// Delete the row from the data source
 		switch ([indexPath section])
 		{
-		case SECTION_BOOKMARKS:
-		{
-			if (_manual_search_result == nil)
-				[_manual_bookmarks removeObjectAtIndex:[self bookmarkIndexFromIndexPath:indexPath]];
-			else
+			case SECTION_BOOKMARKS:
 			{
-				// history item or bookmark?
-				if ([self isIndexPathToHistoryItem:indexPath])
-				{
-					[_connection_history
-					    removeObject:[_history_search_result
-					                     objectAtIndex:[self historyIndexFromIndexPath:indexPath]]];
-					[_history_search_result
-					    removeObjectAtIndex:[self historyIndexFromIndexPath:indexPath]];
-				}
+				if (_manual_search_result == nil)
+					[_manual_bookmarks
+					    removeObjectAtIndex:[self bookmarkIndexFromIndexPath:indexPath]];
 				else
 				{
-					[_manual_bookmarks
-					    removeObject:[[_manual_search_result
-					                     objectAtIndex:[self bookmarkIndexFromIndexPath:indexPath]]
-					                     valueForKey:@"bookmark"]];
-					[_manual_search_result
-					    removeObjectAtIndex:[self bookmarkIndexFromIndexPath:indexPath]];
+					// history item or bookmark?
+					if ([self isIndexPathToHistoryItem:indexPath])
+					{
+						[_connection_history
+						    removeObject:
+						        [_history_search_result
+						            objectAtIndex:[self historyIndexFromIndexPath:indexPath]]];
+						[_history_search_result
+						    removeObjectAtIndex:[self historyIndexFromIndexPath:indexPath]];
+					}
+					else
+					{
+						[_manual_bookmarks
+						    removeObject:
+						        [[_manual_search_result
+						            objectAtIndex:[self bookmarkIndexFromIndexPath:indexPath]]
+						            valueForKey:@"bookmark"]];
+						[_manual_search_result
+						    removeObjectAtIndex:[self bookmarkIndexFromIndexPath:indexPath]];
+					}
 				}
+				[self scheduleWriteManualBookmarksToDataStore];
+				break;
 			}
-			[self scheduleWriteManualBookmarksToDataStore];
-			break;
-		}
 		}
 
 		[tableView reloadSections:[NSIndexSet indexSetWithIndex:[indexPath section]]
@@ -374,26 +393,28 @@
 // Override to support rearranging the table view.
 - (void)tableView:(UITableView *)tableView
     moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
-           toIndexPath:(NSIndexPath *)toIndexPath {
+           toIndexPath:(NSIndexPath *)toIndexPath
+{
 	if ([fromIndexPath compare:toIndexPath] != NSOrderedSame)
 	{
 		switch ([fromIndexPath section])
 		{
-		case SECTION_BOOKMARKS:
-		{
-			int fromIdx = [self bookmarkIndexFromIndexPath:fromIndexPath];
-			int toIdx = [self bookmarkIndexFromIndexPath:toIndexPath];
-			ComputerBookmark *temp_bookmark = [[_manual_bookmarks objectAtIndex:fromIdx] retain];
-			[_manual_bookmarks removeObjectAtIndex:fromIdx];
-			if (toIdx >= [_manual_bookmarks count])
-				[_manual_bookmarks addObject:temp_bookmark];
-			else
-				[_manual_bookmarks insertObject:temp_bookmark atIndex:toIdx];
-			[temp_bookmark release];
+			case SECTION_BOOKMARKS:
+			{
+				int fromIdx = [self bookmarkIndexFromIndexPath:fromIndexPath];
+				int toIdx = [self bookmarkIndexFromIndexPath:toIndexPath];
+				ComputerBookmark *temp_bookmark =
+				    [[_manual_bookmarks objectAtIndex:fromIdx] retain];
+				[_manual_bookmarks removeObjectAtIndex:fromIdx];
+				if (toIdx >= [_manual_bookmarks count])
+					[_manual_bookmarks addObject:temp_bookmark];
+				else
+					[_manual_bookmarks insertObject:temp_bookmark atIndex:toIdx];
+				[temp_bookmark release];
 
-			[self scheduleWriteManualBookmarksToDataStore];
-			break;
-		}
+				[self scheduleWriteManualBookmarksToDataStore];
+				break;
+			}
 		}
 	}
 }
@@ -401,7 +422,8 @@
 // prevent that an item is moved befoer the Add Bookmark item
 - (NSIndexPath *)tableView:(UITableView *)tableView
     targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath
-                         toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
+                         toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath
+{
 	// don't allow to move:
 	//  - items between sections
 	//  - the quick connect/quick create bookmark cell
@@ -419,14 +441,16 @@
 }
 
 // Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	// dont allow to reorder Add Bookmark item
 	if ([indexPath section] == SECTION_BOOKMARKS && [indexPath row] == 0)
 		return NO;
 	return YES;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
 	if (section == SECTION_SESSIONS && [_active_sessions count] > 0)
 		return NSLocalizedString(@"My Sessions", @"'My Session': section sessions header");
 	if (section == SECTION_BOOKMARKS)
@@ -435,11 +459,13 @@
 	return nil;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
+{
 	return nil;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	if ([indexPath section] == SECTION_SESSIONS)
 		return 72;
 	return [tableView rowHeight];
@@ -448,12 +474,14 @@
 #pragma mark -
 #pragma mark Table view delegate
 
-- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated
+{
 	[super setEditing:editing animated:animated];
 	[[self tableView] setEditing:editing animated:animated];
 }
 
-- (void)accessoryButtonTapped:(UIControl *)button withEvent:(UIEvent *)event {
+- (void)accessoryButtonTapped:(UIControl *)button withEvent:(UIEvent *)event
+{
 	// forward a tap on our custom accessory button to the real accessory button handler
 	NSIndexPath *indexPath =
 	    [[self tableView] indexPathForRowAtPoint:[[[event touchesForView:button] anyObject]
@@ -465,7 +493,8 @@
 	    accessoryButtonTappedForRowWithIndexPath:indexPath];
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	if ([indexPath section] == SECTION_SESSIONS)
 	{
 		// resume session
@@ -558,7 +587,8 @@
 }
 
 - (void)tableView:(UITableView *)tableView
-    accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath {
+    accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+{
 	// get the bookmark
 	NSString *bookmark_editor_title =
 	    NSLocalizedString(@"Edit Connection", @"Edit Connection title");
@@ -611,13 +641,15 @@
 #pragma mark -
 #pragma mark Search Bar Delegates
 
-- (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar {
+- (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar
+{
 	// show cancel button
 	[searchBar setShowsCancelButton:YES animated:YES];
 	return YES;
 }
 
-- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
+{
 	// clear search result
 	[_manual_search_result release];
 	_manual_search_result = nil;
@@ -627,7 +659,8 @@
 	[searchBar resignFirstResponder];
 }
 
-- (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar {
+- (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar
+{
 	[searchBar setShowsCancelButton:NO animated:YES];
 
 	// re-enable table selection
@@ -636,11 +669,13 @@
 	return YES;
 }
 
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
 	[_searchBar resignFirstResponder];
 }
 
-- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
 	[self performSearch:searchText];
 	[_tableView reloadData];
 }
@@ -648,7 +683,8 @@
 #pragma mark - Session handling
 
 // session was added
-- (void)sessionDisconnected:(NSNotification *)notification {
+- (void)sessionDisconnected:(NSNotification *)notification
+{
 	// remove session from active sessions
 	RDPSession *session = (RDPSession *)[notification object];
 	[_active_sessions removeObject:session];
@@ -690,7 +726,8 @@
 	}
 }
 
-- (void)sessionFailedToConnect:(NSNotification *)notification {
+- (void)sessionFailedToConnect:(NSNotification *)notification
+{
 	// remove session from active sessions
 	RDPSession *session = (RDPSession *)[notification object];
 	[_active_sessions removeObject:session];
@@ -703,7 +740,8 @@
 }
 
 #pragma mark - Reachability notification
-- (void)reachabilityChanged:(NSNotification *)notification {
+- (void)reachabilityChanged:(NSNotification *)notification
+{
 	// no matter how the network changed - we will disconnect
 	// disconnect session (if there is any)
 	if ([_active_sessions count] > 0)
@@ -715,7 +753,8 @@
 
 #pragma mark - BookmarkEditorController delegate
 
-- (void)commitBookmark:(ComputerBookmark *)bookmark {
+- (void)commitBookmark:(ComputerBookmark *)bookmark
+{
 	// if we got a manual bookmark that is not in the list yet - add it otherwise replace it
 	BOOL found = NO;
 	for (int idx = 0; idx < [_manual_bookmarks count]; ++idx)
@@ -741,7 +780,8 @@
 	[self scheduleWriteManualBookmarksToDataStore];
 }
 
-- (IBAction)disconnectButtonPressed:(id)sender {
+- (IBAction)disconnectButtonPressed:(id)sender
+{
 	// disconnect session and refresh table view
 	RDPSession *session = [_active_sessions objectAtIndex:[sender tag]];
 	[session disconnect];
@@ -749,11 +789,13 @@
 
 #pragma mark - Misc functions
 
-- (BOOL)hasNoBookmarks {
+- (BOOL)hasNoBookmarks
+{
 	return ([_manual_bookmarks count] == 0);
 }
 
-- (UIButton *)disclosureButtonWithImage:(UIImage *)image {
+- (UIButton *)disclosureButtonWithImage:(UIImage *)image
+{
 	// we make the button a little bit bigger (image widht * 2, height + 10) so that the user
 	// doesn't accidentally connect to the bookmark ...
 	UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -766,7 +808,8 @@
 	return button;
 }
 
-- (void)performSearch:(NSString *)searchText {
+- (void)performSearch:(NSString *)searchText
+{
 	[_manual_search_result autorelease];
 
 	if ([searchText length] > 0)
@@ -785,20 +828,24 @@
 	}
 }
 
-- (int)bookmarkIndexFromIndexPath:(NSIndexPath *)indexPath {
+- (int)bookmarkIndexFromIndexPath:(NSIndexPath *)indexPath
+{
 	return [indexPath row] -
 	       ((_history_search_result != nil) ? [_history_search_result count] : 0) - 1;
 }
 
-- (int)historyIndexFromIndexPath:(NSIndexPath *)indexPath {
+- (int)historyIndexFromIndexPath:(NSIndexPath *)indexPath
+{
 	return [indexPath row] - 1;
 }
 
-- (BOOL)isIndexPathToHistoryItem:(NSIndexPath *)indexPath {
+- (BOOL)isIndexPathToHistoryItem:(NSIndexPath *)indexPath
+{
 	return (([indexPath row] - 1) < [_history_search_result count]);
 }
 
-- (ComputerBookmark *)bookmarkForQuickConnectTo:(NSString *)host {
+- (ComputerBookmark *)bookmarkForQuickConnectTo:(NSString *)host
+{
 	ComputerBookmark *bookmark =
 	    [[[ComputerBookmark alloc] initWithBaseDefaultParameters] autorelease];
 	[bookmark setLabel:host];
@@ -808,17 +855,20 @@
 
 #pragma mark - Persisting bookmarks
 
-- (void)scheduleWriteBookmarksToDataStore {
+- (void)scheduleWriteBookmarksToDataStore
+{
 	[[NSOperationQueue mainQueue] addOperationWithBlock:^{
 		[self writeBookmarksToDataStore];
 	}];
 }
 
-- (void)writeBookmarksToDataStore {
+- (void)writeBookmarksToDataStore
+{
 	[self writeManualBookmarksToDataStore];
 }
 
-- (void)scheduleWriteManualBookmarksToDataStore {
+- (void)scheduleWriteManualBookmarksToDataStore
+{
 	[[NSOperationQueue mainQueue]
 	    addOperation:[[[NSInvocationOperation alloc]
 	                     initWithTarget:self
@@ -826,11 +876,13 @@
 	                             object:nil] autorelease]];
 }
 
-- (void)writeManualBookmarksToDataStore {
+- (void)writeManualBookmarksToDataStore
+{
 	[self writeArray:_manual_bookmarks toDataStoreURL:[self manualBookmarksDataStoreURL]];
 }
 
-- (void)scheduleWriteConnectionHistoryToDataStore {
+- (void)scheduleWriteConnectionHistoryToDataStore
+{
 	[[NSOperationQueue mainQueue]
 	    addOperation:[[[NSInvocationOperation alloc]
 	                     initWithTarget:self
@@ -838,16 +890,19 @@
 	                             object:nil] autorelease]];
 }
 
-- (void)writeConnectionHistoryToDataStore {
+- (void)writeConnectionHistoryToDataStore
+{
 	[self writeArray:_connection_history toDataStoreURL:[self connectionHistoryDataStoreURL]];
 }
 
-- (void)writeArray:(NSArray *)bookmarks toDataStoreURL:(NSURL *)url {
+- (void)writeArray:(NSArray *)bookmarks toDataStoreURL:(NSURL *)url
+{
 	NSData *archived_data = [NSKeyedArchiver archivedDataWithRootObject:bookmarks];
 	[archived_data writeToURL:url atomically:YES];
 }
 
-- (void)readManualBookmarksFromDataStore {
+- (void)readManualBookmarksFromDataStore
+{
 	[_manual_bookmarks autorelease];
 	_manual_bookmarks = [self arrayFromDataStoreURL:[self manualBookmarksDataStoreURL]];
 
@@ -859,7 +914,8 @@
 	}
 }
 
-- (void)readConnectionHistoryFromDataStore {
+- (void)readConnectionHistoryFromDataStore
+{
 	[_connection_history autorelease];
 	_connection_history = [self arrayFromDataStoreURL:[self connectionHistoryDataStoreURL]];
 
@@ -867,7 +923,8 @@
 		_connection_history = [[NSMutableArray alloc] init];
 }
 
-- (NSMutableArray *)arrayFromDataStoreURL:(NSURL *)url {
+- (NSMutableArray *)arrayFromDataStoreURL:(NSURL *)url
+{
 	NSData *archived_data = [NSData dataWithContentsOfURL:url];
 
 	if (!archived_data)
@@ -876,7 +933,8 @@
 	return [[NSKeyedUnarchiver unarchiveObjectWithData:archived_data] retain];
 }
 
-- (NSURL *)manualBookmarksDataStoreURL {
+- (NSURL *)manualBookmarksDataStoreURL
+{
 	return [NSURL
 	    fileURLWithPath:[NSString stringWithFormat:@"%@/%@",
 	                                               [NSSearchPathForDirectoriesInDomains(
@@ -885,7 +943,8 @@
 	                                               @"com.freerdp.ifreerdp.bookmarks.plist"]];
 }
 
-- (NSURL *)connectionHistoryDataStoreURL {
+- (NSURL *)connectionHistoryDataStoreURL
+{
 	return [NSURL
 	    fileURLWithPath:[NSString
 	                        stringWithFormat:@"%@/%@",

@@ -24,12 +24,14 @@ NSString *TableCellIdentifierButton = @"cellIdButton";
 
 @implementation EditorBaseController
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
 	return YES;
 }
 
 #pragma mark - Create table view cells
-- (UITableViewCell *)tableViewCellFromIdentifier:(NSString *)identifier {
+- (UITableViewCell *)tableViewCellFromIdentifier:(NSString *)identifier
+{
 	// try to reuse a cell
 	UITableViewCell *cell = [[self tableView] dequeueReusableCellWithIdentifier:identifier];
 	if (cell != nil)
@@ -86,7 +88,8 @@ NSString *TableCellIdentifierButton = @"cellIdButton";
 }
 
 #pragma mark - Utility functions
-- (void)adjustEditTextTableViewCell:(EditTextTableViewCell *)cell {
+- (void)adjustEditTextTableViewCell:(EditTextTableViewCell *)cell
+{
 	UILabel *label = [cell label];
 	UITextField *textField = [cell textfield];
 

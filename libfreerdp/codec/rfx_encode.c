@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -60,137 +60,137 @@ static void rfx_encode_format_rgb(const BYTE* rgb_data, int width, int height, i
 
 		switch (pixel_format)
 		{
-		case PIXEL_FORMAT_BGRX32:
-		case PIXEL_FORMAT_BGRA32:
-			for (x = 0; x < width; x++)
-			{
-				*b_buf++ = (INT16)(*src++);
-				*g_buf++ = (INT16)(*src++);
-				*r_buf++ = (INT16)(*src++);
-				src++;
-			}
+			case PIXEL_FORMAT_BGRX32:
+			case PIXEL_FORMAT_BGRA32:
+				for (x = 0; x < width; x++)
+				{
+					*b_buf++ = (INT16)(*src++);
+					*g_buf++ = (INT16)(*src++);
+					*r_buf++ = (INT16)(*src++);
+					src++;
+				}
 
-			break;
-
-		case PIXEL_FORMAT_XBGR32:
-		case PIXEL_FORMAT_ABGR32:
-			for (x = 0; x < width; x++)
-			{
-				src++;
-				*b_buf++ = (INT16)(*src++);
-				*g_buf++ = (INT16)(*src++);
-				*r_buf++ = (INT16)(*src++);
-			}
-
-			break;
-
-		case PIXEL_FORMAT_RGBX32:
-		case PIXEL_FORMAT_RGBA32:
-			for (x = 0; x < width; x++)
-			{
-				*r_buf++ = (INT16)(*src++);
-				*g_buf++ = (INT16)(*src++);
-				*b_buf++ = (INT16)(*src++);
-				src++;
-			}
-
-			break;
-
-		case PIXEL_FORMAT_XRGB32:
-		case PIXEL_FORMAT_ARGB32:
-			for (x = 0; x < width; x++)
-			{
-				src++;
-				*r_buf++ = (INT16)(*src++);
-				*g_buf++ = (INT16)(*src++);
-				*b_buf++ = (INT16)(*src++);
-			}
-
-			break;
-
-		case PIXEL_FORMAT_BGR24:
-			for (x = 0; x < width; x++)
-			{
-				*b_buf++ = (INT16)(*src++);
-				*g_buf++ = (INT16)(*src++);
-				*r_buf++ = (INT16)(*src++);
-			}
-
-			break;
-
-		case PIXEL_FORMAT_RGB24:
-			for (x = 0; x < width; x++)
-			{
-				*r_buf++ = (INT16)(*src++);
-				*g_buf++ = (INT16)(*src++);
-				*b_buf++ = (INT16)(*src++);
-			}
-
-			break;
-
-		case PIXEL_FORMAT_BGR16:
-			for (x = 0; x < width; x++)
-			{
-				*b_buf++ = (INT16)(((*(src + 1)) & 0xF8) | ((*(src + 1)) >> 5));
-				*g_buf++ = (INT16)((((*(src + 1)) & 0x07) << 5) | (((*src) & 0xE0) >> 3));
-				*r_buf++ = (INT16)((((*src) & 0x1F) << 3) | (((*src) >> 2) & 0x07));
-				src += 2;
-			}
-
-			break;
-
-		case PIXEL_FORMAT_RGB16:
-			for (x = 0; x < width; x++)
-			{
-				*r_buf++ = (INT16)(((*(src + 1)) & 0xF8) | ((*(src + 1)) >> 5));
-				*g_buf++ = (INT16)((((*(src + 1)) & 0x07) << 5) | (((*src) & 0xE0) >> 3));
-				*b_buf++ = (INT16)((((*src) & 0x1F) << 3) | (((*src) >> 2) & 0x07));
-				src += 2;
-			}
-
-			break;
-
-		case PIXEL_FORMAT_RGB8:
-			if (!palette)
 				break;
 
-			for (x = 0; x < width; x++)
-			{
-				int shift;
-				BYTE idx;
-				shift = (7 - (x % 8));
-				idx = ((*src) >> shift) & 1;
-				idx |= (((*(src + 1)) >> shift) & 1) << 1;
-				idx |= (((*(src + 2)) >> shift) & 1) << 2;
-				idx |= (((*(src + 3)) >> shift) & 1) << 3;
-				idx *= 3;
-				*r_buf++ = (INT16)palette[idx];
-				*g_buf++ = (INT16)palette[idx + 1];
-				*b_buf++ = (INT16)palette[idx + 2];
+			case PIXEL_FORMAT_XBGR32:
+			case PIXEL_FORMAT_ABGR32:
+				for (x = 0; x < width; x++)
+				{
+					src++;
+					*b_buf++ = (INT16)(*src++);
+					*g_buf++ = (INT16)(*src++);
+					*r_buf++ = (INT16)(*src++);
+				}
 
-				if (shift == 0)
-					src += 4;
-			}
-
-			break;
-
-		case PIXEL_FORMAT_A4:
-			if (!palette)
 				break;
 
-			for (x = 0; x < width; x++)
-			{
-				int idx = (*src) * 3;
-				*r_buf++ = (INT16)palette[idx];
-				*g_buf++ = (INT16)palette[idx + 1];
-				*b_buf++ = (INT16)palette[idx + 2];
-				src++;
-			}
+			case PIXEL_FORMAT_RGBX32:
+			case PIXEL_FORMAT_RGBA32:
+				for (x = 0; x < width; x++)
+				{
+					*r_buf++ = (INT16)(*src++);
+					*g_buf++ = (INT16)(*src++);
+					*b_buf++ = (INT16)(*src++);
+					src++;
+				}
 
-			break;
+				break;
 
-		default:
-			break;
+			case PIXEL_FORMAT_XRGB32:
+			case PIXEL_FORMAT_ARGB32:
+				for (x = 0; x < width; x++)
+				{
+					src++;
+					*r_buf++ = (INT16)(*src++);
+					*g_buf++ = (INT16)(*src++);
+					*b_buf++ = (INT16)(*src++);
+				}
+
+				break;
+
+			case PIXEL_FORMAT_BGR24:
+				for (x = 0; x < width; x++)
+				{
+					*b_buf++ = (INT16)(*src++);
+					*g_buf++ = (INT16)(*src++);
+					*r_buf++ = (INT16)(*src++);
+				}
+
+				break;
+
+			case PIXEL_FORMAT_RGB24:
+				for (x = 0; x < width; x++)
+				{
+					*r_buf++ = (INT16)(*src++);
+					*g_buf++ = (INT16)(*src++);
+					*b_buf++ = (INT16)(*src++);
+				}
+
+				break;
+
+			case PIXEL_FORMAT_BGR16:
+				for (x = 0; x < width; x++)
+				{
+					*b_buf++ = (INT16)(((*(src + 1)) & 0xF8) | ((*(src + 1)) >> 5));
+					*g_buf++ = (INT16)((((*(src + 1)) & 0x07) << 5) | (((*src) & 0xE0) >> 3));
+					*r_buf++ = (INT16)((((*src) & 0x1F) << 3) | (((*src) >> 2) & 0x07));
+					src += 2;
+				}
+
+				break;
+
+			case PIXEL_FORMAT_RGB16:
+				for (x = 0; x < width; x++)
+				{
+					*r_buf++ = (INT16)(((*(src + 1)) & 0xF8) | ((*(src + 1)) >> 5));
+					*g_buf++ = (INT16)((((*(src + 1)) & 0x07) << 5) | (((*src) & 0xE0) >> 3));
+					*b_buf++ = (INT16)((((*src) & 0x1F) << 3) | (((*src) >> 2) & 0x07));
+					src += 2;
+				}
+
+				break;
+
+			case PIXEL_FORMAT_RGB8:
+				if (!palette)
+					break;
+
+				for (x = 0; x < width; x++)
+				{
+					int shift;
+					BYTE idx;
+					shift = (7 - (x % 8));
+					idx = ((*src) >> shift) & 1;
+					idx |= (((*(src + 1)) >> shift) & 1) << 1;
+					idx |= (((*(src + 2)) >> shift) & 1) << 2;
+					idx |= (((*(src + 3)) >> shift) & 1) << 3;
+					idx *= 3;
+					*r_buf++ = (INT16)palette[idx];
+					*g_buf++ = (INT16)palette[idx + 1];
+					*b_buf++ = (INT16)palette[idx + 2];
+
+					if (shift == 0)
+						src += 4;
+				}
+
+				break;
+
+			case PIXEL_FORMAT_A4:
+				if (!palette)
+					break;
+
+				for (x = 0; x < width; x++)
+				{
+					int idx = (*src) * 3;
+					*r_buf++ = (INT16)palette[idx];
+					*g_buf++ = (INT16)palette[idx + 1];
+					*b_buf++ = (INT16)palette[idx + 2];
+					src++;
+				}
+
+				break;
+
+			default:
+				break;
 		}
 
 		/* Fill the horizontal region outside of 64x64 tile size with the right-most pixel for best

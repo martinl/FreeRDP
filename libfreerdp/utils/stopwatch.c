@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -29,7 +29,7 @@
 #ifdef _WIN32
 LARGE_INTEGER stopwatch_freq = { 0, 0 };
 #else
-#	include <sys/time.h>
+#include <sys/time.h>
 #endif
 
 void stopwatch_set_time(UINT64* usecs)

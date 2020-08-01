@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -28,15 +28,15 @@
 
 #ifndef _WIN32
 
-#	include "ndr_array.h"
-#	include "ndr_context.h"
-#	include "ndr_pointer.h"
-#	include "ndr_simple.h"
-#	include "ndr_string.h"
-#	include "ndr_structure.h"
-#	include "ndr_union.h"
+#include "ndr_array.h"
+#include "ndr_context.h"
+#include "ndr_pointer.h"
+#include "ndr_simple.h"
+#include "ndr_string.h"
+#include "ndr_structure.h"
+#include "ndr_union.h"
 
-#	include "ndr_private.h"
+#include "ndr_private.h"
 
 void NdrpAlignLength(ULONG* length, unsigned int alignment)
 {

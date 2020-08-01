@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -40,12 +40,12 @@
 #include <fcntl.h>
 
 #ifndef _WIN32
-#	include <netdb.h>
-#	include <sys/socket.h>
+#include <netdb.h>
+#include <sys/socket.h>
 #endif /* _WIN32 */
 
 #ifdef HAVE_VALGRIND_MEMCHECK_H
-#	include <valgrind/memcheck.h>
+#include <valgrind/memcheck.h>
 #endif
 
 #include "tpkt.h"
@@ -60,8 +60,8 @@
 
 #ifdef WITH_GSSAPI
 
-#	include <krb5.h>
-#	include <winpr/library.h>
+#include <krb5.h>
+#include <winpr/library.h>
 static UINT32 transport_krb5_check_account(rdpTransport* transport, char* username, char* domain,
                                            char* passwd)
 {
@@ -109,40 +109,40 @@ out:
 
 	switch (ret)
 	{
-	case KRB5KDC_ERR_NONE:
-		break;
+		case KRB5KDC_ERR_NONE:
+			break;
 
-	case KRB5_KDC_UNREACH:
-		WLog_Print(transport->log, WLOG_WARN, "krb5_init_creds_get: KDC unreachable");
-		ret = FREERDP_ERROR_CONNECT_KDC_UNREACHABLE;
-		break;
+		case KRB5_KDC_UNREACH:
+			WLog_Print(transport->log, WLOG_WARN, "krb5_init_creds_get: KDC unreachable");
+			ret = FREERDP_ERROR_CONNECT_KDC_UNREACHABLE;
+			break;
 
-	case KRB5KRB_AP_ERR_BAD_INTEGRITY:
-	case KRB5KRB_AP_ERR_MODIFIED:
-	case KRB5KDC_ERR_PREAUTH_FAILED:
-	case KRB5_GET_IN_TKT_LOOP:
-		WLog_Print(transport->log, WLOG_WARN, "krb5_init_creds_get: Password incorrect");
-		ret = FREERDP_ERROR_AUTHENTICATION_FAILED;
-		break;
+		case KRB5KRB_AP_ERR_BAD_INTEGRITY:
+		case KRB5KRB_AP_ERR_MODIFIED:
+		case KRB5KDC_ERR_PREAUTH_FAILED:
+		case KRB5_GET_IN_TKT_LOOP:
+			WLog_Print(transport->log, WLOG_WARN, "krb5_init_creds_get: Password incorrect");
+			ret = FREERDP_ERROR_AUTHENTICATION_FAILED;
+			break;
 
-	case KRB5KDC_ERR_KEY_EXP:
-		WLog_Print(transport->log, WLOG_WARN, "krb5_init_creds_get: Password has expired");
-		ret = FREERDP_ERROR_CONNECT_PASSWORD_EXPIRED;
-		break;
+		case KRB5KDC_ERR_KEY_EXP:
+			WLog_Print(transport->log, WLOG_WARN, "krb5_init_creds_get: Password has expired");
+			ret = FREERDP_ERROR_CONNECT_PASSWORD_EXPIRED;
+			break;
 
-	case KRB5KDC_ERR_CLIENT_REVOKED:
-		WLog_Print(transport->log, WLOG_WARN, "krb5_init_creds_get: Password revoked");
-		ret = FREERDP_ERROR_CONNECT_CLIENT_REVOKED;
-		break;
+		case KRB5KDC_ERR_CLIENT_REVOKED:
+			WLog_Print(transport->log, WLOG_WARN, "krb5_init_creds_get: Password revoked");
+			ret = FREERDP_ERROR_CONNECT_CLIENT_REVOKED;
+			break;
 
-	case KRB5KDC_ERR_POLICY:
-		ret = FREERDP_ERROR_INSUFFICIENT_PRIVILEGES;
-		break;
+		case KRB5KDC_ERR_POLICY:
+			ret = FREERDP_ERROR_INSUFFICIENT_PRIVILEGES;
+			break;
 
-	default:
-		WLog_Print(transport->log, WLOG_WARN, "krb5_init_creds_get");
-		ret = FREERDP_ERROR_CONNECT_TRANSPORT_FAILED;
-		break;
+		default:
+			WLog_Print(transport->log, WLOG_WARN, "krb5_init_creds_get");
+			ret = FREERDP_ERROR_CONNECT_TRANSPORT_FAILED;
+			break;
 	}
 
 	if (ctx)
@@ -161,49 +161,49 @@ static void transport_ssl_cb(SSL* ssl, int where, int ret)
 
 		switch (ret)
 		{
-		case (SSL3_AL_FATAL << 8) | SSL_AD_ACCESS_DENIED:
-		{
-			if (!freerdp_get_last_error(transport->context))
+			case (SSL3_AL_FATAL << 8) | SSL_AD_ACCESS_DENIED:
 			{
-				WLog_Print(transport->log, WLOG_ERROR, "%s: ACCESS DENIED", __FUNCTION__);
-				freerdp_set_last_error(transport->context, FREERDP_ERROR_AUTHENTICATION_FAILED);
+				if (!freerdp_get_last_error(transport->context))
+				{
+					WLog_Print(transport->log, WLOG_ERROR, "%s: ACCESS DENIED", __FUNCTION__);
+					freerdp_set_last_error(transport->context, FREERDP_ERROR_AUTHENTICATION_FAILED);
+				}
 			}
-		}
-		break;
+			break;
 
-		case (SSL3_AL_FATAL << 8) | SSL_AD_INTERNAL_ERROR:
-		{
-			if (transport->NlaMode)
+			case (SSL3_AL_FATAL << 8) | SSL_AD_INTERNAL_ERROR:
 			{
-				UINT32 kret = 0;
+				if (transport->NlaMode)
+				{
+					UINT32 kret = 0;
 #ifdef WITH_GSSAPI
 
-				if ((strlen(transport->settings->Domain) != 0) &&
-				    (strncmp(transport->settings->Domain, ".", 1) != 0))
-				{
-					kret = transport_krb5_check_account(transport, transport->settings->Username,
-					                                    transport->settings->Domain,
-					                                    transport->settings->Password);
-				}
-				else
+					if ((strlen(transport->settings->Domain) != 0) &&
+					    (strncmp(transport->settings->Domain, ".", 1) != 0))
+					{
+						kret = transport_krb5_check_account(
+						    transport, transport->settings->Username, transport->settings->Domain,
+						    transport->settings->Password);
+					}
+					else
 #endif /* WITH_GSSAPI */
-					kret = FREERDP_ERROR_CONNECT_PASSWORD_CERTAINLY_EXPIRED;
+						kret = FREERDP_ERROR_CONNECT_PASSWORD_CERTAINLY_EXPIRED;
 
-				if (!freerdp_get_last_error(transport->context))
-					freerdp_set_last_error(transport->context, kret);
+					if (!freerdp_get_last_error(transport->context))
+						freerdp_set_last_error(transport->context, kret);
+				}
+
+				break;
+
+				case (SSL3_AL_WARNING << 8) | SSL3_AD_CLOSE_NOTIFY:
+					break;
+
+				default:
+					WLog_Print(transport->log, WLOG_WARN,
+					           "Unhandled SSL error (where=%d, ret=%d [%s, %s])", where, ret,
+					           SSL_alert_type_string_long(ret), SSL_alert_desc_string_long(ret));
+					break;
 			}
-
-			break;
-
-		case (SSL3_AL_WARNING << 8) | SSL3_AD_CLOSE_NOTIFY:
-			break;
-
-		default:
-			WLog_Print(transport->log, WLOG_WARN, "Unhandled SSL error (where=%d, ret=%d [%s, %s])",
-			           where, ret, SSL_alert_type_string_long(ret),
-			           SSL_alert_desc_string_long(ret));
-			break;
-		}
 		}
 	}
 }

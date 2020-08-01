@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdlib.h>
@@ -28,7 +28,7 @@
 #include <X11/Xatom.h>
 
 #ifdef WITH_XFIXES
-#	include <X11/extensions/Xfixes.h>
+#include <X11/extensions/Xfixes.h>
 #endif
 
 #include <winpr/crt.h>
@@ -563,28 +563,28 @@ static void xf_cliprdr_process_requested_data(xfClipboard* clipboard, BOOL hasDa
 
 	switch (format->formatId)
 	{
-	case CF_RAW:
-		srcFormatId = CF_RAW;
-		break;
+		case CF_RAW:
+			srcFormatId = CF_RAW;
+			break;
 
-	case CF_TEXT:
-	case CF_OEMTEXT:
-	case CF_UNICODETEXT:
-		size = strlen((char*)data) + 1;
-		srcFormatId = ClipboardGetFormatId(clipboard->system, "UTF8_STRING");
-		break;
+		case CF_TEXT:
+		case CF_OEMTEXT:
+		case CF_UNICODETEXT:
+			size = strlen((char*)data) + 1;
+			srcFormatId = ClipboardGetFormatId(clipboard->system, "UTF8_STRING");
+			break;
 
-	case CF_DIB:
-		srcFormatId = ClipboardGetFormatId(clipboard->system, "image/bmp");
-		break;
+		case CF_DIB:
+			srcFormatId = ClipboardGetFormatId(clipboard->system, "image/bmp");
+			break;
 
-	case CB_FORMAT_HTML:
-		srcFormatId = ClipboardGetFormatId(clipboard->system, "text/html");
-		break;
+		case CB_FORMAT_HTML:
+			srcFormatId = ClipboardGetFormatId(clipboard->system, "text/html");
+			break;
 
-	case CB_FORMAT_TEXTURILIST:
-		srcFormatId = ClipboardGetFormatId(clipboard->system, "text/uri-list");
-		break;
+		case CB_FORMAT_TEXTURILIST:
+			srcFormatId = ClipboardGetFormatId(clipboard->system, "text/uri-list");
+			break;
 	}
 
 	SrcSize = (UINT32)size;
@@ -1011,29 +1011,29 @@ void xf_cliprdr_handle_xevent(xfContext* xfc, XEvent* event)
 
 	switch (event->type)
 	{
-	case SelectionNotify:
-		xf_cliprdr_process_selection_notify(clipboard, event);
-		break;
+		case SelectionNotify:
+			xf_cliprdr_process_selection_notify(clipboard, event);
+			break;
 
-	case SelectionRequest:
-		xf_cliprdr_process_selection_request(clipboard, event);
-		break;
+		case SelectionRequest:
+			xf_cliprdr_process_selection_request(clipboard, event);
+			break;
 
-	case SelectionClear:
-		xf_cliprdr_process_selection_clear(clipboard, event);
-		break;
+		case SelectionClear:
+			xf_cliprdr_process_selection_clear(clipboard, event);
+			break;
 
-	case PropertyNotify:
-		xf_cliprdr_process_property_notify(clipboard, event);
-		break;
+		case PropertyNotify:
+			xf_cliprdr_process_property_notify(clipboard, event);
+			break;
 
-	case FocusIn:
-		if (!clipboard->xfixes_supported)
-		{
-			xf_cliprdr_check_owner(clipboard);
-		}
+		case FocusIn:
+			if (!clipboard->xfixes_supported)
+			{
+				xf_cliprdr_check_owner(clipboard);
+			}
 
-		break;
+			break;
 	}
 }
 
@@ -1367,31 +1367,31 @@ xf_cliprdr_server_format_data_response(CliprdrClientContext* context,
 	{
 		switch (clipboard->data_format_id)
 		{
-		case CF_TEXT:
-			srcFormatId = CF_TEXT;
-			dstFormatId = ClipboardGetFormatId(clipboard->system, "UTF8_STRING");
-			nullTerminated = TRUE;
-			break;
+			case CF_TEXT:
+				srcFormatId = CF_TEXT;
+				dstFormatId = ClipboardGetFormatId(clipboard->system, "UTF8_STRING");
+				nullTerminated = TRUE;
+				break;
 
-		case CF_OEMTEXT:
-			srcFormatId = CF_OEMTEXT;
-			dstFormatId = ClipboardGetFormatId(clipboard->system, "UTF8_STRING");
-			nullTerminated = TRUE;
-			break;
+			case CF_OEMTEXT:
+				srcFormatId = CF_OEMTEXT;
+				dstFormatId = ClipboardGetFormatId(clipboard->system, "UTF8_STRING");
+				nullTerminated = TRUE;
+				break;
 
-		case CF_UNICODETEXT:
-			srcFormatId = CF_UNICODETEXT;
-			dstFormatId = ClipboardGetFormatId(clipboard->system, "UTF8_STRING");
-			nullTerminated = TRUE;
-			break;
+			case CF_UNICODETEXT:
+				srcFormatId = CF_UNICODETEXT;
+				dstFormatId = ClipboardGetFormatId(clipboard->system, "UTF8_STRING");
+				nullTerminated = TRUE;
+				break;
 
-		case CF_DIB:
-			srcFormatId = CF_DIB;
-			dstFormatId = ClipboardGetFormatId(clipboard->system, "image/bmp");
-			break;
+			case CF_DIB:
+				srcFormatId = CF_DIB;
+				dstFormatId = ClipboardGetFormatId(clipboard->system, "image/bmp");
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 

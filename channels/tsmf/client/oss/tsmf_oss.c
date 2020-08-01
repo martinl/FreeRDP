@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -35,9 +35,9 @@
 #include <limits.h>
 #include <unistd.h>
 #if defined(__OpenBSD__)
-#	include <soundcard.h>
+#include <soundcard.h>
 #else
-#	include <sys/soundcard.h>
+#include <sys/soundcard.h>
 #endif
 #include <sys/ioctl.h>
 
@@ -230,10 +230,10 @@ static void tsmf_oss_free(ITSMFAudioDevice* audio)
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_tsmf_client_audio_subsystem_entry oss_freerdp_tsmf_client_audio_subsystem_entry
+#define freerdp_tsmf_client_audio_subsystem_entry oss_freerdp_tsmf_client_audio_subsystem_entry
 #else
-#	define freerdp_tsmf_client_audio_subsystem_entry \
-		FREERDP_API freerdp_tsmf_client_audio_subsystem_entry
+#define freerdp_tsmf_client_audio_subsystem_entry \
+	FREERDP_API freerdp_tsmf_client_audio_subsystem_entry
 #endif
 
 ITSMFAudioDevice* freerdp_tsmf_client_audio_subsystem_entry(void)

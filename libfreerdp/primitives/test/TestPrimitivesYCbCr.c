@@ -7,7 +7,7 @@
 #include <freerdp/utils/profiler.h>
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #define TAG __FILE__

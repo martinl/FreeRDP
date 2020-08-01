@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -451,69 +451,70 @@ static UINT remdesk_recv_ctl_pdu(RemdeskServerContext* context, wStream* s,
 
 	switch (msgType)
 	{
-	case REMDESK_CTL_REMOTE_CONTROL_DESKTOP:
-		if ((error = remdesk_recv_ctl_remote_control_desktop_pdu(context, s, header)))
-		{
-			WLog_ERR(TAG,
-			         "remdesk_recv_ctl_remote_control_desktop_pdu failed with error %" PRIu32 "!",
-			         error);
-			return error;
-		}
+		case REMDESK_CTL_REMOTE_CONTROL_DESKTOP:
+			if ((error = remdesk_recv_ctl_remote_control_desktop_pdu(context, s, header)))
+			{
+				WLog_ERR(TAG,
+				         "remdesk_recv_ctl_remote_control_desktop_pdu failed with error %" PRIu32
+				         "!",
+				         error);
+				return error;
+			}
 
-		break;
+			break;
 
-	case REMDESK_CTL_AUTHENTICATE:
-		if ((error = remdesk_recv_ctl_authenticate_pdu(context, s, header)))
-		{
-			WLog_ERR(TAG, "remdesk_recv_ctl_authenticate_pdu failed with error %" PRIu32 "!",
-			         error);
-			return error;
-		}
+		case REMDESK_CTL_AUTHENTICATE:
+			if ((error = remdesk_recv_ctl_authenticate_pdu(context, s, header)))
+			{
+				WLog_ERR(TAG, "remdesk_recv_ctl_authenticate_pdu failed with error %" PRIu32 "!",
+				         error);
+				return error;
+			}
 
-		break;
+			break;
 
-	case REMDESK_CTL_DISCONNECT:
-		break;
+		case REMDESK_CTL_DISCONNECT:
+			break;
 
-	case REMDESK_CTL_VERSIONINFO:
-		if ((error = remdesk_recv_ctl_version_info_pdu(context, s, header)))
-		{
-			WLog_ERR(TAG, "remdesk_recv_ctl_version_info_pdu failed with error %" PRIu32 "!",
-			         error);
-			return error;
-		}
+		case REMDESK_CTL_VERSIONINFO:
+			if ((error = remdesk_recv_ctl_version_info_pdu(context, s, header)))
+			{
+				WLog_ERR(TAG, "remdesk_recv_ctl_version_info_pdu failed with error %" PRIu32 "!",
+				         error);
+				return error;
+			}
 
-		break;
+			break;
 
-	case REMDESK_CTL_ISCONNECTED:
-		break;
+		case REMDESK_CTL_ISCONNECTED:
+			break;
 
-	case REMDESK_CTL_VERIFY_PASSWORD:
-		if ((error = remdesk_recv_ctl_verify_password_pdu(context, s, header)))
-		{
-			WLog_ERR(TAG, "remdesk_recv_ctl_verify_password_pdu failed with error %" PRIu32 "!",
-			         error);
-			return error;
-		}
+		case REMDESK_CTL_VERIFY_PASSWORD:
+			if ((error = remdesk_recv_ctl_verify_password_pdu(context, s, header)))
+			{
+				WLog_ERR(TAG, "remdesk_recv_ctl_verify_password_pdu failed with error %" PRIu32 "!",
+				         error);
+				return error;
+			}
 
-		break;
+			break;
 
-	case REMDESK_CTL_EXPERT_ON_VISTA:
-		break;
+		case REMDESK_CTL_EXPERT_ON_VISTA:
+			break;
 
-	case REMDESK_CTL_RANOVICE_NAME:
-		break;
+		case REMDESK_CTL_RANOVICE_NAME:
+			break;
 
-	case REMDESK_CTL_RAEXPERT_NAME:
-		break;
+		case REMDESK_CTL_RAEXPERT_NAME:
+			break;
 
-	case REMDESK_CTL_TOKEN:
-		break;
+		case REMDESK_CTL_TOKEN:
+			break;
 
-	default:
-		WLog_ERR(TAG, "remdesk_recv_control_pdu: unknown msgType: %" PRIu32 "", msgType);
-		error = ERROR_INVALID_DATA;
-		break;
+		default:
+			WLog_ERR(TAG, "remdesk_recv_control_pdu: unknown msgType: %" PRIu32 "", msgType);
+			error = ERROR_INVALID_DATA;
+			break;
 	}
 
 	return error;

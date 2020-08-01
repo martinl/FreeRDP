@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/handle.h>
@@ -53,25 +53,25 @@
 
 #ifndef _WIN32
 
-#	include <winpr/crt.h>
-#	include <winpr/path.h>
-#	include <winpr/environment.h>
+#include <winpr/crt.h>
+#include <winpr/path.h>
+#include <winpr/environment.h>
 
-#	include <grp.h>
+#include <grp.h>
 
-#	include <signal.h>
+#include <signal.h>
 
-#	include "thread.h"
+#include "thread.h"
 
-#	include "../security/security.h"
+#include "../security/security.h"
 
-#	ifndef NSIG
-#		ifdef SIGMAX
-#			define NSIG SIGMAX
-#		else
-#			define NSIG 64
-#		endif
-#	endif
+#ifndef NSIG
+#ifdef SIGMAX
+#define NSIG SIGMAX
+#else
+#define NSIG 64
+#endif
+#endif
 
 /**
  * If the file name does not contain a directory path, the system searches for the executable file
@@ -208,9 +208,9 @@ BOOL _CreateProcessExA(HANDLE hToken, DWORD dwLogonFlags, LPCSTR lpApplicationNa
 	if (pid == 0)
 	{
 		/* child process */
-#	ifndef __sun
+#ifndef __sun
 		int maxfd;
-#	endif
+#endif
 		int fd;
 		int sig;
 		sigset_t set;
@@ -247,19 +247,19 @@ BOOL _CreateProcessExA(HANDLE hToken, DWORD dwLogonFlags, LPCSTR lpApplicationNa
 				dup2(handle_fd, STDIN_FILENO);
 		}
 
-#	ifdef __sun
+#ifdef __sun
 		closefrom(3);
-#	else
-#		ifdef F_MAXFD // on some BSD derivates
+#else
+#ifdef F_MAXFD // on some BSD derivates
 		maxfd = fcntl(0, F_MAXFD);
-#		else
+#else
 		maxfd = sysconf(_SC_OPEN_MAX);
-#		endif
+#endif
 
 		for (fd = 3; fd < maxfd; fd++)
 			close(fd);
 
-#	endif // __sun
+#endif // __sun
 
 		if (token)
 		{

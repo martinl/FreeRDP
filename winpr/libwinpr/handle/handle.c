@@ -19,29 +19,29 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/handle.h>
 
 #ifndef _WIN32
 
-#	include <assert.h>
-#	include <pthread.h>
+#include <assert.h>
+#include <pthread.h>
 
-#	include "../synch/synch.h"
-#	include "../thread/thread.h"
-#	include "../pipe/pipe.h"
-#	include "../comm/comm.h"
-#	include "../security/security.h"
+#include "../synch/synch.h"
+#include "../thread/thread.h"
+#include "../pipe/pipe.h"
+#include "../comm/comm.h"
+#include "../security/security.h"
 
-#	ifdef HAVE_UNISTD_H
-#		include <unistd.h>
-#	endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
-#	include <assert.h>
+#include <assert.h>
 
-#	include "../handle/handle.h"
+#include "../handle/handle.h"
 
 BOOL CloseHandle(HANDLE hObject)
 {

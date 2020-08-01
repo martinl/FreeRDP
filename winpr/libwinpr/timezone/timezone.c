@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/wtypes.h>
@@ -30,14 +30,14 @@
 
 #ifndef _WIN32
 
-#	include <time.h>
-#	include <unistd.h>
+#include <time.h>
+#include <unistd.h>
 
 /* Table generated with TimeZones.csx */
-#	include "TimeZones.c"
+#include "TimeZones.c"
 
 /* Table generated with WindowsZones.csx */
-#	include "WindowsZones.c"
+#include "WindowsZones.c"
 
 static UINT64 winpr_windows_gmtime(void)
 {
@@ -145,8 +145,8 @@ static char* winpr_get_timezone_from_link(void)
 	return NULL;
 }
 
-#	if defined(ANDROID)
-#		include <jni.h>
+#if defined(ANDROID)
+#include <jni.h>
 static JavaVM* jniVm = NULL;
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
@@ -223,20 +223,20 @@ static char* winpr_get_android_timezone_identifier(void)
 
 	return tzid;
 }
-#	endif
+#endif
 
 static char* winpr_get_unix_timezone_identifier_from_file(void)
 {
-#	if defined(ANDROID)
+#if defined(ANDROID)
 	return winpr_get_android_timezone_identifier();
-#	else
+#else
 	FILE* fp;
 	char* tzid = NULL;
-#		if defined(__FreeBSD__) || defined(__OpenBSD__)
+#if defined(__FreeBSD__) || defined(__OpenBSD__)
 	fp = fopen("/var/db/zoneinfo", "r");
-#		else
+#else
 	fp = fopen("/etc/timezone", "r");
-#		endif
+#endif
 
 	if (NULL == fp)
 		return NULL;
@@ -244,7 +244,7 @@ static char* winpr_get_unix_timezone_identifier_from_file(void)
 	tzid = winpr_read_unix_timezone_identifier_from_file(fp);
 	fclose(fp);
 	return tzid;
-#	endif
+#endif
 }
 
 static BOOL winpr_match_unix_timezone_identifier_with_list(const char* tzid, const char* list)
@@ -344,7 +344,7 @@ DWORD GetTimeZoneInformation(LPTIME_ZONE_INFORMATION lpTimeZoneInformation)
 	time(&t);
 	local_time = localtime(&t);
 	memset(tz, 0, sizeof(TIME_ZONE_INFORMATION));
-#	ifdef HAVE_TM_GMTOFF
+#ifdef HAVE_TM_GMTOFF
 	{
 		long bias = -(local_time->tm_gmtoff / 60L);
 
@@ -353,9 +353,9 @@ DWORD GetTimeZoneInformation(LPTIME_ZONE_INFORMATION lpTimeZoneInformation)
 
 		tz->Bias = (LONG)bias;
 	}
-#	else
+#else
 	tz->Bias = 0;
-#	endif
+#endif
 	dtz = winpr_detect_windows_time_zone();
 
 	if (dtz != NULL)

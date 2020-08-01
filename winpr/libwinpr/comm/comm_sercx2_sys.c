@@ -22,12 +22,12 @@
 
 #if defined __linux__ && !defined ANDROID
 
-#	include <winpr/wlog.h>
+#include <winpr/wlog.h>
 
-#	include "comm_serial_sys.h"
-#	include "comm_sercx_sys.h"
+#include "comm_serial_sys.h"
+#include "comm_sercx_sys.h"
 
-#	include "comm_sercx2_sys.h"
+#include "comm_sercx2_sys.h"
 
 /* http://msdn.microsoft.com/en-us/library/dn265347%28v=vs.85%29.aspx
  *

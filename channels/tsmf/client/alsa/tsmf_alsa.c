@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -227,10 +227,10 @@ static void tsmf_alsa_free(ITSMFAudioDevice* audio)
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_tsmf_client_audio_subsystem_entry alsa_freerdp_tsmf_client_audio_subsystem_entry
+#define freerdp_tsmf_client_audio_subsystem_entry alsa_freerdp_tsmf_client_audio_subsystem_entry
 #else
-#	define freerdp_tsmf_client_audio_subsystem_entry \
-		FREERDP_API freerdp_tsmf_client_audio_subsystem_entry
+#define freerdp_tsmf_client_audio_subsystem_entry \
+	FREERDP_API freerdp_tsmf_client_audio_subsystem_entry
 #endif
 
 ITSMFAudioDevice* freerdp_tsmf_client_audio_subsystem_entry(void)

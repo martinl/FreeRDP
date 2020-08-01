@@ -68,7 +68,8 @@ static DWORD WINAPI mac_client_thread(void *param);
 
 @synthesize is_connected;
 
-- (int)rdpStart:(rdpContext *)rdp_context {
+- (int)rdpStart:(rdpContext *)rdp_context
+{
 	rdpSettings *settings;
 	EmbedWindowEventArgs e;
 	[self initializeView];
@@ -252,7 +253,8 @@ DWORD WINAPI mac_client_thread(void *param)
 	}
 }
 
-- (id)initWithFrame:(NSRect)frame {
+- (id)initWithFrame:(NSRect)frame
+{
 	self = [super initWithFrame:frame];
 
 	if (self)
@@ -263,11 +265,13 @@ DWORD WINAPI mac_client_thread(void *param)
 	return self;
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
 	[self initializeView];
 }
 
-- (void)initializeView {
+- (void)initializeView
+{
 	if (!initialized)
 	{
 		cursors = [[NSMutableArray alloc] initWithCapacity:10];
@@ -286,22 +290,26 @@ DWORD WINAPI mac_client_thread(void *param)
 	}
 }
 
-- (void)setCursor:(NSCursor *)cursor {
+- (void)setCursor:(NSCursor *)cursor
+{
 	self->currentCursor = cursor;
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[[self window] invalidateCursorRectsForView:self];
 	});
 }
 
-- (void)resetCursorRects {
+- (void)resetCursorRects
+{
 	[self addCursorRect:[self visibleRect] cursor:currentCursor];
 }
 
-- (BOOL)acceptsFirstResponder {
+- (BOOL)acceptsFirstResponder
+{
 	return YES;
 }
 
-- (void)mouseMoved:(NSEvent *)event {
+- (void)mouseMoved:(NSEvent *)event
+{
 	[super mouseMoved:event];
 
 	if (!self.is_connected)
@@ -313,7 +321,8 @@ DWORD WINAPI mac_client_thread(void *param)
 	mf_scale_mouse_event(context, instance->input, PTR_FLAGS_MOVE, x, y);
 }
 
-- (void)mouseDown:(NSEvent *)event {
+- (void)mouseDown:(NSEvent *)event
+{
 	[super mouseDown:event];
 
 	if (!self.is_connected)
@@ -325,7 +334,8 @@ DWORD WINAPI mac_client_thread(void *param)
 	mf_press_mouse_button(context, instance->input, 0, x, y, TRUE);
 }
 
-- (void)mouseUp:(NSEvent *)event {
+- (void)mouseUp:(NSEvent *)event
+{
 	[super mouseUp:event];
 
 	if (!self.is_connected)
@@ -337,7 +347,8 @@ DWORD WINAPI mac_client_thread(void *param)
 	mf_press_mouse_button(context, instance->input, 0, x, y, FALSE);
 }
 
-- (void)rightMouseDown:(NSEvent *)event {
+- (void)rightMouseDown:(NSEvent *)event
+{
 	[super rightMouseDown:event];
 
 	if (!self.is_connected)
@@ -349,7 +360,8 @@ DWORD WINAPI mac_client_thread(void *param)
 	mf_press_mouse_button(context, instance->input, 1, x, y, TRUE);
 }
 
-- (void)rightMouseUp:(NSEvent *)event {
+- (void)rightMouseUp:(NSEvent *)event
+{
 	[super rightMouseUp:event];
 
 	if (!self.is_connected)
@@ -361,7 +373,8 @@ DWORD WINAPI mac_client_thread(void *param)
 	mf_press_mouse_button(context, instance->input, 1, x, y, FALSE);
 }
 
-- (void)otherMouseDown:(NSEvent *)event {
+- (void)otherMouseDown:(NSEvent *)event
+{
 	[super otherMouseDown:event];
 
 	if (!self.is_connected)
@@ -374,7 +387,8 @@ DWORD WINAPI mac_client_thread(void *param)
 	mf_press_mouse_button(context, instance->input, pressed, x, y, TRUE);
 }
 
-- (void)otherMouseUp:(NSEvent *)event {
+- (void)otherMouseUp:(NSEvent *)event
+{
 	[super otherMouseUp:event];
 
 	if (!self.is_connected)
@@ -387,7 +401,8 @@ DWORD WINAPI mac_client_thread(void *param)
 	mf_press_mouse_button(context, instance->input, pressed, x, y, FALSE);
 }
 
-- (void)scrollWheel:(NSEvent *)event {
+- (void)scrollWheel:(NSEvent *)event
+{
 	UINT16 flags;
 	[super scrollWheel:event];
 
@@ -431,7 +446,8 @@ DWORD WINAPI mac_client_thread(void *param)
 	}
 }
 
-- (void)mouseDragged:(NSEvent *)event {
+- (void)mouseDragged:(NSEvent *)event
+{
 	[super mouseDragged:event];
 
 	if (!self.is_connected)
@@ -500,7 +516,8 @@ DWORD fixKeyCode(DWORD keyCode, unichar keyChar, enum APPLE_KEYBOARD_TYPE type)
 	return keyCode;
 }
 
-- (void)keyDown:(NSEvent *)event {
+- (void)keyDown:(NSEvent *)event
+{
 	DWORD keyCode;
 	DWORD keyFlags;
 	DWORD vkcode;
@@ -535,7 +552,8 @@ DWORD fixKeyCode(DWORD keyCode, unichar keyChar, enum APPLE_KEYBOARD_TYPE type)
 	freerdp_input_send_keyboard_event(instance->input, keyFlags, scancode);
 }
 
-- (void)keyUp:(NSEvent *)event {
+- (void)keyUp:(NSEvent *)event
+{
 	DWORD keyCode;
 	DWORD keyFlags;
 	DWORD vkcode;
@@ -569,7 +587,8 @@ DWORD fixKeyCode(DWORD keyCode, unichar keyChar, enum APPLE_KEYBOARD_TYPE type)
 	freerdp_input_send_keyboard_event(instance->input, keyFlags, scancode);
 }
 
-- (void)flagsChanged:(NSEvent *)event {
+- (void)flagsChanged:(NSEvent *)event
+{
 	int key;
 	DWORD keyFlags;
 	DWORD vkcode;
@@ -653,7 +672,8 @@ DWORD fixKeyCode(DWORD keyCode, unichar keyChar, enum APPLE_KEYBOARD_TYPE type)
 	kbdModFlags = modFlags;
 }
 
-- (void)releaseResources {
+- (void)releaseResources
+{
 	int i;
 
 	for (i = 0; i < argc; i++)
@@ -665,7 +685,8 @@ DWORD fixKeyCode(DWORD keyCode, unichar keyChar, enum APPLE_KEYBOARD_TYPE type)
 	free(pixel_data);
 }
 
-- (void)drawRect:(NSRect)rect {
+- (void)drawRect:(NSRect)rect
+{
 	if (!context)
 		return;
 
@@ -690,7 +711,8 @@ DWORD fixKeyCode(DWORD keyCode, unichar keyChar, enum APPLE_KEYBOARD_TYPE type)
 	}
 }
 
-- (void)onPasteboardTimerFired:(NSTimer *)timer {
+- (void)onPasteboardTimerFired:(NSTimer *)timer
+{
 	const BYTE *data;
 	UINT32 size;
 	UINT32 formatId;
@@ -741,7 +763,8 @@ DWORD fixKeyCode(DWORD keyCode, unichar keyChar, enum APPLE_KEYBOARD_TYPE type)
 		mac_cliprdr_send_client_format_list(mfc->cliprdr);
 }
 
-- (void)pause {
+- (void)pause
+{
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self->pasteboard_timer invalidate];
 	});
@@ -753,7 +776,8 @@ DWORD fixKeyCode(DWORD keyCode, unichar keyChar, enum APPLE_KEYBOARD_TYPE type)
 	}
 }
 
-- (void)resume {
+- (void)resume
+{
 	if (!self.is_connected)
 		return;
 
@@ -777,7 +801,8 @@ DWORD fixKeyCode(DWORD keyCode, unichar keyChar, enum APPLE_KEYBOARD_TYPE type)
 	});
 }
 
-- (void)setScrollOffset:(int)xOffset y:(int)yOffset w:(int)width h:(int)height {
+- (void)setScrollOffset:(int)xOffset y:(int)yOffset w:(int)width h:(int)height
+{
 	mfc->yCurrentScroll = yOffset;
 	mfc->xCurrentScroll = xOffset;
 	mfc->client_height = height;

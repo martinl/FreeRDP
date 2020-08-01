@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -64,12 +64,12 @@ static BOOL rdpsnd_winmm_convert_format(const AUDIO_FORMAT* in, WAVEFORMATEX* ou
 
 	switch (in->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		out->wBitsPerSample = in->wBitsPerSample;
-		break;
+		case WAVE_FORMAT_PCM:
+			out->wBitsPerSample = in->wBitsPerSample;
+			break;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	out->nBlockAlign = out->nChannels * out->wBitsPerSample / 8;
@@ -96,23 +96,23 @@ static void CALLBACK rdpsnd_winmm_callback_function(HWAVEOUT hwo, UINT uMsg, DWO
 
 	switch (uMsg)
 	{
-	case MM_WOM_OPEN:
-		WLog_DBG(TAG, "MM_WOM_OPEN");
-		break;
+		case MM_WOM_OPEN:
+			WLog_DBG(TAG, "MM_WOM_OPEN");
+			break;
 
-	case MM_WOM_CLOSE:
-		WLog_DBG(TAG, "MM_WOM_CLOSE");
-		break;
+		case MM_WOM_CLOSE:
+			WLog_DBG(TAG, "MM_WOM_CLOSE");
+			break;
 
-	case MM_WOM_DONE:
-		WLog_DBG(TAG, "MM_WOM_DONE");
-		lpWaveHdr = (LPWAVEHDR)dwParam1;
-		free(lpWaveHdr);
-		break;
+		case MM_WOM_DONE:
+			WLog_DBG(TAG, "MM_WOM_DONE");
+			lpWaveHdr = (LPWAVEHDR)dwParam1;
+			free(lpWaveHdr);
+			break;
 
-	default:
-		WLog_DBG(TAG, "UNKNOWN [0x%08" PRIx32 "]", uMsg);
-		break;
+		default:
+			WLog_DBG(TAG, "UNKNOWN [0x%08" PRIx32 "]", uMsg);
+			break;
 	}
 }
 
@@ -275,9 +275,9 @@ static void rdpsnd_winmm_parse_addin_args(rdpsndDevicePlugin* device, ADDIN_ARGV
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_rdpsnd_client_subsystem_entry winmm_freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry winmm_freerdp_rdpsnd_client_subsystem_entry
 #else
-#	define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
+#define freerdp_rdpsnd_client_subsystem_entry FREERDP_API freerdp_rdpsnd_client_subsystem_entry
 #endif
 
 /**

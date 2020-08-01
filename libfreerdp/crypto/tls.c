@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -39,11 +39,11 @@
 #include "opensslcompat.h"
 
 #ifdef HAVE_POLL_H
-#	include <poll.h>
+#include <poll.h>
 #endif
 
 #ifdef HAVE_VALGRIND_MEMCHECK_H
-#	include <valgrind/memcheck.h>
+#include <valgrind/memcheck.h>
 #endif
 
 #define TAG FREERDP_TAG("crypto")
@@ -103,35 +103,35 @@ static int bio_rdp_tls_write(BIO* bio, const char* buf, int size)
 	{
 		switch (error)
 		{
-		case SSL_ERROR_NONE:
-			BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
-			break;
+			case SSL_ERROR_NONE:
+				BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
+				break;
 
-		case SSL_ERROR_WANT_WRITE:
-			BIO_set_flags(bio, BIO_FLAGS_WRITE | BIO_FLAGS_SHOULD_RETRY);
-			break;
+			case SSL_ERROR_WANT_WRITE:
+				BIO_set_flags(bio, BIO_FLAGS_WRITE | BIO_FLAGS_SHOULD_RETRY);
+				break;
 
-		case SSL_ERROR_WANT_READ:
-			BIO_set_flags(bio, BIO_FLAGS_READ | BIO_FLAGS_SHOULD_RETRY);
-			break;
+			case SSL_ERROR_WANT_READ:
+				BIO_set_flags(bio, BIO_FLAGS_READ | BIO_FLAGS_SHOULD_RETRY);
+				break;
 
-		case SSL_ERROR_WANT_X509_LOOKUP:
-			BIO_set_flags(bio, BIO_FLAGS_IO_SPECIAL);
-			BIO_set_retry_reason(bio, BIO_RR_SSL_X509_LOOKUP);
-			break;
+			case SSL_ERROR_WANT_X509_LOOKUP:
+				BIO_set_flags(bio, BIO_FLAGS_IO_SPECIAL);
+				BIO_set_retry_reason(bio, BIO_RR_SSL_X509_LOOKUP);
+				break;
 
-		case SSL_ERROR_WANT_CONNECT:
-			BIO_set_flags(bio, BIO_FLAGS_IO_SPECIAL);
-			BIO_set_retry_reason(bio, BIO_RR_CONNECT);
-			break;
+			case SSL_ERROR_WANT_CONNECT:
+				BIO_set_flags(bio, BIO_FLAGS_IO_SPECIAL);
+				BIO_set_retry_reason(bio, BIO_RR_CONNECT);
+				break;
 
-		case SSL_ERROR_SYSCALL:
-			BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
-			break;
+			case SSL_ERROR_SYSCALL:
+				BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
+				break;
 
-		case SSL_ERROR_SSL:
-			BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
-			break;
+			case SSL_ERROR_SSL:
+				BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
+				break;
 		}
 	}
 
@@ -157,44 +157,44 @@ static int bio_rdp_tls_read(BIO* bio, char* buf, int size)
 	{
 		switch (error)
 		{
-		case SSL_ERROR_NONE:
-			BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
-			break;
+			case SSL_ERROR_NONE:
+				BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
+				break;
 
-		case SSL_ERROR_WANT_READ:
-			BIO_set_flags(bio, BIO_FLAGS_READ | BIO_FLAGS_SHOULD_RETRY);
-			break;
+			case SSL_ERROR_WANT_READ:
+				BIO_set_flags(bio, BIO_FLAGS_READ | BIO_FLAGS_SHOULD_RETRY);
+				break;
 
-		case SSL_ERROR_WANT_WRITE:
-			BIO_set_flags(bio, BIO_FLAGS_WRITE | BIO_FLAGS_SHOULD_RETRY);
-			break;
+			case SSL_ERROR_WANT_WRITE:
+				BIO_set_flags(bio, BIO_FLAGS_WRITE | BIO_FLAGS_SHOULD_RETRY);
+				break;
 
-		case SSL_ERROR_WANT_X509_LOOKUP:
-			BIO_set_flags(bio, BIO_FLAGS_IO_SPECIAL);
-			BIO_set_retry_reason(bio, BIO_RR_SSL_X509_LOOKUP);
-			break;
+			case SSL_ERROR_WANT_X509_LOOKUP:
+				BIO_set_flags(bio, BIO_FLAGS_IO_SPECIAL);
+				BIO_set_retry_reason(bio, BIO_RR_SSL_X509_LOOKUP);
+				break;
 
-		case SSL_ERROR_WANT_ACCEPT:
-			BIO_set_flags(bio, BIO_FLAGS_IO_SPECIAL);
-			BIO_set_retry_reason(bio, BIO_RR_ACCEPT);
-			break;
+			case SSL_ERROR_WANT_ACCEPT:
+				BIO_set_flags(bio, BIO_FLAGS_IO_SPECIAL);
+				BIO_set_retry_reason(bio, BIO_RR_ACCEPT);
+				break;
 
-		case SSL_ERROR_WANT_CONNECT:
-			BIO_set_flags(bio, BIO_FLAGS_IO_SPECIAL);
-			BIO_set_retry_reason(bio, BIO_RR_CONNECT);
-			break;
+			case SSL_ERROR_WANT_CONNECT:
+				BIO_set_flags(bio, BIO_FLAGS_IO_SPECIAL);
+				BIO_set_retry_reason(bio, BIO_RR_CONNECT);
+				break;
 
-		case SSL_ERROR_SSL:
-			BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
-			break;
+			case SSL_ERROR_SSL:
+				BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
+				break;
 
-		case SSL_ERROR_ZERO_RETURN:
-			BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
-			break;
+			case SSL_ERROR_ZERO_RETURN:
+				BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
+				break;
 
-		case SSL_ERROR_SYSCALL:
-			BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
-			break;
+			case SSL_ERROR_SYSCALL:
+				BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
+				break;
 		}
 	}
 
@@ -247,190 +247,190 @@ static long bio_rdp_tls_ctrl(BIO* bio, int cmd, long num, void* ptr)
 
 	switch (cmd)
 	{
-	case BIO_CTRL_RESET:
-		SSL_shutdown(tls->ssl);
+		case BIO_CTRL_RESET:
+			SSL_shutdown(tls->ssl);
 
-		if (SSL_in_connect_init(tls->ssl))
-			SSL_set_connect_state(tls->ssl);
-		else if (SSL_in_accept_init(tls->ssl))
-			SSL_set_accept_state(tls->ssl);
+			if (SSL_in_connect_init(tls->ssl))
+				SSL_set_connect_state(tls->ssl);
+			else if (SSL_in_accept_init(tls->ssl))
+				SSL_set_accept_state(tls->ssl);
 
-		SSL_clear(tls->ssl);
+			SSL_clear(tls->ssl);
 
-		if (next_bio)
-			status = BIO_ctrl(next_bio, cmd, num, ptr);
-		else if (ssl_rbio)
+			if (next_bio)
+				status = BIO_ctrl(next_bio, cmd, num, ptr);
+			else if (ssl_rbio)
+				status = BIO_ctrl(ssl_rbio, cmd, num, ptr);
+			else
+				status = 1;
+
+			break;
+
+		case BIO_C_GET_FD:
 			status = BIO_ctrl(ssl_rbio, cmd, num, ptr);
-		else
+			break;
+
+		case BIO_CTRL_INFO:
+			status = 0;
+			break;
+
+		case BIO_CTRL_SET_CALLBACK:
+			status = 0;
+			break;
+
+		case BIO_CTRL_GET_CALLBACK:
+			*((ULONG_PTR*)ptr) = (ULONG_PTR)SSL_get_info_callback(tls->ssl);
 			status = 1;
+			break;
 
-		break;
+		case BIO_C_SSL_MODE:
+			if (num)
+				SSL_set_connect_state(tls->ssl);
+			else
+				SSL_set_accept_state(tls->ssl);
 
-	case BIO_C_GET_FD:
-		status = BIO_ctrl(ssl_rbio, cmd, num, ptr);
-		break;
-
-	case BIO_CTRL_INFO:
-		status = 0;
-		break;
-
-	case BIO_CTRL_SET_CALLBACK:
-		status = 0;
-		break;
-
-	case BIO_CTRL_GET_CALLBACK:
-		*((ULONG_PTR*)ptr) = (ULONG_PTR)SSL_get_info_callback(tls->ssl);
-		status = 1;
-		break;
-
-	case BIO_C_SSL_MODE:
-		if (num)
-			SSL_set_connect_state(tls->ssl);
-		else
-			SSL_set_accept_state(tls->ssl);
-
-		status = 1;
-		break;
-
-	case BIO_CTRL_GET_CLOSE:
-		status = BIO_get_shutdown(bio);
-		break;
-
-	case BIO_CTRL_SET_CLOSE:
-		BIO_set_shutdown(bio, (int)num);
-		status = 1;
-		break;
-
-	case BIO_CTRL_WPENDING:
-		status = BIO_ctrl(ssl_wbio, cmd, num, ptr);
-		break;
-
-	case BIO_CTRL_PENDING:
-		status = SSL_pending(tls->ssl);
-
-		if (status == 0)
-			status = BIO_pending(ssl_rbio);
-
-		break;
-
-	case BIO_CTRL_FLUSH:
-		BIO_clear_retry_flags(bio);
-		status = BIO_ctrl(ssl_wbio, cmd, num, ptr);
-		BIO_copy_next_retry(bio);
-		status = 1;
-		break;
-
-	case BIO_CTRL_PUSH:
-		if (next_bio && (next_bio != ssl_rbio))
-		{
-#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
-			SSL_set_bio(tls->ssl, next_bio, next_bio);
-			CRYPTO_add(&(bio->next_bio->references), 1, CRYPTO_LOCK_BIO);
-#else
-			/*
-			 * We are going to pass ownership of next to the SSL object...but
-			 * we don't own a reference to pass yet - so up ref
-			 */
-			BIO_up_ref(next_bio);
-			SSL_set_bio(tls->ssl, next_bio, next_bio);
-#endif
-		}
-
-		status = 1;
-		break;
-
-	case BIO_CTRL_POP:
-
-		/* Only detach if we are the BIO explicitly being popped */
-		if (bio == ptr)
-		{
-			if (ssl_rbio != ssl_wbio)
-				BIO_free_all(ssl_wbio);
-
-#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
-
-			if (next_bio)
-				CRYPTO_add(&(bio->next_bio->references), -1, CRYPTO_LOCK_BIO);
-
-			tls->ssl->wbio = tls->ssl->rbio = NULL;
-#else
-			/* OpenSSL 1.1: This will also clear the reference we obtained during push */
-			SSL_set_bio(tls->ssl, NULL, NULL);
-#endif
-		}
-
-		status = 1;
-		break;
-
-	case BIO_C_GET_SSL:
-		if (ptr)
-		{
-			*((SSL**)ptr) = tls->ssl;
 			status = 1;
-		}
+			break;
 
-		break;
+		case BIO_CTRL_GET_CLOSE:
+			status = BIO_get_shutdown(bio);
+			break;
 
-	case BIO_C_SET_SSL:
-		BIO_set_shutdown(bio, (int)num);
+		case BIO_CTRL_SET_CLOSE:
+			BIO_set_shutdown(bio, (int)num);
+			status = 1;
+			break;
 
-		if (ptr)
-		{
-			tls->ssl = (SSL*)ptr;
-			ssl_rbio = SSL_get_rbio(tls->ssl);
-			ssl_wbio = SSL_get_wbio(tls->ssl);
-		}
+		case BIO_CTRL_WPENDING:
+			status = BIO_ctrl(ssl_wbio, cmd, num, ptr);
+			break;
 
-		if (ssl_rbio)
-		{
-			if (next_bio)
-				BIO_push(ssl_rbio, next_bio);
+		case BIO_CTRL_PENDING:
+			status = SSL_pending(tls->ssl);
 
-			BIO_set_next(bio, ssl_rbio);
-#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
-			CRYPTO_add(&(ssl_rbio->references), 1, CRYPTO_LOCK_BIO);
-#else
-			BIO_up_ref(ssl_rbio);
-#endif
-		}
+			if (status == 0)
+				status = BIO_pending(ssl_rbio);
 
-		BIO_set_init(bio, 1);
-		status = 1;
-		break;
+			break;
 
-	case BIO_C_DO_STATE_MACHINE:
-		BIO_clear_flags(bio, BIO_FLAGS_READ | BIO_FLAGS_WRITE | BIO_FLAGS_IO_SPECIAL);
-		BIO_set_retry_reason(bio, 0);
-		status = SSL_do_handshake(tls->ssl);
+		case BIO_CTRL_FLUSH:
+			BIO_clear_retry_flags(bio);
+			status = BIO_ctrl(ssl_wbio, cmd, num, ptr);
+			BIO_copy_next_retry(bio);
+			status = 1;
+			break;
 
-		if (status <= 0)
-		{
-			switch (SSL_get_error(tls->ssl, status))
+		case BIO_CTRL_PUSH:
+			if (next_bio && (next_bio != ssl_rbio))
 			{
-			case SSL_ERROR_WANT_READ:
-				BIO_set_flags(bio, BIO_FLAGS_READ | BIO_FLAGS_SHOULD_RETRY);
-				break;
-
-			case SSL_ERROR_WANT_WRITE:
-				BIO_set_flags(bio, BIO_FLAGS_WRITE | BIO_FLAGS_SHOULD_RETRY);
-				break;
-
-			case SSL_ERROR_WANT_CONNECT:
-				BIO_set_flags(bio, BIO_FLAGS_IO_SPECIAL | BIO_FLAGS_SHOULD_RETRY);
-				BIO_set_retry_reason(bio, BIO_get_retry_reason(next_bio));
-				break;
-
-			default:
-				BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
-				break;
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
+				SSL_set_bio(tls->ssl, next_bio, next_bio);
+				CRYPTO_add(&(bio->next_bio->references), 1, CRYPTO_LOCK_BIO);
+#else
+				/*
+				 * We are going to pass ownership of next to the SSL object...but
+				 * we don't own a reference to pass yet - so up ref
+				 */
+				BIO_up_ref(next_bio);
+				SSL_set_bio(tls->ssl, next_bio, next_bio);
+#endif
 			}
-		}
 
-		break;
+			status = 1;
+			break;
 
-	default:
-		status = BIO_ctrl(ssl_rbio, cmd, num, ptr);
-		break;
+		case BIO_CTRL_POP:
+
+			/* Only detach if we are the BIO explicitly being popped */
+			if (bio == ptr)
+			{
+				if (ssl_rbio != ssl_wbio)
+					BIO_free_all(ssl_wbio);
+
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
+
+				if (next_bio)
+					CRYPTO_add(&(bio->next_bio->references), -1, CRYPTO_LOCK_BIO);
+
+				tls->ssl->wbio = tls->ssl->rbio = NULL;
+#else
+				/* OpenSSL 1.1: This will also clear the reference we obtained during push */
+				SSL_set_bio(tls->ssl, NULL, NULL);
+#endif
+			}
+
+			status = 1;
+			break;
+
+		case BIO_C_GET_SSL:
+			if (ptr)
+			{
+				*((SSL**)ptr) = tls->ssl;
+				status = 1;
+			}
+
+			break;
+
+		case BIO_C_SET_SSL:
+			BIO_set_shutdown(bio, (int)num);
+
+			if (ptr)
+			{
+				tls->ssl = (SSL*)ptr;
+				ssl_rbio = SSL_get_rbio(tls->ssl);
+				ssl_wbio = SSL_get_wbio(tls->ssl);
+			}
+
+			if (ssl_rbio)
+			{
+				if (next_bio)
+					BIO_push(ssl_rbio, next_bio);
+
+				BIO_set_next(bio, ssl_rbio);
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
+				CRYPTO_add(&(ssl_rbio->references), 1, CRYPTO_LOCK_BIO);
+#else
+				BIO_up_ref(ssl_rbio);
+#endif
+			}
+
+			BIO_set_init(bio, 1);
+			status = 1;
+			break;
+
+		case BIO_C_DO_STATE_MACHINE:
+			BIO_clear_flags(bio, BIO_FLAGS_READ | BIO_FLAGS_WRITE | BIO_FLAGS_IO_SPECIAL);
+			BIO_set_retry_reason(bio, 0);
+			status = SSL_do_handshake(tls->ssl);
+
+			if (status <= 0)
+			{
+				switch (SSL_get_error(tls->ssl, status))
+				{
+					case SSL_ERROR_WANT_READ:
+						BIO_set_flags(bio, BIO_FLAGS_READ | BIO_FLAGS_SHOULD_RETRY);
+						break;
+
+					case SSL_ERROR_WANT_WRITE:
+						BIO_set_flags(bio, BIO_FLAGS_WRITE | BIO_FLAGS_SHOULD_RETRY);
+						break;
+
+					case SSL_ERROR_WANT_CONNECT:
+						BIO_set_flags(bio, BIO_FLAGS_IO_SPECIAL | BIO_FLAGS_SHOULD_RETRY);
+						BIO_set_retry_reason(bio, BIO_get_retry_reason(next_bio));
+						break;
+
+					default:
+						BIO_clear_flags(bio, BIO_FLAGS_SHOULD_RETRY);
+						break;
+				}
+			}
+
+			break;
+
+		default:
+			status = BIO_ctrl(ssl_rbio, cmd, num, ptr);
+			break;
 	}
 
 	return status;
@@ -493,21 +493,21 @@ static long bio_rdp_tls_callback_ctrl(BIO* bio, int cmd, bio_info_cb* fp)
 
 	switch (cmd)
 	{
-	case BIO_CTRL_SET_CALLBACK:
-	{
-		typedef void (*fkt_t)(const SSL*, int, int);
-		/* Documented since https://www.openssl.org/docs/man1.1.1/man3/BIO_set_callback.html
-		 * the argument is not really of type bio_info_cb* and must be cast
-		 * to the required type */
-		fkt_t fkt = (fkt_t)(void*)fp;
-		SSL_set_info_callback(tls->ssl, fkt);
-		status = 1;
-	}
-	break;
-
-	default:
-		status = BIO_callback_ctrl(SSL_get_rbio(tls->ssl), cmd, fp);
+		case BIO_CTRL_SET_CALLBACK:
+		{
+			typedef void (*fkt_t)(const SSL*, int, int);
+			/* Documented since https://www.openssl.org/docs/man1.1.1/man3/BIO_set_callback.html
+			 * the argument is not really of type bio_info_cb* and must be cast
+			 * to the required type */
+			fkt_t fkt = (fkt_t)(void*)fp;
+			SSL_set_info_callback(tls->ssl, fkt);
+			status = 1;
+		}
 		break;
+
+		default:
+			status = BIO_callback_ctrl(SSL_get_rbio(tls->ssl), cmd, fp);
+			break;
 	}
 
 	return status;
@@ -1539,27 +1539,29 @@ int tls_verify_certificate(rdpTls* tls, CryptoCert cert, const char* hostname, U
 			/* Save certificate or do a simple accept / reject */
 			switch (accept_certificate)
 			{
-			case 1:
+				case 1:
 
-				/* user accepted certificate, add entry in known_hosts file */
-				if (match < 0)
-					verification_status =
-					    certificate_data_replace(tls->certificate_store, certificate_data) ? 1 : -1;
-				else
-					verification_status =
-					    certificate_data_print(tls->certificate_store, certificate_data) ? 1 : -1;
+					/* user accepted certificate, add entry in known_hosts file */
+					if (match < 0)
+						verification_status =
+						    certificate_data_replace(tls->certificate_store, certificate_data) ? 1
+						                                                                       : -1;
+					else
+						verification_status =
+						    certificate_data_print(tls->certificate_store, certificate_data) ? 1
+						                                                                     : -1;
 
-				break;
+					break;
 
-			case 2:
-				/* user did accept temporaty, do not add to known hosts file */
-				verification_status = 1;
-				break;
+				case 2:
+					/* user did accept temporaty, do not add to known hosts file */
+					verification_status = 1;
+					break;
 
-			default:
-				/* user did not accept, abort and do not add entry in known_hosts file */
-				verification_status = -1; /* failure! */
-				break;
+				default:
+					/* user did not accept, abort and do not add entry in known_hosts file */
+					verification_status = -1; /* failure! */
+					break;
 			}
 
 			free(issuer);

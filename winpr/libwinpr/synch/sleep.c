@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/windows.h>
@@ -31,14 +31,14 @@
 
 #ifndef _WIN32
 
-#	include <time.h>
+#include <time.h>
 
-#	ifdef HAVE_UNISTD_H
-#		ifndef _XOPEN_SOURCE
-#			define _XOPEN_SOURCE 500
-#		endif
-#		include <unistd.h>
-#	endif
+#ifdef HAVE_UNISTD_H
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 500
+#endif
+#include <unistd.h>
+#endif
 
 VOID Sleep(DWORD dwMilliseconds)
 {

@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -86,11 +86,11 @@ static AudioFormatID audin_mac_get_format(const AUDIO_FORMAT* format)
 {
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		return kAudioFormatLinearPCM;
+		case WAVE_FORMAT_PCM:
+			return kAudioFormatLinearPCM;
 
-	default:
-		return 0;
+		default:
+			return 0;
 	}
 }
 
@@ -98,11 +98,11 @@ static AudioFormatFlags audin_mac_get_flags_for_format(const AUDIO_FORMAT* forma
 {
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		return kAudioFormatFlagIsSignedInteger;
+		case WAVE_FORMAT_PCM:
+			return kAudioFormatFlagIsSignedInteger;
 
-	default:
-		return 0;
+		default:
+			return 0;
 	}
 }
 
@@ -361,9 +361,9 @@ static UINT audin_mac_parse_addin_args(AudinMacDevice* device, ADDIN_ARGV* args)
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_audin_client_subsystem_entry mac_freerdp_audin_client_subsystem_entry
+#define freerdp_audin_client_subsystem_entry mac_freerdp_audin_client_subsystem_entry
 #else
-#	define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
+#define freerdp_audin_client_subsystem_entry FREERDP_API freerdp_audin_client_subsystem_entry
 #endif
 
 UINT freerdp_audin_client_subsystem_entry(PFREERDP_AUDIN_DEVICE_ENTRY_POINTS pEntryPoints)

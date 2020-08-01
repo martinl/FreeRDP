@@ -22,7 +22,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #ifndef __CYGWIN__
-#	include <sys/syscall.h>
+#include <sys/syscall.h>
 #endif
 
 #include <unistd.h>
@@ -34,18 +34,18 @@
 #include <winpr/string.h>
 
 #if __clang__
-#	pragma clang diagnostic push
-#	pragma clang diagnostic ignored "-Wparentheses-equality"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wparentheses-equality"
 #endif /* __clang__ */
 #include <gst/gst.h>
 #if __clang__
-#	pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif /* __clang__ */
 
 #if GST_VERSION_MAJOR > 0
-#	include <gst/video/videooverlay.h>
+#include <gst/video/videooverlay.h>
 #else
-#	include <gst/interfaces/xoverlay.h>
+#include <gst/interfaces/xoverlay.h>
 #endif
 
 #include <X11/Xlib.h>
@@ -59,7 +59,7 @@
 #include "tsmf_decoder.h"
 
 #if !defined(WITH_XEXT)
-#	warning "Building TSMF without shape extension support"
+#warning "Building TSMF without shape extension support"
 #endif
 
 struct X11Handle
@@ -120,11 +120,11 @@ static GstBusSyncReply tsmf_platform_bus_sync_handler(GstBus* bus, GstMessage* m
 		gst_video_overlay_handle_events(hdl->overlay, FALSE);
 #else
 		hdl->overlay = GST_X_OVERLAY(GST_MESSAGE_SRC(message));
-#	if GST_CHECK_VERSION(0, 10, 31)
+#if GST_CHECK_VERSION(0, 10, 31)
 		gst_x_overlay_set_window_handle(hdl->overlay, hdl->subwin);
-#	else
+#else
 		gst_x_overlay_set_xwindow_id(hdl->overlay, hdl->subwin);
-#	endif
+#endif
 		gst_x_overlay_handle_events(hdl->overlay, TRUE);
 #endif
 

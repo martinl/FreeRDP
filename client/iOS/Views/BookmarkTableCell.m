@@ -14,7 +14,8 @@
 
 @synthesize title = _title, subTitle = _sub_title, connectionStateIcon = _connection_state_icon;
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
 	if ((self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]))
 	{
 		// Initialization code
@@ -22,14 +23,16 @@
 	return self;
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated
+{
 
 	[super setSelected:selected animated:animated];
 
 	// Configure the view for the selected state
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[super dealloc];
 }
 

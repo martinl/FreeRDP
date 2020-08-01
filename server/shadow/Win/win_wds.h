@@ -22,13 +22,13 @@
 #define WITH_WDS_API 1
 
 #ifndef CINTERFACE
-#	define CINTERFACE
+#define CINTERFACE
 #endif
 
 #include <rdpencomapi.h>
 
 #ifndef DISPID_RDPAPI_EVENT_ON_BOUNDING_RECT_CHANGED
-#	define DISPID_RDPAPI_EVENT_ON_BOUNDING_RECT_CHANGED 340
+#define DISPID_RDPAPI_EVENT_ON_BOUNDING_RECT_CHANGED 340
 #endif
 
 #include "win_shadow.h"

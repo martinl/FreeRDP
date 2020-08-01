@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "JournaldAppender.h"
@@ -91,33 +91,33 @@ static BOOL WLog_JournaldAppender_WriteMessage(wLog* log, wLogAppender* appender
 
 	switch (message->Level)
 	{
-	case WLOG_TRACE:
-	case WLOG_DEBUG:
-		formatStr = "<7>%s%s\n";
-		break;
+		case WLOG_TRACE:
+		case WLOG_DEBUG:
+			formatStr = "<7>%s%s\n";
+			break;
 
-	case WLOG_INFO:
-		formatStr = "<6>%s%s\n";
-		break;
+		case WLOG_INFO:
+			formatStr = "<6>%s%s\n";
+			break;
 
-	case WLOG_WARN:
-		formatStr = "<4>%s%s\n";
-		break;
+		case WLOG_WARN:
+			formatStr = "<4>%s%s\n";
+			break;
 
-	case WLOG_ERROR:
-		formatStr = "<3>%s%s\n";
-		break;
+		case WLOG_ERROR:
+			formatStr = "<3>%s%s\n";
+			break;
 
-	case WLOG_FATAL:
-		formatStr = "<2>%s%s\n";
-		break;
+		case WLOG_FATAL:
+			formatStr = "<2>%s%s\n";
+			break;
 
-	case WLOG_OFF:
-		return TRUE;
+		case WLOG_OFF:
+			return TRUE;
 
-	default:
-		fprintf(stderr, "%s: unknown level %" PRIu32 "\n", __FUNCTION__, message->Level);
-		return FALSE;
+		default:
+			fprintf(stderr, "%s: unknown level %" PRIu32 "\n", __FUNCTION__, message->Level);
+			return FALSE;
 	}
 
 	message->PrefixString = prefix;

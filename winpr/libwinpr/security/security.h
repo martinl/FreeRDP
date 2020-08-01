@@ -22,9 +22,9 @@
 
 #ifndef _WIN32
 
-#	include <winpr/security.h>
+#include <winpr/security.h>
 
-#	include "../handle/handle.h"
+#include "../handle/handle.h"
 
 struct winpr_access_token
 {

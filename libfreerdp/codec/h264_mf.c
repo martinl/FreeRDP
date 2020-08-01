@@ -85,12 +85,12 @@ static const GUID sCODECAPI_AVDecVideoMaxCodedHeight = {
 };
 
 #ifndef __IMFDXGIDeviceManager_FWD_DEFINED__
-#	define __IMFDXGIDeviceManager_FWD_DEFINED__
+#define __IMFDXGIDeviceManager_FWD_DEFINED__
 typedef interface IMFDXGIDeviceManager IMFDXGIDeviceManager;
 #endif /* __IMFDXGIDeviceManager_FWD_DEFINED__ */
 
 #ifndef __IMFDXGIDeviceManager_INTERFACE_DEFINED__
-#	define __IMFDXGIDeviceManager_INTERFACE_DEFINED__
+#define __IMFDXGIDeviceManager_INTERFACE_DEFINED__
 
 typedef struct IMFDXGIDeviceManagerVtbl
 {

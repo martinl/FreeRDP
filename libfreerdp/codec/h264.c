@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -243,22 +243,24 @@ INT32 avc444_compress(H264_CONTEXT* h264, const BYTE* pSrcData, DWORD SrcFormat,
 
 	switch (version)
 	{
-	case 1:
-		if (prims->RGBToAVC444YUV(pSrcData, SrcFormat, nSrcStep, h264->pYUV444Data, h264->iStride,
-		                          h264->pYUVData, h264->iStride, &roi) != PRIMITIVES_SUCCESS)
+		case 1:
+			if (prims->RGBToAVC444YUV(pSrcData, SrcFormat, nSrcStep, h264->pYUV444Data,
+			                          h264->iStride, h264->pYUVData, h264->iStride,
+			                          &roi) != PRIMITIVES_SUCCESS)
+				return -1;
+
+			break;
+
+		case 2:
+			if (prims->RGBToAVC444YUVv2(pSrcData, SrcFormat, nSrcStep, h264->pYUV444Data,
+			                            h264->iStride, h264->pYUVData, h264->iStride,
+			                            &roi) != PRIMITIVES_SUCCESS)
+				return -1;
+
+			break;
+
+		default:
 			return -1;
-
-		break;
-
-	case 2:
-		if (prims->RGBToAVC444YUVv2(pSrcData, SrcFormat, nSrcStep, h264->pYUV444Data, h264->iStride,
-		                            h264->pYUVData, h264->iStride, &roi) != PRIMITIVES_SUCCESS)
-			return -1;
-
-		break;
-
-	default:
-		return -1;
 	}
 
 	{
@@ -414,60 +416,62 @@ INT32 avc444_decompress(H264_CONTEXT* h264, BYTE op, RECTANGLE_16* regionRects,
 
 	switch (op)
 	{
-	case 0: /* YUV420 in stream 1
-	         * Chroma420 in stream 2 */
-		if (!avc444_process_rects(h264, pSrcData, SrcSize, pDstData, DstFormat, nDstStep, nDstWidth,
-		                          nDstHeight, regionRects, numRegionRects, AVC444_LUMA))
-			status = -1;
-		else if (!avc444_process_rects(h264, pAuxSrcData, AuxSrcSize, pDstData, DstFormat, nDstStep,
-		                               nDstWidth, nDstHeight, auxRegionRects, numAuxRegionRect,
-		                               chroma))
-			status = -1;
-		else
-			status = 0;
+		case 0: /* YUV420 in stream 1
+		         * Chroma420 in stream 2 */
+			if (!avc444_process_rects(h264, pSrcData, SrcSize, pDstData, DstFormat, nDstStep,
+			                          nDstWidth, nDstHeight, regionRects, numRegionRects,
+			                          AVC444_LUMA))
+				status = -1;
+			else if (!avc444_process_rects(h264, pAuxSrcData, AuxSrcSize, pDstData, DstFormat,
+			                               nDstStep, nDstWidth, nDstHeight, auxRegionRects,
+			                               numAuxRegionRect, chroma))
+				status = -1;
+			else
+				status = 0;
 
-		break;
+			break;
 
-	case 2: /* Chroma420 in stream 1 */
-		if (!avc444_process_rects(h264, pSrcData, SrcSize, pDstData, DstFormat, nDstStep, nDstWidth,
-		                          nDstHeight, regionRects, numRegionRects, chroma))
-			status = -1;
-		else
-			status = 0;
+		case 2: /* Chroma420 in stream 1 */
+			if (!avc444_process_rects(h264, pSrcData, SrcSize, pDstData, DstFormat, nDstStep,
+			                          nDstWidth, nDstHeight, regionRects, numRegionRects, chroma))
+				status = -1;
+			else
+				status = 0;
 
-		break;
+			break;
 
-	case 1: /* YUV420 in stream 1 */
-		if (!avc444_process_rects(h264, pSrcData, SrcSize, pDstData, DstFormat, nDstStep, nDstWidth,
-		                          nDstHeight, regionRects, numRegionRects, AVC444_LUMA))
-			status = -1;
-		else
-			status = 0;
+		case 1: /* YUV420 in stream 1 */
+			if (!avc444_process_rects(h264, pSrcData, SrcSize, pDstData, DstFormat, nDstStep,
+			                          nDstWidth, nDstHeight, regionRects, numRegionRects,
+			                          AVC444_LUMA))
+				status = -1;
+			else
+				status = 0;
 
-		break;
+			break;
 
-	default: /* WTF? */
-		break;
+		default: /* WTF? */
+			break;
 	}
 
 #if defined(AVC444_FRAME_STAT)
 
 	switch (op)
 	{
-	case 0:
-		op1sum = avg(&op1, op1sum, SrcSize + AuxSrcSize);
-		break;
+		case 0:
+			op1sum = avg(&op1, op1sum, SrcSize + AuxSrcSize);
+			break;
 
-	case 1:
-		op2sum = avg(&op2, op2sum, SrcSize);
-		break;
+		case 1:
+			op2sum = avg(&op2, op2sum, SrcSize);
+			break;
 
-	case 2:
-		op3sum = avg(&op3, op3sum, SrcSize);
-		break;
+		case 2:
+			op3sum = avg(&op3, op3sum, SrcSize);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	WLog_Print(h264->log, WLOG_INFO,

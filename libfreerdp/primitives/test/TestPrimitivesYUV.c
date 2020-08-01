@@ -1,6 +1,6 @@
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <math.h>
@@ -700,18 +700,18 @@ static BOOL TestPrimitiveRgbToLumaChroma(primitives_t* prims, prim_size_t roi, U
 
 	switch (version)
 	{
-	case 1:
-		fkt = prims->RGBToAVC444YUV;
-		gen = generic->RGBToAVC444YUV;
-		break;
+		case 1:
+			fkt = prims->RGBToAVC444YUV;
+			gen = generic->RGBToAVC444YUV;
+			break;
 
-	case 2:
-		fkt = prims->RGBToAVC444YUVv2;
-		gen = generic->RGBToAVC444YUVv2;
-		break;
+		case 2:
+			fkt = prims->RGBToAVC444YUVv2;
+			gen = generic->RGBToAVC444YUVv2;
+			break;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	if (!fkt || !gen)

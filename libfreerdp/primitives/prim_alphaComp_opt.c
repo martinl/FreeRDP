@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/types.h>
@@ -29,12 +29,12 @@
 #include <winpr/sysinfo.h>
 
 #ifdef WITH_SSE2
-#	include <emmintrin.h>
-#	include <pmmintrin.h>
+#include <emmintrin.h>
+#include <pmmintrin.h>
 #endif /* WITH_SSE2 */
 
 #ifdef WITH_IPP
-#	include <ippi.h>
+#include <ippi.h>
 #endif /* WITH_IPP */
 
 #include "prim_internal.h"
@@ -43,7 +43,7 @@ static primitives_t* generic = NULL;
 
 /* ------------------------------------------------------------------------- */
 #ifdef WITH_SSE2
-#	if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
+#if !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS)
 
 pstatus_t sse2_alphaComp_argb(const BYTE* pSrc1, UINT32 src1Step, const BYTE* pSrc2,
                               UINT32 src2Step, BYTE* pDst, UINT32 dstStep, UINT32 width,
@@ -82,28 +82,28 @@ pstatus_t sse2_alphaComp_argb(const BYTE* pSrc1, UINT32 src1Step, const BYTE* pS
 
 		switch ((ULONG_PTR)dptr & 0x0f)
 		{
-		case 0:
-			leadIn = 0;
-			break;
+			case 0:
+				leadIn = 0;
+				break;
 
-		case 4:
-			leadIn = 3;
-			break;
+			case 4:
+				leadIn = 3;
+				break;
 
-		case 8:
-			leadIn = 2;
-			break;
+			case 8:
+				leadIn = 2;
+				break;
 
-		case 12:
-			leadIn = 1;
-			break;
+			case 12:
+				leadIn = 1;
+				break;
 
-		default:
-			/* We'll never hit a 16-byte boundary, so do the whole
-			 * thing the slow way.
-			 */
-			leadIn = width;
-			break;
+			default:
+				/* We'll never hit a 16-byte boundary, so do the whole
+				 * thing the slow way.
+				 */
+				leadIn = width;
+				break;
 		}
 
 		if (leadIn)
@@ -205,7 +205,7 @@ pstatus_t sse2_alphaComp_argb(const BYTE* pSrc1, UINT32 src1Step, const BYTE* pS
 
 	return PRIMITIVES_SUCCESS;
 }
-#	endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
+#endif /* !defined(WITH_IPP) || defined(ALL_PRIMITIVES_VERSIONS) */
 #endif
 
 #ifdef WITH_IPP

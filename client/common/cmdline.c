@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <ctype.h>
@@ -1829,16 +1829,16 @@ int freerdp_client_settings_parse_command_line_arguments(rdpSettings* settings, 
 
 			switch (settings->ColorDepth)
 			{
-			case 32:
-			case 24:
-			case 16:
-			case 15:
-			case 8:
-				settings->ColorDepth = (UINT32)val;
-				break;
+				case 32:
+				case 24:
+				case 16:
+				case 15:
+				case 8:
+					settings->ColorDepth = (UINT32)val;
+					break;
 
-			default:
-				return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+				default:
+					return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
 			}
 		}
 		CommandLineSwitchCase(arg, "admin")
@@ -2232,21 +2232,21 @@ int freerdp_client_settings_parse_command_line_arguments(rdpSettings* settings, 
 
 			switch (val)
 			{
-			case AUDIO_MODE_REDIRECT:
-				settings->AudioPlayback = TRUE;
-				break;
+				case AUDIO_MODE_REDIRECT:
+					settings->AudioPlayback = TRUE;
+					break;
 
-			case AUDIO_MODE_PLAY_ON_SERVER:
-				settings->RemoteConsoleAudio = TRUE;
-				break;
+				case AUDIO_MODE_PLAY_ON_SERVER:
+					settings->RemoteConsoleAudio = TRUE;
+					break;
 
-			case AUDIO_MODE_NONE:
-				settings->AudioPlayback = FALSE;
-				settings->RemoteConsoleAudio = FALSE;
-				break;
+				case AUDIO_MODE_NONE:
+					settings->AudioPlayback = FALSE;
+					settings->RemoteConsoleAudio = FALSE;
+					break;
 
-			default:
-				return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+				default:
+					return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
 			}
 		}
 		CommandLineSwitchCase(arg, "network")
@@ -2876,14 +2876,14 @@ int freerdp_client_settings_parse_command_line_arguments(rdpSettings* settings, 
 
 			switch (val)
 			{
-			case 100:
-			case 140:
-			case 180:
-				settings->DeviceScaleFactor = (UINT32)val;
-				break;
+				case 100:
+				case 140:
+				case 180:
+					settings->DeviceScaleFactor = (UINT32)val;
+					break;
 
-			default:
-				return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+				default:
+					return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
 			}
 		}
 		CommandLineSwitchCase(arg, "scale-desktop")
@@ -2904,14 +2904,14 @@ int freerdp_client_settings_parse_command_line_arguments(rdpSettings* settings, 
 
 			switch (val)
 			{
-			case 100:
-			case 140:
-			case 180:
-				settings->DeviceScaleFactor = (UINT32)val;
-				break;
+				case 100:
+				case 140:
+				case 180:
+					settings->DeviceScaleFactor = (UINT32)val;
+					break;
 
-			default:
-				return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
+				default:
+					return COMMAND_LINE_ERROR_UNEXPECTED_VALUE;
 			}
 		}
 		CommandLineSwitchCase(arg, "action-script")

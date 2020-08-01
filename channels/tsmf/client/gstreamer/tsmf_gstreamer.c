@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -34,12 +34,12 @@
 #include <winpr/string.h>
 
 #if __clang__
-#	pragma clang diagnostic push
-#	pragma clang diagnostic ignored "-Wparentheses-equality"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wparentheses-equality"
 #endif /* __clang__ */
 #include <gst/gst.h>
 #if __clang__
-#	pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif /* __clang__ */
 
 #include <gst/app/gstappsrc.h>
@@ -50,7 +50,7 @@
 #include "tsmf_platform.h"
 
 #ifdef HAVE_INTTYPES_H
-#	include <inttypes.h>
+#include <inttypes.h>
 #endif
 
 /* 1 second = 10,000,000 100ns units*/
@@ -69,14 +69,14 @@ const char* get_type(TSMFGstreamerDecoder* mdecoder)
 
 	switch (mdecoder->media_type)
 	{
-	case TSMF_MAJOR_TYPE_VIDEO:
-		return "VIDEO";
+		case TSMF_MAJOR_TYPE_VIDEO:
+			return "VIDEO";
 
-	case TSMF_MAJOR_TYPE_AUDIO:
-		return "AUDIO";
+		case TSMF_MAJOR_TYPE_AUDIO:
+			return "AUDIO";
 
-	default:
-		return "UNKNOWN";
+		default:
+			return "UNKNOWN";
 	}
 }
 
@@ -249,245 +249,246 @@ static BOOL tsmf_gstreamer_set_format(ITSMFDecoder* decoder, TS_AM_MEDIA_TYPE* m
 
 	switch (media_type->MajorType)
 	{
-	case TSMF_MAJOR_TYPE_VIDEO:
-		mdecoder->media_type = TSMF_MAJOR_TYPE_VIDEO;
-		break;
+		case TSMF_MAJOR_TYPE_VIDEO:
+			mdecoder->media_type = TSMF_MAJOR_TYPE_VIDEO;
+			break;
 
-	case TSMF_MAJOR_TYPE_AUDIO:
-		mdecoder->media_type = TSMF_MAJOR_TYPE_AUDIO;
-		break;
+		case TSMF_MAJOR_TYPE_AUDIO:
+			mdecoder->media_type = TSMF_MAJOR_TYPE_AUDIO;
+			break;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 
 	switch (media_type->SubType)
 	{
-	case TSMF_SUB_TYPE_WVC1:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "video/x-wmv", "bitrate", G_TYPE_UINT, media_type->BitRate, "width", G_TYPE_INT,
-		    media_type->Width, "height", G_TYPE_INT, media_type->Height, "wmvversion", G_TYPE_INT,
-		    3,
+		case TSMF_SUB_TYPE_WVC1:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "video/x-wmv", "bitrate", G_TYPE_UINT, media_type->BitRate, "width", G_TYPE_INT,
+			    media_type->Width, "height", G_TYPE_INT, media_type->Height, "wmvversion",
+			    G_TYPE_INT, 3,
 #if GST_VERSION_MAJOR > 0
-		    "format", G_TYPE_STRING, "WVC1",
+			    "format", G_TYPE_STRING, "WVC1",
 #else
-		    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('W', 'V', 'C', '1'),
+			    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('W', 'V', 'C', '1'),
 #endif
-		    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
-		    media_type->SamplesPerSecond.Denominator, "pixel-aspect-ratio", GST_TYPE_FRACTION, 1, 1,
-		    NULL);
-		break;
+			    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
+			    media_type->SamplesPerSecond.Denominator, "pixel-aspect-ratio", GST_TYPE_FRACTION,
+			    1, 1, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_MP4S:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "video/x-divx", "divxversion", G_TYPE_INT, 5, "bitrate", G_TYPE_UINT,
-		    media_type->BitRate, "width", G_TYPE_INT, media_type->Width, "height", G_TYPE_INT,
-		    media_type->Height,
+		case TSMF_SUB_TYPE_MP4S:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "video/x-divx", "divxversion", G_TYPE_INT, 5, "bitrate", G_TYPE_UINT,
+			    media_type->BitRate, "width", G_TYPE_INT, media_type->Width, "height", G_TYPE_INT,
+			    media_type->Height,
 #if GST_VERSION_MAJOR > 0
-		    "format", G_TYPE_STRING, "MP42",
+			    "format", G_TYPE_STRING, "MP42",
 #else
-		    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('M', 'P', '4', '2'),
+			    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('M', 'P', '4', '2'),
 #endif
-		    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
-		    media_type->SamplesPerSecond.Denominator, NULL);
-		break;
+			    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
+			    media_type->SamplesPerSecond.Denominator, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_MP42:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "video/x-msmpeg", "msmpegversion", G_TYPE_INT, 42, "bitrate", G_TYPE_UINT,
-		    media_type->BitRate, "width", G_TYPE_INT, media_type->Width, "height", G_TYPE_INT,
-		    media_type->Height,
+		case TSMF_SUB_TYPE_MP42:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "video/x-msmpeg", "msmpegversion", G_TYPE_INT, 42, "bitrate", G_TYPE_UINT,
+			    media_type->BitRate, "width", G_TYPE_INT, media_type->Width, "height", G_TYPE_INT,
+			    media_type->Height,
 #if GST_VERSION_MAJOR > 0
-		    "format", G_TYPE_STRING, "MP42",
+			    "format", G_TYPE_STRING, "MP42",
 #else
-		    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('M', 'P', '4', '2'),
+			    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('M', 'P', '4', '2'),
 #endif
-		    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
-		    media_type->SamplesPerSecond.Denominator, NULL);
-		break;
+			    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
+			    media_type->SamplesPerSecond.Denominator, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_MP43:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "video/x-msmpeg", "msmpegversion", G_TYPE_INT, 43, "bitrate", G_TYPE_UINT,
-		    media_type->BitRate, "width", G_TYPE_INT, media_type->Width, "height", G_TYPE_INT,
-		    media_type->Height,
+		case TSMF_SUB_TYPE_MP43:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "video/x-msmpeg", "msmpegversion", G_TYPE_INT, 43, "bitrate", G_TYPE_UINT,
+			    media_type->BitRate, "width", G_TYPE_INT, media_type->Width, "height", G_TYPE_INT,
+			    media_type->Height,
 #if GST_VERSION_MAJOR > 0
-		    "format", G_TYPE_STRING, "MP43",
+			    "format", G_TYPE_STRING, "MP43",
 #else
-		    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('M', 'P', '4', '3'),
+			    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('M', 'P', '4', '3'),
 #endif
-		    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
-		    media_type->SamplesPerSecond.Denominator, NULL);
-		break;
+			    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
+			    media_type->SamplesPerSecond.Denominator, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_M4S2:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "video/mpeg", "mpegversion", G_TYPE_INT, 4, "width", G_TYPE_INT, media_type->Width,
-		    "height", G_TYPE_INT, media_type->Height,
+		case TSMF_SUB_TYPE_M4S2:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "video/mpeg", "mpegversion", G_TYPE_INT, 4, "width", G_TYPE_INT, media_type->Width,
+			    "height", G_TYPE_INT, media_type->Height,
 #if GST_VERSION_MAJOR > 0
-		    "format", G_TYPE_STRING, "M4S2",
+			    "format", G_TYPE_STRING, "M4S2",
 #else
-		    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('M', '4', 'S', '2'),
+			    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('M', '4', 'S', '2'),
 #endif
-		    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
-		    media_type->SamplesPerSecond.Denominator, NULL);
-		break;
+			    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
+			    media_type->SamplesPerSecond.Denominator, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_WMA9:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "audio/x-wma", "wmaversion", G_TYPE_INT, 3, "rate", G_TYPE_INT,
-		    media_type->SamplesPerSecond.Numerator, "channels", G_TYPE_INT, media_type->Channels,
-		    "bitrate", G_TYPE_INT, media_type->BitRate, "depth", G_TYPE_INT,
-		    media_type->BitsPerSample, "width", G_TYPE_INT, media_type->BitsPerSample,
-		    "block_align", G_TYPE_INT, media_type->BlockAlign, NULL);
-		break;
+		case TSMF_SUB_TYPE_WMA9:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "audio/x-wma", "wmaversion", G_TYPE_INT, 3, "rate", G_TYPE_INT,
+			    media_type->SamplesPerSecond.Numerator, "channels", G_TYPE_INT,
+			    media_type->Channels, "bitrate", G_TYPE_INT, media_type->BitRate, "depth",
+			    G_TYPE_INT, media_type->BitsPerSample, "width", G_TYPE_INT,
+			    media_type->BitsPerSample, "block_align", G_TYPE_INT, media_type->BlockAlign, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_WMA1:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "audio/x-wma", "wmaversion", G_TYPE_INT, 1, "rate", G_TYPE_INT,
-		    media_type->SamplesPerSecond.Numerator, "channels", G_TYPE_INT, media_type->Channels,
-		    "bitrate", G_TYPE_INT, media_type->BitRate, "depth", G_TYPE_INT,
-		    media_type->BitsPerSample, "width", G_TYPE_INT, media_type->BitsPerSample,
-		    "block_align", G_TYPE_INT, media_type->BlockAlign, NULL);
-		break;
+		case TSMF_SUB_TYPE_WMA1:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "audio/x-wma", "wmaversion", G_TYPE_INT, 1, "rate", G_TYPE_INT,
+			    media_type->SamplesPerSecond.Numerator, "channels", G_TYPE_INT,
+			    media_type->Channels, "bitrate", G_TYPE_INT, media_type->BitRate, "depth",
+			    G_TYPE_INT, media_type->BitsPerSample, "width", G_TYPE_INT,
+			    media_type->BitsPerSample, "block_align", G_TYPE_INT, media_type->BlockAlign, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_WMA2:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "audio/x-wma", "wmaversion", G_TYPE_INT, 2, "rate", G_TYPE_INT,
-		    media_type->SamplesPerSecond.Numerator, "channels", G_TYPE_INT, media_type->Channels,
-		    "bitrate", G_TYPE_INT, media_type->BitRate, "depth", G_TYPE_INT,
-		    media_type->BitsPerSample, "width", G_TYPE_INT, media_type->BitsPerSample,
-		    "block_align", G_TYPE_INT, media_type->BlockAlign, NULL);
-		break;
+		case TSMF_SUB_TYPE_WMA2:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "audio/x-wma", "wmaversion", G_TYPE_INT, 2, "rate", G_TYPE_INT,
+			    media_type->SamplesPerSecond.Numerator, "channels", G_TYPE_INT,
+			    media_type->Channels, "bitrate", G_TYPE_INT, media_type->BitRate, "depth",
+			    G_TYPE_INT, media_type->BitsPerSample, "width", G_TYPE_INT,
+			    media_type->BitsPerSample, "block_align", G_TYPE_INT, media_type->BlockAlign, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_MP3:
-		mdecoder->gst_caps =
-		    gst_caps_new_simple("audio/mpeg", "mpegversion", G_TYPE_INT, 1, "layer", G_TYPE_INT, 3,
-		                        "rate", G_TYPE_INT, media_type->SamplesPerSecond.Numerator,
-		                        "channels", G_TYPE_INT, media_type->Channels, NULL);
-		break;
+		case TSMF_SUB_TYPE_MP3:
+			mdecoder->gst_caps =
+			    gst_caps_new_simple("audio/mpeg", "mpegversion", G_TYPE_INT, 1, "layer", G_TYPE_INT,
+			                        3, "rate", G_TYPE_INT, media_type->SamplesPerSecond.Numerator,
+			                        "channels", G_TYPE_INT, media_type->Channels, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_WMV1:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "video/x-wmv", "bitrate", G_TYPE_UINT, media_type->BitRate, "width", G_TYPE_INT,
-		    media_type->Width, "height", G_TYPE_INT, media_type->Height, "wmvversion", G_TYPE_INT,
-		    1,
+		case TSMF_SUB_TYPE_WMV1:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "video/x-wmv", "bitrate", G_TYPE_UINT, media_type->BitRate, "width", G_TYPE_INT,
+			    media_type->Width, "height", G_TYPE_INT, media_type->Height, "wmvversion",
+			    G_TYPE_INT, 1,
 #if GST_VERSION_MAJOR > 0
-		    "format", G_TYPE_STRING, "WMV1",
+			    "format", G_TYPE_STRING, "WMV1",
 #else
-		    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('W', 'M', 'V', '1'),
+			    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('W', 'M', 'V', '1'),
 #endif
-		    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
-		    media_type->SamplesPerSecond.Denominator, NULL);
-		break;
+			    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
+			    media_type->SamplesPerSecond.Denominator, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_WMV2:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "video/x-wmv", "width", G_TYPE_INT, media_type->Width, "height", G_TYPE_INT,
-		    media_type->Height, "wmvversion", G_TYPE_INT, 2,
+		case TSMF_SUB_TYPE_WMV2:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "video/x-wmv", "width", G_TYPE_INT, media_type->Width, "height", G_TYPE_INT,
+			    media_type->Height, "wmvversion", G_TYPE_INT, 2,
 #if GST_VERSION_MAJOR > 0
-		    "format", G_TYPE_STRING, "WMV2",
+			    "format", G_TYPE_STRING, "WMV2",
 #else
-		    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('W', 'M', 'V', '2'),
+			    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('W', 'M', 'V', '2'),
 #endif
-		    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
-		    media_type->SamplesPerSecond.Denominator, "pixel-aspect-ratio", GST_TYPE_FRACTION, 1, 1,
-		    NULL);
-		break;
+			    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
+			    media_type->SamplesPerSecond.Denominator, "pixel-aspect-ratio", GST_TYPE_FRACTION,
+			    1, 1, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_WMV3:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "video/x-wmv", "bitrate", G_TYPE_UINT, media_type->BitRate, "width", G_TYPE_INT,
-		    media_type->Width, "height", G_TYPE_INT, media_type->Height, "wmvversion", G_TYPE_INT,
-		    3,
+		case TSMF_SUB_TYPE_WMV3:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "video/x-wmv", "bitrate", G_TYPE_UINT, media_type->BitRate, "width", G_TYPE_INT,
+			    media_type->Width, "height", G_TYPE_INT, media_type->Height, "wmvversion",
+			    G_TYPE_INT, 3,
 #if GST_VERSION_MAJOR > 0
-		    "format", G_TYPE_STRING, "WMV3",
+			    "format", G_TYPE_STRING, "WMV3",
 #else
-		    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('W', 'M', 'V', '3'),
+			    "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC('W', 'M', 'V', '3'),
 #endif
-		    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
-		    media_type->SamplesPerSecond.Denominator, "pixel-aspect-ratio", GST_TYPE_FRACTION, 1, 1,
-		    NULL);
-		break;
+			    "framerate", GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
+			    media_type->SamplesPerSecond.Denominator, "pixel-aspect-ratio", GST_TYPE_FRACTION,
+			    1, 1, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_AVC1:
-	case TSMF_SUB_TYPE_H264:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "video/x-h264", "width", G_TYPE_INT, media_type->Width, "height", G_TYPE_INT,
-		    media_type->Height, "framerate", GST_TYPE_FRACTION,
-		    media_type->SamplesPerSecond.Numerator, media_type->SamplesPerSecond.Denominator,
-		    "pixel-aspect-ratio", GST_TYPE_FRACTION, 1, 1, "stream-format", G_TYPE_STRING,
-		    "byte-stream", "alignment", G_TYPE_STRING, "nal", NULL);
-		break;
+		case TSMF_SUB_TYPE_AVC1:
+		case TSMF_SUB_TYPE_H264:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "video/x-h264", "width", G_TYPE_INT, media_type->Width, "height", G_TYPE_INT,
+			    media_type->Height, "framerate", GST_TYPE_FRACTION,
+			    media_type->SamplesPerSecond.Numerator, media_type->SamplesPerSecond.Denominator,
+			    "pixel-aspect-ratio", GST_TYPE_FRACTION, 1, 1, "stream-format", G_TYPE_STRING,
+			    "byte-stream", "alignment", G_TYPE_STRING, "nal", NULL);
+			break;
 
-	case TSMF_SUB_TYPE_AC3:
-		mdecoder->gst_caps = gst_caps_new_simple("audio/x-ac3", "rate", G_TYPE_INT,
-		                                         media_type->SamplesPerSecond.Numerator, "channels",
-		                                         G_TYPE_INT, media_type->Channels, NULL);
-		break;
+		case TSMF_SUB_TYPE_AC3:
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "audio/x-ac3", "rate", G_TYPE_INT, media_type->SamplesPerSecond.Numerator,
+			    "channels", G_TYPE_INT, media_type->Channels, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_AAC:
+		case TSMF_SUB_TYPE_AAC:
 
-		/* For AAC the pFormat is a HEAACWAVEINFO struct, and the codec data
-		   is at the end of it. See
-		   http://msdn.microsoft.com/en-us/library/dd757806.aspx */
-		if (media_type->ExtraData)
-		{
-			media_type->ExtraData += 12;
-			media_type->ExtraDataSize -= 12;
-		}
+			/* For AAC the pFormat is a HEAACWAVEINFO struct, and the codec data
+			   is at the end of it. See
+			   http://msdn.microsoft.com/en-us/library/dd757806.aspx */
+			if (media_type->ExtraData)
+			{
+				media_type->ExtraData += 12;
+				media_type->ExtraDataSize -= 12;
+			}
 
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "audio/mpeg", "rate", G_TYPE_INT, media_type->SamplesPerSecond.Numerator, "channels",
-		    G_TYPE_INT, media_type->Channels, "mpegversion", G_TYPE_INT, 4, "framed",
-		    G_TYPE_BOOLEAN, TRUE, "stream-format", G_TYPE_STRING, "raw", NULL);
-		break;
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "audio/mpeg", "rate", G_TYPE_INT, media_type->SamplesPerSecond.Numerator,
+			    "channels", G_TYPE_INT, media_type->Channels, "mpegversion", G_TYPE_INT, 4,
+			    "framed", G_TYPE_BOOLEAN, TRUE, "stream-format", G_TYPE_STRING, "raw", NULL);
+			break;
 
-	case TSMF_SUB_TYPE_MP1A:
-		mdecoder->gst_caps =
-		    gst_caps_new_simple("audio/mpeg", "mpegversion", G_TYPE_INT, 1, "channels", G_TYPE_INT,
-		                        media_type->Channels, NULL);
-		break;
+		case TSMF_SUB_TYPE_MP1A:
+			mdecoder->gst_caps =
+			    gst_caps_new_simple("audio/mpeg", "mpegversion", G_TYPE_INT, 1, "channels",
+			                        G_TYPE_INT, media_type->Channels, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_MP1V:
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "video/mpeg", "mpegversion", G_TYPE_INT, 1, "width", G_TYPE_INT, media_type->Width,
-		    "height", G_TYPE_INT, media_type->Height, "systemstream", G_TYPE_BOOLEAN, FALSE, NULL);
-		break;
+		case TSMF_SUB_TYPE_MP1V:
+			mdecoder->gst_caps =
+			    gst_caps_new_simple("video/mpeg", "mpegversion", G_TYPE_INT, 1, "width", G_TYPE_INT,
+			                        media_type->Width, "height", G_TYPE_INT, media_type->Height,
+			                        "systemstream", G_TYPE_BOOLEAN, FALSE, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_YUY2:
+		case TSMF_SUB_TYPE_YUY2:
 #if GST_VERSION_MAJOR > 0
-		mdecoder->gst_caps =
-		    gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "YUY2", "width", G_TYPE_INT,
-		                        media_type->Width, "height", G_TYPE_INT, media_type->Height, NULL);
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "video/x-raw", "format", G_TYPE_STRING, "YUY2", "width", G_TYPE_INT,
+			    media_type->Width, "height", G_TYPE_INT, media_type->Height, NULL);
 #else
-		mdecoder->gst_caps = gst_caps_new_simple(
-		    "video/x-raw-yuv", "format", G_TYPE_STRING, "YUY2", "width", G_TYPE_INT,
-		    media_type->Width, "height", G_TYPE_INT, media_type->Height, "framerate",
-		    GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
-		    media_type->SamplesPerSecond.Denominator, NULL);
+			mdecoder->gst_caps = gst_caps_new_simple(
+			    "video/x-raw-yuv", "format", G_TYPE_STRING, "YUY2", "width", G_TYPE_INT,
+			    media_type->Width, "height", G_TYPE_INT, media_type->Height, "framerate",
+			    GST_TYPE_FRACTION, media_type->SamplesPerSecond.Numerator,
+			    media_type->SamplesPerSecond.Denominator, NULL);
 #endif
-		break;
+			break;
 
-	case TSMF_SUB_TYPE_MP2V:
-		mdecoder->gst_caps = gst_caps_new_simple("video/mpeg", "mpegversion", G_TYPE_INT, 2,
-		                                         "systemstream", G_TYPE_BOOLEAN, FALSE, NULL);
-		break;
+		case TSMF_SUB_TYPE_MP2V:
+			mdecoder->gst_caps = gst_caps_new_simple("video/mpeg", "mpegversion", G_TYPE_INT, 2,
+			                                         "systemstream", G_TYPE_BOOLEAN, FALSE, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_MP2A:
-		mdecoder->gst_caps =
-		    gst_caps_new_simple("audio/mpeg", "mpegversion", G_TYPE_INT, 1, "rate", G_TYPE_INT,
-		                        media_type->SamplesPerSecond.Numerator, "channels", G_TYPE_INT,
-		                        media_type->Channels, NULL);
-		break;
+		case TSMF_SUB_TYPE_MP2A:
+			mdecoder->gst_caps =
+			    gst_caps_new_simple("audio/mpeg", "mpegversion", G_TYPE_INT, 1, "rate", G_TYPE_INT,
+			                        media_type->SamplesPerSecond.Numerator, "channels", G_TYPE_INT,
+			                        media_type->Channels, NULL);
+			break;
 
-	case TSMF_SUB_TYPE_FLAC:
-		mdecoder->gst_caps = gst_caps_new_simple("audio/x-flac", "", NULL);
-		break;
+		case TSMF_SUB_TYPE_FLAC:
+			mdecoder->gst_caps = gst_caps_new_simple("audio/x-flac", "", NULL);
+			break;
 
-	default:
-		WLog_ERR(TAG, "unknown format:(%d).", media_type->SubType);
-		return FALSE;
+		default:
+			WLog_ERR(TAG, "unknown format:(%d).", media_type->SubType);
+			return FALSE;
 	}
 
 	if (media_type->ExtraDataSize > 0)
@@ -1033,11 +1034,9 @@ BOOL tsmf_gstreamer_sync(ITSMFDecoder* decoder, void (*cb)(void*), void* stream)
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define freerdp_tsmf_client_subsystem_entry \
-		gstreamer_freerdp_tsmf_client_decoder_subsystem_entry
+#define freerdp_tsmf_client_subsystem_entry gstreamer_freerdp_tsmf_client_decoder_subsystem_entry
 #else
-#	define freerdp_tsmf_client_subsystem_entry \
-		FREERDP_API freerdp_tsmf_client_decoder_subsystem_entry
+#define freerdp_tsmf_client_subsystem_entry FREERDP_API freerdp_tsmf_client_decoder_subsystem_entry
 #endif
 
 ITSMFDecoder* freerdp_tsmf_client_subsystem_entry(void)

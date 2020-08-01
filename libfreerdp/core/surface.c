@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/utils/pcap.h>
@@ -146,22 +146,22 @@ int update_recv_surfcmds(rdpUpdate* update, wStream* s)
 
 		switch (cmdType)
 		{
-		case CMDTYPE_SET_SURFACE_BITS:
-		case CMDTYPE_STREAM_SURFACE_BITS:
-			if (!update_recv_surfcmd_surface_bits(update, s))
+			case CMDTYPE_SET_SURFACE_BITS:
+			case CMDTYPE_STREAM_SURFACE_BITS:
+				if (!update_recv_surfcmd_surface_bits(update, s))
+					return -1;
+
+				break;
+
+			case CMDTYPE_FRAME_MARKER:
+				if (!update_recv_surfcmd_frame_marker(update, s))
+					return -1;
+
+				break;
+
+			default:
+				WLog_ERR(TAG, "unknown cmdType 0x%04" PRIX16 "", cmdType);
 				return -1;
-
-			break;
-
-		case CMDTYPE_FRAME_MARKER:
-			if (!update_recv_surfcmd_frame_marker(update, s))
-				return -1;
-
-			break;
-
-		default:
-			WLog_ERR(TAG, "unknown cmdType 0x%04" PRIX16 "", cmdType);
-			return -1;
 		}
 
 		if (update->dump_rfx)

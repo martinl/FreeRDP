@@ -16,7 +16,8 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil
                bundle:(NSBundle *)nibBundleOrNil
               session:(RDPSession *)session
-               params:(NSMutableDictionary *)params {
+               params:(NSMutableDictionary *)params
+{
 	self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
 	if (self)
 	{
@@ -27,7 +28,8 @@
 	return self;
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
 	[super viewDidLoad];
 
 	NSString *message = NSLocalizedString(
@@ -44,32 +46,37 @@
 	[_label_issuer setText:[_params valueForKey:@"issuer"]];
 }
 
-- (void)viewDidUnload {
+- (void)viewDidUnload
+{
 	[super viewDidUnload];
 	// Release any retained subviews of the main view.
 }
 
-- (void)viewDidDisappear:(BOOL)animated {
+- (void)viewDidDisappear:(BOOL)animated
+{
 	[super viewDidDisappear:animated];
 
 	// set signal
 	[[_session uiRequestCompleted] signal];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
 	return YES;
 }
 
 #pragma mark - Action handlers
 
-- (IBAction)acceptPressed:(id)sender {
+- (IBAction)acceptPressed:(id)sender
+{
 	[_params setValue:[NSNumber numberWithBool:YES] forKey:@"result"];
 
 	// dismiss controller
 	[self dismissModalViewControllerAnimated:YES];
 }
 
-- (IBAction)declinePressed:(id)sender {
+- (IBAction)declinePressed:(id)sender
+{
 	[_params setValue:[NSNumber numberWithBool:NO] forKey:@"result"];
 
 	// dismiss controller

@@ -39,7 +39,8 @@ NSString *TSXSessionDidFailToConnectNotification = @"TSXSessionDidFailToConnect"
 @synthesize delegate = _delegate, params = _params, toolbarVisible = _toolbar_visible,
             uiRequestCompleted = _ui_request_completed, bookmark = _bookmark;
 
-+ (void)initialize {
++ (void)initialize
+{
 	ios_init_freerdp();
 }
 
@@ -77,7 +78,8 @@ static void freeArguments(int argc, char **argv)
 }
 
 // Designated initializer.
-- (id)initWithBookmark:(ComputerBookmark *)bookmark {
+- (id)initWithBookmark:(ComputerBookmark *)bookmark
+{
 	int status;
 	char **argv = NULL;
 	int argc = 0;
@@ -213,26 +215,26 @@ static void freeArguments(int argc, char **argv)
 	// security
 	switch ([_params intForKey:@"security"])
 	{
-	case TSXProtocolSecurityNLA:
-		if (!addArgument(&argc, &argv, "/sec:NLA"))
-			goto out_free;
+		case TSXProtocolSecurityNLA:
+			if (!addArgument(&argc, &argv, "/sec:NLA"))
+				goto out_free;
 
-		break;
+			break;
 
-	case TSXProtocolSecurityTLS:
-		if (!addArgument(&argc, &argv, "/sec:TLS"))
-			goto out_free;
+		case TSXProtocolSecurityTLS:
+			if (!addArgument(&argc, &argv, "/sec:TLS"))
+				goto out_free;
 
-		break;
+			break;
 
-	case TSXProtocolSecurityRDP:
-		if (!addArgument(&argc, &argv, "/sec:RDP"))
-			goto out_free;
+		case TSXProtocolSecurityRDP:
+			if (!addArgument(&argc, &argv, "/sec:RDP"))
+				goto out_free;
 
-		break;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	// ts gateway settings
@@ -264,7 +266,7 @@ static void freeArguments(int argc, char **argv)
 		goto out_free;
 
 	freeArguments(argc, argv);
-	[self mfi] -> session = self;
+	[self mfi]->session = self;
 	return self;
 out_free:
 	freeArguments(argc, argv);
@@ -272,7 +274,8 @@ out_free:
 	return nil;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[self setDelegate:nil];
 	[_bookmark release];
 	[_name release];
@@ -282,14 +285,16 @@ out_free:
 	[super dealloc];
 }
 
-- (CGContextRef)bitmapContext {
-	return [self mfi] -> bitmap_context;
+- (CGContextRef)bitmapContext
+{
+	return [self mfi]->bitmap_context;
 }
 
 #pragma mark -
 #pragma mark Connecting and disconnecting
 
-- (void)connect {
+- (void)connect
+{
 	// Set Screen Size to automatic if widht or height are still 0
 	rdpSettings *settings = _freerdp->settings;
 
@@ -318,7 +323,8 @@ out_free:
 	[self performSelectorInBackground:@selector(runSession) withObject:nil];
 }
 
-- (void)disconnect {
+- (void)disconnect
+{
 	mfInfo *mfi = [self mfi];
 	ios_events_send(mfi, [NSDictionary dictionaryWithObject:@"disconnect" forKey:@"type"]);
 
@@ -330,12 +336,14 @@ out_free:
 	}
 }
 
-- (TSXConnectionState)connectionState {
-	return [self mfi] -> connection_state;
+- (TSXConnectionState)connectionState
+{
+	return [self mfi]->connection_state;
 }
 
 // suspends the session
-- (void)suspend {
+- (void)suspend
+{
 	if (!_suspended)
 	{
 		_suspended = YES;
@@ -344,7 +352,8 @@ out_free:
 }
 
 // resumes a previously suspended session
-- (void)resume {
+- (void)resume
+{
 	if (_suspended)
 	{
 		/*        RECTANGLE_16 rec;
@@ -360,22 +369,25 @@ out_free:
 }
 
 // returns YES if the session is started
-- (BOOL)isSuspended {
+- (BOOL)isSuspended
+{
 	return _suspended;
 }
 
 #pragma mark -
 #pragma mark Input events
 
-- (void)sendInputEvent:(NSDictionary *)eventDescriptor {
-	if ([self mfi] -> connection_state == TSXConnectionConnected)
+- (void)sendInputEvent:(NSDictionary *)eventDescriptor
+{
+	if ([self mfi]->connection_state == TSXConnectionConnected)
 		ios_events_send([self mfi], eventDescriptor);
 }
 
 #pragma mark -
 #pragma mark Server events (main thread)
 
-- (void)setNeedsDisplayInRectAsValue:(NSValue *)rect_value {
+- (void)setNeedsDisplayInRectAsValue:(NSValue *)rect_value
+{
 	if ([[self delegate] respondsToSelector:@selector(session:needsRedrawInRect:)])
 		[[self delegate] session:self needsRedrawInRect:[rect_value CGRectValue]];
 }
@@ -383,10 +395,11 @@ out_free:
 #pragma mark -
 #pragma mark interface functions
 
-- (UIImage *)getScreenshotWithSize:(CGSize)size {
-	NSAssert([self mfi] -> bitmap_context != nil,
+- (UIImage *)getScreenshotWithSize:(CGSize)size
+{
+	NSAssert([self mfi]->bitmap_context != nil,
 	         @"Screenshot requested while having no valid RDP drawing context");
-	CGImageRef cgImage = CGBitmapContextCreateImage([self mfi] -> bitmap_context);
+	CGImageRef cgImage = CGBitmapContextCreateImage([self mfi]->bitmap_context);
 	UIGraphicsBeginImageContext(size);
 	CGContextTranslateCTM(UIGraphicsGetCurrentContext(), 0, size.height);
 	CGContextScaleCTM(UIGraphicsGetCurrentContext(), 1.0, -1.0);
@@ -398,11 +411,13 @@ out_free:
 	return viewImage;
 }
 
-- (rdpSettings *)getSessionParams {
+- (rdpSettings *)getSessionParams
+{
 	return _freerdp->settings;
 }
 
-- (NSString *)sessionName {
+- (NSString *)sessionName
+{
 	return _name;
 }
 
@@ -411,19 +426,21 @@ out_free:
 #pragma mark -
 @implementation RDPSession (Private)
 
-- (mfInfo *)mfi {
+- (mfInfo *)mfi
+{
 	return MFI_FROM_INSTANCE(_freerdp);
 }
 
 // Blocks until rdp session finishes.
-- (void)runSession {
+- (void)runSession
+{
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	// Run the session
 	[self performSelectorOnMainThread:@selector(sessionWillConnect)
 	                       withObject:nil
 	                    waitUntilDone:YES];
 	int result_code = ios_run_freerdp(_freerdp);
-	[self mfi] -> connection_state = TSXConnectionDisconnected;
+	[self mfi]->connection_state = TSXConnectionDisconnected;
 	[self performSelectorOnMainThread:@selector(runSessionFinished:)
 	                       withObject:[NSNumber numberWithInt:result_code]
 	                    waitUntilDone:YES];
@@ -431,41 +448,45 @@ out_free:
 }
 
 // Main thread.
-- (void)runSessionFinished:(NSNumber *)result {
+- (void)runSessionFinished:(NSNumber *)result
+{
 	int result_code = [result intValue];
 
 	switch (result_code)
 	{
-	case MF_EXIT_CONN_CANCELED:
-		[self sessionDidDisconnect];
-		break;
+		case MF_EXIT_CONN_CANCELED:
+			[self sessionDidDisconnect];
+			break;
 
-	case MF_EXIT_LOGON_TIMEOUT:
-	case MF_EXIT_CONN_FAILED:
-		[self sessionDidFailToConnect:result_code];
-		break;
+		case MF_EXIT_LOGON_TIMEOUT:
+		case MF_EXIT_CONN_FAILED:
+			[self sessionDidFailToConnect:result_code];
+			break;
 
-	case MF_EXIT_SUCCESS:
-	default:
-		[self sessionDidDisconnect];
-		break;
+		case MF_EXIT_SUCCESS:
+		default:
+			[self sessionDidDisconnect];
+			break;
 	}
 }
 
 #pragma mark -
 #pragma mark Session management (main thread)
 
-- (void)sessionWillConnect {
+- (void)sessionWillConnect
+{
 	if ([[self delegate] respondsToSelector:@selector(sessionWillConnect:)])
 		[[self delegate] sessionWillConnect:self];
 }
 
-- (void)sessionDidConnect {
+- (void)sessionDidConnect
+{
 	if ([[self delegate] respondsToSelector:@selector(sessionDidConnect:)])
 		[[self delegate] sessionDidConnect:self];
 }
 
-- (void)sessionDidFailToConnect:(int)reason {
+- (void)sessionDidFailToConnect:(int)reason
+{
 	[[NSNotificationCenter defaultCenter]
 	    postNotificationName:TSXSessionDidFailToConnectNotification
 	                  object:self];
@@ -474,7 +495,8 @@ out_free:
 		[[self delegate] session:self didFailToConnect:reason];
 }
 
-- (void)sessionDidDisconnect {
+- (void)sessionDidDisconnect
+{
 	[[NSNotificationCenter defaultCenter] postNotificationName:TSXSessionDidDisconnectNotification
 	                                                    object:self];
 
@@ -482,22 +504,26 @@ out_free:
 		[[self delegate] sessionDidDisconnect:self];
 }
 
-- (void)sessionBitmapContextWillChange {
+- (void)sessionBitmapContextWillChange
+{
 	if ([[self delegate] respondsToSelector:@selector(sessionBitmapContextWillChange:)])
 		[[self delegate] sessionBitmapContextWillChange:self];
 }
 
-- (void)sessionBitmapContextDidChange {
+- (void)sessionBitmapContextDidChange
+{
 	if ([[self delegate] respondsToSelector:@selector(sessionBitmapContextDidChange:)])
 		[[self delegate] sessionBitmapContextDidChange:self];
 }
 
-- (void)sessionRequestsAuthenticationWithParams:(NSMutableDictionary *)params {
+- (void)sessionRequestsAuthenticationWithParams:(NSMutableDictionary *)params
+{
 	if ([[self delegate] respondsToSelector:@selector(session:requestsAuthenticationWithParams:)])
 		[[self delegate] session:self requestsAuthenticationWithParams:params];
 }
 
-- (void)sessionVerifyCertificateWithParams:(NSMutableDictionary *)params {
+- (void)sessionVerifyCertificateWithParams:(NSMutableDictionary *)params
+{
 	if ([[self delegate] respondsToSelector:@selector(session:verifyCertificateWithParams:)])
 		[[self delegate] session:self verifyCertificateWithParams:params];
 }

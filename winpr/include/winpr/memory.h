@@ -33,10 +33,10 @@
 
 #ifndef _WIN32
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-#	endif
+#endif
 
 	WINPR_API HANDLE CreateFileMappingA(HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes,
 	                                    DWORD flProtect, DWORD dwMaximumSizeHigh,
@@ -60,17 +60,17 @@ extern "C"
 
 	WINPR_API BOOL UnmapViewOfFile(LPCVOID lpBaseAddress);
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 }
-#	endif
+#endif
 
-#	ifdef UNICODE
-#		define CreateFileMapping CreateFileMappingW
-#		define OpenFileMapping OpenFileMappingW
-#	else
-#		define CreateFileMapping CreateFileMappingA
-#		define OpenFileMapping OpenFileMappingA
-#	endif
+#ifdef UNICODE
+#define CreateFileMapping CreateFileMappingW
+#define OpenFileMapping OpenFileMappingW
+#else
+#define CreateFileMapping CreateFileMappingA
+#define OpenFileMapping OpenFileMappingA
+#endif
 
 #endif
 

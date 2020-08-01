@@ -31,7 +31,7 @@
  * Beware: the result of __builtin_clz(0) is undefined
  */
 
-#	if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2))
+#if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2))
 
 static INLINE UINT32 __lzcnt(UINT32 _val32)
 {
@@ -43,7 +43,7 @@ static INLINE UINT16 __lzcnt16(UINT16 _val16)
 	return ((UINT16)(__builtin_clz((UINT32)_val16) - 16));
 }
 
-#	else /* (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2) */
+#else /* (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2) */
 
 static INLINE UINT32 __lzcnt(UINT32 x)
 {
@@ -94,7 +94,7 @@ static INLINE UINT16 __lzcnt16(UINT16 x)
 	return ((UINT16)__lzcnt((UINT32)x));
 }
 
-#	endif /* (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2) */
+#endif /* (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2) */
 
 #endif /* _WIN32 */
 #endif /* WINPR_INTRIN_H */

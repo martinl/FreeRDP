@@ -22,137 +22,137 @@
 
 #if defined __linux__ && !defined ANDROID
 
-#	include <assert.h>
-#	include <errno.h>
-#	include <fcntl.h>
-#	include <sys/ioctl.h>
-#	include <termios.h>
-#	include <unistd.h>
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <unistd.h>
 
-#	include "comm_serial_sys.h"
-#	ifdef __UCLIBC__
-#		include "comm.h"
-#	endif
+#include "comm_serial_sys.h"
+#ifdef __UCLIBC__
+#include "comm.h"
+#endif
 
-#	include <winpr/crt.h>
-#	include <winpr/wlog.h>
+#include <winpr/crt.h>
+#include <winpr/wlog.h>
 
 /* Undocumented flag, not supported everywhere.
  * Provide a sensible fallback to avoid compilation problems. */
-#	ifndef CMSPAR
-#		define CMSPAR 010000000000
-#	endif
+#ifndef CMSPAR
+#define CMSPAR 010000000000
+#endif
 
 /* hard-coded in N_TTY */
-#	define TTY_THRESHOLD_THROTTLE 128 /* now based on remaining room */
-#	define TTY_THRESHOLD_UNTHROTTLE 128
-#	define N_TTY_BUF_SIZE 4096
+#define TTY_THRESHOLD_THROTTLE 128 /* now based on remaining room */
+#define TTY_THRESHOLD_UNTHROTTLE 128
+#define N_TTY_BUF_SIZE 4096
 
-#	define _BAUD_TABLE_END 0010020 /* __MAX_BAUD + 1 */
+#define _BAUD_TABLE_END 0010020 /* __MAX_BAUD + 1 */
 
 /* 0: B* (Linux termios)
  * 1: CBR_* or actual baud rate
  * 2: BAUD_* (identical to SERIAL_BAUD_*)
  */
 static const speed_t _BAUD_TABLE[][3] = {
-#	ifdef B0
+#ifdef B0
 	{ B0, 0, 0 }, /* hang up */
-#	endif
-#	ifdef B50
+#endif
+#ifdef B50
 	{ B50, 50, 0 },
-#	endif
-#	ifdef B75
+#endif
+#ifdef B75
 	{ B75, 75, BAUD_075 },
-#	endif
-#	ifdef B110
+#endif
+#ifdef B110
 	{ B110, CBR_110, BAUD_110 },
-#	endif
-#	ifdef B134
+#endif
+#ifdef B134
 	{ B134, 134, 0 /*BAUD_134_5*/ },
-#	endif
-#	ifdef B150
+#endif
+#ifdef B150
 	{ B150, 150, BAUD_150 },
-#	endif
-#	ifdef B200
+#endif
+#ifdef B200
 	{ B200, 200, 0 },
-#	endif
-#	ifdef B300
+#endif
+#ifdef B300
 	{ B300, CBR_300, BAUD_300 },
-#	endif
-#	ifdef B600
+#endif
+#ifdef B600
 	{ B600, CBR_600, BAUD_600 },
-#	endif
-#	ifdef B1200
+#endif
+#ifdef B1200
 	{ B1200, CBR_1200, BAUD_1200 },
-#	endif
-#	ifdef B1800
+#endif
+#ifdef B1800
 	{ B1800, 1800, BAUD_1800 },
-#	endif
-#	ifdef B2400
+#endif
+#ifdef B2400
 	{ B2400, CBR_2400, BAUD_2400 },
-#	endif
-#	ifdef B4800
+#endif
+#ifdef B4800
 	{ B4800, CBR_4800, BAUD_4800 },
-#	endif
+#endif
 /* {, ,BAUD_7200} */
-#	ifdef B9600
+#ifdef B9600
 	{ B9600, CBR_9600, BAUD_9600 },
-#	endif
+#endif
 /* {, CBR_14400, BAUD_14400},	/\* unsupported on Linux *\/ */
-#	ifdef B19200
+#ifdef B19200
 	{ B19200, CBR_19200, BAUD_19200 },
-#	endif
-#	ifdef B38400
+#endif
+#ifdef B38400
 	{ B38400, CBR_38400, BAUD_38400 },
-#	endif
+#endif
 /* {, CBR_56000, BAUD_56K},	/\* unsupported on Linux *\/ */
-#	ifdef B57600
+#ifdef B57600
 	{ B57600, CBR_57600, BAUD_57600 },
-#	endif
-#	ifdef B115200
+#endif
+#ifdef B115200
 	{ B115200, CBR_115200, BAUD_115200 },
-#	endif
+#endif
 /* {, CBR_128000, BAUD_128K},	/\* unsupported on Linux *\/ */
 /* {, CBR_256000, BAUD_USER},	/\* unsupported on Linux *\/ */
-#	ifdef B230400
+#ifdef B230400
 	{ B230400, 230400, BAUD_USER },
-#	endif
-#	ifdef B460800
+#endif
+#ifdef B460800
 	{ B460800, 460800, BAUD_USER },
-#	endif
-#	ifdef B500000
+#endif
+#ifdef B500000
 	{ B500000, 500000, BAUD_USER },
-#	endif
-#	ifdef B576000
+#endif
+#ifdef B576000
 	{ B576000, 576000, BAUD_USER },
-#	endif
-#	ifdef B921600
+#endif
+#ifdef B921600
 	{ B921600, 921600, BAUD_USER },
-#	endif
-#	ifdef B1000000
+#endif
+#ifdef B1000000
 	{ B1000000, 1000000, BAUD_USER },
-#	endif
-#	ifdef B1152000
+#endif
+#ifdef B1152000
 	{ B1152000, 1152000, BAUD_USER },
-#	endif
-#	ifdef B1500000
+#endif
+#ifdef B1500000
 	{ B1500000, 1500000, BAUD_USER },
-#	endif
-#	ifdef B2000000
+#endif
+#ifdef B2000000
 	{ B2000000, 2000000, BAUD_USER },
-#	endif
-#	ifdef B2500000
+#endif
+#ifdef B2500000
 	{ B2500000, 2500000, BAUD_USER },
-#	endif
-#	ifdef B3000000
+#endif
+#ifdef B3000000
 	{ B3000000, 3000000, BAUD_USER },
-#	endif
-#	ifdef B3500000
+#endif
+#ifdef B3500000
 	{ B3500000, 3500000, BAUD_USER },
-#	endif
-#	ifdef B4000000
+#endif
+#ifdef B4000000
 	{ B4000000, 4000000, BAUD_USER }, /* __MAX_BAUD */
-#	endif
+#endif
 	{ _BAUD_TABLE_END, 0, 0 }
 };
 
@@ -420,83 +420,84 @@ static BOOL _set_line_control(WINPR_COMM* pComm, const SERIAL_LINE_CONTROL* pLin
 
 	switch (pLineControl->StopBits)
 	{
-	case STOP_BIT_1:
-		upcomingTermios.c_cflag &= ~CSTOPB;
-		break;
+		case STOP_BIT_1:
+			upcomingTermios.c_cflag &= ~CSTOPB;
+			break;
 
-	case STOP_BITS_1_5:
-		CommLog_Print(WLOG_WARN, "Unsupported one and a half stop bits.");
-		break;
+		case STOP_BITS_1_5:
+			CommLog_Print(WLOG_WARN, "Unsupported one and a half stop bits.");
+			break;
 
-	case STOP_BITS_2:
-		upcomingTermios.c_cflag |= CSTOPB;
-		break;
+		case STOP_BITS_2:
+			upcomingTermios.c_cflag |= CSTOPB;
+			break;
 
-	default:
-		CommLog_Print(WLOG_WARN, "unexpected number of stop bits: %" PRIu8 "\n",
-		              pLineControl->StopBits);
-		result = FALSE; /* but keep on */
-		break;
+		default:
+			CommLog_Print(WLOG_WARN, "unexpected number of stop bits: %" PRIu8 "\n",
+			              pLineControl->StopBits);
+			result = FALSE; /* but keep on */
+			break;
 	}
 
 	switch (pLineControl->Parity)
 	{
-	case NO_PARITY:
-		upcomingTermios.c_cflag &= ~(PARENB | PARODD | CMSPAR);
-		break;
+		case NO_PARITY:
+			upcomingTermios.c_cflag &= ~(PARENB | PARODD | CMSPAR);
+			break;
 
-	case ODD_PARITY:
-		upcomingTermios.c_cflag &= ~CMSPAR;
-		upcomingTermios.c_cflag |= PARENB | PARODD;
-		break;
+		case ODD_PARITY:
+			upcomingTermios.c_cflag &= ~CMSPAR;
+			upcomingTermios.c_cflag |= PARENB | PARODD;
+			break;
 
-	case EVEN_PARITY:
-		upcomingTermios.c_cflag &= ~(PARODD | CMSPAR);
-		upcomingTermios.c_cflag |= PARENB;
-		break;
+		case EVEN_PARITY:
+			upcomingTermios.c_cflag &= ~(PARODD | CMSPAR);
+			upcomingTermios.c_cflag |= PARENB;
+			break;
 
-	case MARK_PARITY:
-		upcomingTermios.c_cflag |= PARENB | PARODD | CMSPAR;
-		break;
+		case MARK_PARITY:
+			upcomingTermios.c_cflag |= PARENB | PARODD | CMSPAR;
+			break;
 
-	case SPACE_PARITY:
-		upcomingTermios.c_cflag &= ~PARODD;
-		upcomingTermios.c_cflag |= PARENB | CMSPAR;
-		break;
+		case SPACE_PARITY:
+			upcomingTermios.c_cflag &= ~PARODD;
+			upcomingTermios.c_cflag |= PARENB | CMSPAR;
+			break;
 
-	default:
-		CommLog_Print(WLOG_WARN, "unexpected type of parity: %" PRIu8 "\n", pLineControl->Parity);
-		result = FALSE; /* but keep on */
-		break;
+		default:
+			CommLog_Print(WLOG_WARN, "unexpected type of parity: %" PRIu8 "\n",
+			              pLineControl->Parity);
+			result = FALSE; /* but keep on */
+			break;
 	}
 
 	switch (pLineControl->WordLength)
 	{
-	case 5:
-		upcomingTermios.c_cflag &= ~CSIZE;
-		upcomingTermios.c_cflag |= CS5;
-		break;
+		case 5:
+			upcomingTermios.c_cflag &= ~CSIZE;
+			upcomingTermios.c_cflag |= CS5;
+			break;
 
-	case 6:
-		upcomingTermios.c_cflag &= ~CSIZE;
-		upcomingTermios.c_cflag |= CS6;
-		break;
+		case 6:
+			upcomingTermios.c_cflag &= ~CSIZE;
+			upcomingTermios.c_cflag |= CS6;
+			break;
 
-	case 7:
-		upcomingTermios.c_cflag &= ~CSIZE;
-		upcomingTermios.c_cflag |= CS7;
-		break;
+		case 7:
+			upcomingTermios.c_cflag &= ~CSIZE;
+			upcomingTermios.c_cflag |= CS7;
+			break;
 
-	case 8:
-		upcomingTermios.c_cflag &= ~CSIZE;
-		upcomingTermios.c_cflag |= CS8;
-		break;
+		case 8:
+			upcomingTermios.c_cflag &= ~CSIZE;
+			upcomingTermios.c_cflag |= CS8;
+			break;
 
-	default:
-		CommLog_Print(WLOG_WARN, "unexpected number od data bits per character: %" PRIu8 "\n",
-		              pLineControl->WordLength);
-		result = FALSE; /* but keep on */
-		break;
+		default:
+			CommLog_Print(WLOG_WARN, "unexpected number od data bits per character: %" PRIu8 "\n",
+			              pLineControl->WordLength);
+			result = FALSE; /* but keep on */
+			break;
 	}
 
 	if (_comm_ioctl_tcsetattr(pComm->fd, TCSANOW, &upcomingTermios) < 0)
@@ -538,21 +539,21 @@ static BOOL _get_line_control(WINPR_COMM* pComm, SERIAL_LINE_CONTROL* pLineContr
 
 	switch (currentTermios.c_cflag & CSIZE)
 	{
-	case CS5:
-		pLineControl->WordLength = 5;
-		break;
+		case CS5:
+			pLineControl->WordLength = 5;
+			break;
 
-	case CS6:
-		pLineControl->WordLength = 6;
-		break;
+		case CS6:
+			pLineControl->WordLength = 6;
+			break;
 
-	case CS7:
-		pLineControl->WordLength = 7;
-		break;
+		case CS7:
+			pLineControl->WordLength = 7;
+			break;
 
-	default:
-		pLineControl->WordLength = 8;
-		break;
+		default:
+			pLineControl->WordLength = 8;
+			break;
 	}
 
 	return TRUE;

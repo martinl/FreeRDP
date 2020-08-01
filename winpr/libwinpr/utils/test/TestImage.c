@@ -6,7 +6,7 @@
 #include <winpr/environment.h>
 
 #ifndef PATH_MAX
-#	define PATH_MAX 4096
+#define PATH_MAX 4096
 #endif
 
 static void* read_image(const char* src, size_t* size)

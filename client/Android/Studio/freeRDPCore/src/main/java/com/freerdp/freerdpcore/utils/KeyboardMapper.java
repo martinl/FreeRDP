@@ -422,57 +422,58 @@ public class KeyboardMapper
 	{
 		switch (event.getAction())
 		{
-		// we only process down events
-		case KeyEvent.ACTION_UP:
-		{
-			return false;
-		}
-
-		case KeyEvent.ACTION_DOWN:
-		{
-			boolean modifierActive = isModifierPressed();
-			// if a modifier is pressed we will send a VK event (if possible) so that key
-			// combinations will be recognized correctly. Otherwise we will send the unicode key. At
-			// the end we will reset all modifiers and notifiy our listener.
-			int vkcode = getVirtualKeyCode(event.getKeyCode());
-			if ((vkcode & KEY_FLAG_UNICODE) != 0)
-				listener.processUnicodeKey(vkcode & (~KEY_FLAG_UNICODE));
-			// if we got a valid vkcode send it - except for letters/numbers if a modifier is active
-			else if (vkcode > 0 &&
-			         (event.getMetaState() &
-			          (KeyEvent.META_ALT_ON | KeyEvent.META_SHIFT_ON | KeyEvent.META_SYM_ON)) == 0)
+			// we only process down events
+			case KeyEvent.ACTION_UP:
 			{
-				listener.processVirtualKey(vkcode, true);
-				listener.processVirtualKey(vkcode, false);
-			}
-			else if (event.isShiftPressed() && vkcode != 0)
-			{
-				listener.processVirtualKey(VK_LSHIFT, true);
-				listener.processVirtualKey(vkcode, true);
-				listener.processVirtualKey(vkcode, false);
-				listener.processVirtualKey(VK_LSHIFT, false);
-			}
-			else if (event.getUnicodeChar() != 0)
-				listener.processUnicodeKey(event.getUnicodeChar());
-			else
 				return false;
+			}
 
-			// reset any pending toggle states if a modifier was pressed
-			if (modifierActive)
-				resetModifierKeysAfterInput(false);
-			return true;
-		}
+			case KeyEvent.ACTION_DOWN:
+			{
+				boolean modifierActive = isModifierPressed();
+				// if a modifier is pressed we will send a VK event (if possible) so that key
+				// combinations will be recognized correctly. Otherwise we will send the unicode
+				// key. At the end we will reset all modifiers and notifiy our listener.
+				int vkcode = getVirtualKeyCode(event.getKeyCode());
+				if ((vkcode & KEY_FLAG_UNICODE) != 0)
+					listener.processUnicodeKey(vkcode & (~KEY_FLAG_UNICODE));
+				// if we got a valid vkcode send it - except for letters/numbers if a modifier is
+				// active
+				else if (vkcode > 0 &&
+				         (event.getMetaState() & (KeyEvent.META_ALT_ON | KeyEvent.META_SHIFT_ON |
+				                                  KeyEvent.META_SYM_ON)) == 0)
+				{
+					listener.processVirtualKey(vkcode, true);
+					listener.processVirtualKey(vkcode, false);
+				}
+				else if (event.isShiftPressed() && vkcode != 0)
+				{
+					listener.processVirtualKey(VK_LSHIFT, true);
+					listener.processVirtualKey(vkcode, true);
+					listener.processVirtualKey(vkcode, false);
+					listener.processVirtualKey(VK_LSHIFT, false);
+				}
+				else if (event.getUnicodeChar() != 0)
+					listener.processUnicodeKey(event.getUnicodeChar());
+				else
+					return false;
 
-		case KeyEvent.ACTION_MULTIPLE:
-		{
-			String str = event.getCharacters();
-			for (int i = 0; i < str.length(); i++)
-				listener.processUnicodeKey(str.charAt(i));
-			return true;
-		}
+				// reset any pending toggle states if a modifier was pressed
+				if (modifierActive)
+					resetModifierKeysAfterInput(false);
+				return true;
+			}
 
-		default:
-			break;
+			case KeyEvent.ACTION_MULTIPLE:
+			{
+				String str = event.getCharacters();
+				for (int i = 0; i < str.length(); i++)
+					listener.processUnicodeKey(str.charAt(i));
+				return true;
+			}
+
+			default:
+				break;
 		}
 		return false;
 	}
@@ -534,22 +535,24 @@ public class KeyboardMapper
 
 		switch (modifierCode)
 		{
-		case VK_LSHIFT:
-		{
-			return (shiftPressed ? (isShiftLocked ? KEYSTATE_LOCKED : KEYSTATE_ON) : KEYSTATE_OFF);
-		}
-		case VK_LCONTROL:
-		{
-			return (ctrlPressed ? (isCtrlLocked ? KEYSTATE_LOCKED : KEYSTATE_ON) : KEYSTATE_OFF);
-		}
-		case VK_LMENU:
-		{
-			return (altPressed ? (isAltLocked ? KEYSTATE_LOCKED : KEYSTATE_ON) : KEYSTATE_OFF);
-		}
-		case VK_LWIN:
-		{
-			return (winPressed ? (isWinLocked ? KEYSTATE_LOCKED : KEYSTATE_ON) : KEYSTATE_OFF);
-		}
+			case VK_LSHIFT:
+			{
+				return (shiftPressed ? (isShiftLocked ? KEYSTATE_LOCKED : KEYSTATE_ON)
+				                     : KEYSTATE_OFF);
+			}
+			case VK_LCONTROL:
+			{
+				return (ctrlPressed ? (isCtrlLocked ? KEYSTATE_LOCKED : KEYSTATE_ON)
+				                    : KEYSTATE_OFF);
+			}
+			case VK_LMENU:
+			{
+				return (altPressed ? (isAltLocked ? KEYSTATE_LOCKED : KEYSTATE_ON) : KEYSTATE_OFF);
+			}
+			case VK_LWIN:
+			{
+				return (winPressed ? (isWinLocked ? KEYSTATE_LOCKED : KEYSTATE_ON) : KEYSTATE_OFF);
+			}
 		}
 
 		return -1;
@@ -573,54 +576,54 @@ public class KeyboardMapper
 	{
 		switch (keycode)
 		{
-		case VK_LSHIFT:
-		{
-			if (!checkToggleModifierLock(VK_LSHIFT))
+			case VK_LSHIFT:
 			{
-				isShiftLocked = false;
-				shiftPressed = !shiftPressed;
-				listener.processVirtualKey(VK_LSHIFT, shiftPressed);
+				if (!checkToggleModifierLock(VK_LSHIFT))
+				{
+					isShiftLocked = false;
+					shiftPressed = !shiftPressed;
+					listener.processVirtualKey(VK_LSHIFT, shiftPressed);
+				}
+				else
+					isShiftLocked = true;
+				break;
 			}
-			else
-				isShiftLocked = true;
-			break;
-		}
-		case VK_LCONTROL:
-		{
-			if (!checkToggleModifierLock(VK_LCONTROL))
+			case VK_LCONTROL:
 			{
-				isCtrlLocked = false;
-				ctrlPressed = !ctrlPressed;
-				listener.processVirtualKey(VK_LCONTROL, ctrlPressed);
+				if (!checkToggleModifierLock(VK_LCONTROL))
+				{
+					isCtrlLocked = false;
+					ctrlPressed = !ctrlPressed;
+					listener.processVirtualKey(VK_LCONTROL, ctrlPressed);
+				}
+				else
+					isCtrlLocked = true;
+				break;
 			}
-			else
-				isCtrlLocked = true;
-			break;
-		}
-		case VK_LMENU:
-		{
-			if (!checkToggleModifierLock(VK_LMENU))
+			case VK_LMENU:
 			{
-				isAltLocked = false;
-				altPressed = !altPressed;
-				listener.processVirtualKey(VK_LMENU, altPressed);
+				if (!checkToggleModifierLock(VK_LMENU))
+				{
+					isAltLocked = false;
+					altPressed = !altPressed;
+					listener.processVirtualKey(VK_LMENU, altPressed);
+				}
+				else
+					isAltLocked = true;
+				break;
 			}
-			else
-				isAltLocked = true;
-			break;
-		}
-		case VK_LWIN:
-		{
-			if (!checkToggleModifierLock(VK_LWIN))
+			case VK_LWIN:
 			{
-				isWinLocked = false;
-				winPressed = !winPressed;
-				listener.processVirtualKey(VK_LWIN | VK_EXT_KEY, winPressed);
+				if (!checkToggleModifierLock(VK_LWIN))
+				{
+					isWinLocked = false;
+					winPressed = !winPressed;
+					listener.processVirtualKey(VK_LWIN | VK_EXT_KEY, winPressed);
+				}
+				else
+					isWinLocked = true;
+				break;
 			}
-			else
-				isWinLocked = true;
-			break;
-		}
 		}
 		listener.modifiersChanged();
 	}
@@ -661,26 +664,26 @@ public class KeyboardMapper
 	{
 		switch (keycode)
 		{
-		case EXTKEY_KBFUNCTIONKEYS:
-		{
-			listener.switchKeyboard(KEYBOARD_TYPE_FUNCTIONKEYS);
-			break;
-		}
+			case EXTKEY_KBFUNCTIONKEYS:
+			{
+				listener.switchKeyboard(KEYBOARD_TYPE_FUNCTIONKEYS);
+				break;
+			}
 
-		case EXTKEY_KBNUMPAD:
-		{
-			listener.switchKeyboard(KEYBOARD_TYPE_NUMPAD);
-			break;
-		}
+			case EXTKEY_KBNUMPAD:
+			{
+				listener.switchKeyboard(KEYBOARD_TYPE_NUMPAD);
+				break;
+			}
 
-		case EXTKEY_KBCURSOR:
-		{
-			listener.switchKeyboard(KEYBOARD_TYPE_CURSOR);
-			break;
-		}
+			case EXTKEY_KBCURSOR:
+			{
+				listener.switchKeyboard(KEYBOARD_TYPE_CURSOR);
+				break;
+			}
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 

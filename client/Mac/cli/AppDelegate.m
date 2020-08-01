@@ -21,7 +21,8 @@ void mac_set_view_size(rdpContext *context, MRDPView *view);
 
 @implementation AppDelegate
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[super dealloc];
 }
 
@@ -29,7 +30,8 @@ void mac_set_view_size(rdpContext *context, MRDPView *view);
 
 @synthesize context = context;
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
 	int status;
 	mfContext *mfc;
 	_singleDelegate = self;
@@ -73,15 +75,18 @@ void mac_set_view_size(rdpContext *context, MRDPView *view);
 	}
 }
 
-- (void)applicationWillBecomeActive:(NSNotification *)notification {
+- (void)applicationWillBecomeActive:(NSNotification *)notification
+{
 	[mrdpView resume];
 }
 
-- (void)applicationWillResignActive:(NSNotification *)notification {
+- (void)applicationWillResignActive:(NSNotification *)notification
+{
 	[mrdpView pause];
 }
 
-- (void)applicationWillTerminate:(NSNotification *)notification {
+- (void)applicationWillTerminate:(NSNotification *)notification
+{
 	NSLog(@"Stopping...\n");
 	freerdp_client_stop(context);
 	[mrdpView releaseResources];
@@ -89,11 +94,13 @@ void mac_set_view_size(rdpContext *context, MRDPView *view);
 	NSLog(@"Stopped.\n");
 }
 
-- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender
+{
 	return YES;
 }
 
-- (int)ParseCommandLineArguments {
+- (int)ParseCommandLineArguments
+{
 	int i;
 	int length;
 	int status;
@@ -126,7 +133,8 @@ void mac_set_view_size(rdpContext *context, MRDPView *view);
 	return status;
 }
 
-- (void)CreateContext {
+- (void)CreateContext
+{
 	RDP_CLIENT_ENTRY_POINTS clientEntryPoints;
 	ZeroMemory(&clientEntryPoints, sizeof(RDP_CLIENT_ENTRY_POINTS));
 	clientEntryPoints.Size = sizeof(RDP_CLIENT_ENTRY_POINTS);
@@ -135,7 +143,8 @@ void mac_set_view_size(rdpContext *context, MRDPView *view);
 	context = freerdp_client_context_new(&clientEntryPoints);
 }
 
-- (void)ReleaseContext {
+- (void)ReleaseContext
+{
 	mfContext *mfc;
 	MRDPView *view;
 	mfc = (mfContext *)context;
@@ -152,7 +161,8 @@ void mac_set_view_size(rdpContext *context, MRDPView *view);
  * called when we fail to connect to a RDP server - Make sure this is called from the main thread.
  ***********************************************************************/
 
-- (void)rdpConnectError:(NSString *)withMessage {
+- (void)rdpConnectError:(NSString *)withMessage
+{
 	mfContext *mfc;
 	MRDPView *view;
 	mfc = (mfContext *)context;
@@ -171,7 +181,8 @@ void mac_set_view_size(rdpContext *context, MRDPView *view);
  * just a terminate selector for above call
  ***********************************************************************/
 
-- (void)alertDidEnd:(NSAlert *)a returnCode:(NSInteger)rc contextInfo:(void *)ci {
+- (void)alertDidEnd:(NSAlert *)a returnCode:(NSInteger)rc contextInfo:(void *)ci
+{
 	[NSApp terminate:nil];
 }
 

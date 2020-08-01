@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -33,13 +33,13 @@
 #include "../log.h"
 
 #ifdef HAVE_UNISTD_H
-#	include <unistd.h>
+#include <unistd.h>
 #endif
 
 #ifdef _WIN32
-#	define WINPR_SAM_FILE "C:\\SAM"
+#define WINPR_SAM_FILE "C:\\SAM"
 #else
-#	define WINPR_SAM_FILE "/etc/winpr/SAM"
+#define WINPR_SAM_FILE "/etc/winpr/SAM"
 #endif
 #define TAG WINPR_TAG("utils")
 

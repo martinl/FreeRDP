@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -34,15 +34,15 @@
 #include "rfx_sse2.h"
 
 #ifdef _MSC_VER
-#	define __attribute__(...)
+#define __attribute__(...)
 #endif
 
 #define CACHE_LINE_BYTES 64
 
 #ifndef __clang__
-#	define ATTRIBUTES __gnu_inline__, __always_inline__, __artificial__
+#define ATTRIBUTES __gnu_inline__, __always_inline__, __artificial__
 #else
-#	define ATTRIBUTES __gnu_inline__, __always_inline__
+#define ATTRIBUTES __gnu_inline__, __always_inline__
 #endif
 
 #define _mm_between_epi16(_val, _min, _max)                    \

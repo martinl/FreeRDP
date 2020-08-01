@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -34,11 +34,11 @@
 
 #ifdef WITH_X11
 
-#	include "keyboard_x11.h"
+#include "keyboard_x11.h"
 
-#	ifdef WITH_XKBFILE
-#		include "keyboard_xkbfile.h"
-#	endif
+#ifdef WITH_XKBFILE
+#include "keyboard_xkbfile.h"
+#endif
 
 #endif
 
@@ -110,12 +110,12 @@ DWORD freerdp_keyboard_init(DWORD keyboardLayoutId)
 
 #endif
 #if defined(WITH_X11) || defined(WITH_WAYLAND)
-#	ifdef WITH_XKBFILE
+#ifdef WITH_XKBFILE
 
 	if (status < 0)
 		status = freerdp_keyboard_init_xkbfile(&keyboardLayoutId, X11_KEYCODE_TO_VIRTUAL_SCANCODE);
 
-#	endif
+#endif
 
 	if (status < 0)
 		status =

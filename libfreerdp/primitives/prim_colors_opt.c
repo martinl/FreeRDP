@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/types.h>
@@ -26,9 +26,9 @@
 #include <winpr/sysinfo.h>
 
 #ifdef WITH_SSE2
-#	include <emmintrin.h>
+#include <emmintrin.h>
 #elif defined(WITH_NEON)
-#	include <arm_neon.h>
+#include <arm_neon.h>
 #endif /* WITH_SSE2 else WITH_NEON */
 
 #include "prim_internal.h"
@@ -38,21 +38,21 @@ static primitives_t* generic = NULL;
 
 #ifdef WITH_SSE2
 
-#	ifdef __GNUC__
-#		define GNU_INLINE __attribute__((__gnu_inline__, __always_inline__, __artificial__))
-#	else
-#		define GNU_INLINE
-#	endif
+#ifdef __GNUC__
+#define GNU_INLINE __attribute__((__gnu_inline__, __always_inline__, __artificial__))
+#else
+#define GNU_INLINE
+#endif
 
-#	define CACHE_LINE_BYTES 64
+#define CACHE_LINE_BYTES 64
 
-#	define _mm_between_epi16(_val, _min, _max)                    \
-		do                                                         \
-		{                                                          \
-			_val = _mm_min_epi16(_max, _mm_max_epi16(_val, _min)); \
-		} while (0)
+#define _mm_between_epi16(_val, _min, _max)                    \
+	do                                                         \
+	{                                                          \
+		_val = _mm_min_epi16(_max, _mm_max_epi16(_val, _min)); \
+	} while (0)
 
-#	ifdef DO_PREFETCH
+#ifdef DO_PREFETCH
 /*---------------------------------------------------------------------------*/
 static inline void GNU_INLINE _mm_prefetch_buffer(char* buffer, int num_bytes)
 {
@@ -64,7 +64,7 @@ static inline void GNU_INLINE _mm_prefetch_buffer(char* buffer, int num_bytes)
 		_mm_prefetch((char*)(&buf[i]), _MM_HINT_NTA);
 	}
 }
-#	endif /* DO_PREFETCH */
+#endif /* DO_PREFETCH */
 
 /*---------------------------------------------------------------------------*/
 static pstatus_t sse2_yCbCrToRGB_16s16s_P3P3(const INT16* pSrc[3], int srcStep, INT16* pDst[3],
@@ -100,7 +100,7 @@ static pstatus_t sse2_yCbCrToRGB_16s16s_P3P3(const INT16* pSrc[3], int srcStep, 
 	c4096 = _mm_set1_epi16(4096);
 	srcbump = srcStep / sizeof(__m128i);
 	dstbump = dstStep / sizeof(__m128i);
-#	ifdef DO_PREFETCH
+#ifdef DO_PREFETCH
 
 	/* Prefetch Y's, Cb's, and Cr's. */
 	for (yp = 0; yp < roi->height; yp++)
@@ -123,7 +123,7 @@ static pstatus_t sse2_yCbCrToRGB_16s16s_P3P3(const INT16* pSrc[3], int srcStep, 
 	y_buf = (__m128i*)(pSrc[0]);
 	cb_buf = (__m128i*)(pSrc[1]);
 	cr_buf = (__m128i*)(pSrc[2]);
-#	endif /* DO_PREFETCH */
+#endif /* DO_PREFETCH */
 	imax = roi->width * sizeof(INT16) / sizeof(__m128i);
 
 	for (yp = 0; yp < roi->height; ++yp)
@@ -213,7 +213,7 @@ static pstatus_t sse2_yCbCrToRGB_16s8u_P3AC4R_BGRX(const INT16* pSrc[3], UINT32 
 	BYTE* d_buf = pDst;
 	UINT32 yp;
 	const size_t dstPad = (dstStep - roi->width * 4);
-#	ifdef DO_PREFETCH
+#ifdef DO_PREFETCH
 
 	/* Prefetch Y's, Cb's, and Cr's. */
 	for (yp = 0; yp < roi->height; yp++)
@@ -235,7 +235,7 @@ static pstatus_t sse2_yCbCrToRGB_16s8u_P3AC4R_BGRX(const INT16* pSrc[3], UINT32 
 	y_buf = (INT16*)pSrc[0];
 	cb_buf = (INT16*)pSrc[1];
 	cr_buf = (INT16*)pSrc[2];
-#	endif /* DO_PREFETCH */
+#endif /* DO_PREFETCH */
 
 	for (yp = 0; yp < roi->height; ++yp)
 	{
@@ -400,7 +400,7 @@ static pstatus_t sse2_yCbCrToRGB_16s8u_P3AC4R_RGBX(const INT16* pSrc[3], UINT32 
 	BYTE* d_buf = pDst;
 	UINT32 yp;
 	const size_t dstPad = (dstStep - roi->width * 4);
-#	ifdef DO_PREFETCH
+#ifdef DO_PREFETCH
 
 	/* Prefetch Y's, Cb's, and Cr's. */
 	for (yp = 0; yp < roi->height; yp++)
@@ -422,7 +422,7 @@ static pstatus_t sse2_yCbCrToRGB_16s8u_P3AC4R_RGBX(const INT16* pSrc[3], UINT32 
 	y_buf = (INT16*)(pSrc[0]);
 	cb_buf = (INT16*)(pSrc[1]);
 	cr_buf = (INT16*)(pSrc[2]);
-#	endif /* DO_PREFETCH */
+#endif /* DO_PREFETCH */
 
 	for (yp = 0; yp < roi->height; ++yp)
 	{
@@ -580,16 +580,16 @@ static pstatus_t sse2_yCbCrToRGB_16s8u_P3AC4R(const INT16* pSrc[3], UINT32 srcSt
 
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return sse2_yCbCrToRGB_16s8u_P3AC4R_BGRX(pSrc, srcStep, pDst, dstStep, roi);
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return sse2_yCbCrToRGB_16s8u_P3AC4R_BGRX(pSrc, srcStep, pDst, dstStep, roi);
 
-	case PIXEL_FORMAT_RGBA32:
-	case PIXEL_FORMAT_RGBX32:
-		return sse2_yCbCrToRGB_16s8u_P3AC4R_RGBX(pSrc, srcStep, pDst, dstStep, roi);
+		case PIXEL_FORMAT_RGBA32:
+		case PIXEL_FORMAT_RGBX32:
+			return sse2_yCbCrToRGB_16s8u_P3AC4R_RGBX(pSrc, srcStep, pDst, dstStep, roi);
 
-	default:
-		return generic->yCbCrToRGB_16s8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		default:
+			return generic->yCbCrToRGB_16s8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
 	}
 }
 /* The encodec YCbCr coeffectients are represented as 11.5 fixed-point
@@ -632,7 +632,7 @@ static pstatus_t sse2_RGBToYCbCr_16s16s_P3P3(const INT16* pSrc[3], int srcStep, 
 	cr_b = _mm_set1_epi16(-2663);  /* -0.081282 << 15 */
 	srcbump = srcStep / sizeof(__m128i);
 	dstbump = dstStep / sizeof(__m128i);
-#	ifdef DO_PREFETCH
+#ifdef DO_PREFETCH
 
 	/* Prefetch RGB's. */
 	for (yp = 0; yp < roi->height; yp++)
@@ -655,7 +655,7 @@ static pstatus_t sse2_RGBToYCbCr_16s16s_P3P3(const INT16* pSrc[3], int srcStep, 
 	r_buf = (__m128i*)(pSrc[0]);
 	g_buf = (__m128i*)(pSrc[1]);
 	b_buf = (__m128i*)(pSrc[2]);
-#	endif /* DO_PREFETCH */
+#endif /* DO_PREFETCH */
 	imax = roi->width * sizeof(INT16) / sizeof(__m128i);
 
 	for (yp = 0; yp < roi->height; ++yp)
@@ -1148,24 +1148,24 @@ sse2_RGBToRGB_16s8u_P3AC4R(const INT16* const pSrc[3], /* 16-bit R,G, and B arra
 
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return sse2_RGBToRGB_16s8u_P3AC4R_BGRX(pSrc, srcStep, pDst, dstStep, roi);
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return sse2_RGBToRGB_16s8u_P3AC4R_BGRX(pSrc, srcStep, pDst, dstStep, roi);
 
-	case PIXEL_FORMAT_RGBA32:
-	case PIXEL_FORMAT_RGBX32:
-		return sse2_RGBToRGB_16s8u_P3AC4R_RGBX(pSrc, srcStep, pDst, dstStep, roi);
+		case PIXEL_FORMAT_RGBA32:
+		case PIXEL_FORMAT_RGBX32:
+			return sse2_RGBToRGB_16s8u_P3AC4R_RGBX(pSrc, srcStep, pDst, dstStep, roi);
 
-	case PIXEL_FORMAT_ABGR32:
-	case PIXEL_FORMAT_XBGR32:
-		return sse2_RGBToRGB_16s8u_P3AC4R_XBGR(pSrc, srcStep, pDst, dstStep, roi);
+		case PIXEL_FORMAT_ABGR32:
+		case PIXEL_FORMAT_XBGR32:
+			return sse2_RGBToRGB_16s8u_P3AC4R_XBGR(pSrc, srcStep, pDst, dstStep, roi);
 
-	case PIXEL_FORMAT_ARGB32:
-	case PIXEL_FORMAT_XRGB32:
-		return sse2_RGBToRGB_16s8u_P3AC4R_XRGB(pSrc, srcStep, pDst, dstStep, roi);
+		case PIXEL_FORMAT_ARGB32:
+		case PIXEL_FORMAT_XRGB32:
+			return sse2_RGBToRGB_16s8u_P3AC4R_XRGB(pSrc, srcStep, pDst, dstStep, roi);
 
-	default:
-		return generic->RGBToRGB_16s8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		default:
+			return generic->RGBToRGB_16s8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
 	}
 }
 #endif /* WITH_SSE2 */
@@ -1380,24 +1380,24 @@ static pstatus_t neon_yCbCrToRGB_16s8u_P3AC4R(const INT16* pSrc[3], UINT32 srcSt
 {
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return neon_yCbCrToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 2, 1, 0, 3);
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return neon_yCbCrToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 2, 1, 0, 3);
 
-	case PIXEL_FORMAT_RGBA32:
-	case PIXEL_FORMAT_RGBX32:
-		return neon_yCbCrToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 0, 1, 2, 3);
+		case PIXEL_FORMAT_RGBA32:
+		case PIXEL_FORMAT_RGBX32:
+			return neon_yCbCrToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 0, 1, 2, 3);
 
-	case PIXEL_FORMAT_ARGB32:
-	case PIXEL_FORMAT_XRGB32:
-		return neon_yCbCrToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 1, 2, 3, 0);
+		case PIXEL_FORMAT_ARGB32:
+		case PIXEL_FORMAT_XRGB32:
+			return neon_yCbCrToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 1, 2, 3, 0);
 
-	case PIXEL_FORMAT_ABGR32:
-	case PIXEL_FORMAT_XBGR32:
-		return neon_yCbCrToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 3, 2, 1, 0);
+		case PIXEL_FORMAT_ABGR32:
+		case PIXEL_FORMAT_XBGR32:
+			return neon_yCbCrToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 3, 2, 1, 0);
 
-	default:
-		return generic->yCbCrToRGB_16s8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		default:
+			return generic->yCbCrToRGB_16s8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
 	}
 }
 
@@ -1462,24 +1462,24 @@ neon_RGBToRGB_16s8u_P3AC4R(const INT16* const pSrc[3], /* 16-bit R,G, and B arra
 {
 	switch (DstFormat)
 	{
-	case PIXEL_FORMAT_BGRA32:
-	case PIXEL_FORMAT_BGRX32:
-		return neon_RGBToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 2, 1, 0, 3);
+		case PIXEL_FORMAT_BGRA32:
+		case PIXEL_FORMAT_BGRX32:
+			return neon_RGBToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 2, 1, 0, 3);
 
-	case PIXEL_FORMAT_RGBA32:
-	case PIXEL_FORMAT_RGBX32:
-		return neon_RGBToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 0, 1, 2, 3);
+		case PIXEL_FORMAT_RGBA32:
+		case PIXEL_FORMAT_RGBX32:
+			return neon_RGBToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 0, 1, 2, 3);
 
-	case PIXEL_FORMAT_ARGB32:
-	case PIXEL_FORMAT_XRGB32:
-		return neon_RGBToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 1, 2, 3, 0);
+		case PIXEL_FORMAT_ARGB32:
+		case PIXEL_FORMAT_XRGB32:
+			return neon_RGBToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 1, 2, 3, 0);
 
-	case PIXEL_FORMAT_ABGR32:
-	case PIXEL_FORMAT_XBGR32:
-		return neon_RGBToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 3, 2, 1, 0);
+		case PIXEL_FORMAT_ABGR32:
+		case PIXEL_FORMAT_XBGR32:
+			return neon_RGBToRGB_16s8u_P3AC4R_X(pSrc, srcStep, pDst, dstStep, roi, 3, 2, 1, 0);
 
-	default:
-		return generic->RGBToRGB_16s8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
+		default:
+			return generic->RGBToRGB_16s8u_P3AC4R(pSrc, srcStep, pDst, dstStep, DstFormat, roi);
 	}
 }
 #endif /* WITH_NEON */

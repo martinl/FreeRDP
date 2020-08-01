@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <errno.h>
@@ -53,17 +53,17 @@ static BOOL certificate_line_is_comment(const char* line, size_t length)
 	{
 		switch (*line)
 		{
-		case ' ':
-		case '\t':
-			line++;
-			length--;
-			break;
+			case ' ':
+			case '\t':
+				line++;
+				length--;
+				break;
 
-		case '#':
-			return TRUE;
+			case '#':
+				return TRUE;
 
-		default:
-			return FALSE;
+			default:
+				return FALSE;
 		}
 	}
 

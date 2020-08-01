@@ -18,30 +18,30 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/io.h>
 
 #ifndef _WIN32
 
-#	include "io.h"
+#include "io.h"
 
-#	include <stdio.h>
-#	include <fcntl.h>
-#	include <stdlib.h>
-#	include <errno.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <errno.h>
 
-#	ifdef HAVE_UNISTD_H
-#		include <unistd.h>
-#	endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
-#	include <sys/types.h>
-#	include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
-#	include <winpr/crt.h>
-#	include <winpr/path.h>
-#	include <winpr/file.h>
+#include <winpr/crt.h>
+#include <winpr/path.h>
+#include <winpr/file.h>
 
 /**
  * I/O Manager Routines
@@ -62,7 +62,7 @@
  * http://www.codeproject.com/Articles/9504/Driver-Development-Part-1-Introduction-to-Drivers/
  */
 
-#	define DEVICE_FILE_PREFIX_PATH "\\Device\\"
+#define DEVICE_FILE_PREFIX_PATH "\\Device\\"
 
 char* GetDeviceFileNameWithoutPrefixA(LPCSTR lpName)
 {
@@ -189,24 +189,24 @@ NTSTATUS _IoCreateDeviceEx(PDRIVER_OBJECT_EX DriverObject, ULONG DeviceExtension
 
 		switch (errno)
 		{
-		case EACCES:
-			return STATUS_ACCESS_DENIED;
+			case EACCES:
+				return STATUS_ACCESS_DENIED;
 
-		case EEXIST:
-			return STATUS_OBJECT_NAME_EXISTS;
+			case EEXIST:
+				return STATUS_OBJECT_NAME_EXISTS;
 
-		case ENAMETOOLONG:
-			return STATUS_NAME_TOO_LONG;
+			case ENAMETOOLONG:
+				return STATUS_NAME_TOO_LONG;
 
-		case ENOENT:
-		case ENOTDIR:
-			return STATUS_NOT_A_DIRECTORY;
+			case ENOENT:
+			case ENOTDIR:
+				return STATUS_NOT_A_DIRECTORY;
 
-		case ENOSPC:
-			return STATUS_DISK_FULL;
+			case ENOSPC:
+				return STATUS_DISK_FULL;
 
-		default:
-			return STATUS_INTERNAL_ERROR;
+			default:
+				return STATUS_INTERNAL_ERROR;
 		}
 	}
 

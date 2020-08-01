@@ -81,9 +81,9 @@ static INLINE BOOL testcase(const char* name, char** argv, size_t argc, int expe
 }
 
 #if defined(_WIN32)
-#	define DRIVE_REDIRECT_PATH "c:\\Windows"
+#define DRIVE_REDIRECT_PATH "c:\\Windows"
 #else
-#	define DRIVE_REDIRECT_PATH "/tmp"
+#define DRIVE_REDIRECT_PATH "/tmp"
 #endif
 
 static BOOL check_settings_smartcard_no_redirection(rdpSettings* settings)

@@ -10,7 +10,7 @@
 #include <winpr/wlog.h>
 #include <winpr/thread.h>
 #ifndef _WIN32
-#	include <signal.h>
+#include <signal.h>
 #endif
 #include "../pipe.h"
 

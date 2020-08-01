@@ -437,17 +437,17 @@ static void (^mac_capture_stream_handler)(
   {
 	  switch (status)
 	  {
-	  case kCGDisplayStreamFrameStatusFrameIdle:
-		  break;
+		  case kCGDisplayStreamFrameStatusFrameIdle:
+			  break;
 
-	  case kCGDisplayStreamFrameStatusStopped:
-		  break;
+		  case kCGDisplayStreamFrameStatusStopped:
+			  break;
 
-	  case kCGDisplayStreamFrameStatusFrameBlank:
-		  break;
+		  case kCGDisplayStreamFrameStatusFrameBlank:
+			  break;
 
-	  default:
-		  break;
+		  default:
+			  break;
 	  }
   }
   else if (!subsystem->lastUpdate)
@@ -494,15 +494,15 @@ static int mac_shadow_subsystem_process_message(macShadowSubsystem* subsystem, w
 
 	switch (message->id)
 	{
-	case SHADOW_MSG_IN_REFRESH_REQUEST_ID:
-		EnterCriticalSection(&(surface->lock));
-		shadow_subsystem_frame_update((rdpShadowSubsystem*)subsystem);
-		LeaveCriticalSection(&(surface->lock));
-		break;
+		case SHADOW_MSG_IN_REFRESH_REQUEST_ID:
+			EnterCriticalSection(&(surface->lock));
+			shadow_subsystem_frame_update((rdpShadowSubsystem*)subsystem);
+			LeaveCriticalSection(&(surface->lock));
+			break;
 
-	default:
-		WLog_ERR(TAG, "Unknown message id: %" PRIu32 "", message->id);
-		break;
+		default:
+			WLog_ERR(TAG, "Unknown message id: %" PRIu32 "", message->id);
+			break;
 	}
 
 	if (message->Free)

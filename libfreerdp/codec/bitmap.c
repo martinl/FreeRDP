@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/codec/bitmap.h>
@@ -1076,16 +1076,16 @@ SSIZE_T freerdp_bitmap_compress(const void* srcData, UINT32 width, UINT32 height
 
 	switch (bpp)
 	{
-	case 15:
-	case 16:
-		return freerdp_bitmap_compress_16(srcData, width, height, s, bpp, byte_limit, start_line,
-		                                  temp_s, e);
+		case 15:
+		case 16:
+			return freerdp_bitmap_compress_16(srcData, width, height, s, bpp, byte_limit,
+			                                  start_line, temp_s, e);
 
-	case 24:
-		return freerdp_bitmap_compress_24(srcData, width, height, s, byte_limit, start_line, temp_s,
-		                                  e);
+		case 24:
+			return freerdp_bitmap_compress_24(srcData, width, height, s, byte_limit, start_line,
+			                                  temp_s, e);
 
-	default:
-		return -1;
+		default:
+			return -1;
 	}
 }

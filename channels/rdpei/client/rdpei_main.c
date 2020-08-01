@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -508,41 +508,41 @@ UINT rdpei_recv_pdu(RDPEI_CHANNEL_CALLBACK* callback, wStream* s)
 
 	switch (eventId)
 	{
-	case EVENTID_SC_READY:
-		if ((error = rdpei_recv_sc_ready_pdu(callback, s)))
-		{
-			WLog_ERR(TAG, "rdpei_recv_sc_ready_pdu failed with error %" PRIu32 "!", error);
-			return error;
-		}
+		case EVENTID_SC_READY:
+			if ((error = rdpei_recv_sc_ready_pdu(callback, s)))
+			{
+				WLog_ERR(TAG, "rdpei_recv_sc_ready_pdu failed with error %" PRIu32 "!", error);
+				return error;
+			}
 
-		if ((error = rdpei_send_cs_ready_pdu(callback)))
-		{
-			WLog_ERR(TAG, "rdpei_send_cs_ready_pdu failed with error %" PRIu32 "!", error);
-			return error;
-		}
+			if ((error = rdpei_send_cs_ready_pdu(callback)))
+			{
+				WLog_ERR(TAG, "rdpei_send_cs_ready_pdu failed with error %" PRIu32 "!", error);
+				return error;
+			}
 
-		break;
+			break;
 
-	case EVENTID_SUSPEND_TOUCH:
-		if ((error = rdpei_recv_suspend_touch_pdu(callback, s)))
-		{
-			WLog_ERR(TAG, "rdpei_recv_suspend_touch_pdu failed with error %" PRIu32 "!", error);
-			return error;
-		}
+		case EVENTID_SUSPEND_TOUCH:
+			if ((error = rdpei_recv_suspend_touch_pdu(callback, s)))
+			{
+				WLog_ERR(TAG, "rdpei_recv_suspend_touch_pdu failed with error %" PRIu32 "!", error);
+				return error;
+			}
 
-		break;
+			break;
 
-	case EVENTID_RESUME_TOUCH:
-		if ((error = rdpei_recv_resume_touch_pdu(callback, s)))
-		{
-			WLog_ERR(TAG, "rdpei_recv_resume_touch_pdu failed with error %" PRIu32 "!", error);
-			return error;
-		}
+		case EVENTID_RESUME_TOUCH:
+			if ((error = rdpei_recv_resume_touch_pdu(callback, s)))
+			{
+				WLog_ERR(TAG, "rdpei_recv_resume_touch_pdu failed with error %" PRIu32 "!", error);
+				return error;
+			}
 
-		break;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return CHANNEL_RC_OK;
@@ -914,9 +914,9 @@ UINT rdpei_touch_end(RdpeiClientContext* context, int externalId, int x, int y, 
 }
 
 #ifdef BUILTIN_CHANNELS
-#	define DVCPluginEntry rdpei_DVCPluginEntry
+#define DVCPluginEntry rdpei_DVCPluginEntry
 #else
-#	define DVCPluginEntry FREERDP_API DVCPluginEntry
+#define DVCPluginEntry FREERDP_API DVCPluginEntry
 #endif
 
 /**

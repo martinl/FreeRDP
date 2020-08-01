@@ -29,7 +29,8 @@
 #pragma mark -
 #pragma mark Initialization
 
-- (id)initWithBookmark:(ComputerBookmark *)bookmark {
+- (id)initWithBookmark:(ComputerBookmark *)bookmark
+{
 	if ((self = [super initWithStyle:UITableViewStyleGrouped]))
 	{
 		// set additional settings state according to bookmark data
@@ -47,7 +48,8 @@
 #pragma mark -
 #pragma mark View lifecycle
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
 	[super viewDidLoad];
 
 	// replace back button with a custom handler that checks if the required bookmark settings were
@@ -66,7 +68,8 @@
 	[[self navigationItem] setRightBarButtonItem:saveButton];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated
+{
 	[super viewWillAppear:animated];
 
 	// we need to reload the table view data here to have up-to-date data for the
@@ -75,86 +78,91 @@
 }
 
 // Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
 	return YES;
 }
 
 #pragma mark -
 #pragma mark Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
 	// Return the number of sections.
 	return SECTION_COUNT;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
 	// Return the number of rows in the section.
 	switch (section)
 	{
-	case SECTION_SERVER: // server settings
-		return (_display_server_settings ? 3 : 0);
-	case SECTION_CREDENTIALS: // credentials
-		return 1;
-	case SECTION_SETTINGS: // session settings
-		return 3;
-	default:
-		break;
+		case SECTION_SERVER: // server settings
+			return (_display_server_settings ? 3 : 0);
+		case SECTION_CREDENTIALS: // credentials
+			return 1;
+		case SECTION_SETTINGS: // session settings
+			return 3;
+		default:
+			break;
 	}
 
 	return 0;
 }
 
 // set section headers
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
 	switch (section)
 	{
-	case SECTION_SERVER:
-		return (_display_server_settings
-		            ? NSLocalizedString(@"Host", @"'Host': host settings header")
-		            : nil);
-	case SECTION_CREDENTIALS:
-		return NSLocalizedString(@"Credentials", @"'Credentials': credentials settings header");
-	case SECTION_SETTINGS:
-		return NSLocalizedString(@"Settings", @"'Session Settings': session settings header");
+		case SECTION_SERVER:
+			return (_display_server_settings
+			            ? NSLocalizedString(@"Host", @"'Host': host settings header")
+			            : nil);
+		case SECTION_CREDENTIALS:
+			return NSLocalizedString(@"Credentials", @"'Credentials': credentials settings header");
+		case SECTION_SETTINGS:
+			return NSLocalizedString(@"Settings", @"'Session Settings': session settings header");
 	}
 	return @"unknown";
 }
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView
-         cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+         cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 
 	// determine the required cell type
 	NSString *cellType = nil;
 	switch ([indexPath section])
 	{
-	case SECTION_SERVER:
-		cellType = TableCellIdentifierText;
-		break;
+		case SECTION_SERVER:
+			cellType = TableCellIdentifierText;
+			break;
 
-	case SECTION_CREDENTIALS:
-		cellType = TableCellIdentifierSelection;
-		break;
-
-	case SECTION_SETTINGS: // settings
-	{
-		switch ([indexPath row])
-		{
-		case 0: // screen/color depth
+		case SECTION_CREDENTIALS:
 			cellType = TableCellIdentifierSelection;
 			break;
-		case 1: // performance settings
-		case 2: // advanced settings
-			cellType = TableCellIdentifierSubEditor;
-			break;
+
+		case SECTION_SETTINGS: // settings
+		{
+			switch ([indexPath row])
+			{
+				case 0: // screen/color depth
+					cellType = TableCellIdentifierSelection;
+					break;
+				case 1: // performance settings
+				case 2: // advanced settings
+					cellType = TableCellIdentifierSubEditor;
+					break;
+				default:
+					break;
+			}
+		}
+		break;
+
 		default:
 			break;
-		}
-	}
-	break;
-
-	default:
-		break;
 	}
 	NSAssert(cellType != nil, @"Couldn't determine cell type");
 
@@ -165,150 +173,157 @@
 	// set cell values
 	switch ([indexPath section])
 	{
-	// server settings
-	case SECTION_SERVER:
-		[self initServerSettings:indexPath cell:cell];
-		break;
+		// server settings
+		case SECTION_SERVER:
+			[self initServerSettings:indexPath cell:cell];
+			break;
 
-	// credentials
-	case SECTION_CREDENTIALS:
-		[self initCredentialSettings:indexPath cell:cell];
-		break;
+		// credentials
+		case SECTION_CREDENTIALS:
+			[self initCredentialSettings:indexPath cell:cell];
+			break;
 
-	// session settings
-	case SECTION_SETTINGS:
-		[self initSettings:indexPath cell:cell];
-		break;
+		// session settings
+		case SECTION_SETTINGS:
+			[self initSettings:indexPath cell:cell];
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return cell;
 }
 
 // updates server settings in the UI
-- (void)initServerSettings:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell {
+- (void)initServerSettings:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell
+{
 	EditTextTableViewCell *textCell = (EditTextTableViewCell *)cell;
 	[[textCell textfield] setTag:GET_TAG_FROM_PATH(indexPath)];
 	switch ([indexPath row])
 	{
-	case 0:
-		[[textCell label] setText:NSLocalizedString(@"Label", @"'Label': Bookmark label")];
-		[[textCell textfield] setText:[_bookmark label]];
-		[[textCell textfield] setPlaceholder:NSLocalizedString(@"not set", @"not set placeholder")];
-		break;
-	case 1:
-		[[textCell label] setText:NSLocalizedString(@"Host", @"'Host': Bookmark hostname")];
-		[[textCell textfield] setText:[_params StringForKey:@"hostname"]];
-		[[textCell textfield] setPlaceholder:NSLocalizedString(@"not set", @"not set placeholder")];
-		break;
-	case 2:
-		[[textCell label] setText:NSLocalizedString(@"Port", @"'Port': Bookmark port")];
-		[[textCell textfield]
-		    setText:[NSString stringWithFormat:@"%d", [_params intForKey:@"port"]]];
-		[[textCell textfield] setKeyboardType:UIKeyboardTypeNumberPad];
-		break;
-	default:
-		NSLog(@"Invalid row index in settings table!");
-		break;
+		case 0:
+			[[textCell label] setText:NSLocalizedString(@"Label", @"'Label': Bookmark label")];
+			[[textCell textfield] setText:[_bookmark label]];
+			[[textCell textfield]
+			    setPlaceholder:NSLocalizedString(@"not set", @"not set placeholder")];
+			break;
+		case 1:
+			[[textCell label] setText:NSLocalizedString(@"Host", @"'Host': Bookmark hostname")];
+			[[textCell textfield] setText:[_params StringForKey:@"hostname"]];
+			[[textCell textfield]
+			    setPlaceholder:NSLocalizedString(@"not set", @"not set placeholder")];
+			break;
+		case 2:
+			[[textCell label] setText:NSLocalizedString(@"Port", @"'Port': Bookmark port")];
+			[[textCell textfield]
+			    setText:[NSString stringWithFormat:@"%d", [_params intForKey:@"port"]]];
+			[[textCell textfield] setKeyboardType:UIKeyboardTypeNumberPad];
+			break;
+		default:
+			NSLog(@"Invalid row index in settings table!");
+			break;
 	}
 
 	[self adjustEditTextTableViewCell:textCell];
 }
 
 // updates credentials in the UI
-- (void)initCredentialSettings:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell {
+- (void)initCredentialSettings:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell
+{
 	EditSelectionTableViewCell *selCell = (EditSelectionTableViewCell *)cell;
 	switch (indexPath.row)
 	{
-	case 0:
-		[[selCell label]
-		    setText:NSLocalizedString(@"Credentials", @"'Credentials': Bookmark credentials")];
-		[[selCell selection] setText:[_params StringForKey:@"username"]];
-		break;
-	default:
-		NSLog(@"Invalid row index in settings table!");
-		break;
+		case 0:
+			[[selCell label]
+			    setText:NSLocalizedString(@"Credentials", @"'Credentials': Bookmark credentials")];
+			[[selCell selection] setText:[_params StringForKey:@"username"]];
+			break;
+		default:
+			NSLog(@"Invalid row index in settings table!");
+			break;
 	}
 }
 
 // updates session settings in the UI
-- (void)initSettings:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell {
+- (void)initSettings:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell
+{
 	switch (indexPath.row)
 	{
-	case 0:
-	{
-		EditSelectionTableViewCell *selCell = (EditSelectionTableViewCell *)cell;
-		[[selCell label]
-		    setText:NSLocalizedString(@"Screen", @"'Screen': Bookmark Screen settings")];
-		NSString *resolution = ScreenResolutionDescription(
-		    [_params intForKey:@"screen_resolution_type"], [_params intForKey:@"width"],
-		    [_params intForKey:@"height"]);
-		int colorBits = [_params intForKey:@"colors"];
-		[[selCell selection] setText:[NSString stringWithFormat:@"%@@%d", resolution, colorBits]];
-		break;
-	}
-	case 1:
-	{
-		EditSubEditTableViewCell *editCell = (EditSubEditTableViewCell *)cell;
-		[[editCell label]
-		    setText:NSLocalizedString(@"Performance",
-		                              @"'Performance': Bookmark Performance Settings")];
-		break;
-	}
-	case 2:
-	{
-		EditSubEditTableViewCell *editCell = (EditSubEditTableViewCell *)cell;
-		[[editCell label]
-		    setText:NSLocalizedString(@"Advanced", @"'Advanced': Bookmark Advanced Settings")];
-		break;
-	}
-	default:
-		NSLog(@"Invalid row index in settings table!");
-		break;
+		case 0:
+		{
+			EditSelectionTableViewCell *selCell = (EditSelectionTableViewCell *)cell;
+			[[selCell label]
+			    setText:NSLocalizedString(@"Screen", @"'Screen': Bookmark Screen settings")];
+			NSString *resolution = ScreenResolutionDescription(
+			    [_params intForKey:@"screen_resolution_type"], [_params intForKey:@"width"],
+			    [_params intForKey:@"height"]);
+			int colorBits = [_params intForKey:@"colors"];
+			[[selCell selection]
+			    setText:[NSString stringWithFormat:@"%@@%d", resolution, colorBits]];
+			break;
+		}
+		case 1:
+		{
+			EditSubEditTableViewCell *editCell = (EditSubEditTableViewCell *)cell;
+			[[editCell label]
+			    setText:NSLocalizedString(@"Performance",
+			                              @"'Performance': Bookmark Performance Settings")];
+			break;
+		}
+		case 2:
+		{
+			EditSubEditTableViewCell *editCell = (EditSubEditTableViewCell *)cell;
+			[[editCell label]
+			    setText:NSLocalizedString(@"Advanced", @"'Advanced': Bookmark Advanced Settings")];
+			break;
+		}
+		default:
+			NSLog(@"Invalid row index in settings table!");
+			break;
 	}
 }
 
 #pragma mark -
 #pragma mark Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	UIViewController *viewCtrl = nil;
 
 	// determine view
 	switch ([indexPath section])
 	{
-	case SECTION_CREDENTIALS:
-	{
-		if ([indexPath row] == 0)
-			viewCtrl =
-			    [[[CredentialsEditorController alloc] initWithBookmark:_bookmark] autorelease];
-		break;
-	}
-
-	case SECTION_SETTINGS:
-	{
-		switch ([indexPath row])
+		case SECTION_CREDENTIALS:
 		{
-		case 0:
-			viewCtrl =
-			    [[[ScreenSelectionController alloc] initWithConnectionParams:_params] autorelease];
-			break;
-		case 1:
-			viewCtrl = [[[PerformanceEditorController alloc] initWithConnectionParams:_params]
-			    autorelease];
-			break;
-		case 2:
-			viewCtrl =
-			    [[[AdvancedBookmarkEditorController alloc] initWithBookmark:_bookmark] autorelease];
-			break;
-		default:
+			if ([indexPath row] == 0)
+				viewCtrl =
+				    [[[CredentialsEditorController alloc] initWithBookmark:_bookmark] autorelease];
 			break;
 		}
 
-		break;
-	}
+		case SECTION_SETTINGS:
+		{
+			switch ([indexPath row])
+			{
+				case 0:
+					viewCtrl = [[[ScreenSelectionController alloc] initWithConnectionParams:_params]
+					    autorelease];
+					break;
+				case 1:
+					viewCtrl = [[[PerformanceEditorController alloc]
+					    initWithConnectionParams:_params] autorelease];
+					break;
+				case 2:
+					viewCtrl = [[[AdvancedBookmarkEditorController alloc]
+					    initWithBookmark:_bookmark] autorelease];
+					break;
+				default:
+					break;
+			}
+
+			break;
+		}
 	}
 
 	// display view
@@ -319,29 +334,31 @@
 #pragma mark -
 #pragma mark Text Field delegate
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
 	[textField resignFirstResponder];
 	return NO;
 }
 
-- (BOOL)textFieldShouldEndEditing:(UITextField *)textField {
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField
+{
 	switch (textField.tag)
 	{
-	// update server settings
-	case GET_TAG(SECTION_SERVER, 0):
-		[_bookmark setLabel:[textField text]];
-		break;
+		// update server settings
+		case GET_TAG(SECTION_SERVER, 0):
+			[_bookmark setLabel:[textField text]];
+			break;
 
-	case GET_TAG(SECTION_SERVER, 1):
-		[_params setValue:[textField text] forKey:@"hostname"];
-		break;
+		case GET_TAG(SECTION_SERVER, 1):
+			[_params setValue:[textField text] forKey:@"hostname"];
+			break;
 
-	case GET_TAG(SECTION_SERVER, 2):
-		[_params setInt:[[textField text] intValue] forKey:@"port"];
-		break;
+		case GET_TAG(SECTION_SERVER, 2):
+			[_params setInt:[[textField text] intValue] forKey:@"port"];
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 	return YES;
 }
@@ -349,7 +366,8 @@
 #pragma mark -
 #pragma mark Action Handlers
 
-- (void)handleSave:(id)sender {
+- (void)handleSave:(id)sender
+{
 	// resign any first responder (so that we finish editing any bookmark parameter that might be
 	// currently edited)
 	[[self view] endEditing:NO];
@@ -383,7 +401,8 @@
 	[[self navigationController] popViewControllerAnimated:YES];
 }
 
-- (void)handleCancel:(id)sender {
+- (void)handleCancel:(id)sender
+{
 	// return to previous view controller
 	[[self navigationController] popViewControllerAnimated:YES];
 }
@@ -391,14 +410,16 @@
 #pragma mark -
 #pragma mark Memory management
 
-- (void)didReceiveMemoryWarning {
+- (void)didReceiveMemoryWarning
+{
 	// Releases the view if it doesn't have a superview.
 	[super didReceiveMemoryWarning];
 
 	// Relinquish ownership any cached data, images, etc that aren't in use.
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[super dealloc];
 	[_bookmark autorelease];
 }

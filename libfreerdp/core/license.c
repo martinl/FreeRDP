@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -38,8 +38,8 @@
 #define TAG FREERDP_TAG("core.license")
 
 #if 0
-#	define LICENSE_NULL_CLIENT_RANDOM 1
-#	define LICENSE_NULL_PREMASTER_SECRET 1
+#define LICENSE_NULL_CLIENT_RANDOM 1
+#define LICENSE_NULL_PREMASTER_SECRET 1
 #endif
 
 static wStream* license_send_stream_init(rdpLicense* license);
@@ -505,40 +505,40 @@ int license_recv(rdpLicense* license, wStream* s)
 
 	switch (bMsgType)
 	{
-	case LICENSE_REQUEST:
-		if (!license_read_license_request_packet(license, s))
+		case LICENSE_REQUEST:
+			if (!license_read_license_request_packet(license, s))
+				return -1;
+
+			if (!license_answer_license_request(license))
+				return -1;
+
+			break;
+
+		case PLATFORM_CHALLENGE:
+			if (!license_read_platform_challenge_packet(license, s))
+				return -1;
+
+			if (!license_send_platform_challenge_response_packet(license))
+				return -1;
+
+			break;
+
+		case NEW_LICENSE:
+		case UPGRADE_LICENSE:
+			if (!license_read_new_or_upgrade_license_packet(license, s))
+				return -1;
+
+			break;
+
+		case ERROR_ALERT:
+			if (!license_read_error_alert_packet(license, s))
+				return -1;
+
+			break;
+
+		default:
+			WLog_ERR(TAG, "invalid bMsgType:%" PRIu8 "", bMsgType);
 			return -1;
-
-		if (!license_answer_license_request(license))
-			return -1;
-
-		break;
-
-	case PLATFORM_CHALLENGE:
-		if (!license_read_platform_challenge_packet(license, s))
-			return -1;
-
-		if (!license_send_platform_challenge_response_packet(license))
-			return -1;
-
-		break;
-
-	case NEW_LICENSE:
-	case UPGRADE_LICENSE:
-		if (!license_read_new_or_upgrade_license_packet(license, s))
-			return -1;
-
-		break;
-
-	case ERROR_ALERT:
-		if (!license_read_error_alert_packet(license, s))
-			return -1;
-
-		break;
-
-	default:
-		WLog_ERR(TAG, "invalid bMsgType:%" PRIu8 "", bMsgType);
-		return -1;
 	}
 
 	return 0;
@@ -1356,23 +1356,23 @@ BOOL license_read_error_alert_packet(rdpLicense* license, wStream* s)
 
 	switch (dwStateTransition)
 	{
-	case ST_TOTAL_ABORT:
-		license->state = LICENSE_STATE_ABORTED;
-		break;
+		case ST_TOTAL_ABORT:
+			license->state = LICENSE_STATE_ABORTED;
+			break;
 
-	case ST_NO_TRANSITION:
-		license->state = LICENSE_STATE_COMPLETED;
-		break;
+		case ST_NO_TRANSITION:
+			license->state = LICENSE_STATE_COMPLETED;
+			break;
 
-	case ST_RESET_PHASE_TO_START:
-		license->state = LICENSE_STATE_AWAIT;
-		break;
+		case ST_RESET_PHASE_TO_START:
+			license->state = LICENSE_STATE_AWAIT;
+			break;
 
-	case ST_RESEND_LAST_MESSAGE:
-		break;
+		case ST_RESEND_LAST_MESSAGE:
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return TRUE;

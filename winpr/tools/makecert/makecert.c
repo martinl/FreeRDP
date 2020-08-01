@@ -26,12 +26,12 @@
 #include <winpr/crypto.h>
 
 #ifdef WITH_OPENSSL
-#	include <openssl/crypto.h>
-#	include <openssl/conf.h>
-#	include <openssl/pem.h>
-#	include <openssl/rsa.h>
-#	include <openssl/pkcs12.h>
-#	include <openssl/x509v3.h>
+#include <openssl/crypto.h>
+#include <openssl/conf.h>
+#include <openssl/pem.h>
+#include <openssl/rsa.h>
+#include <openssl/pkcs12.h>
+#include <openssl/x509v3.h>
 #endif
 
 #include <winpr/tools/makecert.h>
@@ -581,15 +581,15 @@ int makecert_context_output_certificate_file(MAKECERT_CONTEXT* context, char* pa
 				printf("Using default export password \"password\"\n");
 			}
 
-#	if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
+#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
 			OpenSSL_add_all_algorithms();
 			OpenSSL_add_all_ciphers();
 			OpenSSL_add_all_digests();
-#	else
+#else
 			OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS |
 			                        OPENSSL_INIT_LOAD_CONFIG,
 			                    NULL);
-#	endif
+#endif
 			context->pkcs12 = PKCS12_create(context->password, context->default_name, context->pkey,
 			                                context->x509, NULL, 0, 0, 0, 0, 0);
 
@@ -967,9 +967,9 @@ int makecert_context_process(MAKECERT_CONTEXT* context, int argc, char** argv)
 			return -1;
 	}
 
-#	if (OPENSSL_VERSION_NUMBER < 0x10100000L) || defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L) || defined(LIBRESSL_VERSION_NUMBER)
 	context->rsa = RSA_generate_key(key_length, RSA_F4, NULL, NULL);
-#	else
+#else
 	{
 		BIGNUM* rsa = BN_secure_new();
 		int rc;
@@ -992,7 +992,7 @@ int makecert_context_process(MAKECERT_CONTEXT* context, int argc, char** argv)
 		if (rc != 1)
 			return -1;
 	}
-#	endif
+#endif
 
 	if (!EVP_PKEY_assign_RSA(context->pkey, context->rsa))
 		return -1;
@@ -1015,13 +1015,13 @@ int makecert_context_process(MAKECERT_CONTEXT* context, int argc, char** argv)
 	{
 		ASN1_TIME* before;
 		ASN1_TIME* after;
-#	if (OPENSSL_VERSION_NUMBER < 0x10100000L) || defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L) || defined(LIBRESSL_VERSION_NUMBER)
 		before = X509_get_notBefore(context->x509);
 		after = X509_get_notAfter(context->x509);
-#	else
+#else
 		before = X509_getm_notBefore(context->x509);
 		after = X509_getm_notAfter(context->x509);
-#	endif
+#endif
 		X509_gmtime_adj(before, 0);
 
 		if (context->duration_months)
@@ -1221,9 +1221,9 @@ void makecert_context_free(MAKECERT_CONTEXT* context)
 #ifdef WITH_OPENSSL
 		X509_free(context->x509);
 		EVP_PKEY_free(context->pkey);
-#	if (OPENSSL_VERSION_NUMBER < 0x10100000L) || defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L) || defined(LIBRESSL_VERSION_NUMBER)
 		CRYPTO_cleanup_all_ex_data();
-#	endif
+#endif
 #endif
 		free(context);
 	}

@@ -334,22 +334,22 @@ public class SessionView extends View
 			sessionViewListener.onSessionViewBeginTouch();
 			switch (e.getButtonState())
 			{
-			case MotionEvent.BUTTON_PRIMARY:
-				sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
-				                                           (int)mappedEvent.getY(), true);
-				sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
-				                                           (int)mappedEvent.getY(), false);
-				break;
-			case MotionEvent.BUTTON_SECONDARY:
-				sessionViewListener.onSessionViewRightTouch((int)mappedEvent.getX(),
-				                                            (int)mappedEvent.getY(), true);
-				sessionViewListener.onSessionViewRightTouch((int)mappedEvent.getX(),
-				                                            (int)mappedEvent.getY(), false);
-				sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
-				                                           (int)mappedEvent.getY(), true);
-				sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
-				                                           (int)mappedEvent.getY(), false);
-				break;
+				case MotionEvent.BUTTON_PRIMARY:
+					sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
+					                                           (int)mappedEvent.getY(), true);
+					sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
+					                                           (int)mappedEvent.getY(), false);
+					break;
+				case MotionEvent.BUTTON_SECONDARY:
+					sessionViewListener.onSessionViewRightTouch((int)mappedEvent.getX(),
+					                                            (int)mappedEvent.getY(), true);
+					sessionViewListener.onSessionViewRightTouch((int)mappedEvent.getX(),
+					                                            (int)mappedEvent.getY(), false);
+					sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
+					                                           (int)mappedEvent.getY(), true);
+					sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
+					                                           (int)mappedEvent.getY(), false);
+					break;
 			}
 			sessionViewListener.onSessionViewEndTouch();
 			return true;

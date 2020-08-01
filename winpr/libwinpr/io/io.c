@@ -18,46 +18,46 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/io.h>
 
 #ifndef _WIN32
 
-#	ifdef HAVE_UNISTD_H
-#		include <unistd.h>
-#	endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
-#	include <time.h>
-#	include <errno.h>
-#	include <stdio.h>
-#	include <stdlib.h>
-#	include <string.h>
-#	include <dirent.h>
+#include <time.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dirent.h>
 
-#	include <fcntl.h>
-#	include <sys/un.h>
-#	include <sys/stat.h>
-#	include <sys/socket.h>
+#include <fcntl.h>
+#include <sys/un.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
 
-#	include <winpr/crt.h>
-#	include <winpr/wlog.h>
+#include <winpr/crt.h>
+#include <winpr/wlog.h>
 
-#	include "../handle/handle.h"
-#	include "../pipe/pipe.h"
-#	include "../log.h"
+#include "../handle/handle.h"
+#include "../pipe/pipe.h"
+#include "../log.h"
 
-#	define TAG WINPR_TAG("io")
+#define TAG WINPR_TAG("io")
 
 BOOL GetOverlappedResult(HANDLE hFile, LPOVERLAPPED lpOverlapped,
                          LPDWORD lpNumberOfBytesTransferred, BOOL bWait)
 {
-#	if 1
+#if 1
 	WLog_ERR(TAG, "%s: Not implemented", __FUNCTION__);
 	SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
 	return FALSE;
-#	else
+#else
 	ULONG Type;
 	WINPR_HANDLE* Object;
 
@@ -123,7 +123,7 @@ BOOL GetOverlappedResult(HANDLE hFile, LPOVERLAPPED lpOverlapped,
 	}
 
 	return TRUE;
-#	endif
+#endif
 }
 
 BOOL GetOverlappedResultEx(HANDLE hFile, LPOVERLAPPED lpOverlapped,
@@ -203,12 +203,12 @@ BOOL CancelSynchronousIo(HANDLE hThread)
 
 #ifdef _UWP
 
-#	include <winpr/crt.h>
-#	include <winpr/wlog.h>
+#include <winpr/crt.h>
+#include <winpr/wlog.h>
 
-#	include "../log.h"
+#include "../log.h"
 
-#	define TAG WINPR_TAG("io")
+#define TAG WINPR_TAG("io")
 
 BOOL GetOverlappedResult(HANDLE hFile, LPOVERLAPPED lpOverlapped,
                          LPDWORD lpNumberOfBytesTransferred, BOOL bWait)

@@ -20,7 +20,8 @@
 
 - (id)initWithConnectionParams:(ConnectionParams *)params
                        entries:(NSArray *)entries
-                    selections:(NSArray *)selections {
+                    selections:(NSArray *)selections
+{
 	self = [super initWithStyle:UITableViewStyleGrouped];
 	if (self)
 	{
@@ -46,7 +47,8 @@
 	return self;
 }
 
-- (void)didReceiveMemoryWarning {
+- (void)didReceiveMemoryWarning
+{
 	// Releases the view if it doesn't have a superview.
 	[super didReceiveMemoryWarning];
 
@@ -59,25 +61,29 @@
 
 #pragma mark - View lifecycle
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
 	// Return YES for supported orientations
 	return YES;
 }
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
 	// Return the number of sections.
 	return [_entries count];
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
 	// Return the number of rows in the section.
 	return [[self selectionForIndex:section] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView
-         cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+         cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	UITableViewCell *cell = [self tableViewCellFromIdentifier:TableCellIdentifierMultiChoice];
 
 	// get selection
@@ -97,7 +103,8 @@
 
 #pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	// has selection change?
 	int cur_selection = [[_cur_selections objectAtIndex:[indexPath section]] intValue];
 	if ([indexPath row] != cur_selection)
@@ -128,7 +135,8 @@
 
 #pragma mark - Convenience functions
 
-- (OrderedDictionary *)selectionForIndex:(int)index {
+- (OrderedDictionary *)selectionForIndex:(int)index
+{
 	return (OrderedDictionary *)[_selections objectAtIndex:index];
 }
 

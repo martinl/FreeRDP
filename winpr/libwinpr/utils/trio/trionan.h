@@ -26,10 +26,10 @@ extern "C"
 #endif
 
 #if !defined(TRIO_PUBLIC_NAN)
-#	if !defined(TRIO_PUBLIC)
-#		define TRIO_PUBLIC
-#	endif
-#	define TRIO_PUBLIC_NAN TRIO_PUBLIC
+#if !defined(TRIO_PUBLIC)
+#define TRIO_PUBLIC
+#endif
+#define TRIO_PUBLIC_NAN TRIO_PUBLIC
 #endif
 
 	enum
@@ -54,23 +54,23 @@ extern "C"
 	 * The following resolves internal dependencies.
 	 */
 
-#	if defined(TRIO_FUNC_ISNAN) || defined(TRIO_FUNC_ISINF)
-#		if !defined(TRIO_FUNC_FPCLASSIFY_AND_SIGNBIT)
-#			define TRIO_FUNC_FPCLASSIFY_AND_SIGNBIT
-#		endif
-#	endif
+#if defined(TRIO_FUNC_ISNAN) || defined(TRIO_FUNC_ISINF)
+#if !defined(TRIO_FUNC_FPCLASSIFY_AND_SIGNBIT)
+#define TRIO_FUNC_FPCLASSIFY_AND_SIGNBIT
+#endif
+#endif
 
-#	if defined(TRIO_FUNC_NAN)
-#		if !defined(TRIO_FUNC_PINF)
-#			define TRIO_FUNC_PINF
-#		endif
-#	endif
+#if defined(TRIO_FUNC_NAN)
+#if !defined(TRIO_FUNC_PINF)
+#define TRIO_FUNC_PINF
+#endif
+#endif
 
-#	if defined(TRIO_FUNC_NINF)
-#		if !defined(TRIO_FUNC_PINF)
-#			define TRIO_FUNC_PINF
-#		endif
-#	endif
+#if defined(TRIO_FUNC_NINF)
+#if !defined(TRIO_FUNC_PINF)
+#define TRIO_FUNC_PINF
+#endif
+#endif
 
 #else
 
@@ -78,16 +78,16 @@ extern "C"
  * When trionan is not embedded all all functions are defined.
  */
 
-#	define TRIO_FUNC_NAN
-#	define TRIO_FUNC_PINF
-#	define TRIO_FUNC_NINF
-#	define TRIO_FUNC_NZERO
-#	define TRIO_FUNC_ISNAN
-#	define TRIO_FUNC_ISINF
-#	define TRIO_FUNC_ISFINITE
-#	define TRIO_FUNC_SIGNBIT
-#	define TRIO_FUNC_FPCLASSIFY
-#	define TRIO_FUNC_FPCLASSIFY_AND_SIGNBIT
+#define TRIO_FUNC_NAN
+#define TRIO_FUNC_PINF
+#define TRIO_FUNC_NINF
+#define TRIO_FUNC_NZERO
+#define TRIO_FUNC_ISNAN
+#define TRIO_FUNC_ISINF
+#define TRIO_FUNC_ISFINITE
+#define TRIO_FUNC_SIGNBIT
+#define TRIO_FUNC_FPCLASSIFY
+#define TRIO_FUNC_FPCLASSIFY_AND_SIGNBIT
 
 #endif
 

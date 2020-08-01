@@ -22,7 +22,8 @@
 #pragma mark -
 #pragma mark Initialization
 
-- (id)initWithStyle:(UITableViewStyle)style {
+- (id)initWithStyle:(UITableViewStyle)style
+{
 	if ((self = [super initWithStyle:style]))
 	{
 		UIImage *tabBarIcon = [UIImage
@@ -40,23 +41,27 @@
 #pragma mark -
 #pragma mark View lifecycle
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
 	[super viewDidLoad];
 
 	// set title
 	[self setTitle:NSLocalizedString(@"Settings", @"App Settings title")];
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
+- (void)viewWillDisappear:(BOOL)animated
+{
 	[super viewWillDisappear:animated];
 }
 
 // Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
 	return YES;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
 }
@@ -64,76 +69,80 @@
 #pragma mark -
 #pragma mark Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
 	// Return the number of sections.
 	return SECTION_NUM_SECTIONS;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
 	// Return the number of rows in the section.
 	switch (section)
 	{
-	case SECTION_UI_SETTINGS: // UI settings
-		return 5;
-	case SECTION_CERTIFICATE_HANDLING_SETTINGS: // certificate handling settings
-		return 2;
-	default:
-		break;
+		case SECTION_UI_SETTINGS: // UI settings
+			return 5;
+		case SECTION_CERTIFICATE_HANDLING_SETTINGS: // certificate handling settings
+			return 2;
+		default:
+			break;
 	}
 
 	return 0;
 }
 
 // set section headers
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
 	switch (section)
 	{
-	case SECTION_UI_SETTINGS:
-		return NSLocalizedString(@"User Interface", @"UI settings section title");
-	case SECTION_CERTIFICATE_HANDLING_SETTINGS:
-		return NSLocalizedString(@"Server Certificate Handling",
-		                         @"Server Certificate Handling section title");
-	default:
-		return nil;
+		case SECTION_UI_SETTINGS:
+			return NSLocalizedString(@"User Interface", @"UI settings section title");
+		case SECTION_CERTIFICATE_HANDLING_SETTINGS:
+			return NSLocalizedString(@"Server Certificate Handling",
+			                         @"Server Certificate Handling section title");
+		default:
+			return nil;
 	}
 	return @"unknown";
 }
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView
-         cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+         cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 
 	// determine the required cell type
 	NSString *cellIdentifier = nil;
 	switch ([indexPath section])
 	{
-	case SECTION_UI_SETTINGS:
-	{
-		switch ([indexPath row])
+		case SECTION_UI_SETTINGS:
 		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-			cellIdentifier = TableCellIdentifierYesNo;
+			switch ([indexPath row])
+			{
+				case 0:
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+					cellIdentifier = TableCellIdentifierYesNo;
+					break;
+			}
 			break;
 		}
-		break;
-	}
-	case SECTION_CERTIFICATE_HANDLING_SETTINGS:
-	{
-		switch ([indexPath row])
+		case SECTION_CERTIFICATE_HANDLING_SETTINGS:
 		{
-		case 0:
-			cellIdentifier = TableCellIdentifierYesNo;
-			break;
-		case 1:
-			cellIdentifier = TableCellIdentifierSubEditor;
+			switch ([indexPath row])
+			{
+				case 0:
+					cellIdentifier = TableCellIdentifierYesNo;
+					break;
+				case 1:
+					cellIdentifier = TableCellIdentifierSubEditor;
+					break;
+			}
 			break;
 		}
-		break;
-	}
 	}
 	NSAssert(cellIdentifier != nil, @"Couldn't determine cell type");
 
@@ -144,16 +153,16 @@
 	// set cell values
 	switch ([indexPath section])
 	{
-	case SECTION_UI_SETTINGS:
-		[self initUISettings:indexPath cell:cell];
-		break;
+		case SECTION_UI_SETTINGS:
+			[self initUISettings:indexPath cell:cell];
+			break;
 
-	case SECTION_CERTIFICATE_HANDLING_SETTINGS:
-		[self initCertificateHandlingSettings:indexPath cell:cell];
-		break;
+		case SECTION_CERTIFICATE_HANDLING_SETTINGS:
+			[self initCertificateHandlingSettings:indexPath cell:cell];
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return cell;
@@ -162,114 +171,117 @@
 #pragma mark - Initialization helpers
 
 // updates UI settings in the UI
-- (void)initUISettings:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell {
+- (void)initUISettings:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell
+{
 	switch ([indexPath row])
 	{
-	case 0:
-	{
-		EditFlagTableViewCell *flagCell = (EditFlagTableViewCell *)cell;
-		[[flagCell label]
-		    setText:NSLocalizedString(@"Hide Status Bar", "Show/Hide Phone Status Bar setting")];
-		[[flagCell toggle] setTag:GET_TAG_FROM_PATH(indexPath)];
-		[[flagCell toggle]
-		    setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@"ui.hide_status_bar"]];
-		[[flagCell toggle] addTarget:self
-		                      action:@selector(toggleSettingValue:)
-		            forControlEvents:UIControlEventValueChanged];
-		break;
-	}
-	case 1:
-	{
-		EditFlagTableViewCell *flagCell = (EditFlagTableViewCell *)cell;
-		[[flagCell label]
-		    setText:NSLocalizedString(@"Hide Tool Bar", "Show/Hide Tool Bar setting")];
-		[[flagCell toggle] setTag:GET_TAG_FROM_PATH(indexPath)];
-		[[flagCell toggle]
-		    setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@"ui.hide_tool_bar"]];
-		[[flagCell toggle] addTarget:self
-		                      action:@selector(toggleSettingValue:)
-		            forControlEvents:UIControlEventValueChanged];
-		break;
-	}
-	case 2:
-	{
-		EditFlagTableViewCell *flagCell = (EditFlagTableViewCell *)cell;
-		[[flagCell label]
-		    setText:NSLocalizedString(@"Swap Mouse Buttons", "Swap Mouse Button UI setting")];
-		[[flagCell toggle] setTag:GET_TAG_FROM_PATH(indexPath)];
-		[[flagCell toggle]
-		    setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@"ui.swap_mouse_buttons"]];
-		[[flagCell toggle] addTarget:self
-		                      action:@selector(toggleSettingValue:)
-		            forControlEvents:UIControlEventValueChanged];
-		break;
-	}
-	case 3:
-	{
-		EditFlagTableViewCell *flagCell = (EditFlagTableViewCell *)cell;
-		[[flagCell label]
-		    setText:NSLocalizedString(@"Invert Scrolling", "Invert Scrolling UI setting")];
-		[[flagCell toggle] setTag:GET_TAG_FROM_PATH(indexPath)];
-		[[flagCell toggle]
-		    setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@"ui.invert_scrolling"]];
-		[[flagCell toggle] addTarget:self
-		                      action:@selector(toggleSettingValue:)
-		            forControlEvents:UIControlEventValueChanged];
-		break;
-	}
-	case 4:
-	{
-		EditFlagTableViewCell *flagCell = (EditFlagTableViewCell *)cell;
-		[[flagCell label] setText:NSLocalizedString(@"Touch Pointer Auto Scroll",
-		                                            "Touch Pointer Auto Scroll UI setting")];
-		[[flagCell toggle] setTag:GET_TAG_FROM_PATH(indexPath)];
-		[[flagCell toggle] setOn:[[NSUserDefaults standardUserDefaults]
-		                             boolForKey:@"ui.auto_scroll_touchpointer"]];
-		[[flagCell toggle] addTarget:self
-		                      action:@selector(toggleSettingValue:)
-		            forControlEvents:UIControlEventValueChanged];
-		break;
-	}
-	default:
-		NSLog(@"Invalid row index in settings table!");
-		break;
+		case 0:
+		{
+			EditFlagTableViewCell *flagCell = (EditFlagTableViewCell *)cell;
+			[[flagCell label] setText:NSLocalizedString(@"Hide Status Bar",
+			                                            "Show/Hide Phone Status Bar setting")];
+			[[flagCell toggle] setTag:GET_TAG_FROM_PATH(indexPath)];
+			[[flagCell toggle]
+			    setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@"ui.hide_status_bar"]];
+			[[flagCell toggle] addTarget:self
+			                      action:@selector(toggleSettingValue:)
+			            forControlEvents:UIControlEventValueChanged];
+			break;
+		}
+		case 1:
+		{
+			EditFlagTableViewCell *flagCell = (EditFlagTableViewCell *)cell;
+			[[flagCell label]
+			    setText:NSLocalizedString(@"Hide Tool Bar", "Show/Hide Tool Bar setting")];
+			[[flagCell toggle] setTag:GET_TAG_FROM_PATH(indexPath)];
+			[[flagCell toggle]
+			    setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@"ui.hide_tool_bar"]];
+			[[flagCell toggle] addTarget:self
+			                      action:@selector(toggleSettingValue:)
+			            forControlEvents:UIControlEventValueChanged];
+			break;
+		}
+		case 2:
+		{
+			EditFlagTableViewCell *flagCell = (EditFlagTableViewCell *)cell;
+			[[flagCell label]
+			    setText:NSLocalizedString(@"Swap Mouse Buttons", "Swap Mouse Button UI setting")];
+			[[flagCell toggle] setTag:GET_TAG_FROM_PATH(indexPath)];
+			[[flagCell toggle]
+			    setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@"ui.swap_mouse_buttons"]];
+			[[flagCell toggle] addTarget:self
+			                      action:@selector(toggleSettingValue:)
+			            forControlEvents:UIControlEventValueChanged];
+			break;
+		}
+		case 3:
+		{
+			EditFlagTableViewCell *flagCell = (EditFlagTableViewCell *)cell;
+			[[flagCell label]
+			    setText:NSLocalizedString(@"Invert Scrolling", "Invert Scrolling UI setting")];
+			[[flagCell toggle] setTag:GET_TAG_FROM_PATH(indexPath)];
+			[[flagCell toggle]
+			    setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@"ui.invert_scrolling"]];
+			[[flagCell toggle] addTarget:self
+			                      action:@selector(toggleSettingValue:)
+			            forControlEvents:UIControlEventValueChanged];
+			break;
+		}
+		case 4:
+		{
+			EditFlagTableViewCell *flagCell = (EditFlagTableViewCell *)cell;
+			[[flagCell label] setText:NSLocalizedString(@"Touch Pointer Auto Scroll",
+			                                            "Touch Pointer Auto Scroll UI setting")];
+			[[flagCell toggle] setTag:GET_TAG_FROM_PATH(indexPath)];
+			[[flagCell toggle] setOn:[[NSUserDefaults standardUserDefaults]
+			                             boolForKey:@"ui.auto_scroll_touchpointer"]];
+			[[flagCell toggle] addTarget:self
+			                      action:@selector(toggleSettingValue:)
+			            forControlEvents:UIControlEventValueChanged];
+			break;
+		}
+		default:
+			NSLog(@"Invalid row index in settings table!");
+			break;
 	}
 }
 
 // updates certificate handling settings in the UI
-- (void)initCertificateHandlingSettings:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell {
+- (void)initCertificateHandlingSettings:(NSIndexPath *)indexPath cell:(UITableViewCell *)cell
+{
 	switch ([indexPath row])
 	{
-	case 0:
-	{
-		EditFlagTableViewCell *flagCell = (EditFlagTableViewCell *)cell;
-		[[flagCell label] setText:NSLocalizedString(@"Accept all Certificates",
-		                                            "Accept All Certificates setting")];
-		[[flagCell toggle] setTag:GET_TAG_FROM_PATH(indexPath)];
-		[[flagCell toggle] setOn:[[NSUserDefaults standardUserDefaults]
-		                             boolForKey:@"security.accept_certificates"]];
-		[[flagCell toggle] addTarget:self
-		                      action:@selector(toggleSettingValue:)
-		            forControlEvents:UIControlEventValueChanged];
-		break;
-	}
-	case 1:
-	{
-		EditSubEditTableViewCell *subCell = (EditSubEditTableViewCell *)cell;
-		[[subCell label] setText:NSLocalizedString(@"Erase Certificate Cache",
-		                                           @"Erase certificate cache button")];
-		break;
-	}
-	default:
-		NSLog(@"Invalid row index in settings table!");
-		break;
+		case 0:
+		{
+			EditFlagTableViewCell *flagCell = (EditFlagTableViewCell *)cell;
+			[[flagCell label] setText:NSLocalizedString(@"Accept all Certificates",
+			                                            "Accept All Certificates setting")];
+			[[flagCell toggle] setTag:GET_TAG_FROM_PATH(indexPath)];
+			[[flagCell toggle] setOn:[[NSUserDefaults standardUserDefaults]
+			                             boolForKey:@"security.accept_certificates"]];
+			[[flagCell toggle] addTarget:self
+			                      action:@selector(toggleSettingValue:)
+			            forControlEvents:UIControlEventValueChanged];
+			break;
+		}
+		case 1:
+		{
+			EditSubEditTableViewCell *subCell = (EditSubEditTableViewCell *)cell;
+			[[subCell label] setText:NSLocalizedString(@"Erase Certificate Cache",
+			                                           @"Erase certificate cache button")];
+			break;
+		}
+		default:
+			NSLog(@"Invalid row index in settings table!");
+			break;
 	}
 }
 
 #pragma mark -
 #pragma mark Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
 
 	// deselect any row to fake a button-pressed like effect
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -302,45 +314,46 @@
 #pragma mark -
 #pragma mark Action Handlers
 
-- (void)toggleSettingValue:(id)sender {
+- (void)toggleSettingValue:(id)sender
+{
 	UISwitch *valueSwitch = (UISwitch *)sender;
 	switch ([valueSwitch tag])
 	{
-	case GET_TAG(SECTION_UI_SETTINGS, 0):
-		[[NSUserDefaults standardUserDefaults] setBool:[valueSwitch isOn]
-		                                        forKey:@"ui.hide_status_bar"];
-		break;
+		case GET_TAG(SECTION_UI_SETTINGS, 0):
+			[[NSUserDefaults standardUserDefaults] setBool:[valueSwitch isOn]
+			                                        forKey:@"ui.hide_status_bar"];
+			break;
 
-	case GET_TAG(SECTION_UI_SETTINGS, 1):
-		[[NSUserDefaults standardUserDefaults] setBool:[valueSwitch isOn]
-		                                        forKey:@"ui.hide_tool_bar"];
-		break;
+		case GET_TAG(SECTION_UI_SETTINGS, 1):
+			[[NSUserDefaults standardUserDefaults] setBool:[valueSwitch isOn]
+			                                        forKey:@"ui.hide_tool_bar"];
+			break;
 
-	case GET_TAG(SECTION_UI_SETTINGS, 2):
-		[[NSUserDefaults standardUserDefaults] setBool:[valueSwitch isOn]
-		                                        forKey:@"ui.swap_mouse_buttons"];
-		SetSwapMouseButtonsFlag([valueSwitch isOn]);
-		break;
+		case GET_TAG(SECTION_UI_SETTINGS, 2):
+			[[NSUserDefaults standardUserDefaults] setBool:[valueSwitch isOn]
+			                                        forKey:@"ui.swap_mouse_buttons"];
+			SetSwapMouseButtonsFlag([valueSwitch isOn]);
+			break;
 
-	case GET_TAG(SECTION_UI_SETTINGS, 3):
-		[[NSUserDefaults standardUserDefaults] setBool:[valueSwitch isOn]
-		                                        forKey:@"ui.invert_scrolling"];
-		SetInvertScrollingFlag([valueSwitch isOn]);
-		break;
+		case GET_TAG(SECTION_UI_SETTINGS, 3):
+			[[NSUserDefaults standardUserDefaults] setBool:[valueSwitch isOn]
+			                                        forKey:@"ui.invert_scrolling"];
+			SetInvertScrollingFlag([valueSwitch isOn]);
+			break;
 
-	case GET_TAG(SECTION_UI_SETTINGS, 4):
-		[[NSUserDefaults standardUserDefaults] setBool:[valueSwitch isOn]
-		                                        forKey:@"ui.auto_scroll_touchpointer"];
-		SetInvertScrollingFlag([valueSwitch isOn]);
-		break;
+		case GET_TAG(SECTION_UI_SETTINGS, 4):
+			[[NSUserDefaults standardUserDefaults] setBool:[valueSwitch isOn]
+			                                        forKey:@"ui.auto_scroll_touchpointer"];
+			SetInvertScrollingFlag([valueSwitch isOn]);
+			break;
 
-	case GET_TAG(SECTION_CERTIFICATE_HANDLING_SETTINGS, 0):
-		[[NSUserDefaults standardUserDefaults] setBool:[valueSwitch isOn]
-		                                        forKey:@"security.accept_certificates"];
-		break;
+		case GET_TAG(SECTION_CERTIFICATE_HANDLING_SETTINGS, 0):
+			[[NSUserDefaults standardUserDefaults] setBool:[valueSwitch isOn]
+			                                        forKey:@"security.accept_certificates"];
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 }
 

@@ -44,19 +44,19 @@
 #define BMF_32BPP 0x6
 
 #ifndef _WIN32
-#	define BS_SOLID 0x00
-#	define BS_NULL 0x01
-#	define BS_HATCHED 0x02
-#	define BS_PATTERN 0x03
+#define BS_SOLID 0x00
+#define BS_NULL 0x01
+#define BS_HATCHED 0x02
+#define BS_PATTERN 0x03
 #endif
 
 #ifndef _WIN32
-#	define HS_HORIZONTAL 0x00
-#	define HS_VERTICAL 0x01
-#	define HS_FDIAGONAL 0x02
-#	define HS_BDIAGONAL 0x03
-#	define HS_CROSS 0x04
-#	define HS_DIAGCROSS 0x05
+#define HS_HORIZONTAL 0x00
+#define HS_VERTICAL 0x01
+#define HS_FDIAGONAL 0x02
+#define HS_BDIAGONAL 0x03
+#define HS_CROSS 0x04
+#define HS_DIAGCROSS 0x05
 #endif
 
 #define SO_FLAG_DEFAULT_PLACEMENT 0x01

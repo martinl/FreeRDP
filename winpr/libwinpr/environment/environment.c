@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -31,22 +31,22 @@
 
 #ifndef _WIN32
 
-#	define stricmp strcasecmp
-#	define strnicmp strncasecmp
+#define stricmp strcasecmp
+#define strnicmp strncasecmp
 
-#	include <winpr/crt.h>
-#	include <winpr/platform.h>
+#include <winpr/crt.h>
+#include <winpr/platform.h>
 
-#	ifdef HAVE_UNISTD_H
-#		include <unistd.h>
-#	endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
-#	if defined(__IOS__)
+#if defined(__IOS__)
 
-#	elif defined(__MACOSX__)
-#		include <crt_externs.h>
-#		define environ (*_NSGetEnviron())
-#	endif
+#elif defined(__MACOSX__)
+#include <crt_externs.h>
+#define environ (*_NSGetEnviron())
+#endif
 
 DWORD GetCurrentDirectoryA(DWORD nBufferLength, LPSTR lpBuffer)
 {
@@ -138,7 +138,7 @@ BOOL NeedCurrentDirectoryForExePathW(LPCWSTR ExeName)
 
 DWORD GetEnvironmentVariableA(LPCSTR lpName, LPSTR lpBuffer, DWORD nSize)
 {
-#	if !defined(_UWP)
+#if !defined(_UWP)
 	size_t length;
 	char* env = NULL;
 	env = getenv(lpName);
@@ -157,10 +157,10 @@ DWORD GetEnvironmentVariableA(LPCSTR lpName, LPSTR lpBuffer, DWORD nSize)
 	CopyMemory(lpBuffer, env, length);
 	lpBuffer[length] = '\0';
 	return length;
-#	else
+#else
 	SetLastError(ERROR_ENVVAR_NOT_FOUND);
 	return 0;
-#	endif
+#endif
 }
 
 DWORD GetEnvironmentVariableW(LPCWSTR lpName, LPWSTR lpBuffer, DWORD nSize)
@@ -171,7 +171,7 @@ DWORD GetEnvironmentVariableW(LPCWSTR lpName, LPWSTR lpBuffer, DWORD nSize)
 
 BOOL SetEnvironmentVariableA(LPCSTR lpName, LPCSTR lpValue)
 {
-#	if !defined(_UWP)
+#if !defined(_UWP)
 
 	if (!lpName)
 		return FALSE;
@@ -188,9 +188,9 @@ BOOL SetEnvironmentVariableA(LPCSTR lpName, LPCSTR lpValue)
 	}
 
 	return TRUE;
-#	else
+#else
 	return FALSE;
-#	endif
+#endif
 }
 
 BOOL SetEnvironmentVariableW(LPCWSTR lpName, LPCWSTR lpValue)
@@ -218,7 +218,7 @@ extern char** environ;
 
 LPCH GetEnvironmentStringsA(VOID)
 {
-#	if !defined(_UWP)
+#if !defined(_UWP)
 	char* p;
 	int offset;
 	int length;
@@ -263,9 +263,9 @@ LPCH GetEnvironmentStringsA(VOID)
 
 	lpszEnvironmentBlock[offset] = '\0';
 	return lpszEnvironmentBlock;
-#	else
+#else
 	return NULL;
-#	endif
+#endif
 }
 
 LPWCH GetEnvironmentStringsW(VOID)

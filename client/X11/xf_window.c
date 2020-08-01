@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdarg.h>
@@ -44,12 +44,12 @@
 #include <freerdp/log.h>
 
 #ifdef WITH_XEXT
-#	include <X11/extensions/shape.h>
+#include <X11/extensions/shape.h>
 #endif
 
 #ifdef WITH_XI
-#	include <X11/extensions/XInput2.h>
-#	include "xf_input.h"
+#include <X11/extensions/XInput2.h>
+#include "xf_input.h"
 #endif
 
 #include "xf_rail.h"
@@ -58,12 +58,12 @@
 #define TAG CLIENT_TAG("x11")
 
 #ifdef WITH_DEBUG_X11
-#	define DEBUG_X11(...) WLog_DBG(TAG, __VA_ARGS__)
+#define DEBUG_X11(...) WLog_DBG(TAG, __VA_ARGS__)
 #else
-#	define DEBUG_X11(...) \
-		do                 \
-		{                  \
-		} while (0)
+#define DEBUG_X11(...) \
+	do                 \
+	{                  \
+	} while (0)
 #endif
 
 #include "FreeRDP_Icon_256px.h"
@@ -924,53 +924,56 @@ void xf_ShowWindow(xfContext* xfc, xfAppWindow* appWindow, BYTE state)
 {
 	switch (state)
 	{
-	case WINDOW_HIDE:
-		XWithdrawWindow(xfc->display, appWindow->handle, xfc->screen_number);
-		break;
+		case WINDOW_HIDE:
+			XWithdrawWindow(xfc->display, appWindow->handle, xfc->screen_number);
+			break;
 
-	case WINDOW_SHOW_MINIMIZED:
-		XIconifyWindow(xfc->display, appWindow->handle, xfc->screen_number);
-		break;
+		case WINDOW_SHOW_MINIMIZED:
+			XIconifyWindow(xfc->display, appWindow->handle, xfc->screen_number);
+			break;
 
-	case WINDOW_SHOW_MAXIMIZED:
-		/* Set the window as maximized */
-		xf_SendClientEvent(xfc, appWindow->handle, xfc->_NET_WM_STATE, 4, _NET_WM_STATE_ADD,
-		                   xfc->_NET_WM_STATE_MAXIMIZED_VERT, xfc->_NET_WM_STATE_MAXIMIZED_HORZ, 0);
+		case WINDOW_SHOW_MAXIMIZED:
+			/* Set the window as maximized */
+			xf_SendClientEvent(xfc, appWindow->handle, xfc->_NET_WM_STATE, 4, _NET_WM_STATE_ADD,
+			                   xfc->_NET_WM_STATE_MAXIMIZED_VERT, xfc->_NET_WM_STATE_MAXIMIZED_HORZ,
+			                   0);
 
-		/*
-		 * This is a workaround for the case where the window is maximized locally before the rail
-		 * server is told to maximize the window, this appears to be a race condition where the
-		 * local window with incomplete data and once the window is actually maximized on the server
-		 * - an update of the new areas may not happen. So, we simply to do a full update of the
-		 * entire window once the rail server notifies us that the window is now maximized.
-		 */
-		if (appWindow->rail_state == WINDOW_SHOW_MAXIMIZED)
-		{
-			xf_UpdateWindowArea(xfc, appWindow, 0, 0, appWindow->windowWidth,
-			                    appWindow->windowHeight);
-		}
+			/*
+			 * This is a workaround for the case where the window is maximized locally before the
+			 * rail server is told to maximize the window, this appears to be a race condition where
+			 * the local window with incomplete data and once the window is actually maximized on
+			 * the server
+			 * - an update of the new areas may not happen. So, we simply to do a full update of the
+			 * entire window once the rail server notifies us that the window is now maximized.
+			 */
+			if (appWindow->rail_state == WINDOW_SHOW_MAXIMIZED)
+			{
+				xf_UpdateWindowArea(xfc, appWindow, 0, 0, appWindow->windowWidth,
+				                    appWindow->windowHeight);
+			}
 
-		break;
+			break;
 
-	case WINDOW_SHOW:
-		/* Ensure the window is not maximized */
-		xf_SendClientEvent(xfc, appWindow->handle, xfc->_NET_WM_STATE, 4, _NET_WM_STATE_REMOVE,
-		                   xfc->_NET_WM_STATE_MAXIMIZED_VERT, xfc->_NET_WM_STATE_MAXIMIZED_HORZ, 0);
+		case WINDOW_SHOW:
+			/* Ensure the window is not maximized */
+			xf_SendClientEvent(xfc, appWindow->handle, xfc->_NET_WM_STATE, 4, _NET_WM_STATE_REMOVE,
+			                   xfc->_NET_WM_STATE_MAXIMIZED_VERT, xfc->_NET_WM_STATE_MAXIMIZED_HORZ,
+			                   0);
 
-		/*
-		 * Ignore configure requests until both the Maximized properties have been processed
-		 * to prevent condition where WM overrides size of request due to one or both of these
-		 * properties still being set - which causes a position adjustment to be sent back to the
-		 * server thus causing the window to not return to its original size
-		 */
-		if (appWindow->rail_state == WINDOW_SHOW_MAXIMIZED)
-			appWindow->rail_ignore_configure = TRUE;
+			/*
+			 * Ignore configure requests until both the Maximized properties have been processed
+			 * to prevent condition where WM overrides size of request due to one or both of these
+			 * properties still being set - which causes a position adjustment to be sent back to
+			 * the server thus causing the window to not return to its original size
+			 */
+			if (appWindow->rail_state == WINDOW_SHOW_MAXIMIZED)
+				appWindow->rail_ignore_configure = TRUE;
 
-		if (appWindow->is_transient)
-			xf_SetWindowUnlisted(xfc, appWindow->handle);
+			if (appWindow->is_transient)
+				xf_SetWindowUnlisted(xfc, appWindow->handle);
 
-		XMapWindow(xfc->display, appWindow->handle);
-		break;
+			XMapWindow(xfc->display, appWindow->handle);
+			break;
 	}
 
 	/* Save the current rail state of this window */

@@ -39,11 +39,13 @@
 @synthesize domain;
 @synthesize modalCode;
 
-- (id)init {
+- (id)init
+{
 	return [self initWithWindowNibName:@"PasswordDialog"];
 }
 
-- (void)windowDidLoad {
+- (void)windowDidLoad
+{
 	[super windowDidLoad];
 	// Implement this method to handle any initialization after your window controller's window has
 	// been loaded from its nib file.
@@ -68,7 +70,8 @@
 	[self.usernameText setStringValue:domainUser];
 }
 
-- (IBAction)onOK:(NSObject *)sender {
+- (IBAction)onOK:(NSObject *)sender
+{
 	char *submittedUser = NULL;
 	char *submittedDomain = NULL;
 
@@ -88,11 +91,13 @@
 	[NSApp stopModalWithCode:TRUE];
 }
 
-- (IBAction)onCancel:(NSObject *)sender {
+- (IBAction)onCancel:(NSObject *)sender
+{
 	[NSApp stopModalWithCode:FALSE];
 }
 
-- (BOOL)runModal:(NSWindow *)mainWindow {
+- (BOOL)runModal:(NSWindow *)mainWindow
+{
 	if ([mainWindow respondsToSelector:@selector(beginSheet:completionHandler:)])
 	{
 		[mainWindow beginSheet:self.window completionHandler:nil];
@@ -114,7 +119,8 @@
 	return self.modalCode;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[usernameText release];
 	[passwordText release];
 	[messageLabel release];

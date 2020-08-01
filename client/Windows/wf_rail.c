@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/crt.h>
@@ -295,105 +295,105 @@ LRESULT CALLBACK wf_RailWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 
 	switch (msg)
 	{
-	case WM_PAINT:
-	{
-		if (!wfc)
-			return 0;
+		case WM_PAINT:
+		{
+			if (!wfc)
+				return 0;
 
-		hDC = BeginPaint(hWnd, &ps);
-		x = ps.rcPaint.left;
-		y = ps.rcPaint.top;
-		width = ps.rcPaint.right - ps.rcPaint.left + 1;
-		height = ps.rcPaint.bottom - ps.rcPaint.top + 1;
-		BitBlt(hDC, x, y, width, height, wfc->primary->hdc, railWindow->x + x, railWindow->y + y,
-		       SRCCOPY);
-		EndPaint(hWnd, &ps);
-	}
-	break;
-
-	case WM_LBUTTONDOWN:
-	{
-		if (!railWindow || !input)
-			return 0;
-
-		xPos = GET_X_LPARAM(lParam) + railWindow->x;
-		yPos = GET_Y_LPARAM(lParam) + railWindow->y;
-		inputFlags = PTR_FLAGS_DOWN | PTR_FLAGS_BUTTON1;
-
-		if (input)
-			input->MouseEvent(input, inputFlags, xPos, yPos);
-	}
-	break;
-
-	case WM_LBUTTONUP:
-	{
-		if (!railWindow || !input)
-			return 0;
-
-		xPos = GET_X_LPARAM(lParam) + railWindow->x;
-		yPos = GET_Y_LPARAM(lParam) + railWindow->y;
-		inputFlags = PTR_FLAGS_BUTTON1;
-
-		if (input)
-			input->MouseEvent(input, inputFlags, xPos, yPos);
-	}
-	break;
-
-	case WM_RBUTTONDOWN:
-	{
-		if (!railWindow || !input)
-			return 0;
-
-		xPos = GET_X_LPARAM(lParam) + railWindow->x;
-		yPos = GET_Y_LPARAM(lParam) + railWindow->y;
-		inputFlags = PTR_FLAGS_DOWN | PTR_FLAGS_BUTTON2;
-
-		if (input)
-			input->MouseEvent(input, inputFlags, xPos, yPos);
-	}
-	break;
-
-	case WM_RBUTTONUP:
-	{
-		if (!railWindow || !input)
-			return 0;
-
-		xPos = GET_X_LPARAM(lParam) + railWindow->x;
-		yPos = GET_Y_LPARAM(lParam) + railWindow->y;
-		inputFlags = PTR_FLAGS_BUTTON2;
-
-		if (input)
-			input->MouseEvent(input, inputFlags, xPos, yPos);
-	}
-	break;
-
-	case WM_MOUSEMOVE:
-	{
-		if (!railWindow || !input)
-			return 0;
-
-		xPos = GET_X_LPARAM(lParam) + railWindow->x;
-		yPos = GET_Y_LPARAM(lParam) + railWindow->y;
-		inputFlags = PTR_FLAGS_MOVE;
-
-		if (input)
-			input->MouseEvent(input, inputFlags, xPos, yPos);
-	}
-	break;
-
-	case WM_MOUSEWHEEL:
+			hDC = BeginPaint(hWnd, &ps);
+			x = ps.rcPaint.left;
+			y = ps.rcPaint.top;
+			width = ps.rcPaint.right - ps.rcPaint.left + 1;
+			height = ps.rcPaint.bottom - ps.rcPaint.top + 1;
+			BitBlt(hDC, x, y, width, height, wfc->primary->hdc, railWindow->x + x,
+			       railWindow->y + y, SRCCOPY);
+			EndPaint(hWnd, &ps);
+		}
 		break;
 
-	case WM_CLOSE:
-		DestroyWindow(hWnd);
+		case WM_LBUTTONDOWN:
+		{
+			if (!railWindow || !input)
+				return 0;
+
+			xPos = GET_X_LPARAM(lParam) + railWindow->x;
+			yPos = GET_Y_LPARAM(lParam) + railWindow->y;
+			inputFlags = PTR_FLAGS_DOWN | PTR_FLAGS_BUTTON1;
+
+			if (input)
+				input->MouseEvent(input, inputFlags, xPos, yPos);
+		}
 		break;
 
-	case WM_DESTROY:
-		PostQuitMessage(0);
+		case WM_LBUTTONUP:
+		{
+			if (!railWindow || !input)
+				return 0;
+
+			xPos = GET_X_LPARAM(lParam) + railWindow->x;
+			yPos = GET_Y_LPARAM(lParam) + railWindow->y;
+			inputFlags = PTR_FLAGS_BUTTON1;
+
+			if (input)
+				input->MouseEvent(input, inputFlags, xPos, yPos);
+		}
 		break;
 
-	default:
-		return DefWindowProc(hWnd, msg, wParam, lParam);
+		case WM_RBUTTONDOWN:
+		{
+			if (!railWindow || !input)
+				return 0;
+
+			xPos = GET_X_LPARAM(lParam) + railWindow->x;
+			yPos = GET_Y_LPARAM(lParam) + railWindow->y;
+			inputFlags = PTR_FLAGS_DOWN | PTR_FLAGS_BUTTON2;
+
+			if (input)
+				input->MouseEvent(input, inputFlags, xPos, yPos);
+		}
+		break;
+
+		case WM_RBUTTONUP:
+		{
+			if (!railWindow || !input)
+				return 0;
+
+			xPos = GET_X_LPARAM(lParam) + railWindow->x;
+			yPos = GET_Y_LPARAM(lParam) + railWindow->y;
+			inputFlags = PTR_FLAGS_BUTTON2;
+
+			if (input)
+				input->MouseEvent(input, inputFlags, xPos, yPos);
+		}
+		break;
+
+		case WM_MOUSEMOVE:
+		{
+			if (!railWindow || !input)
+				return 0;
+
+			xPos = GET_X_LPARAM(lParam) + railWindow->x;
+			yPos = GET_Y_LPARAM(lParam) + railWindow->y;
+			inputFlags = PTR_FLAGS_MOVE;
+
+			if (input)
+				input->MouseEvent(input, inputFlags, xPos, yPos);
+		}
+		break;
+
+		case WM_MOUSEWHEEL:
+			break;
+
+		case WM_CLOSE:
+			DestroyWindow(hWnd);
+			break;
+
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			break;
+
+		default:
+			return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 
 	return 0;

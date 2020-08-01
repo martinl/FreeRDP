@@ -23,7 +23,7 @@
 #define TRIO_STRIO_H
 
 #if !(defined(DEBUG) || defined(NDEBUG))
-#	define NDEBUG
+#define NDEBUG
 #endif
 #include "triostr.h"
 

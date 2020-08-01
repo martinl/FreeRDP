@@ -30,9 +30,9 @@
 
 #include <stdlib.h>
 #if defined(TRIO_COMPILER_ANCIENT)
-#	include <varargs.h>
+#include <varargs.h>
 #else
-#	include <stdarg.h>
+#include <stdarg.h>
 #endif
 
 #ifdef __cplusplus
@@ -53,7 +53,7 @@ extern "C"
  * specifier documentation.
  */
 #if !defined(TRIO_C99)
-#	define TRIO_C99 1
+#define TRIO_C99 1
 #endif
 
 /*
@@ -65,7 +65,7 @@ extern "C"
  * specifier documentation.
  */
 #if !defined(TRIO_BSD)
-#	define TRIO_BSD 1
+#define TRIO_BSD 1
 #endif
 
 /*
@@ -77,7 +77,7 @@ extern "C"
  * specifier documentation.
  */
 #if !defined(TRIO_GNU)
-#	define TRIO_GNU 1
+#define TRIO_GNU 1
 #endif
 
 /*
@@ -89,7 +89,7 @@ extern "C"
  * format specifier documentation.
  */
 #if !defined(TRIO_MISC)
-#	define TRIO_MISC 1
+#define TRIO_MISC 1
 #endif
 
 /*
@@ -101,7 +101,7 @@ extern "C"
  * specifier documentation.
  */
 #if !defined(TRIO_UNIX98)
-#	define TRIO_UNIX98 1
+#define TRIO_UNIX98 1
 #endif
 
 /*
@@ -113,7 +113,7 @@ extern "C"
  * format specifier documentation.
  */
 #if !defined(TRIO_MICROSOFT)
-#	define TRIO_MICROSOFT 1
+#define TRIO_MICROSOFT 1
 #endif
 
 /*
@@ -128,7 +128,7 @@ extern "C"
  * the format specifier documentation.
  */
 #if !defined(TRIO_EXTENSION)
-#	define TRIO_EXTENSION 1
+#define TRIO_EXTENSION 1
 #endif
 
 /*
@@ -138,7 +138,7 @@ extern "C"
  * to 1 to enable them.
  */
 #if !defined(TRIO_DEPRECATED)
-#	define TRIO_DEPRECATED 1
+#define TRIO_DEPRECATED 1
 #endif
 
 	/*************************************************************************
@@ -146,17 +146,17 @@ extern "C"
 	 */
 
 #if defined(TRIO_SNPRINTF_ONLY)
-#	define TRIO_FEATURE_SCANF 0
-#	define TRIO_FEATURE_FILE 0
-#	define TRIO_FEATURE_STDIO 0
-#	define TRIO_FEATURE_FD 0
-#	define TRIO_FEATURE_DYNAMICSTRING 0
-#	define TRIO_FEATURE_CLOSURE 0
-#	define TRIO_FEATURE_ARGFUNC 0
-#	define TRIO_FEATURE_STRERR 0
-#	define TRIO_FEATURE_LOCALE 0
-#	define TRIO_EMBED_NAN 1
-#	define TRIO_EMBED_STRING 1
+#define TRIO_FEATURE_SCANF 0
+#define TRIO_FEATURE_FILE 0
+#define TRIO_FEATURE_STDIO 0
+#define TRIO_FEATURE_FD 0
+#define TRIO_FEATURE_DYNAMICSTRING 0
+#define TRIO_FEATURE_CLOSURE 0
+#define TRIO_FEATURE_ARGFUNC 0
+#define TRIO_FEATURE_STRERR 0
+#define TRIO_FEATURE_LOCALE 0
+#define TRIO_EMBED_NAN 1
+#define TRIO_EMBED_STRING 1
 #endif
 
 /*
@@ -166,7 +166,7 @@ extern "C"
  * to enable them.
  */
 #if !defined(TRIO_FEATURE_SCANF)
-#	define TRIO_FEATURE_SCANF 1
+#define TRIO_FEATURE_SCANF 1
 #endif
 
 /*
@@ -181,7 +181,7 @@ extern "C"
  * define TRIO_FEATURE_STDIO to 0.
  */
 #if !defined(TRIO_FEATURE_FILE)
-#	define TRIO_FEATURE_FILE 1
+#define TRIO_FEATURE_FILE 1
 #endif
 
 /*
@@ -193,7 +193,7 @@ extern "C"
  * This may be useful on an embedded platform with no standard I/O.
  */
 #if !defined(TRIO_FEATURE_STDIO)
-#	define TRIO_FEATURE_STDIO 1
+#define TRIO_FEATURE_STDIO 1
 #endif
 
 /*
@@ -207,7 +207,7 @@ extern "C"
  * descriptors.
  */
 #if !defined(TRIO_FEATURE_FD)
-#	define TRIO_FEATURE_FD 1
+#define TRIO_FEATURE_FD 1
 #endif
 
 /*
@@ -220,7 +220,7 @@ extern "C"
  * call malloc or free.
  */
 #if !defined(TRIO_FEATURE_DYNAMICSTRING)
-#	define TRIO_FEATURE_DYNAMICSTRING 1
+#define TRIO_FEATURE_DYNAMICSTRING 1
 #endif
 
 /*
@@ -232,7 +232,7 @@ extern "C"
  * These functions are rarely needed. This saves a (small) amount of code.
  */
 #if !defined(TRIO_FEATURE_CLOSURE)
-#	define TRIO_FEATURE_CLOSURE 1
+#define TRIO_FEATURE_CLOSURE 1
 #endif
 
 /*
@@ -251,11 +251,11 @@ extern "C"
  * handling too (and so this forces TRIO_FEATURE_CLOSURE to enabled).
  */
 #if !defined(TRIO_FEATURE_ARGFUNC)
-#	define TRIO_FEATURE_ARGFUNC 1
+#define TRIO_FEATURE_ARGFUNC 1
 #endif
 #if TRIO_FEATURE_ARGFUNC
-#	undef TRIO_FEATURE_CLOSURE
-#	define TRIO_FEATURE_CLOSURE 1
+#undef TRIO_FEATURE_CLOSURE
+#define TRIO_FEATURE_CLOSURE 1
 #endif
 
 /*
@@ -270,10 +270,10 @@ extern "C"
  * TRIO_ERROR_CODE and TRIO_ERROR_POSITION macros.
  */
 #if defined(TRIO_ERRORS)
-#	define TRIO_FEATURE_ERRORCODE TRIO_ERRORS
+#define TRIO_FEATURE_ERRORCODE TRIO_ERRORS
 #endif
 #if !defined(TRIO_FEATURE_ERRORCODE)
-#	define TRIO_FEATURE_ERRORCODE 1
+#define TRIO_FEATURE_ERRORCODE 1
 #endif
 
 /*
@@ -285,7 +285,7 @@ extern "C"
  * This saves a (small) amount of code.
  */
 #if !defined(TRIO_FEATURE_STRERR)
-#	define TRIO_FEATURE_STRERR 1
+#define TRIO_FEATURE_STRERR 1
 #endif
 
 /*
@@ -301,7 +301,7 @@ extern "C"
  * Do not compile trionan.c if you disable this.
  */
 #if !defined(TRIO_FEATURE_FLOAT)
-#	define TRIO_FEATURE_FLOAT 1
+#define TRIO_FEATURE_FLOAT 1
 #endif
 
 /*
@@ -313,7 +313,7 @@ extern "C"
  * This saves a (small) amount of code.
  */
 #if !defined(TRIO_FEATURE_LOCALE)
-#	define TRIO_FEATURE_LOCALE 1
+#define TRIO_FEATURE_LOCALE 1
 #endif
 
 /*
@@ -324,17 +324,17 @@ extern "C"
  * separately.
  */
 #if defined(TRIO_MINIMAL)
-#	if !defined(TRIO_EMBED_NAN)
-#		define TRIO_EMBED_NAN
-#	endif
-#	if !defined(TRIO_EMBED_STRING)
-#		define TRIO_EMBED_STRING
-#	endif
+#if !defined(TRIO_EMBED_NAN)
+#define TRIO_EMBED_NAN
+#endif
+#if !defined(TRIO_EMBED_STRING)
+#define TRIO_EMBED_STRING
+#endif
 #endif
 
 /* Does not work yet. Do not enable */
 #ifndef TRIO_FEATURE_WIDECHAR
-#	define TRIO_FEATURE_WIDECHAR 0
+#define TRIO_FEATURE_WIDECHAR 0
 #endif
 
 	/*************************************************************************
@@ -342,80 +342,80 @@ extern "C"
 	 */
 
 #if !defined(TRIO_FEATURE_HEXFLOAT)
-#	define TRIO_FEATURE_HEXFLOAT (TRIO_C99 && TRIO_FEATURE_FLOAT)
+#define TRIO_FEATURE_HEXFLOAT (TRIO_C99 && TRIO_FEATURE_FLOAT)
 #endif
 
 #if !defined(TRIO_FEATURE_LONGDOUBLE)
-#	define TRIO_FEATURE_LONGDOUBLE TRIO_FEATURE_FLOAT
+#define TRIO_FEATURE_LONGDOUBLE TRIO_FEATURE_FLOAT
 #endif
 
 #if !defined(TRIO_FEATURE_ERRNO)
-#	define TRIO_FEATURE_ERRNO TRIO_GNU
+#define TRIO_FEATURE_ERRNO TRIO_GNU
 #endif
 
 #if !defined(TRIO_FEATURE_QUAD)
-#	define TRIO_FEATURE_QUAD (TRIO_BSD || TRIO_GNU)
+#define TRIO_FEATURE_QUAD (TRIO_BSD || TRIO_GNU)
 #endif
 
 #if !defined(TRIO_FEATURE_SIZE_T)
-#	define TRIO_FEATURE_SIZE_T TRIO_C99
+#define TRIO_FEATURE_SIZE_T TRIO_C99
 #endif
 
 #if !defined(TRIO_FEATURE_SIZE_T_UPPER)
-#	define TRIO_FEATURE_SIZE_T_UPPER TRIO_GNU
+#define TRIO_FEATURE_SIZE_T_UPPER TRIO_GNU
 #endif
 
 #if !defined(TRIO_FEATURE_PTRDIFF_T)
-#	define TRIO_FEATURE_PTRDIFF_T TRIO_C99
+#define TRIO_FEATURE_PTRDIFF_T TRIO_C99
 #endif
 
 #if !defined(TRIO_FEATURE_INTMAX_T)
-#	define TRIO_FEATURE_INTMAX_T TRIO_C99
+#define TRIO_FEATURE_INTMAX_T TRIO_C99
 #endif
 
 #if !defined(TRIO_FEATURE_FIXED_SIZE)
-#	define TRIO_FEATURE_FIXED_SIZE TRIO_MICROSOFT
+#define TRIO_FEATURE_FIXED_SIZE TRIO_MICROSOFT
 #endif
 
 #if !defined(TRIO_FEATURE_POSITIONAL)
-#	define TRIO_FEATURE_POSITIONAL TRIO_UNIX98
+#define TRIO_FEATURE_POSITIONAL TRIO_UNIX98
 #endif
 
 #if !defined(TRIO_FEATURE_USER_DEFINED)
-#	define TRIO_FEATURE_USER_DEFINED TRIO_EXTENSION
+#define TRIO_FEATURE_USER_DEFINED TRIO_EXTENSION
 #endif
 
 #if !defined(TRIO_FEATURE_BINARY)
-#	define TRIO_FEATURE_BINARY TRIO_EXTENSION
+#define TRIO_FEATURE_BINARY TRIO_EXTENSION
 #endif
 
 #if !defined(TRIO_FEATURE_QUOTE)
-#	define TRIO_FEATURE_QUOTE TRIO_EXTENSION
+#define TRIO_FEATURE_QUOTE TRIO_EXTENSION
 #endif
 
 #if !defined(TRIO_FEATURE_STICKY)
-#	define TRIO_FEATURE_STICKY TRIO_EXTENSION
+#define TRIO_FEATURE_STICKY TRIO_EXTENSION
 #endif
 
 #if !defined(TRIO_FEATURE_VARSIZE)
-#	define TRIO_FEATURE_VARSIZE TRIO_EXTENSION
+#define TRIO_FEATURE_VARSIZE TRIO_EXTENSION
 #endif
 
 #if !defined(TRIO_FEATURE_ROUNDING)
-#	define TRIO_FEATURE_ROUNDING TRIO_EXTENSION
+#define TRIO_FEATURE_ROUNDING TRIO_EXTENSION
 #endif
 
 /*************************************************************************
  * Memory handling
  */
 #ifndef TRIO_MALLOC
-#	define TRIO_MALLOC(n) malloc(n)
+#define TRIO_MALLOC(n) malloc(n)
 #endif
 #ifndef TRIO_REALLOC
-#	define TRIO_REALLOC(x, n) realloc((x), (n))
+#define TRIO_REALLOC(x, n) realloc((x), (n))
 #endif
 #ifndef TRIO_FREE
-#	define TRIO_FREE(x) free(x)
+#define TRIO_FREE(x) free(x)
 #endif
 
 	/*************************************************************************

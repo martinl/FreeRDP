@@ -21,21 +21,21 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #if defined __linux__ && !defined ANDROID
 
-#	include <assert.h>
-#	include <errno.h>
+#include <assert.h>
+#include <errno.h>
 
-#	include <winpr/wlog.h>
+#include <winpr/wlog.h>
 
-#	include "comm.h"
-#	include "comm_ioctl.h"
-#	include "comm_serial_sys.h"
-#	include "comm_sercx_sys.h"
-#	include "comm_sercx2_sys.h"
+#include "comm.h"
+#include "comm_ioctl.h"
+#include "comm_serial_sys.h"
+#include "comm_sercx_sys.h"
+#include "comm_sercx2_sys.h"
 
 /* NB: MS-RDPESP's recommendation:
  *
@@ -110,577 +110,578 @@ static BOOL _CommDeviceIoControl(HANDLE hDevice, DWORD dwIoControlCode, LPVOID l
 	 */
 	switch (pComm->serverSerialDriverId)
 	{
-	case SerialDriverSerialSys:
-		pServerSerialDriver = SerialSys_s();
-		break;
+		case SerialDriverSerialSys:
+			pServerSerialDriver = SerialSys_s();
+			break;
 
-	case SerialDriverSerCxSys:
-		pServerSerialDriver = SerCxSys_s();
-		break;
+		case SerialDriverSerCxSys:
+			pServerSerialDriver = SerCxSys_s();
+			break;
 
-	case SerialDriverSerCx2Sys:
-		pServerSerialDriver = SerCx2Sys_s();
-		break;
+		case SerialDriverSerCx2Sys:
+			pServerSerialDriver = SerCx2Sys_s();
+			break;
 
-	case SerialDriverUnknown:
-	default:
-		CommLog_Print(WLOG_DEBUG, "Unknown remote serial driver (%d), using SerCx2.sys",
-		              pComm->serverSerialDriverId);
-		pServerSerialDriver = SerCx2Sys_s();
-		break;
+		case SerialDriverUnknown:
+		default:
+			CommLog_Print(WLOG_DEBUG, "Unknown remote serial driver (%d), using SerCx2.sys",
+			              pComm->serverSerialDriverId);
+			pServerSerialDriver = SerCx2Sys_s();
+			break;
 	}
 
 	assert(pServerSerialDriver != NULL);
 
 	switch (dwIoControlCode)
 	{
-	case IOCTL_USBPRINT_GET_1284_ID:
-	{
-		/* FIXME: http://msdn.microsoft.com/en-us/library/windows/hardware/ff551803(v=vs.85).aspx */
-		*lpBytesReturned = nOutBufferSize; /* an empty OutputBuffer will be returned */
-		SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
-		return FALSE;
-	}
-
-	case IOCTL_SERIAL_SET_BAUD_RATE:
-	{
-		if (pServerSerialDriver->set_baud_rate)
+		case IOCTL_USBPRINT_GET_1284_ID:
 		{
-			SERIAL_BAUD_RATE* pBaudRate = (SERIAL_BAUD_RATE*)lpInBuffer;
-			assert(nInBufferSize >= sizeof(SERIAL_BAUD_RATE));
+			/* FIXME:
+			 * http://msdn.microsoft.com/en-us/library/windows/hardware/ff551803(v=vs.85).aspx */
+			*lpBytesReturned = nOutBufferSize; /* an empty OutputBuffer will be returned */
+			SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+			return FALSE;
+		}
 
-			if (nInBufferSize < sizeof(SERIAL_BAUD_RATE))
+		case IOCTL_SERIAL_SET_BAUD_RATE:
+		{
+			if (pServerSerialDriver->set_baud_rate)
 			{
-				SetLastError(ERROR_INVALID_PARAMETER);
-				return FALSE;
+				SERIAL_BAUD_RATE* pBaudRate = (SERIAL_BAUD_RATE*)lpInBuffer;
+				assert(nInBufferSize >= sizeof(SERIAL_BAUD_RATE));
+
+				if (nInBufferSize < sizeof(SERIAL_BAUD_RATE))
+				{
+					SetLastError(ERROR_INVALID_PARAMETER);
+					return FALSE;
+				}
+
+				return pServerSerialDriver->set_baud_rate(pComm, pBaudRate);
 			}
 
-			return pServerSerialDriver->set_baud_rate(pComm, pBaudRate);
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_GET_BAUD_RATE:
-	{
-		if (pServerSerialDriver->get_baud_rate)
+		case IOCTL_SERIAL_GET_BAUD_RATE:
 		{
-			SERIAL_BAUD_RATE* pBaudRate = (SERIAL_BAUD_RATE*)lpOutBuffer;
-			assert(nOutBufferSize >= sizeof(SERIAL_BAUD_RATE));
-
-			if (nOutBufferSize < sizeof(SERIAL_BAUD_RATE))
+			if (pServerSerialDriver->get_baud_rate)
 			{
-				SetLastError(ERROR_INSUFFICIENT_BUFFER);
-				return FALSE;
+				SERIAL_BAUD_RATE* pBaudRate = (SERIAL_BAUD_RATE*)lpOutBuffer;
+				assert(nOutBufferSize >= sizeof(SERIAL_BAUD_RATE));
+
+				if (nOutBufferSize < sizeof(SERIAL_BAUD_RATE))
+				{
+					SetLastError(ERROR_INSUFFICIENT_BUFFER);
+					return FALSE;
+				}
+
+				if (!pServerSerialDriver->get_baud_rate(pComm, pBaudRate))
+					return FALSE;
+
+				*lpBytesReturned = sizeof(SERIAL_BAUD_RATE);
+				return TRUE;
 			}
 
-			if (!pServerSerialDriver->get_baud_rate(pComm, pBaudRate))
-				return FALSE;
-
-			*lpBytesReturned = sizeof(SERIAL_BAUD_RATE);
-			return TRUE;
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_GET_PROPERTIES:
-	{
-		if (pServerSerialDriver->get_properties)
+		case IOCTL_SERIAL_GET_PROPERTIES:
 		{
-			COMMPROP* pProperties = (COMMPROP*)lpOutBuffer;
-			assert(nOutBufferSize >= sizeof(COMMPROP));
-
-			if (nOutBufferSize < sizeof(COMMPROP))
+			if (pServerSerialDriver->get_properties)
 			{
-				SetLastError(ERROR_INSUFFICIENT_BUFFER);
-				return FALSE;
+				COMMPROP* pProperties = (COMMPROP*)lpOutBuffer;
+				assert(nOutBufferSize >= sizeof(COMMPROP));
+
+				if (nOutBufferSize < sizeof(COMMPROP))
+				{
+					SetLastError(ERROR_INSUFFICIENT_BUFFER);
+					return FALSE;
+				}
+
+				if (!pServerSerialDriver->get_properties(pComm, pProperties))
+					return FALSE;
+
+				*lpBytesReturned = sizeof(COMMPROP);
+				return TRUE;
 			}
 
-			if (!pServerSerialDriver->get_properties(pComm, pProperties))
-				return FALSE;
-
-			*lpBytesReturned = sizeof(COMMPROP);
-			return TRUE;
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_SET_CHARS:
-	{
-		if (pServerSerialDriver->set_serial_chars)
+		case IOCTL_SERIAL_SET_CHARS:
 		{
-			SERIAL_CHARS* pSerialChars = (SERIAL_CHARS*)lpInBuffer;
-			assert(nInBufferSize >= sizeof(SERIAL_CHARS));
-
-			if (nInBufferSize < sizeof(SERIAL_CHARS))
+			if (pServerSerialDriver->set_serial_chars)
 			{
-				SetLastError(ERROR_INVALID_PARAMETER);
-				return FALSE;
+				SERIAL_CHARS* pSerialChars = (SERIAL_CHARS*)lpInBuffer;
+				assert(nInBufferSize >= sizeof(SERIAL_CHARS));
+
+				if (nInBufferSize < sizeof(SERIAL_CHARS))
+				{
+					SetLastError(ERROR_INVALID_PARAMETER);
+					return FALSE;
+				}
+
+				return pServerSerialDriver->set_serial_chars(pComm, pSerialChars);
 			}
 
-			return pServerSerialDriver->set_serial_chars(pComm, pSerialChars);
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_GET_CHARS:
-	{
-		if (pServerSerialDriver->get_serial_chars)
+		case IOCTL_SERIAL_GET_CHARS:
 		{
-			SERIAL_CHARS* pSerialChars = (SERIAL_CHARS*)lpOutBuffer;
-			assert(nOutBufferSize >= sizeof(SERIAL_CHARS));
-
-			if (nOutBufferSize < sizeof(SERIAL_CHARS))
+			if (pServerSerialDriver->get_serial_chars)
 			{
-				SetLastError(ERROR_INSUFFICIENT_BUFFER);
-				return FALSE;
+				SERIAL_CHARS* pSerialChars = (SERIAL_CHARS*)lpOutBuffer;
+				assert(nOutBufferSize >= sizeof(SERIAL_CHARS));
+
+				if (nOutBufferSize < sizeof(SERIAL_CHARS))
+				{
+					SetLastError(ERROR_INSUFFICIENT_BUFFER);
+					return FALSE;
+				}
+
+				if (!pServerSerialDriver->get_serial_chars(pComm, pSerialChars))
+					return FALSE;
+
+				*lpBytesReturned = sizeof(SERIAL_CHARS);
+				return TRUE;
 			}
 
-			if (!pServerSerialDriver->get_serial_chars(pComm, pSerialChars))
-				return FALSE;
-
-			*lpBytesReturned = sizeof(SERIAL_CHARS);
-			return TRUE;
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_SET_LINE_CONTROL:
-	{
-		if (pServerSerialDriver->set_line_control)
+		case IOCTL_SERIAL_SET_LINE_CONTROL:
 		{
-			SERIAL_LINE_CONTROL* pLineControl = (SERIAL_LINE_CONTROL*)lpInBuffer;
-			assert(nInBufferSize >= sizeof(SERIAL_LINE_CONTROL));
-
-			if (nInBufferSize < sizeof(SERIAL_LINE_CONTROL))
+			if (pServerSerialDriver->set_line_control)
 			{
-				SetLastError(ERROR_INVALID_PARAMETER);
-				return FALSE;
+				SERIAL_LINE_CONTROL* pLineControl = (SERIAL_LINE_CONTROL*)lpInBuffer;
+				assert(nInBufferSize >= sizeof(SERIAL_LINE_CONTROL));
+
+				if (nInBufferSize < sizeof(SERIAL_LINE_CONTROL))
+				{
+					SetLastError(ERROR_INVALID_PARAMETER);
+					return FALSE;
+				}
+
+				return pServerSerialDriver->set_line_control(pComm, pLineControl);
 			}
 
-			return pServerSerialDriver->set_line_control(pComm, pLineControl);
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_GET_LINE_CONTROL:
-	{
-		if (pServerSerialDriver->get_line_control)
+		case IOCTL_SERIAL_GET_LINE_CONTROL:
 		{
-			SERIAL_LINE_CONTROL* pLineControl = (SERIAL_LINE_CONTROL*)lpOutBuffer;
-			assert(nOutBufferSize >= sizeof(SERIAL_LINE_CONTROL));
-
-			if (nOutBufferSize < sizeof(SERIAL_LINE_CONTROL))
+			if (pServerSerialDriver->get_line_control)
 			{
-				SetLastError(ERROR_INSUFFICIENT_BUFFER);
-				return FALSE;
+				SERIAL_LINE_CONTROL* pLineControl = (SERIAL_LINE_CONTROL*)lpOutBuffer;
+				assert(nOutBufferSize >= sizeof(SERIAL_LINE_CONTROL));
+
+				if (nOutBufferSize < sizeof(SERIAL_LINE_CONTROL))
+				{
+					SetLastError(ERROR_INSUFFICIENT_BUFFER);
+					return FALSE;
+				}
+
+				if (!pServerSerialDriver->get_line_control(pComm, pLineControl))
+					return FALSE;
+
+				*lpBytesReturned = sizeof(SERIAL_LINE_CONTROL);
+				return TRUE;
 			}
 
-			if (!pServerSerialDriver->get_line_control(pComm, pLineControl))
-				return FALSE;
-
-			*lpBytesReturned = sizeof(SERIAL_LINE_CONTROL);
-			return TRUE;
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_SET_HANDFLOW:
-	{
-		if (pServerSerialDriver->set_handflow)
+		case IOCTL_SERIAL_SET_HANDFLOW:
 		{
-			SERIAL_HANDFLOW* pHandflow = (SERIAL_HANDFLOW*)lpInBuffer;
-			assert(nInBufferSize >= sizeof(SERIAL_HANDFLOW));
-
-			if (nInBufferSize < sizeof(SERIAL_HANDFLOW))
+			if (pServerSerialDriver->set_handflow)
 			{
-				SetLastError(ERROR_INVALID_PARAMETER);
-				return FALSE;
+				SERIAL_HANDFLOW* pHandflow = (SERIAL_HANDFLOW*)lpInBuffer;
+				assert(nInBufferSize >= sizeof(SERIAL_HANDFLOW));
+
+				if (nInBufferSize < sizeof(SERIAL_HANDFLOW))
+				{
+					SetLastError(ERROR_INVALID_PARAMETER);
+					return FALSE;
+				}
+
+				return pServerSerialDriver->set_handflow(pComm, pHandflow);
 			}
 
-			return pServerSerialDriver->set_handflow(pComm, pHandflow);
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_GET_HANDFLOW:
-	{
-		if (pServerSerialDriver->get_handflow)
+		case IOCTL_SERIAL_GET_HANDFLOW:
 		{
-			SERIAL_HANDFLOW* pHandflow = (SERIAL_HANDFLOW*)lpOutBuffer;
-			assert(nOutBufferSize >= sizeof(SERIAL_HANDFLOW));
-
-			if (nOutBufferSize < sizeof(SERIAL_HANDFLOW))
+			if (pServerSerialDriver->get_handflow)
 			{
-				SetLastError(ERROR_INSUFFICIENT_BUFFER);
-				return FALSE;
+				SERIAL_HANDFLOW* pHandflow = (SERIAL_HANDFLOW*)lpOutBuffer;
+				assert(nOutBufferSize >= sizeof(SERIAL_HANDFLOW));
+
+				if (nOutBufferSize < sizeof(SERIAL_HANDFLOW))
+				{
+					SetLastError(ERROR_INSUFFICIENT_BUFFER);
+					return FALSE;
+				}
+
+				if (!pServerSerialDriver->get_handflow(pComm, pHandflow))
+					return FALSE;
+
+				*lpBytesReturned = sizeof(SERIAL_HANDFLOW);
+				return TRUE;
 			}
 
-			if (!pServerSerialDriver->get_handflow(pComm, pHandflow))
-				return FALSE;
-
-			*lpBytesReturned = sizeof(SERIAL_HANDFLOW);
-			return TRUE;
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_SET_TIMEOUTS:
-	{
-		if (pServerSerialDriver->set_timeouts)
+		case IOCTL_SERIAL_SET_TIMEOUTS:
 		{
-			SERIAL_TIMEOUTS* pHandflow = (SERIAL_TIMEOUTS*)lpInBuffer;
-			assert(nInBufferSize >= sizeof(SERIAL_TIMEOUTS));
-
-			if (nInBufferSize < sizeof(SERIAL_TIMEOUTS))
+			if (pServerSerialDriver->set_timeouts)
 			{
-				SetLastError(ERROR_INVALID_PARAMETER);
-				return FALSE;
+				SERIAL_TIMEOUTS* pHandflow = (SERIAL_TIMEOUTS*)lpInBuffer;
+				assert(nInBufferSize >= sizeof(SERIAL_TIMEOUTS));
+
+				if (nInBufferSize < sizeof(SERIAL_TIMEOUTS))
+				{
+					SetLastError(ERROR_INVALID_PARAMETER);
+					return FALSE;
+				}
+
+				return pServerSerialDriver->set_timeouts(pComm, pHandflow);
 			}
 
-			return pServerSerialDriver->set_timeouts(pComm, pHandflow);
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_GET_TIMEOUTS:
-	{
-		if (pServerSerialDriver->get_timeouts)
+		case IOCTL_SERIAL_GET_TIMEOUTS:
 		{
-			SERIAL_TIMEOUTS* pHandflow = (SERIAL_TIMEOUTS*)lpOutBuffer;
-			assert(nOutBufferSize >= sizeof(SERIAL_TIMEOUTS));
-
-			if (nOutBufferSize < sizeof(SERIAL_TIMEOUTS))
+			if (pServerSerialDriver->get_timeouts)
 			{
-				SetLastError(ERROR_INSUFFICIENT_BUFFER);
-				return FALSE;
+				SERIAL_TIMEOUTS* pHandflow = (SERIAL_TIMEOUTS*)lpOutBuffer;
+				assert(nOutBufferSize >= sizeof(SERIAL_TIMEOUTS));
+
+				if (nOutBufferSize < sizeof(SERIAL_TIMEOUTS))
+				{
+					SetLastError(ERROR_INSUFFICIENT_BUFFER);
+					return FALSE;
+				}
+
+				if (!pServerSerialDriver->get_timeouts(pComm, pHandflow))
+					return FALSE;
+
+				*lpBytesReturned = sizeof(SERIAL_TIMEOUTS);
+				return TRUE;
 			}
 
-			if (!pServerSerialDriver->get_timeouts(pComm, pHandflow))
-				return FALSE;
-
-			*lpBytesReturned = sizeof(SERIAL_TIMEOUTS);
-			return TRUE;
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_SET_DTR:
-	{
-		if (pServerSerialDriver->set_dtr)
+		case IOCTL_SERIAL_SET_DTR:
 		{
-			return pServerSerialDriver->set_dtr(pComm);
-		}
-
-		break;
-	}
-
-	case IOCTL_SERIAL_CLR_DTR:
-	{
-		if (pServerSerialDriver->clear_dtr)
-		{
-			return pServerSerialDriver->clear_dtr(pComm);
-		}
-
-		break;
-	}
-
-	case IOCTL_SERIAL_SET_RTS:
-	{
-		if (pServerSerialDriver->set_rts)
-		{
-			return pServerSerialDriver->set_rts(pComm);
-		}
-
-		break;
-	}
-
-	case IOCTL_SERIAL_CLR_RTS:
-	{
-		if (pServerSerialDriver->clear_rts)
-		{
-			return pServerSerialDriver->clear_rts(pComm);
-		}
-
-		break;
-	}
-
-	case IOCTL_SERIAL_GET_MODEMSTATUS:
-	{
-		if (pServerSerialDriver->get_modemstatus)
-		{
-			ULONG* pRegister = (ULONG*)lpOutBuffer;
-			assert(nOutBufferSize >= sizeof(ULONG));
-
-			if (nOutBufferSize < sizeof(ULONG))
+			if (pServerSerialDriver->set_dtr)
 			{
-				SetLastError(ERROR_INSUFFICIENT_BUFFER);
-				return FALSE;
+				return pServerSerialDriver->set_dtr(pComm);
 			}
 
-			if (!pServerSerialDriver->get_modemstatus(pComm, pRegister))
-				return FALSE;
-
-			*lpBytesReturned = sizeof(ULONG);
-			return TRUE;
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_SET_WAIT_MASK:
-	{
-		if (pServerSerialDriver->set_wait_mask)
+		case IOCTL_SERIAL_CLR_DTR:
 		{
-			ULONG* pWaitMask = (ULONG*)lpInBuffer;
-			assert(nInBufferSize >= sizeof(ULONG));
-
-			if (nInBufferSize < sizeof(ULONG))
+			if (pServerSerialDriver->clear_dtr)
 			{
-				SetLastError(ERROR_INVALID_PARAMETER);
-				return FALSE;
+				return pServerSerialDriver->clear_dtr(pComm);
 			}
 
-			return pServerSerialDriver->set_wait_mask(pComm, pWaitMask);
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_GET_WAIT_MASK:
-	{
-		if (pServerSerialDriver->get_wait_mask)
+		case IOCTL_SERIAL_SET_RTS:
 		{
-			ULONG* pWaitMask = (ULONG*)lpOutBuffer;
-			assert(nOutBufferSize >= sizeof(ULONG));
-
-			if (nOutBufferSize < sizeof(ULONG))
+			if (pServerSerialDriver->set_rts)
 			{
-				SetLastError(ERROR_INSUFFICIENT_BUFFER);
-				return FALSE;
+				return pServerSerialDriver->set_rts(pComm);
 			}
 
-			if (!pServerSerialDriver->get_wait_mask(pComm, pWaitMask))
-				return FALSE;
-
-			*lpBytesReturned = sizeof(ULONG);
-			return TRUE;
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_WAIT_ON_MASK:
-	{
-		if (pServerSerialDriver->wait_on_mask)
+		case IOCTL_SERIAL_CLR_RTS:
 		{
-			ULONG* pOutputMask = (ULONG*)lpOutBuffer;
-			assert(nOutBufferSize >= sizeof(ULONG));
-
-			if (nOutBufferSize < sizeof(ULONG))
+			if (pServerSerialDriver->clear_rts)
 			{
-				SetLastError(ERROR_INSUFFICIENT_BUFFER);
-				return FALSE;
+				return pServerSerialDriver->clear_rts(pComm);
 			}
 
-			if (!pServerSerialDriver->wait_on_mask(pComm, pOutputMask))
+			break;
+		}
+
+		case IOCTL_SERIAL_GET_MODEMSTATUS:
+		{
+			if (pServerSerialDriver->get_modemstatus)
 			{
+				ULONG* pRegister = (ULONG*)lpOutBuffer;
+				assert(nOutBufferSize >= sizeof(ULONG));
+
+				if (nOutBufferSize < sizeof(ULONG))
+				{
+					SetLastError(ERROR_INSUFFICIENT_BUFFER);
+					return FALSE;
+				}
+
+				if (!pServerSerialDriver->get_modemstatus(pComm, pRegister))
+					return FALSE;
+
 				*lpBytesReturned = sizeof(ULONG);
-				return FALSE;
+				return TRUE;
 			}
 
-			*lpBytesReturned = sizeof(ULONG);
-			return TRUE;
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_SET_QUEUE_SIZE:
-	{
-		if (pServerSerialDriver->set_queue_size)
+		case IOCTL_SERIAL_SET_WAIT_MASK:
 		{
-			SERIAL_QUEUE_SIZE* pQueueSize = (SERIAL_QUEUE_SIZE*)lpInBuffer;
-			assert(nInBufferSize >= sizeof(SERIAL_QUEUE_SIZE));
-
-			if (nInBufferSize < sizeof(SERIAL_QUEUE_SIZE))
+			if (pServerSerialDriver->set_wait_mask)
 			{
-				SetLastError(ERROR_INVALID_PARAMETER);
-				return FALSE;
+				ULONG* pWaitMask = (ULONG*)lpInBuffer;
+				assert(nInBufferSize >= sizeof(ULONG));
+
+				if (nInBufferSize < sizeof(ULONG))
+				{
+					SetLastError(ERROR_INVALID_PARAMETER);
+					return FALSE;
+				}
+
+				return pServerSerialDriver->set_wait_mask(pComm, pWaitMask);
 			}
 
-			return pServerSerialDriver->set_queue_size(pComm, pQueueSize);
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_PURGE:
-	{
-		if (pServerSerialDriver->purge)
+		case IOCTL_SERIAL_GET_WAIT_MASK:
 		{
-			ULONG* pPurgeMask = (ULONG*)lpInBuffer;
-			assert(nInBufferSize >= sizeof(ULONG));
-
-			if (nInBufferSize < sizeof(ULONG))
+			if (pServerSerialDriver->get_wait_mask)
 			{
-				SetLastError(ERROR_INVALID_PARAMETER);
-				return FALSE;
+				ULONG* pWaitMask = (ULONG*)lpOutBuffer;
+				assert(nOutBufferSize >= sizeof(ULONG));
+
+				if (nOutBufferSize < sizeof(ULONG))
+				{
+					SetLastError(ERROR_INSUFFICIENT_BUFFER);
+					return FALSE;
+				}
+
+				if (!pServerSerialDriver->get_wait_mask(pComm, pWaitMask))
+					return FALSE;
+
+				*lpBytesReturned = sizeof(ULONG);
+				return TRUE;
 			}
 
-			return pServerSerialDriver->purge(pComm, pPurgeMask);
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_GET_COMMSTATUS:
-	{
-		if (pServerSerialDriver->get_commstatus)
+		case IOCTL_SERIAL_WAIT_ON_MASK:
 		{
-			SERIAL_STATUS* pCommstatus = (SERIAL_STATUS*)lpOutBuffer;
-			assert(nOutBufferSize >= sizeof(SERIAL_STATUS));
-
-			if (nOutBufferSize < sizeof(SERIAL_STATUS))
+			if (pServerSerialDriver->wait_on_mask)
 			{
-				SetLastError(ERROR_INSUFFICIENT_BUFFER);
-				return FALSE;
+				ULONG* pOutputMask = (ULONG*)lpOutBuffer;
+				assert(nOutBufferSize >= sizeof(ULONG));
+
+				if (nOutBufferSize < sizeof(ULONG))
+				{
+					SetLastError(ERROR_INSUFFICIENT_BUFFER);
+					return FALSE;
+				}
+
+				if (!pServerSerialDriver->wait_on_mask(pComm, pOutputMask))
+				{
+					*lpBytesReturned = sizeof(ULONG);
+					return FALSE;
+				}
+
+				*lpBytesReturned = sizeof(ULONG);
+				return TRUE;
 			}
 
-			if (!pServerSerialDriver->get_commstatus(pComm, pCommstatus))
-				return FALSE;
-
-			*lpBytesReturned = sizeof(SERIAL_STATUS);
-			return TRUE;
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_SET_BREAK_ON:
-	{
-		if (pServerSerialDriver->set_break_on)
+		case IOCTL_SERIAL_SET_QUEUE_SIZE:
 		{
-			return pServerSerialDriver->set_break_on(pComm);
-		}
-
-		break;
-	}
-
-	case IOCTL_SERIAL_SET_BREAK_OFF:
-	{
-		if (pServerSerialDriver->set_break_off)
-		{
-			return pServerSerialDriver->set_break_off(pComm);
-		}
-
-		break;
-	}
-
-	case IOCTL_SERIAL_SET_XOFF:
-	{
-		if (pServerSerialDriver->set_xoff)
-		{
-			return pServerSerialDriver->set_xoff(pComm);
-		}
-
-		break;
-	}
-
-	case IOCTL_SERIAL_SET_XON:
-	{
-		if (pServerSerialDriver->set_xon)
-		{
-			return pServerSerialDriver->set_xon(pComm);
-		}
-
-		break;
-	}
-
-	case IOCTL_SERIAL_GET_DTRRTS:
-	{
-		if (pServerSerialDriver->get_dtrrts)
-		{
-			ULONG* pMask = (ULONG*)lpOutBuffer;
-			assert(nOutBufferSize >= sizeof(ULONG));
-
-			if (nOutBufferSize < sizeof(ULONG))
+			if (pServerSerialDriver->set_queue_size)
 			{
-				SetLastError(ERROR_INSUFFICIENT_BUFFER);
-				return FALSE;
+				SERIAL_QUEUE_SIZE* pQueueSize = (SERIAL_QUEUE_SIZE*)lpInBuffer;
+				assert(nInBufferSize >= sizeof(SERIAL_QUEUE_SIZE));
+
+				if (nInBufferSize < sizeof(SERIAL_QUEUE_SIZE))
+				{
+					SetLastError(ERROR_INVALID_PARAMETER);
+					return FALSE;
+				}
+
+				return pServerSerialDriver->set_queue_size(pComm, pQueueSize);
 			}
 
-			if (!pServerSerialDriver->get_dtrrts(pComm, pMask))
-				return FALSE;
-
-			*lpBytesReturned = sizeof(ULONG);
-			return TRUE;
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_CONFIG_SIZE:
-	{
-		if (pServerSerialDriver->config_size)
+		case IOCTL_SERIAL_PURGE:
 		{
-			ULONG* pSize = (ULONG*)lpOutBuffer;
-			assert(nOutBufferSize >= sizeof(ULONG));
-
-			if (nOutBufferSize < sizeof(ULONG))
+			if (pServerSerialDriver->purge)
 			{
-				SetLastError(ERROR_INSUFFICIENT_BUFFER);
-				return FALSE;
+				ULONG* pPurgeMask = (ULONG*)lpInBuffer;
+				assert(nInBufferSize >= sizeof(ULONG));
+
+				if (nInBufferSize < sizeof(ULONG))
+				{
+					SetLastError(ERROR_INVALID_PARAMETER);
+					return FALSE;
+				}
+
+				return pServerSerialDriver->purge(pComm, pPurgeMask);
 			}
 
-			if (!pServerSerialDriver->config_size(pComm, pSize))
-				return FALSE;
-
-			*lpBytesReturned = sizeof(ULONG);
-			return TRUE;
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_IMMEDIATE_CHAR:
-	{
-		if (pServerSerialDriver->immediate_char)
+		case IOCTL_SERIAL_GET_COMMSTATUS:
 		{
-			UCHAR* pChar = (UCHAR*)lpInBuffer;
-			assert(nInBufferSize >= sizeof(UCHAR));
-
-			if (nInBufferSize < sizeof(UCHAR))
+			if (pServerSerialDriver->get_commstatus)
 			{
-				SetLastError(ERROR_INVALID_PARAMETER);
-				return FALSE;
+				SERIAL_STATUS* pCommstatus = (SERIAL_STATUS*)lpOutBuffer;
+				assert(nOutBufferSize >= sizeof(SERIAL_STATUS));
+
+				if (nOutBufferSize < sizeof(SERIAL_STATUS))
+				{
+					SetLastError(ERROR_INSUFFICIENT_BUFFER);
+					return FALSE;
+				}
+
+				if (!pServerSerialDriver->get_commstatus(pComm, pCommstatus))
+					return FALSE;
+
+				*lpBytesReturned = sizeof(SERIAL_STATUS);
+				return TRUE;
 			}
 
-			return pServerSerialDriver->immediate_char(pComm, pChar);
+			break;
 		}
 
-		break;
-	}
-
-	case IOCTL_SERIAL_RESET_DEVICE:
-	{
-		if (pServerSerialDriver->reset_device)
+		case IOCTL_SERIAL_SET_BREAK_ON:
 		{
-			return pServerSerialDriver->reset_device(pComm);
+			if (pServerSerialDriver->set_break_on)
+			{
+				return pServerSerialDriver->set_break_on(pComm);
+			}
+
+			break;
 		}
 
-		break;
-	}
+		case IOCTL_SERIAL_SET_BREAK_OFF:
+		{
+			if (pServerSerialDriver->set_break_off)
+			{
+				return pServerSerialDriver->set_break_off(pComm);
+			}
+
+			break;
+		}
+
+		case IOCTL_SERIAL_SET_XOFF:
+		{
+			if (pServerSerialDriver->set_xoff)
+			{
+				return pServerSerialDriver->set_xoff(pComm);
+			}
+
+			break;
+		}
+
+		case IOCTL_SERIAL_SET_XON:
+		{
+			if (pServerSerialDriver->set_xon)
+			{
+				return pServerSerialDriver->set_xon(pComm);
+			}
+
+			break;
+		}
+
+		case IOCTL_SERIAL_GET_DTRRTS:
+		{
+			if (pServerSerialDriver->get_dtrrts)
+			{
+				ULONG* pMask = (ULONG*)lpOutBuffer;
+				assert(nOutBufferSize >= sizeof(ULONG));
+
+				if (nOutBufferSize < sizeof(ULONG))
+				{
+					SetLastError(ERROR_INSUFFICIENT_BUFFER);
+					return FALSE;
+				}
+
+				if (!pServerSerialDriver->get_dtrrts(pComm, pMask))
+					return FALSE;
+
+				*lpBytesReturned = sizeof(ULONG);
+				return TRUE;
+			}
+
+			break;
+		}
+
+		case IOCTL_SERIAL_CONFIG_SIZE:
+		{
+			if (pServerSerialDriver->config_size)
+			{
+				ULONG* pSize = (ULONG*)lpOutBuffer;
+				assert(nOutBufferSize >= sizeof(ULONG));
+
+				if (nOutBufferSize < sizeof(ULONG))
+				{
+					SetLastError(ERROR_INSUFFICIENT_BUFFER);
+					return FALSE;
+				}
+
+				if (!pServerSerialDriver->config_size(pComm, pSize))
+					return FALSE;
+
+				*lpBytesReturned = sizeof(ULONG);
+				return TRUE;
+			}
+
+			break;
+		}
+
+		case IOCTL_SERIAL_IMMEDIATE_CHAR:
+		{
+			if (pServerSerialDriver->immediate_char)
+			{
+				UCHAR* pChar = (UCHAR*)lpInBuffer;
+				assert(nInBufferSize >= sizeof(UCHAR));
+
+				if (nInBufferSize < sizeof(UCHAR))
+				{
+					SetLastError(ERROR_INVALID_PARAMETER);
+					return FALSE;
+				}
+
+				return pServerSerialDriver->immediate_char(pComm, pChar);
+			}
+
+			break;
+		}
+
+		case IOCTL_SERIAL_RESET_DEVICE:
+		{
+			if (pServerSerialDriver->reset_device)
+			{
+				return pServerSerialDriver->reset_device(pComm);
+			}
+
+			break;
+		}
 	}
 
 	CommLog_Print(

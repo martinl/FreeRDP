@@ -283,7 +283,7 @@ SECURITY_STATUS ntlm_computeProofValue(NTLM_CONTEXT* ntlm, SecBuffer* ntproof);
 SECURITY_STATUS ntlm_computeMicValue(NTLM_CONTEXT* ntlm, SecBuffer* micvalue);
 
 #ifdef WITH_DEBUG_NLA
-#	define WITH_DEBUG_NTLM
+#define WITH_DEBUG_NTLM
 #endif
 
 #endif /* FREERDP_SSPI_NTLM_PRIVATE_H */

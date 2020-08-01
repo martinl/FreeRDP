@@ -32,10 +32,10 @@ extern "C"
 
 #ifndef _WIN32
 
-#	ifndef CONTAINING_RECORD
-#		define CONTAINING_RECORD(address, type, field) \
-			((type*)(((ULONG_PTR)address) - (ULONG_PTR)(&(((type*)0)->field))))
-#	endif
+#ifndef CONTAINING_RECORD
+#define CONTAINING_RECORD(address, type, field) \
+	((type*)(((ULONG_PTR)address) - (ULONG_PTR)(&(((type*)0)->field))))
+#endif
 
 	typedef struct _WINPR_LIST_ENTRY WINPR_LIST_ENTRY;
 	typedef struct _WINPR_LIST_ENTRY* WINPR_PLIST_ENTRY;
@@ -68,7 +68,7 @@ extern "C"
 	} WINPR_LIST_ENTRY64;
 	typedef WINPR_LIST_ENTRY64* WINPR_PLIST_ENTRY64;
 
-#	ifdef _WIN64
+#ifdef _WIN64
 
 	typedef struct _WINPR_SLIST_ENTRY* WINPR_PSLIST_ENTRY;
 	typedef struct DECLSPEC_ALIGN(16) _WINPR_SLIST_ENTRY
@@ -76,17 +76,18 @@ extern "C"
 		WINPR_PSLIST_ENTRY Next;
 	} WINPR_SLIST_ENTRY;
 
-#	else /* _WIN64 */
+#else /* _WIN64 */
 
-#		define WINPR_SLIST_ENTRY WINPR_SINGLE_LIST_ENTRY
-#		define _WINPR_SLIST_ENTRY _WINPR_SINGLE_LIST_ENTRY
-#		define WINPR_PSLIST_ENTRY WINPR_PSINGLE_LIST_ENTRY
+#define WINPR_SLIST_ENTRY WINPR_SINGLE_LIST_ENTRY
+#define _WINPR_SLIST_ENTRY _WINPR_SINGLE_LIST_ENTRY
+#define WINPR_PSLIST_ENTRY WINPR_PSINGLE_LIST_ENTRY
 
-#	endif /* _WIN64 */
+#endif /* _WIN64 */
 
-#	ifdef _WIN64
+#ifdef _WIN64
 
-	typedef union DECLSPEC_ALIGN(16) _WINPR_SLIST_HEADER {
+	typedef union DECLSPEC_ALIGN(16) _WINPR_SLIST_HEADER
+	{
 		struct
 		{
 			ULONGLONG Alignment;
@@ -114,9 +115,10 @@ extern "C"
 		} HeaderX64;
 	} WINPR_SLIST_HEADER, *WINPR_PSLIST_HEADER;
 
-#	else /* _WIN64 */
+#else /* _WIN64 */
 
-	typedef union _WINPR_SLIST_HEADER {
+	typedef union _WINPR_SLIST_HEADER
+	{
 		ULONGLONG Alignment;
 
 		struct
@@ -127,7 +129,7 @@ extern "C"
 		} DUMMYSTRUCTNAME;
 	} WINPR_SLIST_HEADER, *WINPR_PSLIST_HEADER;
 
-#	endif /* _WIN64 */
+#endif /* _WIN64 */
 
 	/* Singly-Linked List */
 
@@ -157,27 +159,27 @@ extern "C"
 	                                                  PVOID Comperand);
 
 #else /* _WIN32 */
-#	define WINPR_LIST_ENTRY LIST_ENTRY
-#	define _WINPR_LIST_ENTRY _LIST_ENTRY
-#	define WINPR_PLIST_ENTRY PLIST_ENTRY
+#define WINPR_LIST_ENTRY LIST_ENTRY
+#define _WINPR_LIST_ENTRY _LIST_ENTRY
+#define WINPR_PLIST_ENTRY PLIST_ENTRY
 
-#	define WINPR_SINGLE_LIST_ENTRY SINGLE_LIST_ENTRY
-#	define _WINPR_SINGLE_LIST_ENTRY _SINGLE_LIST_ENTRY
-#	define WINPR_PSINGLE_LIST_ENTRY PSINGLE_LIST_ENTRY
+#define WINPR_SINGLE_LIST_ENTRY SINGLE_LIST_ENTRY
+#define _WINPR_SINGLE_LIST_ENTRY _SINGLE_LIST_ENTRY
+#define WINPR_PSINGLE_LIST_ENTRY PSINGLE_LIST_ENTRY
 
-#	define WINPR_SLIST_ENTRY SLIST_ENTRY
-#	define _WINPR_SLIST_ENTRY _SLIST_ENTRY
-#	define WINPR_PSLIST_ENTRY PSLIST_ENTRY
+#define WINPR_SLIST_ENTRY SLIST_ENTRY
+#define _WINPR_SLIST_ENTRY _SLIST_ENTRY
+#define WINPR_PSLIST_ENTRY PSLIST_ENTRY
 
-#	define WINPR_SLIST_HEADER SLIST_HEADER
-#	define _WINPR_SLIST_HEADER _SLIST_HEADER
-#	define WINPR_PSLIST_HEADER PSLIST_HEADER
+#define WINPR_SLIST_HEADER SLIST_HEADER
+#define _WINPR_SLIST_HEADER _SLIST_HEADER
+#define WINPR_PSLIST_HEADER PSLIST_HEADER
 
 #endif /* _WIN32 */
 
 #if (!defined(_WIN32) || \
      (defined(_WIN32) && (_WIN32_WINNT < 0x0502) && !defined(InterlockedCompareExchange64)))
-#	define WINPR_INTERLOCKED_COMPARE_EXCHANGE64 1
+#define WINPR_INTERLOCKED_COMPARE_EXCHANGE64 1
 #endif
 
 #ifdef WINPR_INTERLOCKED_COMPARE_EXCHANGE64

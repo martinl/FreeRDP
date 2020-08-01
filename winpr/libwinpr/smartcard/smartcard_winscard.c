@@ -18,16 +18,16 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #ifdef _WIN32
 
-#	include <winpr/crt.h>
-#	include <winpr/library.h>
-#	include <winpr/smartcard.h>
+#include <winpr/crt.h>
+#include <winpr/library.h>
+#include <winpr/smartcard.h>
 
-#	include "smartcard_winscard.h"
+#include "smartcard_winscard.h"
 
 static HMODULE g_WinSCardModule = NULL;
 

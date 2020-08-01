@@ -19,11 +19,13 @@
 
 @implementation ScreenSelectionController
 
-- (id)initWithConnectionParams:(ConnectionParams *)params {
+- (id)initWithConnectionParams:(ConnectionParams *)params
+{
 	return [self initWithConnectionParams:params keyPath:nil];
 }
 
-- (id)initWithConnectionParams:(ConnectionParams *)params keyPath:(NSString *)keyPath {
+- (id)initWithConnectionParams:(ConnectionParams *)params keyPath:(NSString *)keyPath
+{
 	self = [super initWithStyle:UITableViewStyleGrouped];
 	if (self)
 	{
@@ -51,7 +53,8 @@
 	return self;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
 	[super dealloc];
 	[_params autorelease];
 	[_keyPath autorelease];
@@ -59,7 +62,8 @@
 	[_resolution_modes autorelease];
 }
 
-- (NSString *)keyPathForKey:(NSString *)key {
+- (NSString *)keyPathForKey:(NSString *)key
+{
 	if (_keyPath)
 		return [_keyPath stringByAppendingFormat:@".%@", key];
 	return key;
@@ -67,18 +71,21 @@
 
 #pragma mark - View lifecycle
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
 	// Return YES for supported orientations
 	return YES;
 }
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
 	return 2;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
 	// Return the number of rows in the section.
 	if (section == 0)
 		return [_color_options count];
@@ -86,27 +93,28 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView
-         cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+         cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	UITableViewCell *cell = nil;
 	switch ([indexPath section])
 	{
-	case 0:
-		cell = [self tableViewCellFromIdentifier:TableCellIdentifierMultiChoice];
-		[[cell textLabel] setText:[_color_options keyAtIndex:[indexPath row]]];
-		break;
-
-	case 1:
-		if ([indexPath row] < [_resolution_modes count])
-		{
+		case 0:
 			cell = [self tableViewCellFromIdentifier:TableCellIdentifierMultiChoice];
-			[[cell textLabel] setText:[_resolution_modes objectAtIndex:[indexPath row]]];
-		}
-		else
-			cell = [self tableViewCellFromIdentifier:TableCellIdentifierText];
-		break;
+			[[cell textLabel] setText:[_color_options keyAtIndex:[indexPath row]]];
+			break;
 
-	default:
-		break;
+		case 1:
+			if ([indexPath row] < [_resolution_modes count])
+			{
+				cell = [self tableViewCellFromIdentifier:TableCellIdentifierMultiChoice];
+				[[cell textLabel] setText:[_resolution_modes objectAtIndex:[indexPath row]]];
+			}
+			else
+				cell = [self tableViewCellFromIdentifier:TableCellIdentifierText];
+			break;
+
+		default:
+			break;
 	}
 
 	if ([indexPath section] == 1)
@@ -148,7 +156,8 @@
 
 #pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	// custom widht/height cells are not selectable
 	if ([indexPath section] == 1 && [indexPath row] >= [_resolution_modes count])
 		return;
@@ -211,30 +220,32 @@
 #pragma mark -
 #pragma mark Text Field delegate
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
 	[textField resignFirstResponder];
 	return NO;
 }
 
-- (BOOL)textFieldShouldEndEditing:(UITextField *)textField {
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField
+{
 
 	switch ([textField tag])
 	{
-		// update resolution settings (and check for invalid input)
-	case 1:
-		if ([[textField text] intValue] < 640)
-			[textField setText:@"640"];
-		[_params setInt:[[textField text] intValue] forKeyPath:[self keyPathForKey:@"width"]];
-		break;
+			// update resolution settings (and check for invalid input)
+		case 1:
+			if ([[textField text] intValue] < 640)
+				[textField setText:@"640"];
+			[_params setInt:[[textField text] intValue] forKeyPath:[self keyPathForKey:@"width"]];
+			break;
 
-	case 2:
-		if ([[textField text] intValue] < 480)
-			[textField setText:@"480"];
-		[_params setInt:[[textField text] intValue] forKeyPath:[self keyPathForKey:@"height"]];
-		break;
+		case 2:
+			if ([[textField text] intValue] < 480)
+				[textField setText:@"480"];
+			[_params setInt:[[textField text] intValue] forKeyPath:[self keyPathForKey:@"height"]];
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 	return YES;
 }

@@ -14,15 +14,15 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <string.h>
 #include <freerdp/types.h>
 #include <freerdp/primitives.h>
 #ifdef WITH_IPP
-#	include <ipps.h>
-#	include <ippi.h>
+#include <ipps.h>
+#include <ippi.h>
 #endif /* WITH_IPP */
 #include "prim_internal.h"
 

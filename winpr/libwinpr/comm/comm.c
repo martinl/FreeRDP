@@ -21,36 +21,36 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #if defined __linux__ && !defined ANDROID
 
-#	include <assert.h>
-#	include <errno.h>
-#	include <fcntl.h>
-#	include <pthread.h>
-#	include <stdarg.h>
-#	include <sys/ioctl.h>
-#	include <sys/stat.h>
-#	include <sys/types.h>
-#	include <termios.h>
-#	include <unistd.h>
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <stdarg.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <termios.h>
+#include <unistd.h>
 
-#	include <winpr/crt.h>
-#	include <winpr/comm.h>
-#	include <winpr/tchar.h>
-#	include <winpr/wlog.h>
-#	include <winpr/handle.h>
+#include <winpr/crt.h>
+#include <winpr/comm.h>
+#include <winpr/tchar.h>
+#include <winpr/wlog.h>
+#include <winpr/handle.h>
 
-#	include "comm_ioctl.h"
+#include "comm_ioctl.h"
 
 /**
  * Communication Resources:
  * http://msdn.microsoft.com/en-us/library/windows/desktop/aa363196/
  */
 
-#	include "comm.h"
+#include "comm.h"
 
 static wLog* _Log = NULL;
 
@@ -64,7 +64,7 @@ typedef struct comm_device COMM_DEVICE;
 
 /* FIXME: get a clever data structure, see also io.h functions */
 /* _CommDevices is a NULL-terminated array with a maximun of COMM_DEVICE_MAX COMM_DEVICE */
-#	define COMM_DEVICE_MAX 128
+#define COMM_DEVICE_MAX 128
 static COMM_DEVICE** _CommDevices = NULL;
 static CRITICAL_SECTION _CommDevicesLock;
 
@@ -570,21 +570,22 @@ BOOL SetCommState(HANDLE hFile, LPDCB lpDCB)
 
 	switch (lpDCB->fDtrControl)
 	{
-	case SERIAL_DTR_HANDSHAKE:
-		handflow.ControlHandShake |= DTR_CONTROL_HANDSHAKE;
-		break;
+		case SERIAL_DTR_HANDSHAKE:
+			handflow.ControlHandShake |= DTR_CONTROL_HANDSHAKE;
+			break;
 
-	case SERIAL_DTR_CONTROL:
-		handflow.ControlHandShake |= DTR_CONTROL_ENABLE;
-		break;
+		case SERIAL_DTR_CONTROL:
+			handflow.ControlHandShake |= DTR_CONTROL_ENABLE;
+			break;
 
-	case DTR_CONTROL_DISABLE:
-		/* do nothing since handflow is init-zeroed */
-		break;
+		case DTR_CONTROL_DISABLE:
+			/* do nothing since handflow is init-zeroed */
+			break;
 
-	default:
-		CommLog_Print(WLOG_WARN, "Unexpected fDtrControl value: %" PRIu32 "\n", lpDCB->fDtrControl);
-		return FALSE;
+		default:
+			CommLog_Print(WLOG_WARN, "Unexpected fDtrControl value: %" PRIu32 "\n",
+			              lpDCB->fDtrControl);
+			return FALSE;
 	}
 
 	if (lpDCB->fDsrSensitivity)
@@ -619,26 +620,27 @@ BOOL SetCommState(HANDLE hFile, LPDCB lpDCB)
 
 	switch (lpDCB->fRtsControl)
 	{
-	case RTS_CONTROL_TOGGLE:
-		CommLog_Print(WLOG_WARN, "Unsupported RTS_CONTROL_TOGGLE feature");
-		// FIXME: see also GetCommState()
-		return FALSE;
+		case RTS_CONTROL_TOGGLE:
+			CommLog_Print(WLOG_WARN, "Unsupported RTS_CONTROL_TOGGLE feature");
+			// FIXME: see also GetCommState()
+			return FALSE;
 
-	case RTS_CONTROL_HANDSHAKE:
-		handflow.FlowReplace |= SERIAL_RTS_HANDSHAKE;
-		break;
+		case RTS_CONTROL_HANDSHAKE:
+			handflow.FlowReplace |= SERIAL_RTS_HANDSHAKE;
+			break;
 
-	case RTS_CONTROL_ENABLE:
-		handflow.FlowReplace |= SERIAL_RTS_CONTROL;
-		break;
+		case RTS_CONTROL_ENABLE:
+			handflow.FlowReplace |= SERIAL_RTS_CONTROL;
+			break;
 
-	case RTS_CONTROL_DISABLE:
-		/* do nothing since handflow is init-zeroed */
-		break;
+		case RTS_CONTROL_DISABLE:
+			/* do nothing since handflow is init-zeroed */
+			break;
 
-	default:
-		CommLog_Print(WLOG_WARN, "Unexpected fRtsControl value: %" PRIu32 "\n", lpDCB->fRtsControl);
-		return FALSE;
+		default:
+			CommLog_Print(WLOG_WARN, "Unexpected fRtsControl value: %" PRIu32 "\n",
+			              lpDCB->fRtsControl);
+			return FALSE;
 	}
 
 	if (lpDCB->fAbortOnError)
@@ -1459,7 +1461,7 @@ BOOL CommCloseHandle(HANDLE handle)
 	return TRUE;
 }
 
-#	ifndef WITH_EVENTFD_READ_WRITE
+#ifndef WITH_EVENTFD_READ_WRITE
 int eventfd_read(int fd, eventfd_t* value)
 {
 	return (read(fd, value, sizeof(*value)) == sizeof(*value)) ? 0 : -1;
@@ -1469,6 +1471,6 @@ int eventfd_write(int fd, eventfd_t value)
 {
 	return (write(fd, &value, sizeof(value)) == sizeof(value)) ? 0 : -1;
 }
-#	endif
+#endif
 
 #endif /* __linux__ */

@@ -22,10 +22,10 @@
 
 #ifndef _WIN32
 
-#	include <winpr/pipe.h>
-#	include <winpr/collections.h>
+#include <winpr/pipe.h>
+#include <winpr/collections.h>
 
-#	include "../handle/handle.h"
+#include "../handle/handle.h"
 
 struct winpr_pipe
 {

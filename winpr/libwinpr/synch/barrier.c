@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/synch.h>
@@ -30,11 +30,11 @@
 
 #ifdef WINPR_SYNCHRONIZATION_BARRIER
 
-#	include <assert.h>
-#	include <winpr/sysinfo.h>
-#	include <winpr/library.h>
-#	include <winpr/interlocked.h>
-#	include <winpr/thread.h>
+#include <assert.h>
+#include <winpr/sysinfo.h>
+#include <winpr/library.h>
+#include <winpr/interlocked.h>
+#include <winpr/thread.h>
 
 /**
  * WinPR uses the internal RTL_BARRIER struct members exactly like Windows:
@@ -46,7 +46,7 @@
  * DWORD Reserved5;          spincount
  */
 
-#	ifdef _WIN32
+#ifdef _WIN32
 
 static HMODULE g_Kernel32 = NULL;
 static BOOL g_NativeBarrier = FALSE;
@@ -85,7 +85,7 @@ static BOOL CALLBACK InitOnce_Barrier(PINIT_ONCE once, PVOID param, PVOID* conte
 	return TRUE;
 }
 
-#	endif
+#endif
 
 BOOL WINAPI winpr_InitializeSynchronizationBarrier(LPSYNCHRONIZATION_BARRIER lpBarrier,
                                                    LONG lTotalThreads, LONG lSpinCount)
@@ -93,13 +93,13 @@ BOOL WINAPI winpr_InitializeSynchronizationBarrier(LPSYNCHRONIZATION_BARRIER lpB
 	SYSTEM_INFO sysinfo;
 	HANDLE hEvent0;
 	HANDLE hEvent1;
-#	ifdef _WIN32
+#ifdef _WIN32
 	InitOnceExecuteOnce(&g_InitOnce, InitOnce_Barrier, NULL, NULL);
 
 	if (g_NativeBarrier)
 		return pfnInitializeSynchronizationBarrier(lpBarrier, lTotalThreads, lSpinCount);
 
-#	endif
+#endif
 
 	if (!lpBarrier || lTotalThreads < 1 || lSpinCount < -1)
 	{
@@ -136,12 +136,12 @@ BOOL WINAPI winpr_EnterSynchronizationBarrier(LPSYNCHRONIZATION_BARRIER lpBarrie
 	LONG remainingThreads;
 	HANDLE hCurrentEvent;
 	HANDLE hDormantEvent;
-#	ifdef _WIN32
+#ifdef _WIN32
 
 	if (g_NativeBarrier)
 		return pfnEnterSynchronizationBarrier(lpBarrier, dwFlags);
 
-#	endif
+#endif
 
 	if (!lpBarrier)
 		return FALSE;
@@ -223,12 +223,12 @@ BOOL WINAPI winpr_EnterSynchronizationBarrier(LPSYNCHRONIZATION_BARRIER lpBarrie
 
 BOOL WINAPI winpr_DeleteSynchronizationBarrier(LPSYNCHRONIZATION_BARRIER lpBarrier)
 {
-#	ifdef _WIN32
+#ifdef _WIN32
 
 	if (g_NativeBarrier)
 		return pfnDeleteSynchronizationBarrier(lpBarrier);
 
-#	endif
+#endif
 
 	/**
 	 * According to https://msdn.microsoft.com/en-us/library/windows/desktop/hh706887(v=vs.85).aspx

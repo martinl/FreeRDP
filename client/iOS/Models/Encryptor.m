@@ -27,7 +27,8 @@
 @implementation Encryptor
 @synthesize plaintextPassword = _plaintext_password;
 
-- (id)initWithPassword:(NSString *)plaintext_password {
+- (id)initWithPassword:(NSString *)plaintext_password
+{
 	if (plaintext_password == nil)
 		return nil;
 
@@ -91,7 +92,8 @@
 #pragma mark -
 #pragma mark Encrypting/Decrypting data
 
-- (NSData *)encryptData:(NSData *)plaintext_data {
+- (NSData *)encryptData:(NSData *)plaintext_data
+{
 	if (![plaintext_data length])
 		return nil;
 
@@ -109,22 +111,24 @@
 
 	switch (ret)
 	{
-	case kCCSuccess:
-		[encrypted_data setLength:[iv length] + data_out_moved];
-		return encrypted_data;
+		case kCCSuccess:
+			[encrypted_data setLength:[iv length] + data_out_moved];
+			return encrypted_data;
 
-	default:
-		NSLog(@"%s: uncaught error, ret CCCryptorStatus = %d (plaintext len = %lu; buffer size = "
-		      @"%lu)",
-		      __func__, ret, (unsigned long)[plaintext_data length],
-		      (unsigned long)([encrypted_data length] - [iv length]));
-		return nil;
+		default:
+			NSLog(
+			    @"%s: uncaught error, ret CCCryptorStatus = %d (plaintext len = %lu; buffer size = "
+			    @"%lu)",
+			    __func__, ret, (unsigned long)[plaintext_data length],
+			    (unsigned long)([encrypted_data length] - [iv length]));
+			return nil;
 	}
 
 	return nil;
 }
 
-- (NSData *)decryptData:(NSData *)encrypted_data {
+- (NSData *)decryptData:(NSData *)encrypted_data
+{
 	if ([encrypted_data length] <= TSXEncryptorBlockCipherBlockSize)
 		return nil;
 
@@ -141,37 +145,40 @@
 
 	switch (ret)
 	{
-	case kCCSuccess:
-		[plaintext_data setLength:data_out_moved];
-		return plaintext_data;
+		case kCCSuccess:
+			[plaintext_data setLength:data_out_moved];
+			return plaintext_data;
 
-	case kCCBufferTooSmall: // Our output buffer is big enough to decrypt valid data. This return
-	                        // code indicates malformed data.
-	case kCCAlignmentError: // Shouldn't get this, since we're using padding.
-	case kCCDecodeError:    // Wrong key.
-		return nil;
+		case kCCBufferTooSmall: // Our output buffer is big enough to decrypt valid data. This
+		                        // return code indicates malformed data.
+		case kCCAlignmentError: // Shouldn't get this, since we're using padding.
+		case kCCDecodeError:    // Wrong key.
+			return nil;
 
-	default:
-		NSLog(@"%s: uncaught error, ret CCCryptorStatus = %d (encrypted data len = %lu; buffer "
-		      @"size = %lu; dom = %lu)",
-		      __func__, ret, (unsigned long)[encrypted_data length],
-		      (unsigned long)[plaintext_data length], data_out_moved);
-		return nil;
+		default:
+			NSLog(@"%s: uncaught error, ret CCCryptorStatus = %d (encrypted data len = %lu; buffer "
+			      @"size = %lu; dom = %lu)",
+			      __func__, ret, (unsigned long)[encrypted_data length],
+			      (unsigned long)[plaintext_data length], data_out_moved);
+			return nil;
 	}
 
 	return nil;
 }
 
-- (NSData *)encryptString:(NSString *)plaintext_string {
+- (NSData *)encryptString:(NSString *)plaintext_string
+{
 	return [self encryptData:[plaintext_string dataUsingEncoding:NSUTF8StringEncoding]];
 }
 
-- (NSString *)decryptString:(NSData *)encrypted_string {
+- (NSString *)decryptString:(NSData *)encrypted_string
+{
 	return [[[NSString alloc] initWithData:[self decryptData:encrypted_string]
 	                              encoding:NSUTF8StringEncoding] autorelease];
 }
 
-- (NSData *)randomInitializationVector {
+- (NSData *)randomInitializationVector
+{
 	NSMutableData *iv = [NSMutableData dataWithLength:TSXEncryptorBlockCipherBlockSize];
 	int fd;
 

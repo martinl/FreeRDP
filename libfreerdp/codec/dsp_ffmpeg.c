@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <freerdp/log.h>
@@ -28,11 +28,11 @@
 #include <libavutil/avutil.h>
 #include <libavutil/opt.h>
 #if defined(SWRESAMPLE_FOUND)
-#	include <libswresample/swresample.h>
+#include <libswresample/swresample.h>
 #elif defined(AVRESAMPLE_FOUND)
-#	include <libavresample/avresample.h>
+#include <libavresample/avresample.h>
 #else
-#	error "libswresample or libavresample required"
+#error "libswresample or libavresample required"
 #endif
 
 #include "dsp.h"
@@ -69,18 +69,18 @@ static BOOL ffmpeg_codec_is_filtered(enum AVCodecID id, BOOL encoder)
 	{
 #if !defined(WITH_DSP_EXPERIMENTAL)
 
-	case AV_CODEC_ID_ADPCM_IMA_OKI:
-	case AV_CODEC_ID_MP3:
-	case AV_CODEC_ID_ADPCM_MS:
-	case AV_CODEC_ID_G723_1:
-		return TRUE;
+		case AV_CODEC_ID_ADPCM_IMA_OKI:
+		case AV_CODEC_ID_MP3:
+		case AV_CODEC_ID_ADPCM_MS:
+		case AV_CODEC_ID_G723_1:
+			return TRUE;
 #endif
 
-	case AV_CODEC_ID_NONE:
-		return TRUE;
+		case AV_CODEC_ID_NONE:
+			return TRUE;
 
-	default:
-		return FALSE;
+		default:
+			return FALSE;
 	}
 }
 
@@ -95,45 +95,45 @@ static enum AVCodecID ffmpeg_get_avcodec(const AUDIO_FORMAT* format)
 
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_UNKNOWN:
-		return AV_CODEC_ID_NONE;
+		case WAVE_FORMAT_UNKNOWN:
+			return AV_CODEC_ID_NONE;
 
-	case WAVE_FORMAT_PCM:
-		switch (format->wBitsPerSample)
-		{
-		case 16:
-			return AV_CODEC_ID_PCM_U16LE;
+		case WAVE_FORMAT_PCM:
+			switch (format->wBitsPerSample)
+			{
+				case 16:
+					return AV_CODEC_ID_PCM_U16LE;
 
-		case 8:
-			return AV_CODEC_ID_PCM_U8;
+				case 8:
+					return AV_CODEC_ID_PCM_U8;
+
+				default:
+					return AV_CODEC_ID_NONE;
+			}
+
+		case WAVE_FORMAT_DVI_ADPCM:
+			return AV_CODEC_ID_ADPCM_IMA_OKI;
+
+		case WAVE_FORMAT_ADPCM:
+			return AV_CODEC_ID_ADPCM_MS;
+
+		case WAVE_FORMAT_ALAW:
+			return AV_CODEC_ID_PCM_ALAW;
+
+		case WAVE_FORMAT_MULAW:
+			return AV_CODEC_ID_PCM_MULAW;
+
+		case WAVE_FORMAT_GSM610:
+			return AV_CODEC_ID_GSM_MS;
+
+		case WAVE_FORMAT_MSG723:
+			return AV_CODEC_ID_G723_1;
+
+		case WAVE_FORMAT_AAC_MS:
+			return AV_CODEC_ID_AAC;
 
 		default:
 			return AV_CODEC_ID_NONE;
-		}
-
-	case WAVE_FORMAT_DVI_ADPCM:
-		return AV_CODEC_ID_ADPCM_IMA_OKI;
-
-	case WAVE_FORMAT_ADPCM:
-		return AV_CODEC_ID_ADPCM_MS;
-
-	case WAVE_FORMAT_ALAW:
-		return AV_CODEC_ID_PCM_ALAW;
-
-	case WAVE_FORMAT_MULAW:
-		return AV_CODEC_ID_PCM_MULAW;
-
-	case WAVE_FORMAT_GSM610:
-		return AV_CODEC_ID_GSM_MS;
-
-	case WAVE_FORMAT_MSG723:
-		return AV_CODEC_ID_G723_1;
-
-	case WAVE_FORMAT_AAC_MS:
-		return AV_CODEC_ID_AAC;
-
-	default:
-		return AV_CODEC_ID_NONE;
 	}
 }
 
@@ -141,36 +141,36 @@ static int ffmpeg_sample_format(const AUDIO_FORMAT* format)
 {
 	switch (format->wFormatTag)
 	{
-	case WAVE_FORMAT_PCM:
-		switch (format->wBitsPerSample)
-		{
-		case 8:
-			return AV_SAMPLE_FMT_U8;
+		case WAVE_FORMAT_PCM:
+			switch (format->wBitsPerSample)
+			{
+				case 8:
+					return AV_SAMPLE_FMT_U8;
 
-		case 16:
+				case 16:
+					return AV_SAMPLE_FMT_S16;
+
+				default:
+					return FALSE;
+			}
+
+		case WAVE_FORMAT_DVI_ADPCM:
+		case WAVE_FORMAT_ADPCM:
+			return AV_SAMPLE_FMT_S16P;
+
+		case WAVE_FORMAT_MPEGLAYER3:
+		case WAVE_FORMAT_AAC_MS:
+			return AV_SAMPLE_FMT_FLTP;
+
+		case WAVE_FORMAT_MSG723:
+		case WAVE_FORMAT_GSM610:
+			return AV_SAMPLE_FMT_S16P;
+
+		case WAVE_FORMAT_ALAW:
 			return AV_SAMPLE_FMT_S16;
 
 		default:
 			return FALSE;
-		}
-
-	case WAVE_FORMAT_DVI_ADPCM:
-	case WAVE_FORMAT_ADPCM:
-		return AV_SAMPLE_FMT_S16P;
-
-	case WAVE_FORMAT_MPEGLAYER3:
-	case WAVE_FORMAT_AAC_MS:
-		return AV_SAMPLE_FMT_FLTP;
-
-	case WAVE_FORMAT_MSG723:
-	case WAVE_FORMAT_GSM610:
-		return AV_SAMPLE_FMT_S16P;
-
-	case WAVE_FORMAT_ALAW:
-		return AV_SAMPLE_FMT_S16;
-
-	default:
-		return FALSE;
 	}
 }
 
@@ -248,17 +248,17 @@ static BOOL ffmpeg_open_context(FREERDP_DSP_CONTEXT* context)
 
 	switch (context->id)
 	{
-	/* We need support for multichannel and sample rates != 8000 */
-	case AV_CODEC_ID_GSM_MS:
-		context->context->strict_std_compliance = FF_COMPLIANCE_UNOFFICIAL;
-		break;
+		/* We need support for multichannel and sample rates != 8000 */
+		case AV_CODEC_ID_GSM_MS:
+			context->context->strict_std_compliance = FF_COMPLIANCE_UNOFFICIAL;
+			break;
 
-	case AV_CODEC_ID_AAC:
-		context->context->profile = FF_PROFILE_AAC_MAIN;
-		break;
+		case AV_CODEC_ID_AAC:
+			context->context->profile = FF_PROFILE_AAC_MAIN;
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	context->context->channels = format->nChannels;

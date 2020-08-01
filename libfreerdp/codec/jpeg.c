@@ -18,7 +18,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <winpr/stream.h>
@@ -29,9 +29,9 @@
 
 #ifdef WITH_JPEG
 
-#	define XMD_H
+#define XMD_H
 
-#	include <jpeglib.h>
+#include <jpeglib.h>
 
 struct mydata_decomp
 {

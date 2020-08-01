@@ -18,16 +18,16 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #ifdef _WIN32
-#	define SEC_ENTRY __stdcall
-#	define SSPI_EXPORT __declspec(dllexport)
+#define SEC_ENTRY __stdcall
+#define SSPI_EXPORT __declspec(dllexport)
 #else
-#	include <winpr/winpr.h>
-#	define SEC_ENTRY
-#	define SSPI_EXPORT WINPR_API
+#include <winpr/winpr.h>
+#define SEC_ENTRY
+#define SSPI_EXPORT WINPR_API
 #endif
 
 #ifdef _WIN32

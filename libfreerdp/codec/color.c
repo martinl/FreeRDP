@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -34,11 +34,11 @@
 #include <freerdp/primitives.h>
 
 #if defined(CAIRO_FOUND)
-#	include <cairo.h>
+#include <cairo.h>
 #endif
 
 #if defined(SWSCALE_FOUND)
-#	include <libswscale/swscale.h>
+#include <libswscale/swscale.h>
 #endif
 
 #define TAG FREERDP_TAG("color")
@@ -208,37 +208,37 @@ BOOL freerdp_image_copy_from_icon_data(BYTE* pDstData, UINT32 DstFormat, UINT32 
 	 */
 	switch (bpp)
 	{
-	case 1:
-	case 4:
-		/*
-		 * These formats are not supported by freerdp_image_copy().
-		 * PIXEL_FORMAT_MONO and PIXEL_FORMAT_A4 are *not* correct
-		 * color formats for this. Please fix freerdp_image_copy()
-		 * if you came here to fix a broken icon of some weird app
-		 * that still uses 1 or 4bpp format in the 21st century.
-		 */
-		WLog_WARN(TAG, "1bpp and 4bpp icons are not supported");
-		return FALSE;
+		case 1:
+		case 4:
+			/*
+			 * These formats are not supported by freerdp_image_copy().
+			 * PIXEL_FORMAT_MONO and PIXEL_FORMAT_A4 are *not* correct
+			 * color formats for this. Please fix freerdp_image_copy()
+			 * if you came here to fix a broken icon of some weird app
+			 * that still uses 1 or 4bpp format in the 21st century.
+			 */
+			WLog_WARN(TAG, "1bpp and 4bpp icons are not supported");
+			return FALSE;
 
-	case 8:
-		format = PIXEL_FORMAT_RGB8;
-		break;
+		case 8:
+			format = PIXEL_FORMAT_RGB8;
+			break;
 
-	case 16:
-		format = PIXEL_FORMAT_RGB15;
-		break;
+		case 16:
+			format = PIXEL_FORMAT_RGB15;
+			break;
 
-	case 24:
-		format = PIXEL_FORMAT_RGB24;
-		break;
+		case 24:
+			format = PIXEL_FORMAT_RGB24;
+			break;
 
-	case 32:
-		format = PIXEL_FORMAT_BGRA32;
-		break;
+		case 32:
+			format = PIXEL_FORMAT_BGRA32;
+			break;
 
-	default:
-		WLog_WARN(TAG, "invalid icon bpp: %d", bpp);
-		return FALSE;
+		default:
+			WLog_WARN(TAG, "invalid icon bpp: %d", bpp);
+			return FALSE;
 	}
 
 	fill_gdi_palette_for_icon(colorTable, cbColorTable, &palette);
@@ -338,152 +338,49 @@ BOOL freerdp_image_copy_from_pointer_data(BYTE* pDstData, UINT32 DstFormat, UINT
 
 	switch (xorBpp)
 	{
-	case 1:
-		if (!andMask || (andMaskLength == 0))
-			return FALSE;
+		case 1:
+			if (!andMask || (andMaskLength == 0))
+				return FALSE;
 
-		xorStep = (nWidth + 7) / 8;
-		xorStep += (xorStep % 2);
+			xorStep = (nWidth + 7) / 8;
+			xorStep += (xorStep % 2);
 
-		if (xorStep * nHeight > xorMaskLength)
-			return FALSE;
+			if (xorStep * nHeight > xorMaskLength)
+				return FALSE;
 
-		if (andStep * nHeight > andMaskLength)
-			return FALSE;
-
-		for (y = 0; y < nHeight; y++)
-		{
-			const BYTE* andBits;
-			const BYTE* xorBits;
-			BYTE* pDstPixel =
-			    &pDstData[((nYDst + y) * nDstStep) + (nXDst * GetBytesPerPixel(DstFormat))];
-			xorBit = andBit = 0x80;
-
-			if (!vFlip)
-			{
-				xorBits = &xorMask[xorStep * y];
-				andBits = &andMask[andStep * y];
-			}
-			else
-			{
-				xorBits = &xorMask[xorStep * (nHeight - y - 1)];
-				andBits = &andMask[andStep * (nHeight - y - 1)];
-			}
-
-			for (x = 0; x < nWidth; x++)
-			{
-				UINT32 color = 0;
-				xorPixel = (*xorBits & xorBit) ? 1 : 0;
-
-				if (!(xorBit >>= 1))
-				{
-					xorBits++;
-					xorBit = 0x80;
-				}
-
-				andPixel = (*andBits & andBit) ? 1 : 0;
-
-				if (!(andBit >>= 1))
-				{
-					andBits++;
-					andBit = 0x80;
-				}
-
-				if (!andPixel && !xorPixel)
-					color = FreeRDPGetColor(DstFormat, 0, 0, 0, 0xFF); /* black */
-				else if (!andPixel && xorPixel)
-					color = FreeRDPGetColor(DstFormat, 0xFF, 0xFF, 0xFF, 0xFF); /* white */
-				else if (andPixel && !xorPixel)
-					color = FreeRDPGetColor(DstFormat, 0, 0, 0, 0); /* transparent */
-				else if (andPixel && xorPixel)
-					color = freerdp_image_inverted_pointer_color(x, y, DstFormat); /* inverted */
-
-				WriteColor(pDstPixel, DstFormat, color);
-				pDstPixel += GetBytesPerPixel(DstFormat);
-			}
-		}
-
-		return TRUE;
-
-	case 8:
-	case 16:
-	case 24:
-	case 32:
-	{
-		UINT32 xorBytesPerPixel = xorBpp >> 3;
-		xorStep = nWidth * xorBytesPerPixel;
-
-		if (xorBpp == 8 && !palette)
-		{
-			WLog_ERR(TAG, "null palette in conversion from %" PRIu32 " bpp to %" PRIu32 " bpp",
-			         xorBpp, dstBitsPerPixel);
-			return FALSE;
-		}
-
-		if (xorStep * nHeight > xorMaskLength)
-			return FALSE;
-
-		if (andMask)
-		{
 			if (andStep * nHeight > andMaskLength)
 				return FALSE;
-		}
 
-		for (y = 0; y < nHeight; y++)
-		{
-			const BYTE* xorBits;
-			const BYTE* andBits = NULL;
-			BYTE* pDstPixel =
-			    &pDstData[((nYDst + y) * nDstStep) + (nXDst * GetBytesPerPixel(DstFormat))];
-			andBit = 0x80;
-
-			if (!vFlip)
+			for (y = 0; y < nHeight; y++)
 			{
-				if (andMask)
+				const BYTE* andBits;
+				const BYTE* xorBits;
+				BYTE* pDstPixel =
+				    &pDstData[((nYDst + y) * nDstStep) + (nXDst * GetBytesPerPixel(DstFormat))];
+				xorBit = andBit = 0x80;
+
+				if (!vFlip)
+				{
+					xorBits = &xorMask[xorStep * y];
 					andBits = &andMask[andStep * y];
-
-				xorBits = &xorMask[xorStep * y];
-			}
-			else
-			{
-				if (andMask)
-					andBits = &andMask[andStep * (nHeight - y - 1)];
-
-				xorBits = &xorMask[xorStep * (nHeight - y - 1)];
-			}
-
-			for (x = 0; x < nWidth; x++)
-			{
-				UINT32 pixelFormat;
-				UINT32 color;
-
-				if (xorBpp == 32)
-				{
-					pixelFormat = PIXEL_FORMAT_BGRA32;
-					xorPixel = ReadColor(xorBits, pixelFormat);
-				}
-				else if (xorBpp == 16)
-				{
-					pixelFormat = PIXEL_FORMAT_RGB15;
-					xorPixel = ReadColor(xorBits, pixelFormat);
-				}
-				else if (xorBpp == 8)
-				{
-					pixelFormat = palette->format;
-					xorPixel = palette->palette[xorBits[0]];
 				}
 				else
 				{
-					pixelFormat = PIXEL_FORMAT_BGR24;
-					xorPixel = ReadColor(xorBits, pixelFormat);
+					xorBits = &xorMask[xorStep * (nHeight - y - 1)];
+					andBits = &andMask[andStep * (nHeight - y - 1)];
 				}
 
-				xorPixel = FreeRDPConvertColor(xorPixel, pixelFormat, PIXEL_FORMAT_ARGB32, palette);
-				xorBits += xorBytesPerPixel;
-				andPixel = 0;
-
-				if (andMask)
+				for (x = 0; x < nWidth; x++)
 				{
+					UINT32 color = 0;
+					xorPixel = (*xorBits & xorBit) ? 1 : 0;
+
+					if (!(xorBit >>= 1))
+					{
+						xorBits++;
+						xorBit = 0x80;
+					}
+
 					andPixel = (*andBits & andBit) ? 1 : 0;
 
 					if (!(andBit >>= 1))
@@ -491,29 +388,135 @@ BOOL freerdp_image_copy_from_pointer_data(BYTE* pDstData, UINT32 DstFormat, UINT
 						andBits++;
 						andBit = 0x80;
 					}
-				}
 
-				if (andPixel)
-				{
-					if (xorPixel == 0xFF000000) /* black -> transparent */
-						xorPixel = 0x00000000;
-					else if (xorPixel == 0xFFFFFFFF) /* white -> inverted */
-						xorPixel = freerdp_image_inverted_pointer_color(x, y, PIXEL_FORMAT_ARGB32);
-				}
+					if (!andPixel && !xorPixel)
+						color = FreeRDPGetColor(DstFormat, 0, 0, 0, 0xFF); /* black */
+					else if (!andPixel && xorPixel)
+						color = FreeRDPGetColor(DstFormat, 0xFF, 0xFF, 0xFF, 0xFF); /* white */
+					else if (andPixel && !xorPixel)
+						color = FreeRDPGetColor(DstFormat, 0, 0, 0, 0); /* transparent */
+					else if (andPixel && xorPixel)
+						color =
+						    freerdp_image_inverted_pointer_color(x, y, DstFormat); /* inverted */
 
-				color = FreeRDPConvertColor(xorPixel, PIXEL_FORMAT_ARGB32, DstFormat, palette);
-				WriteColor(pDstPixel, DstFormat, color);
-				pDstPixel += GetBytesPerPixel(DstFormat);
+					WriteColor(pDstPixel, DstFormat, color);
+					pDstPixel += GetBytesPerPixel(DstFormat);
+				}
 			}
+
+			return TRUE;
+
+		case 8:
+		case 16:
+		case 24:
+		case 32:
+		{
+			UINT32 xorBytesPerPixel = xorBpp >> 3;
+			xorStep = nWidth * xorBytesPerPixel;
+
+			if (xorBpp == 8 && !palette)
+			{
+				WLog_ERR(TAG, "null palette in conversion from %" PRIu32 " bpp to %" PRIu32 " bpp",
+				         xorBpp, dstBitsPerPixel);
+				return FALSE;
+			}
+
+			if (xorStep * nHeight > xorMaskLength)
+				return FALSE;
+
+			if (andMask)
+			{
+				if (andStep * nHeight > andMaskLength)
+					return FALSE;
+			}
+
+			for (y = 0; y < nHeight; y++)
+			{
+				const BYTE* xorBits;
+				const BYTE* andBits = NULL;
+				BYTE* pDstPixel =
+				    &pDstData[((nYDst + y) * nDstStep) + (nXDst * GetBytesPerPixel(DstFormat))];
+				andBit = 0x80;
+
+				if (!vFlip)
+				{
+					if (andMask)
+						andBits = &andMask[andStep * y];
+
+					xorBits = &xorMask[xorStep * y];
+				}
+				else
+				{
+					if (andMask)
+						andBits = &andMask[andStep * (nHeight - y - 1)];
+
+					xorBits = &xorMask[xorStep * (nHeight - y - 1)];
+				}
+
+				for (x = 0; x < nWidth; x++)
+				{
+					UINT32 pixelFormat;
+					UINT32 color;
+
+					if (xorBpp == 32)
+					{
+						pixelFormat = PIXEL_FORMAT_BGRA32;
+						xorPixel = ReadColor(xorBits, pixelFormat);
+					}
+					else if (xorBpp == 16)
+					{
+						pixelFormat = PIXEL_FORMAT_RGB15;
+						xorPixel = ReadColor(xorBits, pixelFormat);
+					}
+					else if (xorBpp == 8)
+					{
+						pixelFormat = palette->format;
+						xorPixel = palette->palette[xorBits[0]];
+					}
+					else
+					{
+						pixelFormat = PIXEL_FORMAT_BGR24;
+						xorPixel = ReadColor(xorBits, pixelFormat);
+					}
+
+					xorPixel =
+					    FreeRDPConvertColor(xorPixel, pixelFormat, PIXEL_FORMAT_ARGB32, palette);
+					xorBits += xorBytesPerPixel;
+					andPixel = 0;
+
+					if (andMask)
+					{
+						andPixel = (*andBits & andBit) ? 1 : 0;
+
+						if (!(andBit >>= 1))
+						{
+							andBits++;
+							andBit = 0x80;
+						}
+					}
+
+					if (andPixel)
+					{
+						if (xorPixel == 0xFF000000) /* black -> transparent */
+							xorPixel = 0x00000000;
+						else if (xorPixel == 0xFFFFFFFF) /* white -> inverted */
+							xorPixel =
+							    freerdp_image_inverted_pointer_color(x, y, PIXEL_FORMAT_ARGB32);
+					}
+
+					color = FreeRDPConvertColor(xorPixel, PIXEL_FORMAT_ARGB32, DstFormat, palette);
+					WriteColor(pDstPixel, DstFormat, color);
+					pDstPixel += GetBytesPerPixel(DstFormat);
+				}
+			}
+
+			return TRUE;
 		}
 
-		return TRUE;
-	}
-
-	default:
-		WLog_ERR(TAG, "failed to convert from %" PRIu32 " bpp to %" PRIu32 " bpp", xorBpp,
-		         dstBitsPerPixel);
-		return FALSE;
+		default:
+			WLog_ERR(TAG, "failed to convert from %" PRIu32 " bpp to %" PRIu32 " bpp", xorBpp,
+			         dstBitsPerPixel);
+			return FALSE;
 	}
 }
 
@@ -687,20 +690,20 @@ static int av_format_for_buffer(UINT32 format)
 {
 	switch (format)
 	{
-	case PIXEL_FORMAT_ARGB32:
-		return AV_PIX_FMT_BGRA;
+		case PIXEL_FORMAT_ARGB32:
+			return AV_PIX_FMT_BGRA;
 
-	case PIXEL_FORMAT_XRGB32:
-		return AV_PIX_FMT_BGR0;
+		case PIXEL_FORMAT_XRGB32:
+			return AV_PIX_FMT_BGR0;
 
-	case PIXEL_FORMAT_BGRA32:
-		return AV_PIX_FMT_RGBA;
+		case PIXEL_FORMAT_BGRA32:
+			return AV_PIX_FMT_RGBA;
 
-	case PIXEL_FORMAT_BGRX32:
-		return AV_PIX_FMT_RGB0;
+		case PIXEL_FORMAT_BGRX32:
+			return AV_PIX_FMT_RGB0;
 
-	default:
-		return AV_PIX_FMT_NONE;
+		default:
+			return AV_PIX_FMT_NONE;
 	}
 }
 #endif

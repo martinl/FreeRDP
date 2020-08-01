@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #include "buildflags.h"
@@ -33,7 +33,7 @@
 #include <winpr/wlog.h>
 
 #if !defined(WIN32)
-#	include <pthread.h>
+#include <pthread.h>
 #endif
 
 void winpr_get_version(int* major, int* minor, int* revision)
